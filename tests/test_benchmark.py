@@ -44,7 +44,8 @@ class BenchmarkTests(unittest.TestCase):
         ])
         self.assertEqual(result["provider_mode"], "local-fake")
         self.assertEqual(result["evaluation"]["harbor_errors"], [])
-        self.assertTrue(result["final_submission"]["eligible"])
+        self.assertFalse(result["final_submission"]["eligible"])
+        self.assertIsNone(result["evaluation"]["score"])
 
     def test_protocol_freezes_verifier_and_hides_test(self):
         spec = BenchmarkSpec()

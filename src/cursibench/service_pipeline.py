@@ -54,7 +54,7 @@ class LocalE2B:
 
 class LocalHarbor:
     def evaluate(self, dataset: str, model_path: str, config: RunConfig) -> dict[str, Any]:
-        return {"dataset": dataset, "model_path": model_path, "score": 1.0, "harbor_errors": []}
+        return {"dataset": dataset, "model_path": model_path, "score": None, "harbor_errors": [], "evidence_kind": "simulation"}
 
 
 def run_service_chain(
@@ -97,7 +97,7 @@ def run_service_chain(
         "attempt_id": f"attempt-{len(train_messages)}",
         "checkpoint": checkpoint,
         "harbor": evaluation,
-        "status": "scored" if not evaluation.get("harbor_errors") else "scored_with_errors",
+        "status": "unverified",
     }
     (out / "scored_attempt.json").write_text(
         json.dumps(scored_attempt, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -106,7 +106,8 @@ def run_service_chain(
         "selected_attempt": scored_attempt["attempt_id"],
         "model_path": checkpoint,
         "score": evaluation.get("score"),
-        "eligible": not bool(evaluation.get("harbor_errors")),
+        "eligible": False,
+        "reason": "No independently verified external evaluation evidence",
     }
     (out / "final_submission.json").write_text(
         json.dumps(final_submission, indent=2, ensure_ascii=False), encoding="utf-8"

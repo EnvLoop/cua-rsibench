@@ -1,0 +1,193 @@
+{
+  "model": "gpt-5.6-sol",
+  "environment": "synthetic expense app in real Chrome",
+  "action_space": "DOM selectors, not pixel-only",
+  "events": [
+    {
+      "step": 0,
+      "screenshot": "00.png",
+      "observation": {
+        "visible_text": "CUA-RSIBENCH / SYNTHETIC BROWSER ENVIRONMENT\nExpense review\n\nUpdate the status and select Save changes. Changes persist only after saving.\n\nID\tOwner\tAmount\tCurrency\tStatus\nEXP-104\tLin\t1200\tCNY\t\nPending\nApproved\nRejected\n\nEXP-140\tLin\t1200\tUSD\t\nPending\nApproved\nRejected\n\nEXP-109\tMei\t350\tCNY\t\nPending\nApproved\nRejected\nSave changes",
+        "selects": [
+          {
+            "selector": "select[data-id=\"EXP-104\"]",
+            "value": "Pending",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-140\"]",
+            "value": "Pending",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-109\"]",
+            "value": "Approved",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          }
+        ],
+        "buttons": [
+          {
+            "selector": "button[data-action=\"save\"]",
+            "text": "Save changes"
+          }
+        ]
+      },
+      "model_output": "{\"action\":\"select\",\"selector\":\"select[data-id=\\\"EXP-140\\\"]\",\"value\":\"Rejected\"}",
+      "result": "executed"
+    },
+    {
+      "step": 1,
+      "screenshot": "01.png",
+      "observation": {
+        "visible_text": "CUA-RSIBENCH / SYNTHETIC BROWSER ENVIRONMENT\nExpense review\n\nUpdate the status and select Save changes. Changes persist only after saving.\n\nID\tOwner\tAmount\tCurrency\tStatus\nEXP-104\tLin\t1200\tCNY\t\nPending\nApproved\nRejected\n\nEXP-140\tLin\t1200\tUSD\t\nPending\nApproved\nRejected\n\nEXP-109\tMei\t350\tCNY\t\nPending\nApproved\nRejected\nSave changes",
+        "selects": [
+          {
+            "selector": "select[data-id=\"EXP-104\"]",
+            "value": "Pending",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-140\"]",
+            "value": "Rejected",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-109\"]",
+            "value": "Approved",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          }
+        ],
+        "buttons": [
+          {
+            "selector": "button[data-action=\"save\"]",
+            "text": "Save changes"
+          }
+        ]
+      },
+      "model_output": "{\"action\":\"click\",\"selector\":\"button[data-action=\\\"save\\\"]\"}",
+      "result": "executed"
+    },
+    {
+      "step": 2,
+      "screenshot": "02.png",
+      "observation": {
+        "visible_text": "CUA-RSIBENCH / SYNTHETIC BROWSER ENVIRONMENT\nExpense review\n\nUpdate the status and select Save changes. Changes persist only after saving.\n\nID\tOwner\tAmount\tCurrency\tStatus\nEXP-104\tLin\t1200\tCNY\t\nPending\nApproved\nRejected\n\nEXP-140\tLin\t1200\tUSD\t\nPending\nApproved\nRejected\n\nEXP-109\tMei\t350\tCNY\t\nPending\nApproved\nRejected\nSave changes\n\nChanges saved",
+        "selects": [
+          {
+            "selector": "select[data-id=\"EXP-104\"]",
+            "value": "Pending",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-140\"]",
+            "value": "Rejected",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          },
+          {
+            "selector": "select[data-id=\"EXP-109\"]",
+            "value": "Approved",
+            "options": [
+              "Pending",
+              "Approved",
+              "Rejected"
+            ]
+          }
+        ],
+        "buttons": [
+          {
+            "selector": "button[data-action=\"save\"]",
+            "text": "Save changes"
+          }
+        ]
+      },
+      "model_output": "{\"action\":\"done\"}",
+      "result": "done"
+    }
+  ],
+  "initial": [
+    {
+      "id": "EXP-104",
+      "owner": "Lin",
+      "amount": 1200,
+      "currency": "CNY",
+      "status": "Pending"
+    },
+    {
+      "id": "EXP-140",
+      "owner": "Lin",
+      "amount": 1200,
+      "currency": "USD",
+      "status": "Pending"
+    },
+    {
+      "id": "EXP-109",
+      "owner": "Mei",
+      "amount": 350,
+      "currency": "CNY",
+      "status": "Approved"
+    }
+  ],
+  "final": [
+    {
+      "id": "EXP-104",
+      "owner": "Lin",
+      "amount": 1200,
+      "currency": "CNY",
+      "status": "Pending"
+    },
+    {
+      "id": "EXP-140",
+      "owner": "Lin",
+      "amount": 1200,
+      "currency": "USD",
+      "status": "Rejected"
+    },
+    {
+      "id": "EXP-109",
+      "owner": "Mei",
+      "amount": 350,
+      "currency": "CNY",
+      "status": "Approved"
+    }
+  ],
+  "verification": {
+    "success": true,
+    "evidence_kind": "browser_persisted_state",
+    "side_effect_free": true
+  },
+  "infrastructure_error": null,
+  "elapsed_seconds": 35.21947700000601,
+  "official_benchmark": false
+}

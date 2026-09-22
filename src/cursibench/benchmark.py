@@ -36,6 +36,8 @@ def run_benchmark(rounds: int = 5) -> dict:
     a0_acceptance, _ = score(acceptance, "naive", spec.repeats)
     a0_test, _ = score(test, "naive", spec.repeats)
     current = Candidate("A0", "naive")
+    incumbent_train = a0_train
+    incumbent_anchors = a0_acceptance
     history: list[Round] = []
     ledger = Ledger("local-run", spec.to_dict())
     for number in range(1, rounds + 1):
@@ -44,20 +46,25 @@ def run_benchmark(rounds: int = 5) -> dict:
         candidate = Candidate(f"A{number}", "scoped")
         candidate_train, trajectories = score(train, candidate.policy, spec.repeats)
         anchors, _ = score(acceptance, candidate.policy, spec.repeats)
-        accepted = candidate_train > a0_train and anchors >= a0_acceptance
+        accepted = candidate_train > incumbent_train and anchors >= incumbent_anchors
         reason = "train improvement and anchor preserved" if accepted else "rejected by train gate"
         history.append(Round(number, candidate.name, accepted, candidate_train, reason))
         ledger.append_attempt({"round": number, "candidate": candidate.name, "train_avg_at_3": candidate_train, "acceptance_avg_at_3": anchors, "accepted": accepted})
         if accepted:
+            parent = current.name
             current = candidate
+            incumbent_train = candidate_train
+            incumbent_anchors = anchors
             ledger.candidate = candidate.name
-            ledger.parent = "A0"
+            ledger.parent = parent
             ledger.changed_modules = ["workflow", "skills"]
-            break
-        ledger.rejected_candidates.append(candidate.name)
+        else:
+            ledger.rejected_candidates.append(candidate.name)
     final_test, final_trajectories = score(test, current.policy, spec.repeats)
     passed = final_test > a0_test and all(not t.errors for t in final_trajectories)
     return {
+        "evidence_kind": "deterministic_fixture_only",
+        "official_submission_eligible": False,
         "spec": spec.to_dict(),
         "splits": {"train": len(train), "acceptance_anchors": len(acceptance), "test_hidden": len(test)},
         "controls": list(spec.controls),

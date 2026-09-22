@@ -1,52 +1,40 @@
-# CUA-RSIBench
+# CUA-RSIBench — work in progress
 
-CUA-RSIBench is a small, runnable benchmark for recursive improvement of computer-use agent harnesses.
-It copies the important RSIBench boundary: model and evaluation stay fixed while an agent may improve
-the harness that plans and executes UI actions. The repository deliberately uses a deterministic document
-workspace so the benchmark can be self-tested without a paid GUI service. The same task contract can later
-be backed by PowerPoint Online, WPS, a desktop VM, or BrowserGym.
+An experimental computer-use benchmark inspired by RSIBench-Data. **The full benchmark is not implemented or validated yet.** No recursive improvement or leaderboard result is claimed.
 
-## What is included
+## Current evidence
 
-- resettable task fixtures with visible state and hidden expected state;
-- an independent verifier that checks intended edits and unintended mutations;
-- a baseline harness and a robust candidate harness;
-- a five-round RSI loop with train-side acceptance and held-out test evaluation;
-- an RSIBench-Data-shaped service chain: `data-generation agent -> JSONL -> Tinker -> E2B -> Harbor -> submission`,
-  with deterministic local providers for CI;
-- CLI commands and tests that verify the complete loop.
+- Legacy deterministic document fixtures and integrity regression tests.
+- A real Chrome runner for a synthetic expense-review application, with model-driven DOM actions, clean browser contexts, screenshot traces, reload-before-verification and exact final-state checks.
+- AgentRouterHub Responses API support for `gpt-6-astra` and `gpt-5.6-sol`.
+- Service-chain mocks for development only. Mock scores are null and cannot qualify for final submission.
 
 ## Run
 
-```bash
+Install the package and browser extra in a virtual environment:
+
+```sh
+pip install -e '.[browser]'
 python -m unittest discover -s tests -v
-python -m cursibench --rounds 5
-python - <<'PY'
-from cursibench.service_pipeline import run_service_chain
-print(run_service_chain("artifacts/local-smoke", [{"messages": [{"role": "user", "content": "edit slide"}]}]))
-PY
+python -m cursibench.browser_trial --out work/browser-run --model gpt-5.6-sol
 ```
 
-The CLI prints the initial score, each accepted/rejected candidate, the final hidden score, and `PASS`
-only when the final candidate improves the hidden split without regression.
+The browser runner requires installed Google Chrome. Set `OPENAI_API_KEY` and `OPENAI_BASE_URL` outside the repository. Never commit keys or raw provider responses containing private configuration.
 
-## Contract for a real GUI adapter
+Browser actions currently use visible DOM selectors. This is a synthetic browser-use integration check, not pixel-only computer use, real enterprise-app evaluation, a held-out benchmark, or an RSI experiment.
 
-An adapter only needs to implement `reset(task_id)`, `observe()`, `act(action)`, and `snapshot()`.
-The verifier must read the saved artifact independently of the agent process. GUI screenshots are evidence,
-not the authority: the authority is the parsed application state plus explicit integrity checks.
+## Remaining requirements
 
-For the Tinker/E2B/Harbor-shaped format and real-provider adapter boundary, see
-[`docs/RSIBENCH_DATA_FORMAT.md`](docs/RSIBENCH_DATA_FORMAT.md). The local chain is intentionally marked
-`provider_mode: local-fake`; it must never be reported as a paid external run.
+1. Real application task families and source-artifact/template-disjoint splits.
+2. Enforced wall-time, token and monetary budgets plus complete provider accounting.
+3. Model-generated, inherited harness proposals and independent acceptance evaluation.
+4. Verifier/test assets isolated from editable agent code, with host-side result integrity.
+5. Matched frozen/nonrecursive controls, independent seeds, confidence intervals and ablations.
+6. Actual Tinker training/checkpoints, E2B lifecycle and Harbor evaluation integration.
+7. A technical report and visualizations tied to auditable run artifacts.
 
-The complete computer-use task/reset/verifier contract is in
-[`docs/COMPUTER_USE_TASK_SPEC.md`](docs/COMPUTER_USE_TASK_SPEC.md), and the Astra/Sol provider choices and
-observed preflight status are in [`docs/MODEL_SELECTION.md`](docs/MODEL_SELECTION.md).
+The legacy `python -m cursibench` command is only a deterministic regression fixture. Its five iterations reuse a hand-written candidate; its score is not evidence of learning. Test assets in this repository are public and not sealed. Configuration fields do not constitute runtime enforcement. Documentation under `docs/` describes the target design, not an implemented production system.
 
-## RSI boundary
+## Browser smoke evidence
 
-The benchmark freezes tasks, verifier, budgets, and the environment contract. The mutable object is the
-harness policy. Train trajectories are available to the improvement loop; hidden test state is not.
-Accepted candidates are inherited, rejected candidates are retained for audit, and the historical best is
-never discarded.
+On 2026-09-23 both Astra and Sol completed one synthetic expense task through real Chrome. Persisted state was checked after reload; unrelated records were unchanged. See [traces and screenshots](docs/evidence/browser-smoke/). These are single integration trials, not comparable performance measurements or RSI results.

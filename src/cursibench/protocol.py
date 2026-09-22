@@ -31,6 +31,8 @@ def validate_spec(spec: BenchmarkSpec) -> None:
         raise ValueError("rounds must be positive")
     if set(spec.frozen_surfaces) & set(spec.editable_surfaces):
         raise ValueError("frozen and editable surfaces overlap")
+    if spec.test_visible_to_improver:
+        raise ValueError("test must not be visible to improver")
     if "verifier" not in spec.frozen_surfaces:
         raise ValueError("verifier must remain fixed")
 

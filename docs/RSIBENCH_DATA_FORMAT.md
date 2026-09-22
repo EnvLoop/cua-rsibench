@@ -8,7 +8,7 @@ The benchmark has two separable tracks:
 
 For a defensible computer-use result, the protocol also needs task-template/application split isolation,
 `avg@3` repeats, non-recursive controls, append-only lineage and cost accounting. The local
-`BenchmarkSpec` and `Ledger` implement those metadata contracts even though the included fixture is small.
+`BenchmarkSpec` and `Ledger` currently describe those fields only. They do not enforce isolation, execute controls, provide append-only storage, or measure costs.
 
 The second track follows this fixed chain:
 
