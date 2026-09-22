@@ -40,6 +40,10 @@ For the Tinker/E2B/Harbor-shaped format and real-provider adapter boundary, see
 [`docs/RSIBENCH_DATA_FORMAT.md`](docs/RSIBENCH_DATA_FORMAT.md). The local chain is intentionally marked
 `provider_mode: local-fake`; it must never be reported as a paid external run.
 
+The complete computer-use task/reset/verifier contract is in
+[`docs/COMPUTER_USE_TASK_SPEC.md`](docs/COMPUTER_USE_TASK_SPEC.md), and the Astra/Sol provider choices and
+observed preflight status are in [`docs/MODEL_SELECTION.md`](docs/MODEL_SELECTION.md).
+
 ## RSI boundary
 
 The benchmark freezes tasks, verifier, budgets, and the environment contract. The mutable object is the

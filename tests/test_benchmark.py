@@ -6,6 +6,8 @@ from cursibench.harness import run_harness
 from cursibench.tasks import make_tasks
 from cursibench.verifier import verify
 from cursibench.service_pipeline import run_service_chain
+from cursibench.protocol import BenchmarkSpec, validate_spec
+from cursibench.agentrouter import MODEL_CHOICES
 
 
 class BenchmarkTests(unittest.TestCase):
@@ -43,6 +45,14 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(result["provider_mode"], "local-fake")
         self.assertEqual(result["evaluation"]["harbor_errors"], [])
         self.assertTrue(result["final_submission"]["eligible"])
+
+    def test_protocol_freezes_verifier_and_hides_test(self):
+        spec = BenchmarkSpec()
+        validate_spec(spec)
+        self.assertEqual(spec.repeats, 3)
+        self.assertFalse(spec.test_visible_to_improver)
+        self.assertIn("verifier", spec.frozen_surfaces)
+        self.assertEqual(MODEL_CHOICES, ("gpt-6-astra", "gpt-5.6-sol"))
 
 
 if __name__ == "__main__":

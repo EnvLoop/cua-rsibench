@@ -6,6 +6,10 @@ The benchmark has two separable tracks:
 2. **Data RSI** changes `train_messages.jsonl` and bounded training configuration while the target
    model, serving path, sandbox and evaluator stay fixed.
 
+For a defensible computer-use result, the protocol also needs task-template/application split isolation,
+`avg@3` repeats, non-recursive controls, append-only lineage and cost accounting. The local
+`BenchmarkSpec` and `Ledger` implement those metadata contracts even though the included fixture is small.
+
 The second track follows this fixed chain:
 
 ```text

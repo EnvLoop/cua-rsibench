@@ -17,6 +17,7 @@ def make_tasks() -> list[Task]:
         ("sales-q3", "Update the Q3 KPI on slide s1 to 140.", 100, 120, 140),
         ("sales-q2", "Update the Q2 KPI on slide s1 to 130.", 100, 130, 125),
         ("sales-q1", "Update the Q1 KPI on slide s1 to 110.", 110, 120, 125),
+        ("sales-anchor", "Update the Q3 KPI on slide s1 to 125.", 100, 120, 125),
         ("risk-note", "Change the note on slide s1 to 'external'.", 100, 120, 125),
     ]
     tasks: list[Task] = []
@@ -29,6 +30,6 @@ def make_tasks() -> list[Task]:
             target["kpis"][f"Q{period}"] = {"1": q1, "2": q2, "3": q3}[period]
         else:
             target["note"] = "external"
-        split = "train" if i < 2 else "test"
+        split = "train" if i < 2 else ("acceptance" if i == 2 else "test")
         tasks.append(Task(name, split, instruction, initial, expected))
     return tasks
