@@ -21,7 +21,7 @@ def export(study,destination):
                     if action.get('type')=='write' and reply.get('written'):
                         saved[action['path']]={'path':action['path'],'content':action['content'],'sha256':reply['sha256']}
                 files=list(saved.values());origin='controller-recorded source writes; complete historical snapshot unavailable'
-            row={'researcher':name,'round':number,'origin':origin,'files':[]}
+            row={'researcher':name,'researcher_model':study_roster(study)[name],'round':number,'origin':origin,'files':[]}
             for entry in sorted(files,key=lambda x:x['path']):
                 relative=Path(entry['path'])
                 if relative.suffix!='.py':continue

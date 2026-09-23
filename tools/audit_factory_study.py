@@ -1,6 +1,7 @@
 """Export allowlisted study evidence; never export provider envelopes or checkpoint IDs."""
 import argparse
 import hashlib
+import collections
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,6 +86,12 @@ def audit(study):
             number=int(record['attempt_id'].split('-')[-1]);factory_root=study/state['protocol']['factory_directory'] if state['protocol'].get('factory_directory') else ROOT/'work';factory=factory_root/f'factory-{name}-{number:02}'
             fr=read(factory/'result.json');verify_factory_identity(factory,model,manifest.get('teacher','gpt-5.6-sol'));corpus,_,incomplete=restore_corpus(factory,registry)
             if incomplete:raise ValueError('unresolved teacher episode')
+            receipt_counts=collections.Counter()
+            for receipt_path in (factory/'controller').glob('researcher-receipt-*.json'):
+                receipt=read(receipt_path)
+                if receipt.get('requested_model')!=model or receipt.get('reported_model')!=model:
+                    raise ValueError('researcher provider receipt identity differs from declared model')
+                receipt_counts[(receipt['requested_model'],receipt['reported_model'],receipt.get('status'))]+=1
             histories=read(factory/'research-history.json')
             events=[h for h in histories if h['action'].get('type')=='rollout']
             new_episodes=[]
@@ -94,10 +101,13 @@ def audit(study):
                     p=factory/'controller'/eid;r=read(p/'result.json');case=read(p/'case.json')
                     new_episodes.append({'episode':eid,'mode':case['kind'],'steps':r['steps'],
                         'success':r['verification'].get('success'),'infrastructure_error':r.get('infrastructure_error'),
-                        'sandbox_destroyed':r.get('sandbox_destroyed'),'result_sha256':sha(p/'result.json')})
+                        'sandbox_destroyed':r.get('sandbox_destroyed'),'result_sha256':sha(p/'result.json'),
+                        'available_receipts':len(read(p/'receipts.json')) if (p/'receipts.json').exists() else 0,
+                        'terminal_error_receipt_available':any(x.get('error') for x in read(p/'receipts.json')) if r.get('infrastructure_error') and (p/'receipts.json').exists() else None})
             campaign['factories'].append({'round':number,'complete':fr['complete'],'research_turns':fr['research_turns'],
                 'resources':fr['budget']['reserved'],'resource_limits':fr['budget']['limits'],
                 'verified_episodes_available':len(corpus.episodes),'new_episodes':new_episodes,
+                'model_receipts':[{'requested_model':k[0],'reported_model':k[1],'status':k[2],'count':v} for k,v in sorted(receipt_counts.items())],
                 'wall_seconds':fr.get('wall_elapsed_seconds',fr['elapsed_seconds']),
                 'history_sha256':sha(factory/'research-history.json')})
             row={'round':number,'dataset_sha256':record['dataset_hash'],'training_tokens':record['training_tokens'],

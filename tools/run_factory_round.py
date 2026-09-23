@@ -51,6 +51,15 @@ def run(study,name,number):
     command=[sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--feedback',str(feedback_path)]
     if parent:command+=['--parent',str(parent)]
     child(command,work,name+'-factory')
+    finish_submission(study,name,number,factory)
+
+
+def finish_submission(study,name,number,factory):
+    study=Path(study).resolve();factory=Path(factory).resolve()
+    registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
+    if state['final_selection'] is not None or number!=len(state['attempts'])+1:raise ValueError('submission is not the next open research round')
+    if f'round-{number}' in state['reservations']:raise ValueError('training already reserved; inspect its actual phase before recovery')
+    work=study/f'round-{number}'
     factory_result=json.loads((factory/'result.json').read_text())
     if not factory_result.get('complete'):
         report={'accepted':False,'reason':'research round ended without a verified submission','research_turns':factory_result['research_turns']}
