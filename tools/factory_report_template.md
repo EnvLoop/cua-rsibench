@@ -108,6 +108,8 @@ Each cohort is small: one application, three task families, one research seed pe
 
 A larger final suite, multiple research seeds, and an equal-budget non-adaptive control are needed to attribute gains to feedback-driven research. The controller's no-regression promotion rule is narrower than unrestricted researcher checkpoint selection. Successful teacher demonstrations and larger datasets do not themselves establish student gains. Related direct-actor calibration in v0.4 establishes limited native-workflow solvability, not student calibration on every new instance.
 
+The researcher interface also affects outcomes. In Luna 6's fifth round, 11 replies contained an English prose preamble followed by a syntactically valid, allowed JSON action. These violated the fixed requirement to return exactly JSON. Clean fenced JSON is accepted by the parser; prose is not stripped. All 20 provider receipts reported completion, and the rejected replies used 112-191 output tokens, so this was not output-token exhaustion. The round ended without submission and received no training or task score. Raw provider envelopes are unavailable, leaving the contribution of response-message aggregation unknown. This measures compliance with the specified interface, not task reasoning in isolation.
+
 No unseen-application, pixel-only grounding, original Microsoft Office, Windows, macOS, or cross-application enterprise capability is measured. Task difficulty needs calibrated tiers and independent solvability evidence in larger studies.
 
 ## 9. Reproducibility and release boundary
@@ -115,6 +117,26 @@ No unseen-application, pixel-only grounding, original Microsoft Office, Windows,
 The release includes the implementation, separate sanitized cohort evidence, a combined presentation index, manuscript, standalone figures, and a portable explorer. Audits reconstruct trusted training records, verify data and checkpoint bindings, re-read independent evaluator outcomes, check resources and promotion, and bind final executions to frozen plans. Raw credentials, private checkpoint identifiers, provider envelopes, and host paths are excluded.
 
 The historical v0.4 selection-only pilot stays separate. Its scores and recovery runs are not pooled with these executable-factory cohorts. Provider dollar totals are unknown. A functioning training or execution service is not counted as successful agent work.
+
+---PAGEBREAK---
+
+## Appendix A. A sealed allocation instance
+
+The extension's `model6-final-allocation-a` places the following records in the native application. Issue IDs and source metadata come from the public Kanboard snapshot. Every numeric planning field and dependency below is synthetic and is visibly labeled as such in the task descriptions.
+
+| Public issue reference | Cost | Hours | Value | Dependency | Blocked |
+| GH-5827 | 3 | 2 | 8 | None | No |
+| GH-5835 | 5 | 2 | 9 | GH-5827 | No |
+| GH-5837 | 9 | 4 | 17 | None | No |
+| GH-5815 | 3 | 1 | 30 | None | Yes |
+
+**Table A1.** One actual sealed final fixture, published after research selection was frozen. Planning values are not claims about the underlying public issues.
+
+The RUNBOOK caps total cost at 9 and hours at 4. The agent must exclude blocked records, honor dependencies, maximize value, and then minimize cost. The pair GH-5827 + GH-5835 has value 17, cost 8, and 4 hours. GH-5837 also has value 17 but costs 9, so choosing that feasible single task fails the tie-break. The high-value GH-5815 distractor is blocked and cannot be selected.
+
+The correct browser workflow assigns Singh, priority 1, and complexity 3 to both records in the pair, saves the edits, and preserves every other record, description, comment, RUNBOOK entry, and archive item. The verifier independently derives those targets and compares the saved database. Editing only one target, choosing the feasible but more expensive alternative, or modifying unrelated state receives zero strict reward.
+
+This small instance tests a specific conjunction of navigation, reading, planning, multi-record editing, and preservation. It does not represent the scale or ambiguity of a production enterprise backlog. Larger worlds and longer cross-application dependencies remain future profiles.
 
 ## References
 

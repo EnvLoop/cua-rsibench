@@ -211,7 +211,7 @@ def cohort_selection(cohort):
 
 def cohort_final(cohort, recovered=False):
     data = cohort['data']
-    rows = [['Comparison role', 'Mean by repetition', 'Recovered mean' if recovered else 'Original mean']]
+    rows = [['Comparison role', 'Mean by repetition', 'Displayed mean' if recovered else 'Original mean']]
     paragraphs = []
     finals = final_rows(data, recovered=recovered)
     base = next(row for row in finals if row['role'] == 'base')
@@ -226,13 +226,17 @@ def cohort_final(cohort, recovered=False):
         else:
             difference = 100 * (row['mean'] - base['mean'])
             direction = f'{abs(difference):.1f} percentage points ' + ('above' if difference > 0 else 'below') if difference else 'equal to'
-            view = 'operationally recovered' if recovered else 'original'
+            replayed = recovered and any('recovered_evaluation' in run for run in row['runs'])
+            view = 'operationally recovered' if replayed else 'original'
             paragraphs.append(row['label'] + f' has an {view} final mean of {score(row["mean"])}, {direction} its own cohort base mean of {score(base["mean"])}. '
                               'This is a descriptive comparison over the fixed task instances, not a population estimate.')
+            if recovered and not replayed:
+                paragraphs.append('These valid original executions are retained in this view without replay.')
     if any(row['mean'] is None for row in finals):
         paragraphs.append('Undefined complete means remain unscored; partial successful executions are not substituted for the prescribed mean.')
     if recovered:
         paragraphs.append('The full-suite operational amendment replays all six tasks for each eligible infrastructure-invalid slot on a separate trusted Linux E2B controller. Each recovered score uses six fresh results; no original rows are mixed into it. Frozen checkpoints, task packages, actor, verifier, and sampling settings are preserved. Valid original slots are never replayed. These are the same prescribed repetitions, not new independent samples or research seeds. The unchanged original outcomes remain in the preceding table and evidence.')
+        paragraphs.append('In the original cohort this view combines valid Astra-selected executions orchestrated from the Mac with Linux-orchestrated replays for the base and Sol-selected slots. The controller platform is therefore not matched across those roles. Any numerical difference is descriptive and cannot isolate a training-data effect from operational or observation variation.')
     return table(rows), '\n\n'.join(paragraphs)
 
 
@@ -270,7 +274,7 @@ def manuscript(publication):
 
 **Table {4 + index * 2}R.** Audited recovery view of the same final task/repetition assignments. Original invalid means remain undefined in Table {4 + index * 2}. These are not additional independent repetitions.
 
-![Figure {4 + index * 2}R. Operationally recovered final outcomes in {cohort['label'].lower()}. Eligible infrastructure failures receive their declared retry; originally scored tasks remain unchanged. The original outcome matrix is retained separately.](figures/factory-{cohort['id']}-final-recovered-matrix.png)
+![Figure {4 + index * 2}R. Operational recovery in {cohort['label'].lower()}. Each replayed slot uses six fresh task results; valid original slots remain unchanged. The original matrix is retained separately. Original-cohort controller platforms differ across roles.](figures/factory-{cohort['id']}-final-recovered-matrix.png)
 
 {recovery_text}'''
         number = index + 6

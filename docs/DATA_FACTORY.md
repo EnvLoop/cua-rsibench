@@ -58,9 +58,11 @@ python -m cursibench.tinker_backend --profile factory-v1 --steps 32 \
 
 Training still enforces the fixed sequence and scheduled-token bounds. In the factory profile, insufficient exposure is rejected instead of silently ignoring the end of a dataset.
 
-## Remaining gates
+## Study status and research limits
 
-Complete a feedback-driven research trajectory through the fixed trainer and evaluator; preserve the historical best before final testing; calibrate a larger, counterbalanced task suite; run independent final cases and appropriate controls; then update the English report and visualization from the resulting evidence. The data-factory integration alone does not complete these gates.
+Both cohorts have finished their five-round searches and frozen selection. The original cohort retains Astra round 1 and Sol5.6 round 5 at 1/3 on selection. The separate extension retains Sol6 round 2 at 1/3 and the base for Luna6 at 0/3. Final execution and declared operational recovery are tracked separately and gate publication.
+
+A broader study still needs more task instances and applications, repeated research seeds, calibrated difficulty tiers, and equal-budget non-adaptive controls. The current pilot does not establish sustained RSI or a general frontier-model ranking.
 
 ## Submission, selection, and final gates
 

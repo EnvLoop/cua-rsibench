@@ -125,6 +125,8 @@ def final_matrix(cohort, directory, recovered=False):
         axis.axvline(offset - .5, color='white', lw=3)
     view = 'Operational recovery / same task repetitions' if recovered else 'Original final outcomes / within this cohort'
     axis.set_title(cohort['label'] + '\n' + view, fontsize=10, pad=14)
+    if recovered and cohort['id'] == 'original':
+        axis.set_xlabel('Astra: Mac originals. Base and Sol: Linux full-suite replays.\nController platforms differ; these are descriptive outcomes, not an isolated training-data effect.', fontsize=7, labelpad=12)
     suffix = 'final-recovered-matrix' if recovered else 'final-matrix'
     save(figure, directory, f'factory-{cohort["id"]}-{suffix}')
 

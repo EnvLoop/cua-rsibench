@@ -9,18 +9,22 @@ A real Kanboard application, public-source issue metadata, actual Tinker LoRA tr
 - [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot)
 - [Campaign audit](docs/site/data-campaigns.json) and [recovery evidence](docs/site/journal-recovery.json)
 
-## Results
+## Executable data-research studies
 
-| Researcher | Training attempts | Scheduled training tokens | Original scored / invalid | Selected model |
-|---|---:|---:|---:|---|
-| gpt-6-astra | 5 | 510,182 | 4 / 1 | Base student |
-| gpt-5.6-sol | 5 | 548,726 | 3 / 2 | Base student |
+Researchers write Python data factories in isolated E2B workspaces, generate native task states, request verified GUI demonstrations, and revise their training mixtures from selection feedback. Each accepted dataset trains a fresh Qwen3.5-4B LoRA adapter. The fixed teacher is **gpt-5.6-sol**; the researcher model and the evaluated student are different roles.
 
-All seven originally scored candidates receive zero strict task reward. Three interrupted candidates are replayed under separately recorded transport repairs; all also score zero. Both researchers retain the same Qwen3.5-4B base model. Three journaled final stability checks complete with zero task reward and no infrastructure error. Original failures remain in the published evidence rather than being overwritten.
+| Cohort | Researcher | Research rounds | Trained candidates | Scheduled training tokens | Retained selection |
+|---|---|---:|---:|---:|---|
+| Original | gpt-6-astra | 5 | 3 | 371,887 | Round 1, 1/3 |
+| Original | gpt-5.6-sol | 5 | 4 | 460,768 | Round 5, 1/3 |
+| Separate extension | gpt-6-sol | 5 | 5 | 664,132 | Round 2, 1/3 |
+| Separate extension | gpt-6-luna | 5 | 1 | 140,167 | Base, 0/3 |
 
-Direct frontier-actor calibration is a separate experiment. Sol completes a native form edit, a public-backlog workflow, and a constrained planning task. In one planning pair, Astra finds a maximum-value set but misses the minimum-cost tie-break. This distinguishes those executions; it does not establish a general model ranking.
+Selections are frozen after the declared search limit. Final tests and operational recoveries are being completed before the new report is released. These are separate cohorts, not a matched four-model ranking: final source records and researcher-facing interface timing differ. Original Sol5.6 results are never relabeled Sol6. The extension explicitly reuses the selection baseline and starts fresh researcher lineages.
 
-No sustained RSI, broad generalization, or mature leaderboard is claimed. Data research currently selects and augments demonstrations from one verified trajectory. It does not yet provide the open-ended experience-synthesis interface of the reference benchmark.
+The [historical v0.4 release](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot) used selection/augmentation from one teacher trace. Its published artifacts remain unchanged and are not pooled with executable-factory results. See [the factory contract](docs/DATA_FACTORY.md) and [alignment with RSIBench-Data](docs/RSIBENCH_ALIGNMENT.md).
+
+No sustained RSI, broad desktop generalization, or mature leaderboard is claimed. Rejected submissions receive no training score. Infrastructure failures remain unscored, and declared recoveries retain the original evidence.
 
 ## Install and validate
 

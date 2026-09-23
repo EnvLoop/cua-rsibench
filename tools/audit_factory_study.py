@@ -111,6 +111,27 @@ def audit(study):
                 'model_receipts':[{'requested_model':k[0],'reported_model':k[1],'status':k[2],'count':v} for k,v in sorted(receipt_counts.items())],
                 'wall_seconds':fr.get('wall_elapsed_seconds',fr['elapsed_seconds']),
                 'history_sha256':sha(factory/'research-history.json')})
+            diagnosis_path=study/f'round-{number}'/(name+'-interface-format-diagnosis.json')
+            if diagnosis_path.exists():
+                diagnosis=read(diagnosis_path)
+                from cursibench.campaign_runtime import json_object
+                rejected=[];token_counts=[]
+                for response_path in (factory/'controller').glob('researcher-response-*.txt'):
+                    response=response_path.read_text()
+                    try:json_object(response)
+                    except (ValueError,json.JSONDecodeError):
+                        if sha(response_path) in diagnosis['response_sha256']:
+                            tail=json.loads(response[response.index('{'):])
+                            if tail.get('action',{}).get('type',tail.get('type')) not in ('read','run'):raise ValueError('diagnosed trailing action differs')
+                            rejected.append(sha(response_path))
+                            receipt=read(response_path.with_name(response_path.name.replace('response','receipt').replace('.txt','.json')))
+                            if receipt['status']!='completed':raise ValueError('diagnosed response was not completed')
+                            token_counts.append(receipt['usage']['output_tokens'])
+                if sorted(rejected)!=sorted(diagnosis['response_sha256']) or len(rejected)!=diagnosis['strict_parser_rejections']:
+                    raise ValueError('interface-format diagnosis does not match raw response hashes')
+                if min(token_counts)!=diagnosis['rejected_response_output_tokens']['min'] or max(token_counts)!=diagnosis['rejected_response_output_tokens']['max']:
+                    raise ValueError('interface-format diagnosis token range differs')
+                campaign['factories'][-1]['interface_format_diagnosis']=diagnosis
             row={'round':number,'dataset_sha256':record['dataset_hash'],'training_tokens':record['training_tokens'],
                  'promoted':record['promoted'],'accounting':record.get('accounting','historical import before reservation guard')}
             if record['training_manifest']:
@@ -132,7 +153,8 @@ def audit(study):
                     path=Path(record['evaluation_path'])
                 ev=evaluation(path,state['protocol']['selection_tasks'])
                 if (path.parent/'remote-completion.json').exists():
-                    row['remote_execution']=audit_remote(path.parent,state['protocol']['selection_tasks'],digest(training['checkpoint']))
+                    row['remote_execution']=audit_remote(path.parent,state['protocol']['selection_tasks'],digest(training['checkpoint']),
+                        {'task_package_hashes':selection_integrity['task_package_hashes'],'runtime_hashes':integrity['runtime_hashes']})
                 if public_summary(ev)!=public_summary(record['evaluation']):raise ValueError('registered score differs from execution')
                 row.update(evaluation=ev,records=len(rows),checkpoint_sha256=digest(training['checkpoint']),
                     data_provenance_verified=True,optimizer_steps=32)
@@ -158,17 +180,45 @@ def audit(study):
         if plan!=make_plan(ROOT,study,state,plan['role'],plan['repetition']):raise ValueError('final plan changed')
         started=read(out/'started.json')['started_at']
         if started<max(c['frozen_at'] for c in result['campaigns']):raise ValueError('final test preceded a closed search')
+        operational=read(out/'operational-plan.json') if (out/'operational-plan.json').exists() else None
+        remote_proofs={}
+        if operational:
+            comparison=read(study/'final-comparison.json')
+            if (operational.get('admission_kind')!='initial_final' or operational['final_plan_sha256']!=sha(out/'plan.json')
+                or operational['final_comparison_sha256']!=sha(study/'final-comparison.json')
+                or operational['selection_frozen_at']!=comparison['selection_frozen_at']
+                or operational['checkpoint_sha256']!=plan['binding']['checkpoint_sha256']
+                or started<max(comparison['created_at'],operational['prepared_at'])):
+                raise ValueError('initial remote final is not bound to the frozen comparison')
         pieces=[]
         for chunk,tasks in plan['chunks'].items():
-            valid=verify_execution(out/chunk,plan);ev=evaluation(out/chunk,tasks)
+            destination=out/chunk
+            if operational:
+                if sha(destination/'plan.json')!=operational['child_plan_sha256'][chunk]:raise ValueError('initial final child plan changed')
+                proof=audit_remote(destination,tasks,plan['binding']['checkpoint_sha256'],plan)
+                binding=read(destination/'manifest.json')['initial_final']
+                if (binding['logical_comparison_slot']!=out.name or binding['chunk']!=chunk
+                    or binding['final_plan_sha256']!=operational['final_plan_sha256']
+                    or binding['final_comparison_sha256']!=operational['final_comparison_sha256']
+                    or proof['admission_kind']!='initial_final' or proof['started_at']<started):
+                    raise ValueError('initial final remote scope or timing differs')
+                remote_proofs[chunk]=proof
+                destination=destination/'evaluation'
+            valid=verify_execution(destination,plan);ev=evaluation(destination,tasks)
             if not valid:ev.update(status='infrastructure_error',score=None)
             pieces.append(ev)
         combined=combine(pieces,state['protocol']['final_tasks'])
         if combined!=read(out/'summary.json'):raise ValueError('final summary differs from evidence')
+        registered=[r for r in state['final_results'] if r['label']==out.name]
+        if len(registered)!=1 or registered[0]['evaluation']!=combined or registered[0]['started_at']!=started:
+            raise ValueError('final registry differs from independently audited evidence')
         result['final_executions'].append({'label':out.name,'role':plan['role'],'candidate':plan['binding']['candidate'],
             'checkpoint_sha256':plan['binding']['checkpoint_sha256'],'repetition':plan['repetition'],
             'started_at':started,'evaluation':combined,'chunk_proofs':[p['proof'] for p in pieces],
             'plan_sha256':sha(out/'plan.json'),'selection_precedes_test':True})
+        if operational:
+            result['final_executions'][-1]['operational_execution']={'version':operational['operational_version'],
+                'kind':'initial_final','plan_sha256':sha(out/'operational-plan.json'),'chunk_proofs':remote_proofs}
     for execution in result['final_executions']:
         recovery=study/'final-recoveries'/execution['label']
         if not (recovery/'summary.json').exists():continue

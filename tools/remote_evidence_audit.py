@@ -20,7 +20,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def audit_remote(directory, names, checkpoint_sha256, final_plan=None):
+def audit_remote(directory, names, checkpoint_sha256, final_plan=None, source_hashes=None):
     """Recompute hashes from payload/archive and extracted evidence; no cloud calls."""
     directory = Path(directory)
     plan = checked_inputs(directory)
@@ -28,6 +28,17 @@ def audit_remote(directory, names, checkpoint_sha256, final_plan=None):
     encoded = payload['manifest.json']
     require(sha(encoded) == plan['manifest_sha256'], 'remote payload manifest changed')
     manifest = json.loads(encoded)
+    trusted = read(Path(__file__).resolve().parents[1] / 'docs/evidence/remote-controller-sources-v1.json')
+    require(manifest.get('worker_sha256') == plan['worker_sha256'] == trusted['worker_sha256'], 'remote worker differs from trusted source')
+    require(manifest.get('operational_version') == plan['operational_version'] == trusted['operational_version'], 'remote operational version differs')
+    if source_hashes is None:
+        source_hashes = trusted['files']
+    supplied_sources = {key: row['sha256'] for key, row in manifest['files'].items() if key.startswith(('src/', 'tools/'))}
+    require(supplied_sources == source_hashes, 'remote source inventory or trusted source bytes differ')
+    allowed_inputs = set(source_hashes) | {key for key in manifest['files'] if key.startswith(tuple('tasks/' + name + '/' for name in names))}
+    if manifest['model'].get('kind') == 'checkpoint':
+        allowed_inputs.add('inputs/training.json')
+    require(set(manifest['files']) == allowed_inputs, 'remote payload includes unexpected input paths')
     require(manifest == read(directory / 'manifest.json'), 'local remote manifest changed')
     require(manifest['job_id'] == plan['job_id'], 'remote job identity mismatch')
     require(set(manifest['task_names']) == set(names) and len(manifest['task_names']) == len(names), 'remote task identities differ')
@@ -46,8 +57,11 @@ def audit_remote(directory, names, checkpoint_sha256, final_plan=None):
             if name in manifest['files']:
                 require(manifest['files'][name]['sha256'] == expected, 'remote frozen runtime differs')
     completion = read(directory / 'remote-completion.json')
+    require(completion.get('operational_version') == plan['operational_version'], 'remote completion version differs')
     lifecycle = read(directory / 'lifecycle.json')
     require(completion.get('complete') is True and completion.get('evaluation_dispatched') is True, 'remote evaluation incomplete')
+    require(completion.get('child_exit') == 0 and not completion.get('child_wall_cap_reached') and not completion.get('forced_group_kill'),
+            'remote process did not complete cleanly; scored admission prohibited')
     require(all(completion[key] == plan[key] for key in ('payload_sha256', 'manifest_sha256')), 'remote completion belongs to another payload')
     require(lifecycle.get('collected') is True and lifecycle.get('orchestrator_destroyed') is True, 'remote collection or cleanup incomplete')
     require(lifecycle['job_id'] == plan['job_id'] and lifecycle['archive_sha256'] == completion['archive_sha256'], 'remote lifecycle differs')
@@ -79,6 +93,7 @@ def audit_remote(directory, names, checkpoint_sha256, final_plan=None):
             'archive_sha256': completion['archive_sha256'], 'evidence_files': len(index['files']),
             'started_at': completion['started_at'], 'controller_platform': runtime['platform'],
             'controller_python': runtime['python'].split()[0], 'runtime_and_member_hashes_verified': True,
+            'trusted_source_snapshot_sha256': digest(source_hashes),
             'proxy_destroyed': True, 'orchestrator_destroyed': True}
 
 
