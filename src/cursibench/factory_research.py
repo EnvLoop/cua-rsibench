@@ -49,6 +49,8 @@ The controller constructs the native application state and RUNBOOK from these re
 
 Rollout feedback supplies episode identifiers and record counts. `/inputs/examples.json` contains approved records, including canonical messages, provenance and decision/history representation variants. Your Python program should read this file, apply its chosen filtering/mixture/ordering policy, and write one complete approved record per JSONL line. The submit service accepts 1..256 records and at most 2MB. Shorter inputs may be preferable to excessive full-history context. A training backend may enforce a tighter token/exposure budget separately; no training is run by this integration entrypoint.
 
+The read-only /inputs/historical-submissions.json file lists earlier approved training mixtures by record ID. Compare and preserve useful prior data; exact duplicate datasets reuse cached results rather than creating new training evidence.
+
 Failure traces remain available for diagnosis. A success flag authored by your code cannot register examples. Public program output and notes must be in English.
 '''
 
@@ -90,13 +92,13 @@ def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=
             workspace.add_input('examples.json',json.dumps(corpus.export()))
             (out/'resume.json').write_text(json.dumps({'at':time.time(),'verified_episodes':len(corpus.episodes),'next_turn':budget.next_research_turn()},indent=2))
         else:
-            inherited=[]
+            inherited=[];parent_record={}
             if parent:
                 from .factory_parent import inherit
                 corpus,recipes,inherited,parent_record=inherit(parent,out,registry)
                 (out/'parent.json').write_text(json.dumps(parent_record,indent=2))
                 notes='Continue the inherited data factory using the supplied selection feedback. You may synthesize additional training tasks or revise filtering, representation and mixture. Existing verified episodes remain usable.'
-            workspace.start({'sources.json':json.dumps(registry.training_input(),indent=2),'contract.md':CASE_CONTRACT,'examples.json':json.dumps(corpus.export())})
+            workspace.start({'sources.json':json.dumps(registry.training_input(),indent=2),'contract.md':CASE_CONTRACT,'examples.json':json.dumps(corpus.export()),'historical-submissions.json':json.dumps(parent_record.get('historical_submissions',[]))})
             for entry in inherited:workspace.write(entry['path'],entry['content'])
 
         for turn in range(budget.next_research_turn(),max_turns):

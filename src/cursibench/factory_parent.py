@@ -32,4 +32,18 @@ def inherit(parent,destination,registry):
         if hashlib.sha256(entry['content'].encode()).hexdigest()!=entry['sha256']:raise ValueError('parent snapshot integrity mismatch')
     # Regenerate data artifacts from the inherited programs; retain script/config files.
     source_files=[x for x in files if x['path'].endswith(('.py','.md','.txt','.json')) and not x['path'].endswith('examples.json')]
-    return corpus,recipes,source_files,{'parent':str(parent),'source_origin':origin,'verified_episodes':len(corpus.episodes)}
+    historical=[];seen=set();ancestor=parent
+    for _ in range(12):
+        ancestor=ancestor.resolve()
+        if ancestor in seen:raise ValueError('parent lineage cycle')
+        seen.add(ancestor)
+        dataset=ancestor/'train_messages.jsonl'
+        if dataset.exists():
+            rows=corpus.validate_submission(dataset.read_text())
+            historical.append({'factory':ancestor.name,'record_ids':[r['record_id'] for r in rows],
+                               'dataset_sha256':hashlib.sha256(dataset.read_bytes()).hexdigest()})
+        ancestor_spec=json.loads((ancestor/'spec.json').read_text())
+        if not ancestor_spec.get('parent'):break
+        ancestor=Path(ancestor_spec['parent'])
+    return corpus,recipes,source_files,{'parent':str(parent),'source_origin':origin,
+        'verified_episodes':len(corpus.episodes),'historical_submissions':historical}

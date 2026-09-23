@@ -37,7 +37,7 @@ class CampaignRegistry:
                 if not protocol.get('selection_tasks') or not protocol.get('final_tasks'):raise ValueError('task identities required')
                 if set(protocol['selection_tasks']) & set(protocol['final_tasks']):raise ValueError('selection/final task identities overlap')
                 self._save({'protocol':copy.deepcopy(protocol),'protocol_hash':digest(protocol),'created_at':time.time(),
-                            'baseline':None,'attempts':[],'selected':'base','best_score':None,'used_training_tokens':0,'final_selection':None,'final_results':[]})
+                            'baseline':None,'attempts':[],'reservations':{},'selected':'base','best_score':None,'used_training_tokens':0,'final_selection':None,'final_results':[]})
             state=self._read()
             if protocol is not None and digest(protocol)!=state['protocol_hash']:raise ValueError('protocol is immutable')
 
@@ -51,6 +51,7 @@ class CampaignRegistry:
     def _read(self):
         state=json.loads(self.path.read_text())
         if digest(state['protocol'])!=state['protocol_hash']:raise ValueError('protocol integrity failure')
+        state.setdefault('reservations',{})
         return state
 
     def _save(self,state):
@@ -63,7 +64,37 @@ class CampaignRegistry:
             if valid_scores(summary,state['protocol']['selection_tasks']) is None:raise ValueError('complete matched baseline required')
             state['baseline']=copy.deepcopy(summary);state['best_score']=summary['score'];self._save(state)
 
-    def register(self,attempt_id,dataset_hash,training_manifest,training_tokens,summary):
+    def reserve_training(self,attempt_id,dataset_hash,token_bound):
+        with self._lock():
+            state=self._read();protocol=state['protocol']
+            if state['baseline'] is None or state['final_selection'] is not None:raise ValueError('search is not open')
+            if type(token_bound) is not int or token_bound<=0:raise ValueError('positive token reservation required')
+            if attempt_id in state['reservations']:
+                old=state['reservations'][attempt_id]
+                if old['dataset_hash']!=dataset_hash or old['token_bound']!=token_bound:raise ValueError('reservation id collision')
+                return copy.deepcopy(old)
+            if any(x['attempt_id']==attempt_id or x['dataset_hash']==dataset_hash for x in state['attempts']):raise ValueError('attempt or dataset already evaluated')
+            if any(x['dataset_hash']==dataset_hash for x in state['reservations'].values()):raise ValueError('dataset already reserved')
+            if len(state['attempts'])+len(state['reservations'])>=protocol['max_attempts']:raise ValueError('attempt budget exhausted')
+            pending=sum(x['token_bound'] for x in state['reservations'].values())
+            if state['used_training_tokens']+pending+token_bound>protocol['training_token_budget']:raise ValueError('training budget exhausted before execution')
+            record={'dataset_hash':dataset_hash,'token_bound':token_bound,'reserved_at':time.time()}
+            state['reservations'][attempt_id]=record;self._save(state);return copy.deepcopy(record)
+
+    def record_training_failure(self,attempt_id,reason,known_tokens=None):
+        with self._lock():
+            state=self._read();reserved=state['reservations'].get(attempt_id)
+            if reserved is None:raise ValueError('training failure has no reservation')
+            # An interrupted execution retains its full reservation unless trusted
+            # training accounting establishes a smaller amount.
+            tokens=reserved['token_bound'] if known_tokens is None else known_tokens
+            if type(tokens) is not int or not 0<=tokens<=reserved['token_bound']:raise ValueError('invalid failure accounting')
+            state['attempts'].append({'attempt_id':attempt_id,'dataset_hash':reserved['dataset_hash'],
+                'training_manifest':None,'training_tokens':tokens,'evaluation':{'status':'training_error','score':None,'tasks':[]},
+                'promoted':False,'no_regression':False,'failure_reason':reason,'registered_at':time.time(),'accounting':'pre-execution reservation'})
+            state['used_training_tokens']+=tokens;del state['reservations'][attempt_id];self._save(state)
+
+    def register(self,attempt_id,dataset_hash,training_manifest,training_tokens,summary,historical_import=False):
         with self._lock():
             state=self._read();protocol=state['protocol']
             if state['baseline'] is None or state['final_selection'] is not None:raise ValueError('search is not open')
@@ -71,13 +102,21 @@ class CampaignRegistry:
             if any(r['dataset_hash']==dataset_hash for r in state['attempts']):raise ValueError('reuse the cached candidate for an identical dataset')
             if len(state['attempts'])>=protocol['max_attempts']:raise ValueError('attempt budget exhausted')
             if type(training_tokens) is not int or training_tokens<=0 or state['used_training_tokens']+training_tokens>protocol['training_token_budget']:raise ValueError('training budget exceeded')
+            reserved=state['reservations'].get(attempt_id)
+            if not historical_import:
+                if reserved is None or reserved['dataset_hash']!=dataset_hash:raise ValueError('pre-execution reservation required')
+                if training_tokens>reserved['token_bound']:raise ValueError('training exceeded reserved tokens')
+            elif reserved is not None:raise ValueError('historical import cannot replace a live reservation')
+            other_pending=sum(v['token_bound'] for k,v in state['reservations'].items() if k!=attempt_id)
+            if state['used_training_tokens']+other_pending+training_tokens>protocol['training_token_budget']:raise ValueError('pending reservations would exceed budget')
             scores=valid_scores(summary,protocol['selection_tasks']);incumbent=state['baseline'] if state['selected']=='base' else next(r['evaluation'] for r in state['attempts'] if r['attempt_id']==state['selected'])
             prior=valid_scores(incumbent,protocol['selection_tasks'])
             no_regression=scores is not None and all(scores[t]>=prior[t] for t in prior)
             improved=scores is not None and summary['score']>state['best_score']
             admitted=improved and (no_regression or protocol.get('promotion')=='strict_score')
             record={'attempt_id':attempt_id,'dataset_hash':dataset_hash,'training_manifest':str(training_manifest),'training_tokens':training_tokens,
-                    'evaluation':copy.deepcopy(summary),'promoted':admitted,'no_regression':no_regression,'registered_at':time.time()}
+                    'evaluation':copy.deepcopy(summary),'promoted':admitted,'no_regression':no_regression,'registered_at':time.time(),'accounting':'historical import' if historical_import else 'pre-execution reservation'}
+            state['reservations'].pop(attempt_id,None)
             state['attempts'].append(record);state['used_training_tokens']+=training_tokens
             if admitted:state['selected']=attempt_id;state['best_score']=summary['score']
             self._save(state);return copy.deepcopy(record)
@@ -86,6 +125,7 @@ class CampaignRegistry:
         with self._lock():
             state=self._read()
             if state['final_selection'] is not None:return copy.deepcopy(state['final_selection'])
+            if state['reservations']:raise ValueError('resolve pending training reservations before final selection')
             if state['baseline'] is None or not state['attempts']:raise ValueError('baseline and attempted research required')
             chosen=None if state['selected']=='base' else next(x for x in state['attempts'] if x['attempt_id']==state['selected'])
             selection={'candidate':state['selected'],'training_manifest':chosen['training_manifest'] if chosen else None,

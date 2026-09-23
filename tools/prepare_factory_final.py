@@ -38,5 +38,5 @@ for name in ('astra','sol'):
  baseline=summarize(root/'cache-repair/base',selection);registry.set_baseline(baseline)
  summary=summarize(root/'cache-repair'/name,selection)
  train=root/('train-'+name)/'training.json';training=json.loads(train.read_text())
- registry.register('round-1',training['data_sha256'],train.resolve(),training['scheduled_tokens'],summary)
+ registry.register('round-1',training['data_sha256'],train.resolve(),training['scheduled_tokens'],summary,historical_import=True)
 print('Sealed six final cases and froze selection/promotion rules before round-2 evaluation')
