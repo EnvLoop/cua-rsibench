@@ -5,7 +5,7 @@ import os
 import json
 import time
 from pathlib import Path
-from .agentrouter import response_receipt,ProviderFailure
+from .agentrouter import response_receipt,ProviderFailure,RESEARCHER_CHOICES,resolve_researcher_model
 from .campaign_runtime import json_object
 from .factory_budget import Budget
 from .factory_cases import SourceRegistry,compile_case,digest,object_keys,semantic_case_key
@@ -62,6 +62,7 @@ def dataset_text(workspace,path):
 
 
 def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=100,resume=False,parent=None,feedback=None):
+    researcher=resolve_researcher_model(researcher)
     out=Path(out).resolve();out.mkdir(exist_ok=resume,parents=True)
     lock=(out/'controller.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     if resume and (out/'result.json').exists() and json.loads((out/'result.json').read_text()).get('complete'):raise ValueError('completed factory run cannot be resumed')
@@ -71,7 +72,7 @@ def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=
                             [r['number'] for r in snapshot['records'][12:36]])
     limits={'researcher_calls':max_turns*2,'program_runs':12,'rollouts':rollout_limit,'teacher_calls':teacher_calls}
     if resume:
-        saved=json.loads((out/'spec.json').read_text());limits=saved['limits'];max_turns=saved['max_turns'];researcher=saved['researcher']
+        saved=json.loads((out/'spec.json').read_text());limits=saved['limits'];max_turns=saved['max_turns'];researcher=resolve_researcher_model(saved['researcher'])
     budget=Budget(private/'budget.jsonl',limits);workspace=FactoryWorkspace(out/'workspace',budget,resume=resume)
     corpus=VerifiedCorpus();history=[];notes='';submission=None;started=time.monotonic();recipes={}
     spec={'parent':str(parent) if parent else None,'feedback':feedback,'created_at':time.time(),'researcher':researcher,'teacher':'gpt-5.6-sol','max_turns':max_turns,'limits':limits,'source_hash':registry.source_hash,
@@ -177,4 +178,4 @@ def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--out',required=True);p.add_argument('--researcher',choices=['gpt-6-astra','gpt-5.6-sol'],default='gpt-6-astra');p.add_argument('--max-turns',type=int,default=20);p.add_argument('--resume',action='store_true');p.add_argument('--parent');p.add_argument('--feedback');a=p.parse_args();run(a.out,a.researcher,a.max_turns,resume=a.resume,parent=a.parent,feedback=json.loads(Path(a.feedback).read_text()) if a.feedback else None)
+    p=argparse.ArgumentParser();p.add_argument('--out',required=True);p.add_argument('--researcher',choices=RESEARCHER_CHOICES,default='gpt-6-astra');p.add_argument('--max-turns',type=int,default=20);p.add_argument('--resume',action='store_true');p.add_argument('--parent');p.add_argument('--feedback');a=p.parse_args();run(a.out,a.researcher,a.max_turns,resume=a.resume,parent=a.parent,feedback=json.loads(Path(a.feedback).read_text()) if a.feedback else None)

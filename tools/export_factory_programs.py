@@ -1,11 +1,12 @@
 """Publish bounded researcher-authored Python snapshots, with provenance and hashes."""
 import argparse,hashlib,json,re
 from pathlib import Path
+from cursibench.factory_roster import study_roster
 ROOT=Path(__file__).resolve().parents[1]
 
 def export(study,destination):
     study=Path(study).resolve();out=Path(destination);out.mkdir(parents=True,exist_ok=True);manifest=[]
-    for name in ('astra','sol'):
+    for name in study_roster(study):
         state=json.loads((study/(name+'-campaign.json')).read_text())
         if state['final_selection'] is None:raise ValueError('finish the research search before publishing its program snapshots')
         factory_root=study/state['protocol']['factory_directory'] if state['protocol'].get('factory_directory') else ROOT/'work'

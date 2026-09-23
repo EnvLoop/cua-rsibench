@@ -9,6 +9,9 @@ from cursibench.factory_cases import SourceRegistry
 from cursibench.factory_recovery import restore_corpus
 from cursibench.factory_final import validate_study, make_plan, combine, verify_execution
 from cursibench.factory_results import summarize
+from cursibench.factory_roster import study_roster
+from cursibench.factory_provenance import validate_selection_packages,verify_factory_identity
+from cursibench.factory_final_recovery import replace_build_failures
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -45,24 +48,42 @@ def audit(study):
         'selection_tasks':3,'final_tasks':6,'source_records':37,'source_partition_counts':{'train':12,'selection':12,'final':12,'unused':1},
         'application':'Kanboard 1.2.54','interaction':'DOM-assisted browser use','cost_usd':None,
         'campaigns':[],'final_executions':[],'claim':'bounded data-centric research pilot; no sustained RSI or broad model ranking'}
+    result['cohort']={'id':manifest.get('cohort','original-factory-study'),'purpose':manifest['purpose'],
+        'created_at':manifest['created_at'],'researchers':study_roster(study),
+        'teacher':manifest.get('teacher','gpt-5.6-sol'),'prior_lineages_inherited':manifest.get('prior_lineages_inherited',False)}
+    result['source_record_ids']={
+        'selection':sorted({n for p in (study/'selection').glob('*/environment/scenario.json') for n in read(p)['source_numbers']}),
+        'final':sorted({n for p in (study/'sealed-final').glob('chunk-*/*/environment/scenario.json') for n in read(p)['source_numbers']})}
+    reuse_path=study/'reuse-provenance.json'
+    if reuse_path.exists():
+        reuse=read(reuse_path)
+        if sha(reuse_path)!=manifest['baseline_reuse_manifest_sha256']:raise ValueError('baseline reuse provenance changed')
+        for relative,expected in reuse['selection_file_hashes'].items():
+            if sha(study/'selection'/relative)!=expected:raise ValueError('reused selection artifact changed')
+        for relative,expected in reuse['baseline_file_hashes'].items():
+            if sha(study/'baseline'/relative)!=expected:raise ValueError('reused baseline artifact changed')
+        result['baseline_reuse']={k:reuse[k] for k in ('kind','new_execution','source_study','source_baseline','source_manifest_sha256','baseline_summary_sha256','boundary')}
+        result['baseline_reuse']['provenance_sha256']=sha(reuse_path)
+    else:result['baseline_reuse']=None
     source_sets=[{r['number'] for r in source['records'][i:i+12]} for i in (0,12,24)]
     result['source_records_used']={'selection':len({n for p in (study/'selection').glob('*/environment/scenario.json') for n in read(p)['source_numbers']}),'final':len({n for p in (study/'sealed-final').glob('chunk-*/*/environment/scenario.json') for n in read(p)['source_numbers']})}
     training_source_ids=set()
     result['source_partitions_disjoint']=all(not source_sets[i]&source_sets[j] for i in range(3) for j in range(i+1,3))
-    for name,model in [('astra','gpt-6-astra'),('sol','gpt-5.6-sol')]:
+    for name,model in study_roster(study).items():
         state=CampaignRegistry(study/(name+'-campaign.json')).snapshot()
         integrity=validate_study(ROOT,study,state)
+        selection_integrity=validate_selection_packages(ROOT,study,state)
         base=evaluation(study/state['protocol'].get('baseline_directory','cache-repair/base'),state['protocol']['selection_tasks'])
         if public_summary(state['baseline'])!=public_summary(base):raise ValueError('baseline registry mismatch')
         campaign={'name':name,'researcher':model,'baseline':base,'attempts':[],'factories':[],
             'used_training_tokens':state['used_training_tokens'],'training_token_budget':state['protocol']['training_token_budget'],
             'max_attempts':state['protocol']['max_attempts'],'selected':state['selected'],'selection_score':state['best_score'],
             'selection_frozen':state['final_selection'] is not None,'pending_training':len(state['reservations']),
-            'protocol_hash':state['protocol_hash'],'runtime_hashes':integrity['runtime_hashes']}
+            'protocol_hash':state['protocol_hash'],'runtime_hashes':integrity['runtime_hashes'],'selection_package_hashes':selection_integrity['task_package_hashes']}
         prior=state['baseline'];incumbent='base';best=prior['score'];total=0
         for record in state['attempts']:
             number=int(record['attempt_id'].split('-')[-1]);factory_root=study/state['protocol']['factory_directory'] if state['protocol'].get('factory_directory') else ROOT/'work';factory=factory_root/f'factory-{name}-{number:02}'
-            fr=read(factory/'result.json');corpus,_,incomplete=restore_corpus(factory,registry)
+            fr=read(factory/'result.json');verify_factory_identity(factory,model,manifest.get('teacher','gpt-5.6-sol'));corpus,_,incomplete=restore_corpus(factory,registry)
             if incomplete:raise ValueError('unresolved teacher episode')
             histories=read(factory/'research-history.json')
             events=[h for h in histories if h['action'].get('type')=='rollout']
@@ -91,6 +112,12 @@ def audit(study):
                     or training['covered_records']!=len(rows) or training['training_profile']!='factory-v1'):
                     raise ValueError('training proof mismatch')
                 path=study/'cache-repair'/name if number==1 and not state['protocol'].get('round1_layout') else study/f'round-{number}'/('eval-'+name)
+                if record.get('recovery'):
+                    original=evaluation(Path(record['recovery']['original_path']),state['protocol']['selection_tasks'])
+                    if public_summary(original)!=public_summary(record['original_evaluation']):raise ValueError('original recovery evidence changed')
+                    row['original_evaluation']=original
+                    row['recovery_plan_sha256']=sha(record['recovery']['plan_path'])
+                    path=Path(record['evaluation_path'])
                 ev=evaluation(path,state['protocol']['selection_tasks'])
                 if public_summary(ev)!=public_summary(record['evaluation']):raise ValueError('registered score differs from execution')
                 row.update(evaluation=ev,records=len(rows),checkpoint_sha256=digest(training['checkpoint']),
@@ -128,18 +155,53 @@ def audit(study):
             'checkpoint_sha256':plan['binding']['checkpoint_sha256'],'repetition':plan['repetition'],
             'started_at':started,'evaluation':combined,'chunk_proofs':[p['proof'] for p in pieces],
             'plan_sha256':sha(out/'plan.json'),'selection_precedes_test':True})
+    for execution in result['final_executions']:
+        recovery=study/'final-recoveries'/execution['label']
+        if not (recovery/'summary.json').exists():continue
+        declaration=read(recovery/'plan.json');original=study/'final-executions'/execution['label'];plan=read(original/'plan.json')
+        if declaration['original_plan_sha256']!=sha(original/'plan.json') or declaration['original_summary_sha256']!=sha(original/'summary.json') or declaration['checkpoint_sha256']!=execution['checkpoint_sha256']:
+            raise ValueError('final recovery original binding mismatch')
+        started=read(recovery/'started.json')['started_at']
+        if started<execution['started_at']:raise ValueError('recovery predates original final execution')
+        retries=[];retry_proofs=[]
+        for item in declaration['cases']:
+            matches=[]
+            for p in original.glob('chunk-*/harbor/checkpoint-browser/*/result.json'):
+                raw=read(p)
+                if raw['task_name']==item['task']:matches.append((p,raw))
+            if len(matches)!=1:raise ValueError('ambiguous original recovery case')
+            p,raw=matches[0]
+            if sha(p)!=item['original_result_sha256'] or raw.get('agent_setup') is not None or raw.get('agent_execution') is not None or (p.parent/'agent/trace.json').exists():
+                raise ValueError('recovery case was not an untouched pre-agent failure')
+            ev=evaluation(recovery/item['task'],[item['task']]);ok=verify_execution(recovery/item['task'],plan)
+            if len(ev['tasks'])!=1:raise ValueError('recovery task identity mismatch')
+            row=ev['tasks'][0]
+            if not ok:row.update(score=None,error_type=row.get('error_type') or 'RecoveryInfrastructureError')
+            retries.append(row);retry_proofs.extend(ev['proof'])
+        recovered=replace_build_failures(execution['evaluation'],retries,execution['evaluation']['expected_tasks'])
+        if recovered!=read(recovery/'summary.json'):raise ValueError('recovered final score differs from evidence')
+        execution['recovered_evaluation']=recovered
+        execution['recovery']={'policy':declaration['policy'],'new_independent_repetition':False,
+            'retried_tasks':[r['task'] for r in retries],'started_at':started,'plan_sha256':sha(recovery/'plan.json'),'proof':retry_proofs}
     comparison=study/'final-comparison.json'
     if comparison.exists():
         plan=read(comparison);result['final_comparison']=plan
         by_label={r['label']:r for r in result['final_executions']}
         for role,labels in plan['bindings'].items():
-            s=CampaignRegistry(study/(('astra' if role=='base' else role)+'-campaign.json')).snapshot()
+            s=CampaignRegistry(study/((next(iter(study_roster(study))) if role=='base' else role)+'-campaign.json')).snapshot()
             expected=make_plan(ROOT,study,s,'base' if role=='base' else 'selected')['binding']['checkpoint_sha256']
             for label in labels:
                 if label in by_label and (by_label[label]['checkpoint_sha256']!=expected or by_label[label]['started_at']<plan['created_at']):
                     raise ValueError('final comparison identity or timing mismatch')
         result['all_final_executions_finished']=all(r['label'] in by_label for r in plan['executions'])
     else:result['all_final_executions_finished']=False
+    result['all_final_recoveries_finished']=all(
+        not any(t.get('error_type')=='BuildException' for t in run['evaluation']['tasks']) or 'recovered_evaluation' in run
+        for run in result['final_executions'])
+    recovery_root=study/'final-recoveries'
+    if recovery_root.exists():
+        result['all_final_recoveries_finished']=result['all_final_recoveries_finished'] and all(
+            (p.parent/'summary.json').exists() for p in recovery_root.glob('*/plan.json'))
     result['audit_pass']=True
     result['search_finished']=all(c['selection_frozen'] and c['pending_training']==0 for c in result['campaigns'])
     result['limitations']=['one application and three task families','one research seed per system',

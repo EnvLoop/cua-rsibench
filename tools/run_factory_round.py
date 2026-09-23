@@ -1,6 +1,7 @@
 """Execute one feedback-driven factory round through fixed real services."""
 import argparse,hashlib,json,os,subprocess,sys,time
 from pathlib import Path
+from cursibench.agentrouter import RESEARCHER_MODELS
 from cursibench.factory_campaign import CampaignRegistry
 from cursibench.factory_results import summarize,selection_feedback
 from cursibench.factory_preflight import preflight,SubmissionRejected
@@ -22,6 +23,8 @@ def child(command,directory,label):
     if result:raise RuntimeError(label+' process failed')
 
 def run(study,name,number):
+    if name not in RESEARCHER_MODELS:raise ValueError('researcher alias outside registered choices')
+    model=RESEARCHER_MODELS[name]
     study=Path(study).resolve();registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
     if not 1<=number<=state['protocol']['max_attempts']:raise ValueError('round outside declared budget')
     if number!=len(state['attempts'])+1:raise ValueError('round must follow the recorded history')
@@ -45,7 +48,6 @@ def run(study,name,number):
         'fixed_training_contract':{'profile':'factory-v1','steps':32,'batch_size':2,'max_records_with_full_coverage':64,'max_sequence_tokens':16384,'scheduled_token_cap':262144,'student_output_tokens':512},
         'instruction':'Use selection feedback to revise the inherited executable data factory. Final-test evidence is unavailable. Preserve demonstrated skills while improving weak task families.'}
     feedback_path=work/(name+'-feedback.json');write(feedback_path,feedback)
-    model={'astra':'gpt-6-astra','sol':'gpt-5.6-sol'}[name]
     command=[sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--feedback',str(feedback_path)]
     if parent:command+=['--parent',str(parent)]
     child(command,work,name+'-factory')
@@ -79,4 +81,4 @@ def run(study,name,number):
     print(json.dumps({'researcher':name,'attempt':attempt,'status':summary['status'],'score':summary['score'],'promoted':admitted['promoted']}),flush=True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--study',default='work/factory-study-02');parser.add_argument('--researcher',choices=['astra','sol'],required=True);parser.add_argument('--round',type=int,required=True);a=parser.parse_args();run(a.study,a.researcher,a.round)
+    parser=argparse.ArgumentParser();parser.add_argument('--study',default='work/factory-study-02');parser.add_argument('--researcher',choices=tuple(RESEARCHER_MODELS),required=True);parser.add_argument('--round',type=int,required=True);a=parser.parse_args();run(a.study,a.researcher,a.round)

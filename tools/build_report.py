@@ -54,6 +54,7 @@ def manuscript(e):
 
 def render(text,out,asset_root=None):
  asset_root=Path(asset_root) if asset_root else ROOT/'outputs'
+ title=next((line[2:].strip() for line in text.splitlines() if line.startswith('# ')), 'CUA-RSIBench - Technical Report')
  story=[]
  for block in text.split('\n\n'):
   block=block.strip()
@@ -83,7 +84,7 @@ def render(text,out,asset_root=None):
   c.setFillColor(GRAY);c.setFont('Times-Roman',8);c.drawRightString(539,815,'CUA-RSIBench - Technical Report')
   c.drawString(56,29,'github.com/EnvLoop/cua-rsibench');c.drawRightString(539,29,str(doc.page))
  out=Path(out)
- SimpleDocTemplate(str(out),pagesize=(595,842),leftMargin=56,rightMargin=56,topMargin=56,bottomMargin=50,title='CUA-RSIBench: Data-Centric Research for Verifiable Computer Use',author='EnvLoop').build(story,onFirstPage=page,onLaterPages=page)
+ SimpleDocTemplate(str(out),pagesize=(595,842),leftMargin=56,rightMargin=56,topMargin=56,bottomMargin=50,title=title,author='EnvLoop').build(story,onFirstPage=page,onLaterPages=page)
  print(out)
 def build(out):
  e=json.loads((ROOT/'outputs/evidence.json').read_text());text=manuscript(e)

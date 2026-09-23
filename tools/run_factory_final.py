@@ -7,6 +7,8 @@ from pathlib import Path
 from cursibench.factory_campaign import CampaignRegistry
 from cursibench.factory_final import make_plan, combine, verify_execution, read
 from cursibench.factory_results import summarize
+from cursibench.factory_roster import study_roster
+from cursibench.agentrouter import RESEARCHER_MODELS
 from run_factory_round import child, write, ROOT
 
 
@@ -14,7 +16,7 @@ def run(study, name, role, repetition):
     study = Path(study).resolve()
     registry = CampaignRegistry(study / (name + '-campaign.json'))
     # Both searches close before either researcher could receive final-test evidence.
-    for researcher in ('astra', 'sol'):
+    for researcher in study_roster(study):
         if CampaignRegistry(study / (researcher + '-campaign.json')).snapshot()['final_selection'] is None:
             raise ValueError('both research campaigns must be frozen before final testing')
     state = registry.snapshot()
@@ -64,7 +66,7 @@ def run(study, name, role, repetition):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--study', default='work/factory-study-02')
-    parser.add_argument('--researcher', choices=['astra', 'sol'], required=True)
+    parser.add_argument('--researcher', choices=list(RESEARCHER_MODELS), required=True)
     parser.add_argument('--role', choices=['selected', 'base'], required=True)
     parser.add_argument('--repetition', type=int, default=1)
     args = parser.parse_args()

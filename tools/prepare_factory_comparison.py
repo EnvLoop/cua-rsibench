@@ -3,26 +3,27 @@ import json,time
 from pathlib import Path
 from cursibench.factory_campaign import CampaignRegistry
 from cursibench.factory_final import make_plan
+from cursibench.factory_roster import study_roster
 
 ROOT=Path(__file__).resolve().parents[1]
 
 def prepare(study):
     study=Path(study).resolve();target=study/'final-comparison.json'
     if target.exists():raise ValueError('final comparison already exists')
-    registries={n:CampaignRegistry(study/(n+'-campaign.json')) for n in ('astra','sol')}
+    registries={n:CampaignRegistry(study/(n+'-campaign.json')) for n in study_roster(study)}
     for name,r in registries.items():
         s=r.snapshot();p=s['protocol']
         if s['reservations']:raise ValueError('training still pending: '+name)
         if len(s['attempts'])<p['max_attempts'] and s['best_score']!=1 and s['used_training_tokens']+262144<=p['training_token_budget']:
             raise ValueError('declared search stopping condition not reached: '+name)
     for r in registries.values():r.freeze_selection('declared round, selection-ceiling, or conservative token-budget stopping condition reached')
-    states={n:r.snapshot() for n,r in registries.items()};base=make_plan(ROOT,study,states['astra'],'base')
+    states={n:r.snapshot() for n,r in registries.items()};reference=next(iter(states));base=make_plan(ROOT,study,states[reference],'base')
     identities={'base':base['binding']['checkpoint_sha256']}
     for name,s in states.items():identities[name]=make_plan(ROOT,study,s,'selected')['binding']['checkpoint_sha256']
     executions=[];bindings={k:[] for k in identities};unique={}
     for role,key in identities.items():
         if key not in unique:
-            name='astra' if role=='base' else role;purpose='base' if role=='base' else 'selected'
+            name=reference if role=='base' else role;purpose='base' if role=='base' else 'selected'
             labels=[]
             for repeat in (1,2):
                 label=f'{name}-{purpose}-repeat-{repeat}';labels.append(label)

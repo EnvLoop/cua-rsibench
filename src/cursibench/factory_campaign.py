@@ -137,6 +137,25 @@ class CampaignRegistry:
             if admitted:state['selected']=attempt_id;state['best_score']=summary['score']
             self._save(state);return copy.deepcopy(record)
 
+    def recover_evaluation(self,attempt_id,summary,evaluation_path,original_path,plan_path):
+        """Resolve the latest invalid execution once, retaining its original evidence."""
+        with self._lock():
+            state=self._read()
+            if state['final_selection'] is not None or state['reservations']:raise ValueError('recovery requires an open search without pending training')
+            if not state['attempts'] or state['attempts'][-1]['attempt_id']!=attempt_id:raise ValueError('only the latest candidate can be recovered before continuing search')
+            record=state['attempts'][-1]
+            if not record['training_manifest'] or record['evaluation']['status']=='scored' or record.get('recovery'):raise ValueError('only one retry of an infrastructure-invalid trained candidate is allowed')
+            incumbent=state['baseline'] if state['selected']=='base' else next(r['evaluation'] for r in state['attempts'] if r['attempt_id']==state['selected'])
+            scores=valid_scores(summary,state['protocol']['selection_tasks']);prior=valid_scores(incumbent,state['protocol']['selection_tasks'])
+            no_regression=scores is not None and all(scores[k]>=prior[k] for k in prior)
+            admitted=no_regression and summary['score']>state['best_score']
+            record['original_evaluation']=copy.deepcopy(record['evaluation'])
+            record['evaluation']=copy.deepcopy(summary);record['evaluation_path']=str(evaluation_path)
+            record['recovery']={'original_path':str(original_path),'plan_path':str(plan_path),'registered_at':time.time(),'valid':scores is not None}
+            record['promoted']=admitted;record['no_regression']=no_regression
+            if admitted:state['selected']=attempt_id;state['best_score']=summary['score']
+            self._save(state);return copy.deepcopy(record)
+
     def freeze_selection(self,reason):
         with self._lock():
             state=self._read()

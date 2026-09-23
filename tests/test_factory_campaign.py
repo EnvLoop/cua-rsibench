@@ -44,6 +44,19 @@ class CampaignRegistryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'duplicate'):r.record_submission_rejection('one','h1',{'accepted':False})
             self.assertEqual(r.freeze_selection('search complete')['candidate'],'base')
 
+    def test_one_invalid_evaluation_can_be_recovered_without_retraining(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            r=self.registry(tmp);r.set_baseline(summary([0,0,0]))
+            bad={'status':'infrastructure_error','score':None,'tasks':[]}
+            r.register('one','h1','training.json',100,bad,historical_import=True)
+            recovered=r.recover_evaluation('one',summary([1,0,0]),'recovery','original','plan.json')
+            self.assertTrue(recovered['promoted'])
+            self.assertEqual(recovered['original_evaluation'],bad)
+            self.assertEqual(r.snapshot()['used_training_tokens'],100)
+            with self.assertRaisesRegex(ValueError,'one retry'):
+                r.recover_evaluation('one',summary([1,1,1]),'again','original','plan.json')
+            self.assertEqual(r.freeze_selection('search done')['candidate'],'one')
+
     def test_reservation_prevents_parallel_overspend_and_survives_restart(self):
         with tempfile.TemporaryDirectory() as tmp:
             r=self.registry(tmp);r.set_baseline(summary([0,0,0]))

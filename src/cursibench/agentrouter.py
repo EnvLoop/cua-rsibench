@@ -9,7 +9,24 @@ import time
 import httpx
 from .http_transport import post_json
 
-MODEL_CHOICES = ('gpt-6-astra', 'gpt-5.6-sol')
+# Keep historical aliases stable: ``sol`` identifies the 5.6 campaign. New
+# generations use distinct aliases and output directories, never relabeled runs.
+RESEARCHER_MODELS = {
+    'astra': 'gpt-6-astra',
+    'sol': 'gpt-5.6-sol',
+    'sol6': 'gpt-6-sol',
+    'luna6': 'gpt-6-luna',
+}
+MODEL_CHOICES = tuple(RESEARCHER_MODELS.values())
+RESEARCHER_CHOICES = tuple(RESEARCHER_MODELS) + MODEL_CHOICES
+
+
+def resolve_researcher_model(name):
+    """Resolve a campaign alias without inferring a model generation."""
+    model = RESEARCHER_MODELS.get(name, name)
+    if model not in MODEL_CHOICES:
+        raise ValueError('researcher outside registered choices')
+    return model
 
 class ProviderFailure(RuntimeError):
     def __init__(self, kind, receipt):
