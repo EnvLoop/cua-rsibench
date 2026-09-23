@@ -61,3 +61,22 @@ Training still enforces the fixed sequence and scheduled-token bounds. In the fa
 ## Remaining gates
 
 Complete a feedback-driven research trajectory through the fixed trainer and evaluator; preserve the historical best before final testing; calibrate a larger, counterbalanced task suite; run independent final cases and appropriate controls; then update the English report and visualization from the resulting evidence. The data-factory integration alone does not complete these gates.
+
+## Submission, selection, and final gates
+
+`factory_preflight.py` uses the student's tokenizer before training to check complete sequence length, output-target capacity, full dataset exposure, and scheduled token budget. In research rounds with a fixed training contract, an invalid submission returns exact feedback while turns remain. A completed round without a valid dataset is retained as unscored and consumes no training tokens. The logical-turn deadline is explicit; retry-call reservations are a separate budget.
+
+`tools/run_factory_round.py` performs generation, preflight, reservation, real training, evaluation, and registry update. Its phase logs prevent accidental duplicate execution after interruption. Inspect the durable process and result records before recovery.
+
+After declared stopping conditions are reached, `tools/prepare_factory_comparison.py` freezes both selections and prescribes final comparisons. `tools/run_factory_final.py` binds each execution to the frozen checkpoint, sealed case hashes, canonical exported runtime, and task identities. It requires both searches to be closed, preserves invalid executions, and allows two same-seed environment repetitions. Identical checkpoint roles share explicitly identified evidence.
+
+`tools/audit_factory_study.py` exports allowlisted evidence after reconstructing corpus provenance and checking training, scoring, promotion, and accounting. The report and explorer builders refuse to publish an unfinished search or incomplete prescribed final executions.
+
+```sh
+PYTHONPATH=src python tools/prepare_factory_comparison.py
+PYTHONPATH=src python tools/run_factory_final.py \
+  --researcher astra --role selected --repetition 1
+PYTHONPATH=src python tools/audit_factory_study.py
+```
+
+These commands require the corresponding local execution artifacts and configured provider accounts. The released sanitized evidence supports offline report rebuilding; it does not include private sampler checkpoint identifiers.

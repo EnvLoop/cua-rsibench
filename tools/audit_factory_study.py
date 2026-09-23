@@ -124,6 +124,18 @@ def audit(study):
             'checkpoint_sha256':plan['binding']['checkpoint_sha256'],'repetition':plan['repetition'],
             'started_at':started,'evaluation':combined,'chunk_proofs':[p['proof'] for p in pieces],
             'plan_sha256':sha(out/'plan.json'),'selection_precedes_test':True})
+    comparison=study/'final-comparison.json'
+    if comparison.exists():
+        plan=read(comparison);result['final_comparison']=plan
+        by_label={r['label']:r for r in result['final_executions']}
+        for role,labels in plan['bindings'].items():
+            s=CampaignRegistry(study/(('astra' if role=='base' else role)+'-campaign.json')).snapshot()
+            expected=make_plan(ROOT,study,s,'base' if role=='base' else 'selected')['binding']['checkpoint_sha256']
+            for label in labels:
+                if label in by_label and (by_label[label]['checkpoint_sha256']!=expected or by_label[label]['started_at']<plan['created_at']):
+                    raise ValueError('final comparison identity or timing mismatch')
+        result['all_final_executions_finished']=all(r['label'] in by_label for r in plan['executions'])
+    else:result['all_final_executions_finished']=False
     result['audit_pass']=True
     result['search_finished']=all(c['selection_frozen'] and c['pending_training']==0 for c in result['campaigns'])
     result['limitations']=['one application and three task families','one research seed per system',

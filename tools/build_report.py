@@ -52,9 +52,8 @@ def manuscript(e):
  if re.search(r'[\u3400-\u9fff]',source):raise ValueError('non-English CJK content in manuscript')
  return source
 
-def build(out):
- e=json.loads((ROOT/'outputs/evidence.json').read_text());text=manuscript(e)
- (ROOT/'outputs/CUA-RSIBench-Technical-Report.md').write_text(text)
+def render(text,out,asset_root=None):
+ asset_root=Path(asset_root) if asset_root else ROOT/'outputs'
  story=[]
  for block in text.split('\n\n'):
   block=block.strip()
@@ -66,8 +65,8 @@ def build(out):
   if block.startswith('!['):
    match=re.fullmatch(r'!\[(.*?)\]\((.*?)\)',block,re.S)
    if not match:raise ValueError('bad figure block')
-   caption,path=match.groups();im=Image(str(ROOT/'outputs'/path));height=WIDTH*im.imageHeight/im.imageWidth
-   story.append(KeepTogether([Image(str(ROOT/'outputs'/path),width=WIDTH,height=height),P(caption,'small')]));continue
+   caption,path=match.groups();im=Image(str(asset_root/path));height=WIDTH*im.imageHeight/im.imageWidth
+   story.append(KeepTogether([Image(str(asset_root/path),width=WIDTH,height=height),P(caption,'small')]));continue
   if block.startswith('|'):
    rows=[[x.strip() for x in line.strip().strip('|').split('|')] for line in block.splitlines()]
    columns=len(rows[0]);weights={2:[.27,.73],3:[.48,.20,.32],5:[.25,.18,.16,.22,.19]}.get(columns,[1/columns]*columns)
@@ -85,5 +84,10 @@ def build(out):
  out=Path(out)
  SimpleDocTemplate(str(out),pagesize=(595,842),leftMargin=56,rightMargin=56,topMargin=56,bottomMargin=50,title='CUA-RSIBench: Data-Centric Research for Verifiable Computer Use',author='EnvLoop').build(story,onFirstPage=page,onLaterPages=page)
  print(out)
+def build(out):
+ e=json.loads((ROOT/'outputs/evidence.json').read_text());text=manuscript(e)
+ (ROOT/'outputs/CUA-RSIBench-Technical-Report.md').write_text(text)
+ render(text,out)
+
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--out',default='outputs/CUA-RSIBench-Technical-Report.pdf');a=p.parse_args();build(a.out)

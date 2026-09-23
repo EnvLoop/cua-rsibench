@@ -104,7 +104,9 @@ def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=
         for turn in range(budget.next_research_turn(),max_turns):
             if time.monotonic()-started>3000:break
             prompt=CONTRACT+'\n'+json.dumps({'case_contract':CASE_CONTRACT,'budget':budget.snapshot(),
-                    'notes':notes,'selection_feedback':feedback,'inherited_factory':bool(parent),'recent_actions':history[-6:],'turn':turn},ensure_ascii=False)
+                    'notes':notes,'selection_feedback':feedback,'inherited_factory':bool(parent),'recent_actions':history[-6:],'turn':turn,
+                    'max_research_turns':max_turns,'remaining_research_turns_including_this':max_turns-turn,
+                    'submission_deadline':'A run or write action does not submit a dataset. Reserve a final action to submit the emitted JSONL before the logical turn cap.'},ensure_ascii=False)
             raw=None
             for retry in range(2):
                 budget.reserve('researcher_calls',1,f'researcher:{turn}:{retry}')
