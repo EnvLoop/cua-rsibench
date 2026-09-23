@@ -44,4 +44,8 @@ The implementation contains separate harness-adaptation and data-training paths.
 
 ## Publication
 
-A technical PDF and visual evidence explorer are being assembled from the current results. They will distinguish validated facts, negative outcomes and remaining work; the historical toy `+0.1429` fixture delta is not an RSI result.
+- [Interactive evidence explorer](https://nanobanana123.github.io/cua-rsibench/site/)
+- [Pilot technical report and offline bundle](https://github.com/nanobanana123/cua-rsibench/releases/tag/v0.3.0-pilot)
+- [PDF in this repository](docs/site/CUA-RSIBench-Technical-Report.pdf)
+
+The 9-page report was rendered, visually inspected, published, fetched back and checked byte-for-byte. The live visualization's filters and PDF link were tested. It reports real data provenance, real cloud execution, native GUI calibration results, infrastructure exclusions and limitations. The historical toy `+0.1429` fixture delta is not an RSI result. Multi-round data-research campaigns are still running; the goal is not yet marked complete.

@@ -5,13 +5,14 @@ from pathlib import Path
 import tinker
 from tinker import types
 from transformers import AutoTokenizer
+from sample_cache import SamplingCache
 
 
 def main():
     service=tinker.ServiceClient();checkpoint=os.environ['TINKER_MODEL_PATH'];base=os.environ['TINKER_BASE_MODEL']
     sampling=service.create_sampling_client(model_path=checkpoint) if checkpoint.startswith('tinker://') else service.create_sampling_client(base_model=base)
     tokenizer=AutoTokenizer.from_pretrained(base)
-    token=os.environ['CUA_PROXY_TOKEN']
+    token=os.environ['CUA_PROXY_TOKEN'];cache=SamplingCache();finished={}
     class H(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def do_GET(self):
@@ -22,14 +23,17 @@ def main():
             size=int(self.headers.get('Content-Length','0'))
             if not 0<size<=200000:self.send_error(413);return
             try:
-                request=json.loads(self.rfile.read(size));prompt=request['prompt']
+                request=json.loads(self.rfile.read(size));prompt=request['prompt'];request_id=request['request_id']
                 text=tokenizer.apply_chat_template([{'role':'user','content':prompt}],tokenize=False,add_generation_prompt=True,enable_thinking=False)
                 ids=tokenizer.encode(text,add_special_tokens=False)
                 if len(ids)>15000:raise ValueError('prompt exceeds fixed proxy budget')
                 started=time.monotonic()
-                output=sampling.sample(prompt=types.ModelInput.from_ints(ids),num_samples=1,sampling_params=types.SamplingParams(max_tokens=512,temperature=0,seed=23)).result(timeout=120)
+                future,reused=cache.get(request_id,prompt,lambda:sampling.sample(prompt=types.ModelInput.from_ints(ids),num_samples=1,sampling_params=types.SamplingParams(max_tokens=512,temperature=0,seed=23)))
+                if request_id in finished:self.respond(finished[request_id]);return
+                output=future.result(timeout=120)
                 tokens=output.sequences[0].tokens
-                result={'text':tokenizer.decode(tokens,skip_special_tokens=True),'usage':{'input_tokens':len(ids),'output_tokens':len(tokens)},'elapsed_seconds':time.monotonic()-started}
+                result={'request_id':request_id,'text':tokenizer.decode(tokens,skip_special_tokens=True),'usage':{'input_tokens':len(ids),'output_tokens':len(tokens)},'elapsed_seconds':time.monotonic()-started}
+                finished[request_id]=result
                 # Accounting only; never log credentials or private provider envelopes.
                 with Path('/app/proxy-usage.jsonl').open('a') as f:f.write(json.dumps(result)+'\n')
                 self.respond(result)

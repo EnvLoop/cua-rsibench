@@ -53,10 +53,19 @@ class TinkerBrowserAgent(BrowserAgent):
     def name():return 'cua-tinker-browser'
     async def call_model(self,prompt,model):
         import os
-        from urllib import request
+        from .http_transport import post_json
+        import uuid,time,httpx
+        request_id=uuid.uuid4().hex
         def call():
-            req=request.Request(os.environ['CUA_TINKER_PROXY_URL']+'/sample',data=json.dumps({'prompt':prompt}).encode(),headers={'Authorization':'Bearer '+os.environ['CUA_PROXY_TOKEN'],'Content-Type':'application/json'},method='POST')
-            with request.urlopen(req,timeout=150) as r:body=json.load(r)
+            for attempt in range(3):
+                try:
+                    body=post_json(os.environ['CUA_TINKER_PROXY_URL']+'/sample',{'prompt':prompt,'request_id':request_id},
+                                   {'Authorization':'Bearer '+os.environ['CUA_PROXY_TOKEN'],'Content-Type':'application/json'},150)
+                    break
+                except (httpx.TransportError,httpx.HTTPStatusError) as exc:
+                    retryable=not isinstance(exc,httpx.HTTPStatusError) or exc.response.status_code in (500,502,503,504)
+                    if attempt==2 or not retryable:raise
+                    time.sleep(2**attempt)
             if body.get('error'):raise RuntimeError('Tinker proxy sampling failed')
             return body['text'],{'requested_model':model,'usage':body['usage'],'elapsed_seconds':body['elapsed_seconds'],'cost_usd':None}
         return await asyncio.to_thread(call)

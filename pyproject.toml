@@ -13,7 +13,7 @@ where = ["src"]
 
 [project.optional-dependencies]
 browser = ["playwright==1.63.0"]
-cloud = ["e2b==2.51.0", "tinker==0.30.0", "jinja2>=3.1,<4"]
+cloud = ["httpx[http2]==0.28.1", "e2b==2.51.0", "tinker==0.30.0", "jinja2>=3.1,<4"]
 harbor = ["harbor[e2b]==0.23.0"]
 
 [tool.setuptools.package-data]

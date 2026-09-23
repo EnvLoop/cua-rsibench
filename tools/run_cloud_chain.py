@@ -14,6 +14,7 @@ result={'training_checkpoint':training['checkpoint'],'training_model':training['
 try:
  sb=Sandbox.create(template='cua-tinker-proxy-v1',timeout=3000,envs={'TINKER_API_KEY':os.environ['TINKER_API_KEY'],'TINKER_MODEL_PATH':training['checkpoint'],'TINKER_BASE_MODEL':training['model'],'CUA_PROXY_TOKEN':secret})
  sb.commands.run('python -c "import tinker, jinja2"',user='root',timeout=20)
+ sb.files.write('/app/sample_cache.py',(root/'src/cursibench/sample_cache.py').read_text())
  sb.files.write('/app/tinker_proxy.py',(root/'src/cursibench/tinker_proxy.py').read_text())
  sb.commands.run('nohup python /app/tinker_proxy.py >/app/tinker-proxy.log 2>&1 </dev/null &',user='root',timeout=10)
  for _ in range(90):
