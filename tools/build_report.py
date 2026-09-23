@@ -70,6 +70,7 @@ def render(text,out,asset_root=None):
   if block.startswith('|'):
    rows=[[x.strip() for x in line.strip().strip('|').split('|')] for line in block.splitlines()]
    columns=len(rows[0]);weights={2:[.27,.73],3:[.48,.20,.32],5:[.25,.18,.16,.22,.19]}.get(columns,[1/columns]*columns)
+   if 'Task family' in block:weights=[.20,.47,.33]
    if 'First / best' in block:weights=[.17,.17,.31,.14,.21]
    if 'Final executions' in block:weights=[.34,.44,.22]
    t=Table([[P(x,'cell') for x in row] for row in rows],colWidths=[WIDTH*w for w in weights],repeatRows=1)

@@ -46,6 +46,8 @@ def audit(study):
         'application':'Kanboard 1.2.54','interaction':'DOM-assisted browser use','cost_usd':None,
         'campaigns':[],'final_executions':[],'claim':'bounded data-centric research pilot; no sustained RSI or broad model ranking'}
     source_sets=[{r['number'] for r in source['records'][i:i+12]} for i in (0,12,24)]
+    result['source_records_used']={'selection':len({n for p in (study/'selection').glob('*/environment/scenario.json') for n in read(p)['source_numbers']}),'final':len({n for p in (study/'sealed-final').glob('chunk-*/*/environment/scenario.json') for n in read(p)['source_numbers']})}
+    training_source_ids=set()
     result['source_partitions_disjoint']=all(not source_sets[i]&source_sets[j] for i in range(3) for j in range(i+1,3))
     for name,model in [('astra','gpt-6-astra'),('sol','gpt-5.6-sol')]:
         state=CampaignRegistry(study/(name+'-campaign.json')).snapshot()
@@ -81,6 +83,7 @@ def audit(study):
                  'promoted':record['promoted'],'accounting':record.get('accounting','historical import before reservation guard')}
             if record['training_manifest']:
                 data=factory/'train_messages.jsonl';rows=corpus.validate_submission(data.read_text());training=read(record['training_manifest'])
+                training_source_ids.update(n for r in rows for n in r['source_numbers'])
                 if sha(data)!=record['dataset_hash'] or training['data_sha256']!=record['dataset_hash']:
                     raise ValueError('training dataset mismatch')
                 if (not training.get('verified_training_and_sampling') or training['scheduled_tokens']!=record['training_tokens']
@@ -106,6 +109,7 @@ def audit(study):
         if state['final_selection']:
             campaign['frozen_at']=state['final_selection']['frozen_at'];campaign['stopping_reason']=state['final_selection']['reason']
         result['campaigns'].append(campaign)
+    result['source_records_used']['training_supervision']=len(training_source_ids)
     directory=study/'final-executions'
     for out in sorted(directory.iterdir()) if directory.exists() else []:
         if not (out/'summary.json').exists():continue

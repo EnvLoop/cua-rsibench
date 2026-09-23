@@ -4,7 +4,7 @@
 
 ## Abstract
 
-Can a researcher agent turn evidence of browser-agent failures into better training data? We study this question in a bounded, real-application setting. Two researchers, gpt-6-astra and gpt-5.6-sol, write and execute Python data factories, construct native Kanboard task states from public issue metadata, request independently verified GUI demonstrations from a fixed teacher, and revise their datasets using student evaluation feedback. Each valid dataset trains a fresh Qwen3.5-4B LoRA adapter through Tinker. Harbor evaluates the student in E2B environments with a separate saved-state verifier. Across {{ROUND_COUNT}} completed research rounds, {{TRAINED_COUNT}} candidates complete training and consume {{TOTAL_TOKENS}} scheduled training tokens. {{SELECTION_SENTENCE}} Final evaluation covers six source-disjoint task instances with two same-seed environment repetitions. {{FINAL_SENTENCE}} We release the implementation, evidence audit, English report, and visualizations while distinguishing failed submissions and infrastructure errors from scored model failures. This is a small data-research pilot, not evidence of sustained recursive self-improvement or broad computer-use generalization.
+Can a researcher agent turn evidence of browser-agent failures into better training data? We study this question in a bounded, real-application setting. Two researchers, gpt-6-astra and gpt-5.6-sol, write and execute Python data factories, construct native Kanboard task states from public issue metadata, request independently verified GUI demonstrations from a fixed teacher, and revise their datasets using student evaluation feedback. Each valid dataset trains a fresh Qwen3.5-4B LoRA adapter through Tinker. Harbor evaluates the student in E2B environments with a separate saved-state verifier. Across {{ROUND_COUNT}} completed research rounds, {{TRAINED_COUNT}} candidates complete training and consume {{TOTAL_TOKENS}} scheduled training tokens. {{SELECTION_SENTENCE}} Final evaluation covers six task variants drawn from a final source pool disjoint from training and selection, with two same-seed environment repetitions. {{FINAL_SENTENCE}} We release the implementation, evidence audit, English report, and visualizations while distinguishing failed submissions and infrastructure errors from scored model failures. This is a small data-research pilot, not evidence of sustained recursive self-improvement or broad computer-use generalization.
 
 ## 1. Research question
 
@@ -36,7 +36,11 @@ The execution environment runs Kanboard 1.2.54 with its original PHP controllers
 
 ![Figure 2. Native Kanboard interface recorded in E2B. The benchmark uses the original application and persistent database; project content and workflow constraints are constructed fixtures.](kanboard-real-ui.png)
 
-The source snapshot contains 37 authentic public issue metadata records with source URLs, issue numbers, capped titles, states, timestamps, labels, and comment counts. Twelve IDs each are assigned to training, selection, and final sources; one is unused. The three source pools do not overlap. Issue bodies, authors, and email addresses are excluded. Staff, planning values, costs, capacities, dependencies, archive distractors, and project names are explicitly synthetic.
+The source snapshot contains 37 authentic public issue metadata records with source URLs, issue numbers, capped titles, states, timestamps, labels, and comment counts. Twelve IDs each are assigned to training, selection, and final sources; one is unused. The three source pools do not overlap. The executed selection suite uses {{SELECTION_SOURCE_COUNT}} distinct source records and the final suite uses {{FINAL_SOURCE_COUNT}}; instances within a split share records. Issue bodies, authors, and email addresses are excluded. Staff, planning values, costs, capacities, dependencies, archive distractors, and project names are explicitly synthetic.
+
+---PAGEBREAK---
+
+### 3.1. Task families
 
 | Task family | Required behavior | Common valid failure |
 | Direct updates | Find specified source records; set assignee, priority, and complexity; save | Edit another record or choose the wrong value |
@@ -44,8 +48,6 @@ The source snapshot contains 37 authentic public issue metadata records with sou
 | Constrained allocation | Maximize value under cost, time, dependency and exclusion rules; minimize cost on ties | Choose a feasible but suboptimal set |
 
 **Table 1.** The three task families. Final instances vary insertion order, target attributes, ranking direction, and planning alternatives. These combined variations probe robustness but do not isolate any single shortcut causally.
-
----PAGEBREAK---
 
 ## 4. Verification and isolation
 
@@ -72,7 +74,7 @@ Both researchers use AgentRouterHub's Responses interface under the same control
 | Data exposure | At most 64 records for full coverage in 32 updates; 16,384 tokens per sequence; 262,144 scheduled tokens per candidate |
 | Student sampling | Temperature 0; seed 23; at most 512 output tokens |
 | Evaluation | 90 actions per task; 1,500-second agent timeout; 3 tasks per bounded execution chunk |
-| Selection / final | 3 fixed selection instances; 6 source-disjoint final instances, each evaluated twice |
+| Selection / final | 3 fixed selection instances; 6 final variants from a separate source pool, each evaluated twice |
 | Software | Kanboard 1.2.54; Harbor 0.23.0; Tinker 0.30.0; E2B 2.51.0 |
 
 **Table 2.** Shared settings. Token counts include masked input tokens and do not estimate dollars. Wall-time limits apply to individual services and round control; the study does not claim the reference paper's monetary or whole-campaign wall-time budget.
@@ -117,7 +119,7 @@ Final evidence is not used to select a different checkpoint or generate another 
 
 This study demonstrates an executable research loop with agent-authored Python, new native task states, verified GUI trajectories, real weight updates, fixed evaluation, and immutable selection. It does not establish sustained recursive self-improvement: a separate frontier researcher improves a fixed smaller student, and improved students do not become the next researchers.
 
-The evaluation is small: one application, three shared task families, one research seed per system, three selection tasks, and six final tasks. Source IDs are disjoint, but templates, UI structure, and some workflow conventions are shared. Public metadata may already occur in pretraining data. No unseen-application, pixel-grounding, original Microsoft Office, Windows, or macOS capability is measured.
+The evaluation is small: one application, three shared task families, one research seed per system, three selection tasks, and six final variants. Source IDs are disjoint across splits; instances within a split share source records, templates, UI structure, and some workflow conventions. Public metadata may already occur in pretraining data. No unseen-application, pixel-grounding, original Microsoft Office, Windows, or macOS capability is measured.
 
 A larger final suite, repeated research seeds, and an equal-budget non-adaptive search control are required before attributing improvement to feedback-driven research or ranking the researchers. The current final repeats test environment stability at a fixed seed. They cannot support confidence intervals over a broad task distribution. The controller-enforced checkpoint rule also measures a narrower research interface than unrestricted strategy and stopping decisions.
 
