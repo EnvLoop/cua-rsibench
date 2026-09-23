@@ -147,6 +147,9 @@ def run(out,researcher='gpt-6-astra',max_turns=20,rollout_limit=3,teacher_calls=
                     rows=corpus.validate_submission(dataset_text(workspace,action['path']))
                     used={r['record_id'].split(':')[0] for r in rows}
                     if len(used)<2:raise ValueError('integration submission must cover two verified generated episodes')
+                    if feedback and feedback.get('fixed_training_contract'):
+                        from .factory_preflight import preflight_rows
+                        preflight_rows(rows)
                     data=''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in rows)
                     (out/'train_messages.jsonl').write_text(data)
                     submission={'records':len(rows),'dataset_sha256':digest(rows),'episodes':sorted(used),'validated':True,'trained':False}

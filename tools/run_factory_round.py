@@ -3,7 +3,7 @@ import argparse,hashlib,json,os,subprocess,sys,time
 from pathlib import Path
 from cursibench.factory_campaign import CampaignRegistry
 from cursibench.factory_results import summarize,selection_feedback
-from cursibench.training_contract import schedule
+from cursibench.factory_preflight import preflight,SubmissionRejected
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -21,21 +21,6 @@ def child(command,directory,label):
     write(status,{'pid':process.pid,'finished_at':time.time(),'return_code':result,'label':label})
     if result:raise RuntimeError(label+' process failed')
 
-def preflight(data):
-    from transformers import AutoTokenizer
-    rows=[json.loads(line) for line in data.read_text().splitlines() if line.strip()]
-    config,indices=schedule(len(rows),32,'factory-v1')
-    tokenizer=AutoTokenizer.from_pretrained('Qwen/Qwen3.5-4B',local_files_only=True)
-    sizes=[];targets=[]
-    for row in rows:
-        messages=row['messages']
-        prefix=tokenizer.encode(tokenizer.apply_chat_template(messages[:-1],tokenize=False,add_generation_prompt=True,enable_thinking=False),add_special_tokens=False)
-        target=tokenizer.encode(messages[-1]['content'],add_special_tokens=False)+[tokenizer.eos_token_id]
-        sizes.append(len(prefix)+len(target)-1);targets.append(len(target))
-    tokens=sum(sizes[i] for batch in indices for i in batch)
-    if max(sizes)>config['sequence_tokens'] or max(targets)>512 or tokens>config['scheduled_tokens']:raise ValueError('data exceeds fixed training/sampling token bounds')
-    return {'records':len(rows),'scheduled_tokens':tokens,'max_sequence':max(sizes),'max_target':max(targets),'data_sha256':hashlib.sha256(data.read_bytes()).hexdigest()}
-
 def run(study,name,number):
     study=Path(study).resolve();registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
     if not 3<=number<=state['protocol']['max_attempts']:raise ValueError('this entrypoint continues rounds 3..5')
@@ -52,6 +37,7 @@ def run(study,name,number):
     work=study/f'round-{number}';work.mkdir(exist_ok=True)
     feedback={'baseline':selection_feedback(state['baseline']),
         'candidate_history':[{'attempt':r['attempt_id'],'feedback':selection_feedback(r['evaluation']),'promoted':r['promoted']} for r in state['attempts'] if r['evaluation'].get('tasks')],
+        'submission_rejections':[{'attempt':r['attempt_id'],'feedback':r['submission_feedback']} for r in state['attempts'] if 'submission_feedback' in r],
         'incumbent':state['selected'],'remaining_training_tokens':state['protocol']['training_token_budget']-state['used_training_tokens'],
         'fixed_training_contract':{'profile':'factory-v1','steps':32,'batch_size':2,'max_records_with_full_coverage':64,'max_sequence_tokens':16384,'scheduled_token_cap':262144,'student_output_tokens':512},
         'instruction':'Use selection feedback to revise the inherited executable data factory. Final-test evidence is unavailable. Preserve demonstrated skills while improving weak task families.'}
@@ -59,8 +45,17 @@ def run(study,name,number):
     model={'astra':'gpt-6-astra','sol':'gpt-5.6-sol'}[name]
     child([sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--parent',str(parent),'--feedback',str(feedback_path)],work,name+'-factory')
     factory_result=json.loads((factory/'result.json').read_text())
-    if not factory_result.get('complete'):raise RuntimeError('factory did not submit verified data')
-    data=factory/'train_messages.jsonl';pre=preflight(data);write(work/(name+'-preflight.json'),pre)
+    if not factory_result.get('complete'):
+        report={'accepted':False,'reason':'research round ended without a verified submission','research_turns':factory_result['research_turns']}
+        registry.record_submission_rejection(f'round-{number}',None,report)
+        print(json.dumps({'researcher':name,'attempt':f'round-{number}','status':'no_submission'}));return
+    data=factory/'train_messages.jsonl'
+    try:pre=preflight(data)
+    except SubmissionRejected as exc:
+        write(work/(name+'-preflight-rejected.json'),exc.report)
+        registry.record_submission_rejection(f'round-{number}',hashlib.sha256(data.read_bytes()).hexdigest(),exc.report)
+        print(json.dumps({'researcher':name,'attempt':f'round-{number}','status':'submission_rejected'}));return
+    write(work/(name+'-preflight.json'),pre)
     attempt=f'round-{number}'
     registry.reserve_training(attempt,pre['data_sha256'],pre['scheduled_tokens'])
     training=work/('train-'+name)

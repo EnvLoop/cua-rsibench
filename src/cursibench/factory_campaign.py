@@ -94,6 +94,22 @@ class CampaignRegistry:
                 'promoted':False,'no_regression':False,'failure_reason':reason,'registered_at':time.time(),'accounting':'pre-execution reservation'})
             state['used_training_tokens']+=tokens;del state['reservations'][attempt_id];self._save(state)
 
+    def record_submission_rejection(self,attempt_id,dataset_hash,report):
+        """A completed research round with no training is visible, not a zero score."""
+        with self._lock():
+            state=self._read()
+            if state['baseline'] is None or state['final_selection'] is not None:raise ValueError('search is not open')
+            if attempt_id in state['reservations']:raise ValueError('resolve training reservation first')
+            if any(x['attempt_id']==attempt_id for x in state['attempts']):raise ValueError('duplicate attempt id')
+            if len(state['attempts'])+len(state['reservations'])>=state['protocol']['max_attempts']:raise ValueError('attempt budget exhausted')
+            if report.get('accepted') is not False:raise ValueError('a failed preflight report is required')
+            state['attempts'].append({'attempt_id':attempt_id,'dataset_hash':dataset_hash,
+                'training_manifest':None,'training_tokens':0,
+                'evaluation':{'status':'submission_rejected','score':None,'tasks':[]},
+                'promoted':False,'no_regression':False,'submission_feedback':copy.deepcopy(report),
+                'registered_at':time.time(),'accounting':'no training executed'})
+            self._save(state)
+
     def register(self,attempt_id,dataset_hash,training_manifest,training_tokens,summary,historical_import=False):
         with self._lock():
             state=self._read();protocol=state['protocol']

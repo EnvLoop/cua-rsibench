@@ -33,6 +33,17 @@ class CampaignRegistryTests(unittest.TestCase):
             with self.assertRaises(ValueError):r.register('two','new','two.json',101,summary([1,1,1]))
             with self.assertRaises(ValueError):CampaignRegistry(r.path,{'selection_tasks':['a'],'final_tasks':['x']})
 
+    def test_rejected_submission_is_an_unscored_attempt_without_training(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            r=self.registry(tmp);r.set_baseline(summary([0,0,0]))
+            r.record_submission_rejection('one','h1',{'accepted':False,'max_sequence':17000})
+            state=r.snapshot()
+            self.assertEqual(state['used_training_tokens'],0)
+            self.assertIsNone(state['attempts'][0]['evaluation']['score'])
+            self.assertEqual(state['attempts'][0]['evaluation']['status'],'submission_rejected')
+            with self.assertRaisesRegex(ValueError,'duplicate'):r.record_submission_rejection('one','h1',{'accepted':False})
+            self.assertEqual(r.freeze_selection('search complete')['candidate'],'base')
+
     def test_reservation_prevents_parallel_overspend_and_survives_restart(self):
         with tempfile.TemporaryDirectory() as tmp:
             r=self.registry(tmp);r.set_baseline(summary([0,0,0]))
