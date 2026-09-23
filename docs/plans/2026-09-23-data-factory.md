@@ -61,5 +61,5 @@ Run focused boundary tests and the existing suite. For cloud checks, inspect act
 - Controller interruption recovery retained Sol's completed rollouts and completed submission without rerunning them.
 - Both datasets trained for 32 real optimizer steps under one configuration; all rows were covered.
 - A multi-task proxy capacity bug was reproduced at exactly 256 samples, fixed, and retained as a separately versioned repair.
-- Clean baseline and Astra rerun are scored; Sol rerun remains active at this note.
+- The repaired initial comparison is scored: base 0/3, Astra-data checkpoint 1/3, Sol-data checkpoint 0/3. Feedback-driven factory revisions are now running.
 - Add counterbalanced layouts/target values to the next calibration to distinguish workflow learning from positional shortcuts. Do not retrofit the frozen three-case comparison.

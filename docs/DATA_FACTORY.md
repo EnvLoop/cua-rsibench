@@ -37,7 +37,7 @@ Both datasets have completed real 32-step Tinker LoRA training on Qwen3.5-4B und
 
 A three-family selection suite was frozen before student runs. The initial multi-task evaluation exposed a proxy-cache capacity defect: 256 entries did not cover three 90-action trials. Those interrupted results are retained as unscored. The repaired proxy derives its bounded capacity from the task count and keeps retry idempotency. Paired reruns use unchanged datasets, weights, tasks, observer and verifier.
 
-Full results must be read from the execution artifacts after all runs finish. No final-task or generalization claim follows from this calibration. The original small suite also needs counterbalanced source order, changed target attributes, and additional instances to test positional shortcuts.
+The repaired initial selection comparison completed without infrastructure errors: base student 0/3, Astra-data checkpoint 1/3, and Sol-data checkpoint 0/3. These are three-task calibration results. No final-task or generalization claim follows. The original small suite also needs counterbalanced source order, changed target attributes, and additional instances to test positional shortcuts.
 
 ## Run
 
