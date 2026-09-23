@@ -10,7 +10,7 @@ def manuscript(d):
     if not d['audit_pass'] or not d['search_finished'] or not d['all_final_executions_finished']:
         raise ValueError('finish and audit the prescribed search and final executions before publishing')
     campaigns=d['campaigns'];trained=[a for c in campaigns for a in c['attempts'] if a.get('optimizer_steps')]
-    values={'TRAINED_COUNT':str(len(trained)),'TOTAL_TOKENS':f'{sum(c["used_training_tokens"] for c in campaigns):,}'}
+    values={'ROUND_COUNT':str(sum(len(c['attempts']) for c in campaigns)),'TRAINED_COUNT':str(len(trained)),'TOTAL_TOKENS':f'{sum(c["used_training_tokens"] for c in campaigns):,}'}
     values['SELECTION_SENTENCE']=' '.join(f'{c["researcher"]} retains {c["selected"]} at {score(c["selection_score"])} selection success.' for c in campaigns)
     table=[['Researcher','Trained / rounds','First / best / last scored','Selected','Train tokens']]
     for c in campaigns:

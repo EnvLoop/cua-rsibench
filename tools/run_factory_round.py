@@ -23,7 +23,9 @@ def child(command,directory,label):
 
 def run(study,name,number):
     study=Path(study).resolve();registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
-    if not 3<=number<=state['protocol']['max_attempts']:raise ValueError('this entrypoint continues rounds 3..5')
+    if not 1<=number<=state['protocol']['max_attempts']:raise ValueError('round outside declared budget')
+    if number!=len(state['attempts'])+1:raise ValueError('round must follow the recorded history')
+    if state['baseline'] is None:raise ValueError('matched baseline must finish first')
     if state['final_selection'] is not None:raise ValueError('search already frozen')
     if state['best_score']==1:
         print(json.dumps({'stopped':'selection ceiling reached'}));return
@@ -31,9 +33,10 @@ def run(study,name,number):
     pending=sum(r['token_bound'] for r in state['reservations'].values())
     if state['used_training_tokens']+pending+262144>state['protocol']['training_token_budget']:
         print(json.dumps({'stopped':'insufficient conservative training reservation'}));return
-    parent=ROOT/'work'/f'factory-{name}-{number-1:02}'
-    if not (parent/'result.json').exists():raise ValueError('previous factory must be completed')
-    factory=ROOT/'work'/f'factory-{name}-{number:02}'
+    factory_root=study/state['protocol']['factory_directory'] if state['protocol'].get('factory_directory') else ROOT/'work'
+    parent=factory_root/f'factory-{name}-{number-1:02}' if number>1 else None
+    if parent and not (parent/'result.json').exists():raise ValueError('previous factory must be completed')
+    factory=factory_root/f'factory-{name}-{number:02}'
     work=study/f'round-{number}';work.mkdir(exist_ok=True)
     feedback={'baseline':selection_feedback(state['baseline']),
         'candidate_history':[{'attempt':r['attempt_id'],'feedback':selection_feedback(r['evaluation']),'promoted':r['promoted']} for r in state['attempts'] if r['evaluation'].get('tasks')],
@@ -43,7 +46,9 @@ def run(study,name,number):
         'instruction':'Use selection feedback to revise the inherited executable data factory. Final-test evidence is unavailable. Preserve demonstrated skills while improving weak task families.'}
     feedback_path=work/(name+'-feedback.json');write(feedback_path,feedback)
     model={'astra':'gpt-6-astra','sol':'gpt-5.6-sol'}[name]
-    child([sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--parent',str(parent),'--feedback',str(feedback_path)],work,name+'-factory')
+    command=[sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--feedback',str(feedback_path)]
+    if parent:command+=['--parent',str(parent)]
+    child(command,work,name+'-factory')
     factory_result=json.loads((factory/'result.json').read_text())
     if not factory_result.get('complete'):
         report={'accepted':False,'reason':'research round ended without a verified submission','research_turns':factory_result['research_turns']}

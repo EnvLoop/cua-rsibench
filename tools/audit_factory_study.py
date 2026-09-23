@@ -50,7 +50,7 @@ def audit(study):
     for name,model in [('astra','gpt-6-astra'),('sol','gpt-5.6-sol')]:
         state=CampaignRegistry(study/(name+'-campaign.json')).snapshot()
         integrity=validate_study(ROOT,study,state)
-        base=evaluation(study/'cache-repair/base',state['protocol']['selection_tasks'])
+        base=evaluation(study/state['protocol'].get('baseline_directory','cache-repair/base'),state['protocol']['selection_tasks'])
         if public_summary(state['baseline'])!=public_summary(base):raise ValueError('baseline registry mismatch')
         campaign={'name':name,'researcher':model,'baseline':base,'attempts':[],'factories':[],
             'used_training_tokens':state['used_training_tokens'],'training_token_budget':state['protocol']['training_token_budget'],
@@ -59,7 +59,7 @@ def audit(study):
             'protocol_hash':state['protocol_hash'],'runtime_hashes':integrity['runtime_hashes']}
         prior=state['baseline'];incumbent='base';best=prior['score'];total=0
         for record in state['attempts']:
-            number=int(record['attempt_id'].split('-')[-1]);factory=ROOT/'work'/f'factory-{name}-{number:02}'
+            number=int(record['attempt_id'].split('-')[-1]);factory_root=study/state['protocol']['factory_directory'] if state['protocol'].get('factory_directory') else ROOT/'work';factory=factory_root/f'factory-{name}-{number:02}'
             fr=read(factory/'result.json');corpus,_,incomplete=restore_corpus(factory,registry)
             if incomplete:raise ValueError('unresolved teacher episode')
             histories=read(factory/'research-history.json')
@@ -87,7 +87,7 @@ def audit(study):
                     or training['steps_requested']!=32 or len(training['events'])!=32 or training['record_count']!=len(rows)
                     or training['covered_records']!=len(rows) or training['training_profile']!='factory-v1'):
                     raise ValueError('training proof mismatch')
-                path=study/'cache-repair'/name if number==1 else study/f'round-{number}'/('eval-'+name)
+                path=study/'cache-repair'/name if number==1 and not state['protocol'].get('round1_layout') else study/f'round-{number}'/('eval-'+name)
                 ev=evaluation(path,state['protocol']['selection_tasks'])
                 if public_summary(ev)!=public_summary(record['evaluation']):raise ValueError('registered score differs from execution')
                 row.update(evaluation=ev,records=len(rows),checkpoint_sha256=digest(training['checkpoint']),

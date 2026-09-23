@@ -66,7 +66,8 @@ def validate_study(root, study, state):
     names = [r['task'] for r in final['cases']]
     if len(set(names)) != len(names) or set(names) != set(protocol['final_tasks']):
         raise ValueError('sealed final task identities changed')
-    repairs = read(study / 'cache-repair/plan.json')['source_sha256']
+    repair_path = study / 'cache-repair/plan.json'
+    repairs = read(repair_path)['source_sha256'] if repair_path.exists() else {}
     runtime = {}
     for name, expected in manifest['engine_hashes'].items():
         relative = 'src/cursibench/' + name

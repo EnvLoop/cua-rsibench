@@ -80,3 +80,18 @@ PYTHONPATH=src python tools/audit_factory_study.py
 ```
 
 These commands require the corresponding local execution artifacts and configured provider accounts. The released sanitized evidence supports offline report rebuilding; it does not include private sampler checkpoint identifiers.
+
+## Start a fresh study
+
+Build the application and proxy templates using the setup commands in the README, configure provider credentials outside the repository, and use an empty output directory. The study launcher exports and seals the selection/final task packages before execution, runs a matched base, carries out the bounded research rounds, freezes selection, executes the prescribed final comparisons, and writes sanitized evidence.
+
+```sh
+# Local preparation check: no cloud model calls.
+PYTHONPATH=src python tools/run_factory_study.py \
+  --out work/new-study-export --prepare-only
+
+# A fresh experiment; consumes the configured provider accounts.
+PYTHONPATH=src python tools/run_factory_study.py --out work/new-study
+```
+
+The local preparation path has been executed and verified. The full launcher composes the same live-tested components; it has not been separately rerun as an additional paid study. It stops on unresolved phase failures instead of silently repeating paid work. Exact replication also depends on available provider model identifiers, Tinker models, and the declared software/template versions.

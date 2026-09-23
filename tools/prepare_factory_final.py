@@ -1,12 +1,13 @@
 """Seal source-disjoint final instances before checkpoint selection or testing."""
-import copy,datetime,hashlib,json
+import argparse,copy,datetime,hashlib,json
 from pathlib import Path
 from cursibench.factory_cases import SourceRegistry,compile_case,digest
 from cursibench.factory_export import export_case
 from cursibench.factory_campaign import CampaignRegistry
 from cursibench.factory_results import summarize
 
-root=Path('work/factory-study-02');destination=root/'sealed-final';destination.mkdir(exist_ok=False)
+parser=argparse.ArgumentParser();parser.add_argument('--study',default='work/factory-study-02');parser.add_argument('--seal-only',action='store_true');args=parser.parse_args()
+root=Path(args.study);destination=root/'sealed-final';destination.mkdir(exist_ok=False)
 raw=json.loads(Path('datasets/public/kanboard_issues.json').read_text());rows=raw['records'][24:36]
 registry=SourceRegistry(raw,[r['number'] for r in rows],[r['number'] for r in raw['records'][:24]],partition='final')
 opened=sorted([r for r in rows if r['state']=='open'],key=lambda r:r['number']);closed=sorted([r for r in rows if r['state']=='closed'],key=lambda r:r['number'])
@@ -33,10 +34,12 @@ seal={'created_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'pur
 protocol={'selection_tasks':selection,'final_tasks':[x['task'] for x in manifest],
           'selection_manifest_sha256':hashlib.sha256((root/'manifest.json').read_bytes()).hexdigest(),'final_manifest_sha256':digest(seal),
           'max_attempts':5,'training_token_budget':1048576,'promotion':'no_regression','early_stop':'all selection tasks solved or budget exhausted','training_steps':32,'training_profile':'factory-v1'}
+if args.seal_only:protocol.update(baseline_directory='baseline',factory_directory='factories',round1_layout='round-1')
 for name in ('astra','sol'):
  registry=CampaignRegistry(root/(name+'-campaign.json'),protocol)
+ if args.seal_only:continue
  baseline=summarize(root/'cache-repair/base',selection);registry.set_baseline(baseline)
  summary=summarize(root/'cache-repair'/name,selection)
  train=root/('train-'+name)/'training.json';training=json.loads(train.read_text())
  registry.register('round-1',training['data_sha256'],train.resolve(),training['scheduled_tokens'],summary,historical_import=True)
-print('Sealed six final cases and froze selection/promotion rules before round-2 evaluation')
+print('Sealed six final cases and froze selection/promotion rules')

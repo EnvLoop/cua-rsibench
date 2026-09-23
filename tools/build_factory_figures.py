@@ -18,11 +18,11 @@ def save(fig,name):
     plt.close(fig)
 
 fig,ax=plt.subplots(figsize=(7,3.0));ax.set_xlim(-.2,10.2);ax.set_ylim(-.3,3.5);ax.axis('off')
-labels=[('Researcher code','Python generator\n+ data policy'),('Native training states','Approved source facts\n+ task recipes'),('Verified GUI experience','Fixed teacher\n+ saved-state check'),('Training data','Filter / representation\n/ order / mixture'),('Tinker SFT','Fixed-base LoRA\n32 optimizer updates'),('E2B + Harbor','Checkpoint proxy\n+ native browser trials'),('Selection','Strict gain\n+ no task regression'),('Sealed final tests','Freeze checkpoint\nthen fresh environments')]
+labels=[('Researcher code','Python generator\n+ data policy'),('Native task states','Approved source facts\n+ task recipes'),('GUI experience','Fixed teacher\n+ saved-state check'),('Training data','Filter / representation\n/ order / mixture'),('Tinker SFT','Fixed-base LoRA\n32 optimizer updates'),('E2B + Harbor','Checkpoint proxy\n+ native browser trials'),('Selection','Strict gain\n+ no task regression'),('Sealed final tests','Freeze checkpoint\nFresh environments')]
 coords=[(0,2.3),(2.6,2.3),(5.2,2.3),(7.8,2.3),(7.8,.65),(5.2,.65),(2.6,.65),(0,.65)]
 for (title,body),(x,y) in zip(labels,coords):
     ax.add_patch(FancyBboxPatch((x,y),2.2,.85,boxstyle='round,pad=.04',lw=.8,edgecolor=BLUE,facecolor='#f0f4fb'))
-    ax.text(x+1.1,y+.62,title,ha='center',fontsize=8.4,weight='bold');ax.text(x+1.1,y+.28,body,ha='center',va='center',fontsize=7.2,color=GRAY)
+    ax.text(x+1.1,y+.62,title,ha='center',fontsize=8,weight='bold');ax.text(x+1.1,y+.28,body,ha='center',va='center',fontsize=7.2,color=GRAY)
 for i in range(7):
     x,y=coords[i];xx,yy=coords[i+1]
     start=(x+2.25,y+.43) if i<3 else ((x+1.1,y-.05) if i==3 else (x-.05,y+.43))
