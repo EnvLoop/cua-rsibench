@@ -26,6 +26,15 @@ if training:evidence['tinker']={k:v for k,v in training.items() if k not in ['ch
 chain=load('work/cloud-chain-01/harbor/checkpoint-browser/result.json')
 if chain:evidence['cloud_chain']={'completed':chain['stats']['n_completed_trials'],'errors':chain['stats']['n_errored_trials'],'reward':next(iter(chain['stats']['evals'].values()))['metrics'][0]['mean'],'provider_cleanup':load('work/cloud-chain-01/result.json').get('proxy_destroyed')}
 oracle=load('work/harbor-jobs/cua-oracle-02/result.json')
-if oracle:evidence['harbor_oracle']={'completed':oracle['stats']['n_completed_trials'],'errors':oracle['stats']['n_errored_trials'],'reward':1}
+if oracle:evidence['harbor_oracle']={'completed':oracle['stats']['n_completed_trials'],'errors':oracle['stats']['n_errored_trials'],'reward':next(iter(oracle['stats']['evals'].values()))['metrics'][0]['mean']}
+evidence['planning_analysis']=[]
+for p in (root/'work').glob('kanboard-planning-*/decision-analysis.json'):
+ evidence['planning_analysis'].append(dict(run=p.parent.name,**json.loads(p.read_text())))
+native=load('work/kanboard-harbor-jobs/native-basic-02/result.json')
+evidence['native_harbor']={'completed':native['stats']['n_completed_trials'],'errors':native['stats']['n_errored_trials'],'reward':next(iter(native['stats']['evals'].values()))['metrics'][0]['mean']} if native else None
+evidence['native_training_runs']=[]
+for p in (root/'work').glob('native-tinker-*/training.json'):
+ r=json.loads(p.read_text())
+ evidence['native_training_runs'].append({'run':p.parent.name,'model':r['model'],'records':r['record_count'],'steps_completed':len(r.get('events',[])),'scheduled_tokens':r.get('scheduled_tokens'),'verified':r.get('verified_training_and_sampling',False)})
 (out/'evidence.json').write_text(json.dumps(evidence,indent=2))
 print('curated',len(evidence['trials']),'trial records')

@@ -36,16 +36,20 @@ def response_receipt(prompt, model='gpt-6-astra', max_output_tokens=900, timeout
             body = json.loads(response.read())
         receipt.update({'response_id': body.get('id'), 'reported_model': body.get('model'),
                         'status': body.get('status'), 'usage': body.get('usage')})
-        if body.get('error') or body.get('status') != 'completed':
+        if body.get('error') or body.get('status') not in ('completed','incomplete'):
             raise ValueError('provider returned incomplete or failed response')
         text = '\n'.join(c['text'] for i in body.get('output', []) if i.get('type') == 'message'
                          for c in i.get('content', []) if c.get('type') == 'output_text')
+        if not text and body.get('status')=='incomplete':text='[OUTPUT_TOKEN_LIMIT]'
         if not text:
             raise ValueError('empty output')
         receipt['elapsed_seconds'] = time.monotonic() - started
         return text, receipt
     except Exception as exc:
         receipt['elapsed_seconds'] = time.monotonic() - started
+        if isinstance(exc,error.URLError) and not isinstance(exc,error.HTTPError):
+            receipt['network_reason_type']=type(exc.reason).__name__
+            receipt['network_reason']=str(exc.reason)[:240]
         receipt['error'] = f'http_{exc.code}' if isinstance(exc, error.HTTPError) else type(exc).__name__
         # Never persist provider response bodies or auth headers.
         raise ProviderFailure(receipt['error'], receipt) from None

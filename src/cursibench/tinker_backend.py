@@ -22,7 +22,7 @@ def validate_records(records):
 
 
 def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
-    if not 1<=steps<=4:raise ValueError('smoke training allows 1..4 steps')
+    if not 1<=steps<=16:raise ValueError('bounded pilot training allows 1..16 steps')
     import tinker
     from tinker import types
     out=Path(out);out.mkdir(parents=True,exist_ok=False)
@@ -43,13 +43,16 @@ def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
             target=tokenizer.encode(messages[-1]['content'],add_special_tokens=False)
             if tokenizer.eos_token_id is not None:target.append(tokenizer.eos_token_id)
             tokens=prefix+target
-            if len(tokens)>8192:raise ValueError('training record exceeds 8192 token smoke limit')
+            if len(tokens)>16384:raise ValueError('training record exceeds fixed 16384 token limit')
             examples.append(types.Datum(model_input=types.ModelInput.from_ints(tokens[:-1]),loss_fn_inputs={'target_tokens':tokens[1:],'weights':[0.0]*(len(prefix)-1)+[1.0]*len(target)}))
             prompts.append(prefix)
-        report['scheduled_tokens']=sum(len(ex.model_input.to_ints()) for ex in examples[:2])*steps
+        batches=[[examples[(step*2+i)%len(examples)] for i in range(2)] for step in range(steps)]
+        report['scheduled_tokens']=sum(len(ex.model_input.to_ints()) for batch in batches for ex in batch)
+        report['token_cap']=262144
+        if report['scheduled_tokens']>report['token_cap']:raise ValueError('scheduled training exceeds token cap')
         report['events']=[];save()
         for step in range(steps):
-            batch=examples[(step*2)%len(examples):][:2]
+            batch=batches[step]
             fw=client.forward_backward(batch,'cross_entropy').result(timeout=180)
             opt=client.optim_step(types.AdamParams(learning_rate=1e-4)).result(timeout=180)
             report['events'].append({'step':step+1,'metrics':getattr(fw,'metrics',{}),'optimizer_metrics':getattr(opt,'metrics',{})});save()
@@ -67,4 +70,4 @@ def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
         service.close(status).result(timeout=30)
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--data',required=True);p.add_argument('--out',required=True);p.add_argument('--model',default='Qwen/Qwen3.5-4B');a=p.parse_args();print(json.dumps(train(a.data,a.out,a.model),default=str))
+    p=argparse.ArgumentParser();p.add_argument('--data',required=True);p.add_argument('--out',required=True);p.add_argument('--model',default='Qwen/Qwen3.5-4B');p.add_argument('--steps',type=int,default=1);a=p.parse_args();print(json.dumps(train(a.data,a.out,a.model,a.steps),default=str))

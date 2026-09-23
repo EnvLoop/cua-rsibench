@@ -9,3 +9,5 @@ Public issue metadata is collected from kanboard/kanboard through GitHub, with s
 The earlier handwritten expense/workbench pages are development fixtures, not the primary realism claim. Their saturated results were excluded from formal RSI claims and the saturated campaign was stopped. Harder synthetic arithmetic/allocation fixtures remain useful for unit and oracle testing, but cannot replace real-software acceptance.
 
 This release tests DOM-assisted browser use, not pixel-only mouse grounding, full Windows/macOS operation, or cross-application enterprise deployment. Any wider claims require corresponding execution evidence.
+
+Native form equivalence is limited to LF/CRLF text line endings, null/zero time fields, and application-maintained timestamps. Content changes, extra records and unrelated object changes still fail. Original results are preserved alongside any corrected regrade.

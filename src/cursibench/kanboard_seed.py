@@ -31,7 +31,7 @@ def main():
     columns=api('getColumns',project_id=project)
     taskids={}
     for row in source['tasks']:
-        task=api('createTask',project_id=project,title=row['title'],description=row['description'],reference=row['reference'],priority=0)
+        task=api('createTask',project_id=project,title=row['title'],description=row['description'].replace('\r\n','\n').replace('\n','\r\n'),reference=row['reference'],priority=0)
         taskids[row['reference']]=task
         for comment in row.get('comments',[]):api('createComment',task_id=task,user_id=1,content=comment)
     # Same reference and title in a similarly named historical project is intentional.
@@ -44,8 +44,9 @@ def main():
 
 
 def snapshot(path):
-    db=sqlite3.connect('/opt/kanboard/data/db.sqlite');db.row_factory=sqlite3.Row
-    tables=['tasks','comments','projects','users','columns','task_has_links','task_has_subtasks']
+    db=sqlite3.connect('file:/opt/kanboard/data/db.sqlite?mode=ro',uri=True);db.row_factory=sqlite3.Row
+    db.execute('BEGIN')
+    tables=['tasks','comments','projects','users','columns','task_has_links','subtasks','task_has_tags','tags','task_has_files','task_has_metadata','project_has_files','project_has_users','project_has_categories','swimlanes']
     data={}
     existing={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     for table in tables:
@@ -55,6 +56,7 @@ def snapshot(path):
             # Password hashes/session tokens never leave the sandbox.
             if table=='users':rows=[{k:v for k,v in r.items() if k in ('id','username','name','role','is_active')} for r in rows]
             data[table]=rows
+    db.close()
     Path(path).write_text(json.dumps(data,indent=2))
 
 if __name__=='__main__':

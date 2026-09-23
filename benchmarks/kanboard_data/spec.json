@@ -1,0 +1,18 @@
+{
+  "schema_version": "0.3",
+  "name": "Kanboard Data Research Pilot",
+  "status": "calibration",
+  "primary_update_surface": "training demonstration selection and validated observation augmentation",
+  "researchers": ["gpt-6-astra", "gpt-5.6-sol"],
+  "target_model": "Qwen/Qwen3.5-4B",
+  "environment": "Kanboard 1.2.54 in E2B",
+  "framework": "Harbor 0.23.0",
+  "verifier_environment": "separate",
+  "source_packs": {"train": 51, "acceptance": 52, "test": 53},
+  "split_contract": "source issue IDs are disjoint; task template is shared",
+  "training": {"steps": 16, "batch_size": 2, "lora_rank": 8, "learning_rate": 0.0001, "seed": 23, "max_records": 32, "max_sequence_tokens": 16384, "max_scheduled_tokens": 262144},
+  "sampling": {"temperature": 0, "max_tokens": 512, "seed": 23},
+  "evaluation": {"max_actions": 90, "timeout_seconds": 1500, "primary_metric": "strict saved-state success", "diagnostics": ["correct target records", "side effects", "valid action rate", "tokens", "infrastructure errors"]},
+  "search": {"attempts": 5, "selection": "acceptance score only; preserve historical best; ties retain earlier checkpoint", "final_repeats": 3},
+  "claim_boundary": "No improvement claim without matched base and checkpoint evaluation; no test evidence in data research requests. Source-real metadata, constructed workflow policy."
+}

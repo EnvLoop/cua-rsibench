@@ -56,6 +56,8 @@ def verify(baseline,final,mapping,targets):
         for rows in result.values():
             for row in rows:
                 for key in ('date_modification','date_moved','last_modified','last_login'):row.pop(key,None)
+                for key in ('description','comment','content'):
+                    if isinstance(row.get(key),str):row[key]=row[key].replace('\r\n','\n')
                 for key in ('time_spent','time_estimated'):
                     if key in row and row[key] is None:row[key]=0
             rows.sort(key=lambda r:str(r.get('id',sorted(r.items()))))
@@ -76,7 +78,8 @@ def public_issue_case(seed=51,snapshot_path='datasets/public/kanboard_issues.jso
     import json,hashlib
     from pathlib import Path
     data=json.loads(Path(snapshot_path).read_text());all_rows=data['records']
-    offset=(seed-51)%max(1,len(all_rows)-12)
+    offset=((seed-51)%3)*12
+    if len(all_rows)<36:raise ValueError('at least 36 source records required for disjoint packs')
     rows=all_rows[offset:offset+12]
     open_rows=[r for r in rows if r['state']=='open']
     chosen=sorted(open_rows,key=lambda r:(r['updated_at'],r['number']))[:3]

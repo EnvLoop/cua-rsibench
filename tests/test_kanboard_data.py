@@ -32,3 +32,13 @@ class RealDataTests(unittest.TestCase):
         base={'tasks':[{'id':1,'description':'keep'}],'comments':[{'id':1,'comment':'source'}]}
         self.assertFalse(verify(base,{'tasks':[],'comments':base['comments']},{'tasks':{},'users':{}},{})['success'])
         self.assertFalse(verify(base,{'tasks':base['tasks'],'comments':[]},{'tasks':{},'users':{}},{})['success'])
+    def test_real_source_partitions_disjoint(self):
+        packs=[public_issue_case(s) for s in (51,52,53)]
+        sets=[{t['reference'] for t in p['tasks'] if t['reference']!='RUNBOOK'} for p in packs]
+        for i in range(3):
+            for j in range(i):self.assertFalse(sets[i]&sets[j])
+    def test_native_line_ending_normalization_preserves_content(self):
+        from cursibench.kanboard_cases import verify
+        base={'tasks':[{'id':1,'description':'first\nsecond'}],'comments':[]}
+        self.assertTrue(verify(base,{'tasks':[{'id':1,'description':'first\r\nsecond'}],'comments':[]},{'tasks':{},'users':{}},{})['success'])
+        self.assertFalse(verify(base,{'tasks':[{'id':1,'description':'first\r\ntampered'}],'comments':[]},{'tasks':{},'users':{}},{})['success'])

@@ -9,7 +9,7 @@ from transformers import AutoTokenizer
 
 def main():
     service=tinker.ServiceClient();checkpoint=os.environ['TINKER_MODEL_PATH'];base=os.environ['TINKER_BASE_MODEL']
-    sampling=service.create_sampling_client(model_path=checkpoint)
+    sampling=service.create_sampling_client(model_path=checkpoint) if checkpoint.startswith('tinker://') else service.create_sampling_client(base_model=base)
     tokenizer=AutoTokenizer.from_pretrained(base)
     token=os.environ['CUA_PROXY_TOKEN']
     class H(BaseHTTPRequestHandler):

@@ -23,26 +23,30 @@ styles={
  'kicker':ParagraphStyle('kicker',fontName='CJK',fontSize=9,leading=14,textColor=TEAL,spaceAfter=12),
 }
 
+for style in styles.values():style.wordWrap='CJK'
+
 def P(text,style='body'):return Paragraph(text,styles[style])
 def table(rows,widths):
- t=Table([[P(escape(str(v)),'cell') for v in row] for row in rows],colWidths=widths,hAlign='LEFT')
+ t=Table([[P(escape(str(v)),'cell') for v in row] for row in rows],colWidths=widths,hAlign='LEFT',repeatRows=1)
  t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),BG),('VALIGN',(0,0),(-1,-1),'TOP'),('BOTTOMPADDING',(0,0),(-1,-1),10),('TOPPADDING',(0,0),(-1,-1),10),('LINEBELOW',(0,0),(-1,-1),.4,HexColor('#cbd8d5'))]));return t
 
 class Pipeline(Flowable):
  def __init__(self):Flowable.__init__(self);self.width=507;self.height=205
  def draw(self):
   c=self.canv
-  rows=[['真实来源数据','浏览器执行','独立 verifier','失败诊断'],['训练 JSONL','Tinker LoRA','E2B 采样代理','Harbor 评测']]
+  rows=[['数据研究 Agent','SFT JSONL','Tinker LoRA','Sampler checkpoint'],['最终选择 / 提交','独立验收','Harbor 任务','E2B 采样代理']]
   for j,labels in enumerate(rows):
    y=143-j*94
    for i,label in enumerate(labels):
     x=i*129;c.setFillColor(BG);c.setStrokeColor(TEAL);c.roundRect(x,y,117,51,5,fill=1,stroke=1)
-    c.setFillColor(INK);c.setFont('CJK',11);c.drawCentredString(x+58.5,y+21,label)
+    c.setFillColor(INK);c.setFont('CJK',10);c.drawCentredString(x+58.5,y+21,label)
     if i<3:
      c.setStrokeColor(TEAL);c.line(x+118,y+26,x+126,y+26)
-     c.line(x+123,y+29,x+126,y+26);c.line(x+123,y+23,x+126,y+26)
-  c.setFillColor(MUTED);c.setFont('CJK',8.5);c.drawString(0,119,'任务面：重置、执行、持久化回读；答案不进入模型请求。')
-  c.drawString(0,24,'训练面：产物与任务成绩分别记录；一次采样成功不等于能力提升。')
+     target=x+126 if j==0 else x+118;delta=-3 if j==0 else 3
+     c.line(target+delta,y+29,target,y+26);c.line(target+delta,y+23,target,y+26)
+  c.setStrokeColor(TEAL);c.line(445,142,445,101);c.line(442,105,445,101);c.line(448,105,445,101)
+  c.setFillColor(MUTED);c.setFont('CJK',8.5);c.drawString(0,119,'固定服务与评测边界；研究者只改变允许的数据策略。')
+  c.drawString(0,24,'保留每次尝试、历史最佳与失败证据；最终测试不参与选择。')
 
 class Bars(Flowable):
  def __init__(self,items):Flowable.__init__(self);self.items=items;self.width=507;self.height=45*len(items)+35
@@ -65,9 +69,9 @@ def build(path):
  add('真实应用 · 真实来源数据 · 独立验收 · 可审计训练评测链','small')
  add('摘要','h2')
  add('本项目借鉴 RSIBench-Data 的固定服务边界，把研究对象扩展到 computer use。当前实现以原生 Kanboard 为环境，用公开 issue 元数据构造可重置任务，并通过应用数据库回读验证结果。模型可见页面文字和控件，不能直接调用数据库、文件或应用 API。')
- add('我们分别记录环境执行、训练服务与任务能力证据。Tinker、E2B、Harbor 的真实服务链已完成一次端到端评测；微量训练后的目标模型在该任务中得分为 0。这是有效的负结果，不应写成训练成功率或自我改进成果。正式提升结论仍需通过难度校准、对照实验和独立测试。')
+ add('我们分别记录环境执行、训练服务与任务能力证据。Tinker、E2B、Harbor 的真实服务链已完成一次端到端评测；微量训练后的目标模型在用于链路贯通的合成浏览器任务中得分为 0。这是有效的负结果，不应写成训练成功率或自我改进成果。正式提升结论仍需通过难度校准、对照实验和独立测试。')
  story.append(Pipeline())
- add('图 1　双层系统边界。上层提供任务状态与反馈，下层固定训练和评测服务；持久更新的对象和收益必须分别标识。','small')
+ add('图 1　数据研究轨道的目标协议。训练与采样分离，Harbor 调度实际任务，独立验收提供选择依据。机制图不等同于完整多轮改进实验已完成。','small')
  add('本报告状态','h2')
  add('这是方法与试验性证据报告，不是成熟排行榜，也不声称已证明持续 RSI。公开代码和证据用于复核及后续扩展。此前全满分的简化任务已降为冒烟测试。')
  add('<link href="https://github.com/nanobanana123/cua-rsibench" color="#007366">代码与复现材料：github.com/nanobanana123/cua-rsibench</link>','small')
@@ -99,13 +103,13 @@ def build(path):
 
  new('04 / VERIFICATION','独立验证与失败分类')
  add('验证依赖最终保存状态，而不是页面看起来正确或模型说已完成。Kanboard 试验比较开始和结束时的任务、评论、项目、用户角色等快照。目标字段根据固定指令重算，其余对象必须保持语义完整。')
- story.append(table([['检查','可拒绝的错误'],['目标对象','相似项目/重复引用导致改错任务，漏改负责人、优先级或复杂度。'],['无关状态','误改归档项目、删除任务、更改源描述或评论。'],['持久化','仅填写未保存、遗漏确认、页面表象与实际保存状态不一致。'],['等价归一化','仅忽略应用维护时间戳，以及原生表单把空工时归一化为 0 的已验证行为。'],['基础设施','API 超时、沙箱创建失败或网络中断独立记录，不视作能力得分 0。']],[108,399]))
+ story.append(table([['检查','可拒绝的错误'],['目标对象','相似项目/重复引用导致改错任务，漏改负责人、优先级或复杂度。'],['无关状态','误改归档项目、删除任务、更改源描述或评论。'],['持久化','仅填写未保存、遗漏确认、页面表象与实际保存状态不一致。'],['等价归一化','仅归一化应用维护时间戳、空工时与 0、原生文本框的 LF/CRLF 换行；不忽略内容变动。'],['基础设施','API 超时、沙箱创建失败或网络中断独立记录，不视作能力得分 0。']],[108,399]))
  add('隔离模型','h2');add('被测策略是远程 API 模型，只拥有受限 GUI 动作通道，不能读取主控文件。Harbor 的 separate verifier 在另一环境运行，答案不放入 agent 环境构建目录。本地回归 fixture 中的公开答案不被称为隐藏集。')
  add('完整性证据','h2');add('请求、响应摘要、环境版本、任务哈希、候选父子关系和接受/拒绝理由共同构成证据。哈希链能揭示日志被修改，但同机哈希链不等同于对恶意主控的安全隔离。')
 
  new('05 / CLOUD CHAIN','真实训练与云端评测结果')
  t=e.get('tinker',{});chain=e.get('cloud_chain',{})
- story.append(table([['阶段','已核验结果'],['Tinker 训练',f'{t.get("model","N/A")}；rank 8；{t.get("steps_requested","N/A")} 步更新；{t.get("record_count","N/A")} 条训练记录；本轮计划 {t.get("scheduled_tokens","N/A")} token。'],['Checkpoint','保存 sampler weights，并从该 checkpoint 实际采样。公开摘要仅记录 checkpoint 哈希。'],['E2B 代理','带临时 Bearer 鉴权的采样服务；任务完成后销毁代理沙箱。'],['Harbor',f'完成 {chain.get("completed","N/A")} 个任务；{chain.get("errors","N/A")} 个基础设施错误；独立 verifier reward={chain.get("reward","N/A")}。']],[105,402]))
+ story.append(table([['阶段','已核验结果'],['Tinker 训练',f'{t.get("model","N/A")}；rank 8；{t.get("steps_requested","N/A")} 步更新；{t.get("record_count","N/A")} 条训练记录；本轮计划 {t.get("scheduled_tokens","N/A")} token。'],['Checkpoint','保存 sampler weights，并从该 checkpoint 实际采样。公开摘要仅记录 checkpoint 哈希。'],['E2B 代理','带临时 Bearer 鉴权的采样服务；任务完成后销毁代理沙箱。'],['Harbor 合成任务',f'完成 {chain.get("completed","N/A")} 个任务；{chain.get("errors","N/A")} 个基础设施错误；独立 verifier reward={chain.get("reward","N/A")}。']],[105,402]))
  story.append(Spacer(1,22));story.append(Bars([('Oracle 可解性验证',1.0),('微量训练 checkpoint',chain.get('reward'))]))
  add('图 3　云端集成验证。两条柱状值来自不同角色的冒烟执行，不是模型对比，也不是训练前后提升。Oracle 得分 1 表明任务可完成，目标 checkpoint 的 0 分是被测行为失败。','small')
  add('这次训练仅验证真实权重更新与执行链，不支持学习效果结论。后续必须固定目标模型、数据接口、评测超参数和预算，以更多行为对齐的示范及独立任务检验改进。美元费用暂为 Unknown，不能按 0 元报告。')
@@ -120,6 +124,7 @@ def build(path):
  story.append(table(rows,[182,120,50,155]))
  failures=sum(bool(r['infrastructure_error']) for r in e['trials'])
  add(f'另有 {failures} 条基础设施失败记录，保留但不作为模型失败计分。单次校准结果只支持该配置下的执行证据，不能推广为模型能力排名。','small')
+ add('排期失败的具体原因','h2');add('Astra 找到了可行且总价值最优的组合（价值 49），但成本为 62；符合第二层最小成本规则的方案成本为 52。严格评分因此未通过。这是条件优先级和验收完整性问题，不是网络错误。规划成本是明确构造的任务输入，并非真实上游项目预算。');
  add('为什么不继续报告先前的 +14.29 分','h2');add('旧版本的差值来自预写规则在少量 JSON fixture 上的切换，没有模型提出候选，也没有真实 UI 或隔离的隐藏集。它已明确降为回归测试结果，不能作为 RSI 提升。')
  add('后续实验准入','h2');add('只有通过环境重置、独立解法、负例验证、数据隔离和难度校准的任务才进入正式实验。正式结果还需重复运行、报告不确定性，并保留失败尝试与预算开销。')
 

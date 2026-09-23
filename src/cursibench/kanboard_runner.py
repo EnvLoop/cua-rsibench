@@ -17,7 +17,7 @@ def run(out,model='gpt-5.6-sol',kind='triage',seed=51,strategy='',max_steps=90):
     # Never upload expected targets. The remote agent receives instruction and visible UI only.
     visible={k:v for k,v in case.items() if k!='targets'}
     import hashlib
-    manifest={'case':case['id'],'model':model,'reasoning_effort':'low','max_steps':max_steps,'max_output_tokens':1200,'per_call_timeout':180,'transient_retries':1,'trial_seconds':1500,'template':'cua-kanboard-1-2-54','kanboard_version':'1.2.54','visible_sha256':hashlib.sha256(json.dumps(visible,sort_keys=True).encode()).hexdigest(),'verifier_sha256':hashlib.sha256(Path(__file__).with_name('kanboard_cases.py').read_bytes()).hexdigest(),'track':'difficulty_calibration'}
+    manifest={'case':case['id'],'model':model,'reasoning_effort':'low','max_steps':max_steps,'max_output_tokens':1200,'per_call_timeout':180,'transient_retries':2,'trial_seconds':1500,'template':'cua-kanboard-1-2-54','kanboard_version':'1.2.54','visible_sha256':hashlib.sha256(json.dumps(visible,sort_keys=True).encode()).hexdigest(),'verifier_sha256':hashlib.sha256(Path(__file__).with_name('kanboard_cases.py').read_bytes()).hexdigest(),'track':'difficulty_calibration'}
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
     sb=None;trace=[];receipts=[];error=None;result={};start=time.monotonic()
     try:
@@ -43,12 +43,13 @@ def run(out,model='gpt-5.6-sol',kind='triage',seed=51,strategy='',max_steps=90):
             if time.monotonic()-start>1500:break
             if step:obs=json.loads(sb.commands.run('curl -sf http://127.0.0.1:4318/observe',timeout=15).stdout)
             message=CONTRACT+'\nStanding strategy:'+strategy+'\n'+json.dumps({'task':case['instruction'],'observation':obs,'memory':memory,'last_action':trace[-1]['outcome'] if trace else None})
-            for attempt in range(2):
+            for attempt in range(3):
                 try:
                     raw,receipt=response_receipt(message,model,1200,180);receipts.append(receipt);break
                 except ProviderFailure as exc:
                     receipts.append(exc.receipt)
-                    if attempt==1 or exc.receipt['error'] not in ('TimeoutError','URLError','http_502','http_503'):raise
+                    if attempt==2 or exc.receipt['error'] not in ('TimeoutError','URLError','http_502','http_503'):raise
+                    time.sleep(min(2**(attempt+1),4))
             try:
                 data=json_object(raw);action=data['action'];memory=str(data.get('memory',memory))[:6000]
                 body=base64.b64encode(json.dumps(action).encode()).decode()
@@ -65,6 +66,14 @@ def run(out,model='gpt-5.6-sol',kind='triage',seed=51,strategy='',max_steps=90):
                 'steps':len(trace),'max_steps':max_steps,'elapsed_seconds':time.monotonic()-start,'baseline':baseline,'final':final,
                 'mapping':mapping,'expected_targets':case['targets'],'receipts':receipts,'trace':trace,'environment':'Kanboard 1.2.54 in E2B',
                 'observation':'DOM visible text and controls; screenshots recorded','infrastructure_error':None}
+        # Persist all captured frames before the sandbox is destroyed.
+        try:
+            sb.commands.run('tar -czf /app/screenshots.tar.gz -C /app screenshots',timeout=30,user='root')
+            (out/'screenshots.tar.gz').write_bytes(sb.files.read('/app/screenshots.tar.gz',format='bytes'))
+            result['screenshots_archived']=True
+        except Exception:result['screenshots_archived']=False
+        try:result['capture_gaps']=[json.loads(x) for x in sb.files.read('/app/capture-errors.jsonl').splitlines()]
+        except Exception:result['capture_gaps']=[]
         # Preserve actual screenshots for human QA, without provider secrets.
         for n in (0,max(0,len(trace)-1)):
             try:(out/f'{n:03}.png').write_bytes(sb.files.read(f'/app/screenshots/{n:03}.png',format='bytes'))
