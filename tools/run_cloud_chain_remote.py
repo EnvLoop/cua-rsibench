@@ -95,7 +95,81 @@ def runtime_origin():
             'packages': dict(sorted(versions.items())), 'package_sources': sources}
 
 
-def prepare(study, researcher, training, base, out):
+def reserved_candidate_binding(study, state, researcher, training, selected, attempt_id):
+    """Bind only an unevaluated, already-trained pending reservation.
+
+    This returns preparation metadata, never a campaign registration. Missing
+    evaluation evidence is accepted only through this explicit narrow path.
+    """
+    from cursibench.factory_campaign import digest
+    study, training = Path(study).resolve(), Path(training).resolve()
+    try:
+        number = int(attempt_id.split('-')[-1])
+    except (ValueError, AttributeError):
+        raise ValueError('invalid reserved attempt identity') from None
+    if (attempt_id != 'round-' + str(number) or number != len(state['attempts']) + 1
+            or not 1 <= number <= state['protocol']['max_attempts']
+            or state.get('final_selection') is not None or state.get('baseline') is None):
+        raise ValueError('reserved candidate is not the next open campaign attempt')
+    reservation = state.get('reservations', {}).get(attempt_id)
+    if reservation is None or any(row['attempt_id'] == attempt_id for row in state['attempts']):
+        raise ValueError('unevaluated training reservation required')
+    expected_training = study / f'round-{number}' / ('train-' + researcher) / 'training.json'
+    if training != expected_training.resolve():
+        raise ValueError('training manifest path differs from reserved attempt')
+    if (study / f'round-{number}' / ('eval-' + researcher)).exists() or (study / f'round-{number}' / (researcher + '-evaluation-process.json')).exists():
+        raise ValueError('existing evaluation evidence requires the governed recovery path')
+    preflight_path = study / f'round-{number}' / (researcher + '-preflight.json')
+    preflight = json.loads(preflight_path.read_text())
+    pending_path = study / f'round-{number}' / (researcher + '-evaluation-pending.json')
+    if not pending_path.is_file():
+        raise ValueError('explicit pending-evaluation receipt required')
+    pending = json.loads(pending_path.read_text())
+    factory = study / state['protocol'].get('factory_directory', 'factories') / f'factory-{researcher}-{number:02}'
+    data_path = factory / 'train_messages.jsonl'
+    data_bytes = data_path.read_bytes()
+    rows = [json.loads(line) for line in data_bytes.decode().splitlines() if line.strip()]
+    factory_result = json.loads((factory / 'result.json').read_text())
+    if (not selected.get('verified_training_and_sampling') or preflight.get('accepted') is not True
+            or selected.get('data_sha256') != reservation['dataset_hash']
+            or preflight.get('data_sha256') != reservation['dataset_hash']
+            or selected.get('scheduled_tokens') != preflight.get('scheduled_tokens')
+            or not 0 < selected['scheduled_tokens'] == reservation['token_bound']
+            or sha(data_bytes) != reservation['dataset_hash']
+            or preflight.get('records') != len(rows) or selected.get('record_count') != len(rows)
+            or factory_result.get('complete') is not True
+            or factory_result.get('submission', {}).get('validated') is not True
+            or factory_result['submission'].get('records') != len(rows)):
+        raise ValueError('reserved training/preflight provenance mismatch')
+    if (pending.get('status') != 'awaiting_evaluation' or pending.get('researcher') != researcher
+            or pending.get('attempt') != attempt_id or pending.get('evaluation_started') is not False
+            or pending.get('training_reservation_retained') is not True
+            or pending.get('training_manifest') != str(training.relative_to(study))
+            or pending.get('training_manifest_sha256') != sha(training.read_bytes())
+            or pending.get('data_sha256') != reservation['dataset_hash']
+            or pending.get('scheduled_tokens') != reservation['token_bound']
+            or pending.get('selection_manifest_sha256') != state['protocol']['selection_manifest_sha256']
+            or not isinstance(pending.get('created_at'), (int, float))
+            or pending['created_at'] < reservation['reserved_at']):
+        raise ValueError('pending-evaluation receipt differs from reserved candidate')
+    if (selected.get('training_profile') != 'factory-v1' or selected.get('steps_requested') != 32
+            or [event.get('step') for event in selected.get('events', [])] != list(range(1, 33))
+            or selected.get('batch_size') != 2 or selected.get('covered_records') != len(rows)):
+        raise ValueError('reserved candidate requires all 32 verified updates and full data coverage')
+    record = {'attempt_id': attempt_id, 'dataset_hash': reservation['dataset_hash'],
+              'training_tokens': selected['scheduled_tokens']}
+    provenance = {'reservation_sha256': digest(reservation),
+                  'preflight_sha256': sha(preflight_path.read_bytes()),
+                  'pending_evaluation_receipt_sha256': sha(pending_path.read_bytes()),
+                  'submitted_dataset_sha256': sha(data_bytes),
+                  'factory_result_sha256': sha((factory / 'result.json').read_bytes()),
+                  'training_manifest_sha256': sha(training.read_bytes()),
+                  'local_evaluation_absent_at_preparation': True,
+                  'registration_required_after_independent_audit': True}
+    return record, provenance
+
+
+def prepare(study, researcher, training, base, out, reserved_attempt=None):
     from cursibench.factory_campaign import CampaignRegistry, digest
     from cursibench.factory_final import validate_study
     from cursibench.factory_provenance import validate_selection_packages
@@ -105,6 +179,8 @@ def prepare(study, researcher, training, base, out):
         raise ValueError('invalid campaign alias')
     if bool(training) == bool(base):
         raise ValueError('choose exactly one verified training manifest or base')
+    if reserved_attempt and base:
+        raise ValueError('a reserved candidate requires its verified training manifest')
     state = CampaignRegistry(study / (researcher + '-campaign.json')).snapshot()
     validate_study(ROOT, study, state)
     integrity = validate_selection_packages(ROOT, study, state)
@@ -114,26 +190,32 @@ def prepare(study, researcher, training, base, out):
     selected = model_input(training, base=base)
     if selected['model'] != 'Qwen/Qwen3.5-4B':
         raise ValueError('remote pilot requires the frozen student model')
+    reservation_provenance = None
     if training:
         training = Path(training).resolve()
-        records = [r for r in state['attempts'] if r.get('training_manifest') and Path(r['training_manifest']).resolve() == training]
-        if len(records) != 1 or selected['data_sha256'] != records[0]['dataset_hash']:
-            raise ValueError('checkpoint is not bound to the campaign candidate')
-        record = records[0]
+        if reserved_attempt:
+            record, reservation_provenance = reserved_candidate_binding(study, state, researcher, training, selected, reserved_attempt)
+        else:
+            records = [r for r in state['attempts'] if r.get('training_manifest') and Path(r['training_manifest']).resolve() == training]
+            if len(records) != 1 or selected['data_sha256'] != records[0]['dataset_hash']:
+                raise ValueError('checkpoint is not bound to the campaign candidate')
+            record = records[0]
         if (selected.get('training_profile') != 'factory-v1' or selected.get('steps_requested') != 32
                 or len(selected.get('events', [])) != 32 or selected.get('batch_size') != 2
                 or selected.get('covered_records') != selected.get('record_count')
                 or selected.get('scheduled_tokens') != record['training_tokens']):
             raise ValueError('training evidence differs from the fixed protocol')
-        number = int(record['attempt_id'].split('-')[-1])
-        original = (Path(record['evaluation_path']) if record.get('evaluation_path') else
-                    study / ('cache-repair/' + researcher if number == 1 and not state['protocol'].get('round1_layout')
-                             else f'round-{number}/eval-{researcher}'))
-        original_wrapper = original / 'result.json'
-        wrapper = json.loads(original_wrapper.read_text())
-        if wrapper.get('training_checkpoint') != selected['checkpoint'] or wrapper.get('training_model') != selected['model']:
-            raise ValueError('checkpoint differs from the candidate actually evaluated')
-        prior_execution_sha = sha(original_wrapper.read_bytes())
+        prior_execution_sha = None
+        if not reserved_attempt:
+            number = int(record['attempt_id'].split('-')[-1])
+            original = (Path(record['evaluation_path']) if record.get('evaluation_path') else
+                        study / ('cache-repair/' + researcher if number == 1 and not state['protocol'].get('round1_layout')
+                                 else f'round-{number}/eval-{researcher}'))
+            original_wrapper = original / 'result.json'
+            wrapper = json.loads(original_wrapper.read_text())
+            if wrapper.get('training_checkpoint') != selected['checkpoint'] or wrapper.get('training_model') != selected['model']:
+                raise ValueError('checkpoint differs from the candidate actually evaluated')
+            prior_execution_sha = sha(original_wrapper.read_bytes())
     else:
         prior_execution_sha = None
     runtime = runtime_origin()
@@ -162,7 +244,11 @@ def prepare(study, researcher, training, base, out):
     worker = (ROOT / 'tools/remote_cloud_worker.py').read_bytes()
     manifest = {'operational_version': VERSION, 'job_id': uuid.uuid4().hex,
                 'campaign': researcher, 'attempt_id': record['attempt_id'] if training else 'base',
-                'purpose': 'governed operational recovery of a frozen selection checkpoint; not a new candidate',
+                'purpose': ('first evaluation of an already-trained reserved candidate on the versioned remote controller'
+                            if reserved_attempt else 'governed operational recovery of a frozen selection checkpoint; not a new candidate'),
+                'execution_kind': 'reserved-candidate-first-evaluation' if reserved_attempt else 'registered-candidate-recovery',
+                'admission_kind': 'reserved_initial_evaluation' if reserved_attempt else 'registered_candidate_recovery',
+                'reservation_provenance': reservation_provenance,
                 'protocol_hash': state['protocol_hash'], 'selection_integrity': integrity,
                 'task_names': names, 'files': files, 'runtime': runtime,
                 'model': {'name': selected['model'], 'kind': selected['inference_kind'],
@@ -192,6 +278,7 @@ def prepare(study, researcher, training, base, out):
     (out / 'worker.py').write_bytes(worker)
     write_json(out / 'manifest.json', manifest)
     plan = {'operational_version': VERSION, 'job_id': manifest['job_id'],
+            'admission_kind': manifest['admission_kind'],
             'prepared_at': time.time(), 'payload_sha256': sha(data), 'manifest_sha256': sha(manifest_bytes),
             'worker_sha256': sha(worker), 'payload_bytes': len(data), 'unique_blobs': len(blobs),
             'materialized_files': len(files), 'task_names': names,
@@ -374,6 +461,7 @@ def main():
     p.add_argument('--researcher', required=True)
     p.add_argument('--training')
     p.add_argument('--base', action='store_true')
+    p.add_argument('--reserved-attempt', help='explicit unevaluated pending reservation, e.g. round-2')
     p.add_argument('--out', required=True)
     for name in ('launch', 'status', 'collect'):
         p = sub.add_parser(name)
@@ -383,7 +471,7 @@ def main():
     args = parser.parse_args()
     try:
         if args.mode == 'prepare':
-            result = prepare(args.study, args.researcher, args.training, args.base, args.out)
+            result = prepare(args.study, args.researcher, args.training, args.base, args.out, args.reserved_attempt)
         elif args.mode == 'launch':
             result = launch(args.out, args.template)
         else:

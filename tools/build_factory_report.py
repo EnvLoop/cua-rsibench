@@ -105,9 +105,16 @@ def validate_study(data, expected_models):
                 original_rows = {row['task']: row for row in run['evaluation']['tasks']}
                 recovered_rows = {row['task']: row for row in recovered['tasks']}
                 require(set(recovered['expected_tasks']) == set(run['evaluation']['expected_tasks']), 'recovery changed the final task set')
-                for task, row in original_rows.items():
-                    if row.get('score') is not None and not row.get('error_type'):
-                        require(task in recovered_rows and recovered_rows[task].get('score') == row['score'] and not recovered_rows[task].get('error_type'), 'recovery altered an originally scored result')
+                if recovery.get('policy_kind') == 'full_suite_replay':
+                    require(recovery.get('original_rows_reused') is False and recovery.get('new_research_seed') is False,
+                            'full-suite replay must use fresh rows without adding a research seed')
+                    require(recovery.get('logical_comparison_slot') == label and recovery.get('amendment_sha256') and recovery.get('chunk_plan_sha256'),
+                            'full-suite replay lacks its frozen comparison and amendment binding')
+                    require(set(recovery['retried_tasks']) == set(recovered['expected_tasks']), 'full-suite replay has partial retry scope')
+                else:
+                    for task, row in original_rows.items():
+                        if row.get('score') is not None and not row.get('error_type'):
+                            require(task in recovered_rows and recovered_rows[task].get('score') == row['score'] and not recovered_rows[task].get('error_type'), 'recovery altered an originally scored result')
             expected_sets.append(set(run['evaluation']['expected_tasks']))
     require(all(tasks == expected_sets[0] for tasks in expected_sets), 'final task set changes within a cohort')
     assert_english(json.dumps(data, ensure_ascii=False))
@@ -225,7 +232,7 @@ def cohort_final(cohort, recovered=False):
     if any(row['mean'] is None for row in finals):
         paragraphs.append('Undefined complete means remain unscored; partial successful executions are not substituted for the prescribed mean.')
     if recovered:
-        paragraphs.append('This view substitutes only audited retries for eligible pre-agent infrastructure failures and retains originally scored rows. It is an operational recovery of the same prescribed task/repetition, not a new independent sample. Original outcomes remain in the preceding table and evidence.')
+        paragraphs.append('The full-suite operational amendment replays all six tasks for each eligible infrastructure-invalid slot on a separate trusted Linux E2B controller. Each recovered score uses six fresh results; no original rows are mixed into it. Frozen checkpoints, task packages, actor, verifier, and sampling settings are preserved. Valid original slots are never replayed. These are the same prescribed repetitions, not new independent samples or research seeds. The unchanged original outcomes remain in the preceding table and evidence.')
     return table(rows), '\n\n'.join(paragraphs)
 
 

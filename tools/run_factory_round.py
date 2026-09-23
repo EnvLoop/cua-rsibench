@@ -63,6 +63,10 @@ def finish_submission(study,name,number,factory,stop_before_evaluation=False):
     factory_result=json.loads((factory/'result.json').read_text())
     if not factory_result.get('complete'):
         report={'accepted':False,'reason':'research round ended without a verified submission','research_turns':factory_result['research_turns']}
+        history_path=factory/'research-history.json'
+        if history_path.exists():
+            history=json.loads(history_path.read_text())
+            report['recorded_submission_errors']=[{'turn':event['turn'],'error':event['reply']['error'],'message':event['reply'].get('message','')} for event in history if event.get('action',{}).get('type')=='submit' and event.get('reply',{}).get('error')]
         registry.record_submission_rejection(f'round-{number}',None,report)
         print(json.dumps({'researcher':name,'attempt':f'round-{number}','status':'no_submission'}));return
     data=factory/'train_messages.jsonl'

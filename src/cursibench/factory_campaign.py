@@ -110,7 +110,7 @@ class CampaignRegistry:
                 'registered_at':time.time(),'accounting':'no training executed'})
             self._save(state)
 
-    def register(self,attempt_id,dataset_hash,training_manifest,training_tokens,summary,historical_import=False):
+    def register(self,attempt_id,dataset_hash,training_manifest,training_tokens,summary,historical_import=False,evaluation_path=None,operational_version=None):
         with self._lock():
             state=self._read();protocol=state['protocol']
             if state['baseline'] is None or state['final_selection'] is not None:raise ValueError('search is not open')
@@ -132,6 +132,8 @@ class CampaignRegistry:
             admitted=improved and (no_regression or protocol.get('promotion')=='strict_score')
             record={'attempt_id':attempt_id,'dataset_hash':dataset_hash,'training_manifest':str(training_manifest),'training_tokens':training_tokens,
                     'evaluation':copy.deepcopy(summary),'promoted':admitted,'no_regression':no_regression,'registered_at':time.time(),'accounting':'historical import' if historical_import else 'pre-execution reservation'}
+            if evaluation_path is not None:record['evaluation_path']=str(evaluation_path)
+            if operational_version is not None:record['operational_version']=str(operational_version)
             state['reservations'].pop(attempt_id,None)
             state['attempts'].append(record);state['used_training_tokens']+=training_tokens
             if admitted:state['selected']=attempt_id;state['best_score']=summary['score']

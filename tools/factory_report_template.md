@@ -92,6 +92,10 @@ The original launch exposed a serving defect: a 256-entry cache could not cover 
 
 Final runners verify frozen selection, training and checkpoint identities, sealed task hashes, application/verifier files, runtime hashes, and execution timing. If two comparison roles select the same checkpoint within a cohort, they may explicitly share execution evidence. Such shared bindings do not add independent observations. Every final mean requires the complete prescribed set of valid results.
 
+The remote-control-plane-v1 amendment moves trusted orchestration from the Mac host to a separate Linux E2B instance. Frozen actor, verifier, application packages, checkpoints, and sampling settings remain bound by hashes. The remote controller verifies 98 package versions and nine installed source files before inference; Python patch versions differ (3.12.13 on the host and 3.12.14 remotely). Downloaded evidence archives and every member are checked before admission. Original invalid runs remain available. Eligible original final slots use one whole-suite replay, preserving the same logical repetition; their recovery means contain only the six fresh outcomes.
+
+Fresh environments still expose nuisance variation. In Luna 6 round two, the original direct task passed while its declared remote recovery failed. First prompt and response hashes matched on all three tasks. At step three, observed differences were CSRF query values and displayed creation/modification/move times; masking those fields made the observations identical. Action sequences later diverged. This documents a reproducibility limitation without attributing causality to either field or excluding inference variability. The controller does not remove these fields or change the actor during the study.
+
 {{COHORT_RESULTS}}
 
 ## 8. Interpretation and limitations

@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,6 +45,32 @@ class FakeFiles:
 
 
 class RestorationIOTests(unittest.TestCase):
+    def test_exact_creation_intent_precedes_lost_ack_and_cannot_be_replaced(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / 'restoration'
+            workspace = io.RestorationWorkspace(root)
+            def lost_ack(**kwargs):
+                saved = json.loads((root / 'creation-intent.json').read_text())
+                self.assertEqual(saved['metadata'], kwargs['metadata'])
+                self.assertEqual(saved['restoration_id'], kwargs['metadata']['restoration_id'])
+                self.assertEqual(saved['timeout_seconds'], kwargs['timeout'])
+                self.assertTrue(saved['template'])
+                self.assertIsInstance(saved['created_at'], float)
+                self.assertEqual([saved[k] for k in ('model_calls', 'program_runs', 'teacher_calls')], [0, 0, 0])
+                self.assertFalse(saved['allow_internet_access'])
+                self.assertFalse(saved['provider_credentials_injected'])
+                self.assertEqual(kwargs['envs'], {})
+                raise ConnectionError('create acknowledgement lost')
+            with patch('e2b.Sandbox.create', side_effect=lost_ack) as create:
+                with self.assertRaises(ConnectionError):
+                    workspace.start({}, 'worker source')
+                original = (root / 'creation-intent.json').read_bytes()
+                with self.assertRaises(FileExistsError):
+                    workspace.start({}, 'worker source')
+                self.assertEqual((root / 'creation-intent.json').read_bytes(), original)
+                self.assertEqual(create.call_count, 1)
+                self.assertFalse((root / 'sandbox.json').exists())
+
     def test_lost_upload_reply_uses_hash_readback_without_duplicate_write(self):
         files = FakeFiles()
         files.lose_write_reply = True

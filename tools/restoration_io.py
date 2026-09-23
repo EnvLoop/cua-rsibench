@@ -1,6 +1,7 @@
 """Bounded operational recovery I/O; never retries researcher or teacher work."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import time
 import uuid
@@ -100,8 +101,20 @@ class RestorationWorkspace:
     def start(self, inputs, worker):
         from e2b import Sandbox
         self.operation = uuid.uuid4().hex
+        metadata = {'project': 'cua-data-factory', 'role': 'research-restoration', 'restoration_id': self.operation}
+        intent = {'restoration_id': self.operation, 'created_at': time.time(),
+                  'template': Sandbox.default_template, 'metadata': metadata,
+                  'timeout_seconds': 3600, 'allow_internet_access': False,
+                  'provider_credentials_injected': False,
+                  'model_calls': 0, 'program_runs': 0, 'teacher_calls': 0}
+        # Persist the exact lookup identity before an ambiguous create response
+        # can be lost. Exclusive creation also refuses blind repeat dispatch.
+        with (self.root / 'creation-intent.json').open('x') as stream:
+            json.dump(intent, stream, indent=2)
+            stream.flush()
+            os.fsync(stream.fileno())
         self.sandbox = Sandbox.create(timeout=3600, allow_internet_access=False, envs={},
-            metadata={'project': 'cua-data-factory', 'role': 'research-restoration', 'restoration_id': self.operation})
+            metadata=metadata)
         (self.root / 'sandbox.json').write_text(json.dumps({'id': self.sandbox.sandbox_id,
             'network': 'no outbound internet', 'provider_credentials_injected': False}))
         self.io = BoundedIO(self.sandbox)

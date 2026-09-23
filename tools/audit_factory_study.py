@@ -13,6 +13,7 @@ from cursibench.factory_results import summarize
 from cursibench.factory_roster import study_roster
 from cursibench.factory_provenance import validate_selection_packages,verify_factory_identity
 from cursibench.factory_final_recovery import replace_build_failures
+from remote_evidence_audit import audit_remote, audit_full_suite_recoveries
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -122,6 +123,7 @@ def audit(study):
                     or training['covered_records']!=len(rows) or training['training_profile']!='factory-v1'):
                     raise ValueError('training proof mismatch')
                 path=study/'cache-repair'/name if number==1 and not state['protocol'].get('round1_layout') else study/f'round-{number}'/('eval-'+name)
+                if record.get('evaluation_path'):path=Path(record['evaluation_path'])
                 if record.get('recovery'):
                     original=evaluation(Path(record['recovery']['original_path']),state['protocol']['selection_tasks'])
                     if public_summary(original)!=public_summary(record['original_evaluation']):raise ValueError('original recovery evidence changed')
@@ -129,6 +131,8 @@ def audit(study):
                     row['recovery_plan_sha256']=sha(record['recovery']['plan_path'])
                     path=Path(record['evaluation_path'])
                 ev=evaluation(path,state['protocol']['selection_tasks'])
+                if (path.parent/'remote-completion.json').exists():
+                    row['remote_execution']=audit_remote(path.parent,state['protocol']['selection_tasks'],digest(training['checkpoint']))
                 if public_summary(ev)!=public_summary(record['evaluation']):raise ValueError('registered score differs from execution')
                 row.update(evaluation=ev,records=len(rows),checkpoint_sha256=digest(training['checkpoint']),
                     data_provenance_verified=True,optimizer_steps=32)
@@ -193,6 +197,7 @@ def audit(study):
         execution['recovered_evaluation']=recovered
         execution['recovery']={'policy':declaration['policy'],'new_independent_repetition':False,
             'retried_tasks':[r['task'] for r in retries],'started_at':started,'plan_sha256':sha(recovery/'plan.json'),'proof':retry_proofs}
+    superseded,remote_recoveries_finished=audit_full_suite_recoveries(study,result['final_executions'],evaluation)
     comparison=study/'final-comparison.json'
     if comparison.exists():
         plan=read(comparison);result['final_comparison']=plan
@@ -205,13 +210,13 @@ def audit(study):
                     raise ValueError('final comparison identity or timing mismatch')
         result['all_final_executions_finished']=all(r['label'] in by_label for r in plan['executions'])
     else:result['all_final_executions_finished']=False
-    result['all_final_recoveries_finished']=all(
+    result['all_final_recoveries_finished']=remote_recoveries_finished and all(
         not any(t.get('error_type')=='BuildException' for t in run['evaluation']['tasks']) or 'recovered_evaluation' in run
         for run in result['final_executions'])
     recovery_root=study/'final-recoveries'
     if recovery_root.exists():
         result['all_final_recoveries_finished']=result['all_final_recoveries_finished'] and all(
-            (p.parent/'summary.json').exists() for p in recovery_root.glob('*/plan.json'))
+            (p.parent/'summary.json').exists() or p.parent.name in superseded for p in recovery_root.glob('*/plan.json'))
     result['audit_pass']=True
     result['search_finished']=all(c['selection_frozen'] and c['pending_training']==0 for c in result['campaigns'])
     result['limitations']=['one application and three task families','one research seed per system',
