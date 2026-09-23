@@ -1,0 +1,28 @@
+{
+  "schema": "trusted-remote-source-snapshot-v1",
+  "source_commit": "def70ca9a4613b6ab1900c4c76b78e02782cc16a",
+  "files": {
+    "src/cursibench/__init__.py": "8413541edecc43ecf240977bbd965e85bf77f06f794f72f6bd282776f655b4a0",
+    "src/cursibench/agentrouter.py": "629a466ad60f627ddeb51c05477c0f3d2a50373a111cd8cf3865a593381c8a12",
+    "src/cursibench/benchmark.py": "58ce5bb6e831390ef32908af21a0f0da626fd8961050e9008cdc2f6d1157c6d7",
+    "src/cursibench/cloud_env.py": "391be140fb0652f101ae96c1adf3d199acfd2ff0565ceabd38cd29c1c6f02824",
+    "src/cursibench/cloud_launch.py": "83d77708b3ca5ff3da409462a1612f1704f9c09feec59c8b3b76146b8f7d859f",
+    "src/cursibench/command_journal.py": "ef674bb1d432efcccf9ab78aa17fa3b654ee590fc66500793be8351f84983db6",
+    "src/cursibench/factory_harbor.py": "35d0d3fcea0ca72464010972fcb6b39900a4c0921821e141bbd8983eeb2835f4",
+    "src/cursibench/gui_contract.py": "766288084a8f7ab5de2e1f19aac13cd7fb0f342112a32184dec49c351d86fecf",
+    "src/cursibench/harbor_adapter.py": "f9200ba40ce8f54c4e754101b3b56dc204ed4f19fc3b81d64c341c9c693e97f5",
+    "src/cursibench/harness.py": "859f0c5cdd5f42930bd7d543afb126c1b838c87b20f7283269db9b440a2d9883",
+    "src/cursibench/http_transport.py": "4b37e2c3056e6437c16ad489540ac7fc9765563bbf4bb7b35601221cd2d82f10",
+    "src/cursibench/journal_env.py": "165cf860854b4fbf46051180ca0017227c5dd3c53420cdbd3c0ed0c8a21be5b6",
+    "src/cursibench/model.py": "c79a5f293f9542315b859e445b617bedf8cfca99ed596213cbab6f8bb7223d8a",
+    "src/cursibench/protocol.py": "7b32061b8c6ab2387a12a6e5be0fe3be25449c147c6de5994305f7d022f0f922",
+    "src/cursibench/read_retry.py": "c19731d8697a8cad7ea104a1753f34452dfafc8c245ea4a157cf079375b8e099",
+    "src/cursibench/sample_cache.py": "8ef86655f5e97c39e49f236df0603bff5ff1106961d0997be2d345cc8bd54804",
+    "src/cursibench/tasks.py": "d4fff3016c939f40341b99cb4b60c526b759bc92c4cb8d6f1ccc5a001028d5af",
+    "src/cursibench/tinker_proxy.py": "503df86196efa9034fbefcf3f5e9eb3d7cb81c5d6b46d94a52042fbbd3ef94a9",
+    "src/cursibench/verifier.py": "e2f454854ef973ffa8e30201a70e1ef41b88674e327c58644d3414e751f64f80",
+    "tools/run_cloud_chain.py": "62342b8366ae000efcd6bb4d06d838ceb916f6b307f41d47d182d73970018225"
+  },
+  "worker_sha256": "49dcf3fe1d633a655420db55c07a3cbc2c418963394922b3290de9040578e503",
+  "operational_version": "remote-control-plane-v1"
+}

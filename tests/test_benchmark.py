@@ -53,7 +53,7 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(spec.repeats, 3)
         self.assertFalse(spec.test_visible_to_improver)
         self.assertIn("verifier", spec.frozen_surfaces)
-        self.assertEqual(MODEL_CHOICES, ("gpt-6-astra", "gpt-5.6-sol"))
+        self.assertEqual(MODEL_CHOICES, ("gpt-6-astra", "gpt-5.6-sol", "gpt-6-sol", "gpt-6-luna"))
 
 
 if __name__ == "__main__":

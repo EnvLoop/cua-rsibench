@@ -1,47 +1,37 @@
 # RSIBench-Data-shaped computer-use format
 
-The benchmark has two separable tracks:
+The evaluated executable-factory study adapts the Data research surface of [RSIBench-Data](https://arxiv.org/abs/2607.25886). A researcher writes a data-generation policy while the student, teacher, optimizer settings, GUI action space, task packages, and independent verifier remain controlled. Operational controller amendments are separately recorded. This does not implement the reference project's Algorithm, Harness, or Architecture roadmap surfaces, or demonstrate sustained model-level RSI.
 
-1. **Harness RSI** changes the computer-use harness while the foundation model is frozen.
-2. **Data RSI** changes `train_messages.jsonl` and bounded training configuration while the target
-   model, serving path, sandbox and evaluator stay fixed.
-
-For a defensible computer-use result, the protocol also needs task-template/application split isolation,
-`avg@3` repeats, non-recursive controls, append-only lineage and cost accounting. The local
-`BenchmarkSpec` and `Ledger` currently describe those fields only. They do not enforce isolation, execute controls, provide append-only storage, or measure costs.
-
-The second track follows this fixed chain:
+## Executed service chain
 
 ```text
-data-generation agent
-  -> Tinker SFT messages JSONL
-  -> Tinker LoRA SFT
-  -> Tinker sampler checkpoint
-  -> E2B tool-call proxy sandbox
-  -> Harbor benchmark evaluation
-  -> scored attempt and final submission
+researcher-authored Python factory in an isolated E2B workspace
+  -> generated native task states and independently verified teacher trajectories
+  -> provenance-checked SFT messages JSONL
+  -> real Tinker LoRA SFT and sampler checkpoint
+  -> authenticated E2B checkpoint proxy
+  -> Harbor native browser evaluation with a separate verifier
+  -> scored or explicitly unscored attempt, retained selection, sealed final tests
 ```
 
-The repository's `service_pipeline.run_service_chain` runs this shape locally with deterministic fake
-providers. It writes `data_generation_agent.json`, `train_messages.jsonl`, `scored_attempt.json`,
-`final_submission.json`, `result.json`, the provider mode, the checkpoint URI, the E2B proxy sandbox
-identity, the Harbor result, and the frozen sampling/evaluation configuration.
+The live implementation uses `factory_research` for bounded research, `factory_preflight` and `factory_corpus` for submission checks, `tinker_backend` for actual training/sampling, and `tools/run_cloud_chain.py` for the E2B/Harbor chain. `factory_campaign` records budget reservations, attempts, promotion, and frozen selection. `tools/audit_factory_study.py` reconstructs evidence independently before export.
 
-## Real adapter boundary
+The researcher can vary task recipes, filtering, representation, ordering, repetition, and mixtures of permitted verified examples. It cannot change the fixed training recipe or fabricate successful trajectories. Each valid candidate starts a fresh adapter from the same base student. The exact researcher model, fixed teacher, and evaluated student are different roles.
 
-Real integrations must implement the three provider protocols in `cursibench.service_pipeline`:
+## Computer-use task mapping
 
-- `TinkerBackend`: LoRA training and checkpoint sampling;
-- `E2BBackend`: create the fixed proxy template and execute the sandbox;
-- `HarborBackend`: run the selected dataset and return task results plus infrastructure errors.
+Each Harbor task contains a resettable native application state, visible source facts, and a user instruction. Hidden targets and the verifier remain outside the actor environment. The trusted compiler derives expected targets. The separate verifier reads the saved application database, checks those targets, and verifies preservation of unrelated state. It does not independently solve the planning objective again. Screenshots are retained as audit artifacts and do not determine the task reward.
 
-The adapter must not modify tasks, hidden expected state, verifier code, or evaluation hyperparameters.
-Missing keys must fail before a paid run. A local-fake result is useful for CI but is not evidence of
-an external Tinker/E2B/Harbor evaluation.
+The current profile is Kanboard 1.2.54 with DOM-assisted browser interaction. Source IDs are separated across training, selection, and final pools, while application and task templates remain shared. Six final variants are repeated twice in fresh environments at the same sampling seed. Shared checkpoint roles reuse explicitly identified results, without adding independent observations.
 
-## Computer-use dataset mapping
+More applications, template-level holdouts, independent research seeds, and equal-budget non-adaptive controls remain research extensions. Original Office and full desktop operation require separate profiles and evidence.
 
-Each Harbor task should mount a resettable application state, visible inputs and the user instruction.
-The hidden verifier reads the final artifact independently. For a document task this means checking the
-parsed application state, intended object changes, untouched objects, and artifact integrity; screenshots
-remain evidence for visual quality rather than the sole authority.
+## Operational provenance
+
+The remote controller is a versioned orchestration change. It preserves frozen task/checkpoint/source bindings, records the Mac-to-Linux difference, verifies archives and every member, and refuses blind redispatch after uncertain creation or execution. The original cohort's whole-suite recoveries retain all originals and are reported separately from initial final executions. See [remote evaluation](REMOTE_EVALUATION.md).
+
+Missing results are incomplete; infrastructure-invalid results are unscored. Neither is a zero model score. Exact provider model IDs are recorded metadata, not independent weight attestations. Provider dollar totals are unknown.
+
+## Legacy local fixtures
+
+`cursibench.service_pipeline.run_service_chain` remains a deterministic local fixture with fake providers for development and regression checks. It is not the live training/evaluation implementation and its scores are not research evidence. Earlier `BenchmarkSpec` and `Ledger` fields describe proposed controls; metadata alone does not enforce isolation, run cloud services, or establish RSI. The historical v0.4 pilot is also a separate experiment and is not pooled with the executable-factory cohorts.

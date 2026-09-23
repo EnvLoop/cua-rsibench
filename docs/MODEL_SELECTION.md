@@ -1,9 +1,16 @@
-# Model roles and provider evidence
+# Model identities and roles
 
-`gpt-6-astra` and `gpt-5.6-sol` are the requested AgentRouterHub model IDs. Both have completed live Responses requests. Use the former or latter for browser execution, candidate research, or review under explicit fixed settings. A returned alias is provider metadata, not independent proof of model identity. No pricing or overall superiority is asserted.
+The registered AgentRouterHub researcher IDs are `gpt-6-astra`, `gpt-6-sol`, and `gpt-6-luna`; `gpt-5.6-sol` is retained for historical research and as the fixed rollout teacher. Exact Sol6 and Luna6 Responses requests have completed and returned matching provider model IDs. A reported model ID is provider metadata, not an independent attestation of its weights.
 
-The Tinker training target is separate: the verified smoke uses `Qwen/Qwen3.5-4B`, rank 8, one optimizer step. It does not train Astra or Sol. The resulting checkpoint was actually sampled and evaluated through E2B and Harbor; it failed the task with reward 0 and no infrastructure error.
+| Alias | Exact researcher model | Evidence cohort |
+|---|---|---|
+| astra | gpt-6-astra | Original executable-factory study |
+| sol | gpt-5.6-sol | Original executable-factory study |
+| sol6 | gpt-6-sol | Separate late-addition cohort |
+| luna6 | gpt-6-luna | Separate late-addition cohort |
 
-Credentials remain outside the repository. Current bounded native-app calls use low reasoning effort, 1200 requested output tokens, 180-second request timeout, one retry for designated transient errors, and a fixed GUI action budget. Earlier timeouts are preserved as infrastructure exclusions.
+Historical Sol5.6 results must never be relabeled Sol6. The late-addition cohort begins from fresh factory lineages, uses the same fixed Sol5.6 teacher and Qwen3.5-4B student, explicitly reuses the matched selection baseline, and has a separate sealed final source set. Its corrected turn-budget interface and initial diagnostics differ from the earliest original rounds; the two cohorts are not a matched four-way model ranking.
 
-E2B is now usable with corrected credentials. Tinker became usable after the account was funded. Old 401/402 observations are historical diagnostics, not current blockers.
+All researcher and teacher requests use the Responses API and the declared low reasoning effort. Dataset quality, inference validity, infrastructure failures, and monetary cost remain separate measurements. Provider dollar totals are unknown unless supplied by the account owner.
+
+Official model references: [GPT-6 Sol](https://developers.openai.com/api/docs/models/gpt-6-sol) and [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna).

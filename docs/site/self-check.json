@@ -1,19 +1,30 @@
 {
-  "checked_at": "2026-09-23T04:30:49.517110+00:00",
-  "pdf_pages": 10,
-  "language": "English",
-  "cjk_text_scan": "passed",
-  "pdf_visual_review": "all 10 final pages inspected; figures inspected at full resolution",
-  "pdf_sha256": "1306fb493c119fab630703afb19e233273337a58c3877618943fec0ea7fe4c16",
-  "unit_tests_passed": 35,
-  "browser_checks": "researcher and metric filters, hypothesis selection, source-state filtering and issue search passed locally",
-  "publication_verification": "passed",
-  "scope": "pilot; no sustained RSI claim",
-  "public_repo": "https://github.com/EnvLoop/cua-rsibench",
-  "public_site": "https://envloop.github.io/cua-rsibench/site/",
-  "public_release": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot",
-  "release_download_byte_match": true,
-  "pages_pdf_byte_match": true,
-  "public_browser_checks": "researcher and metric selection, hypothesis drill-down, 4 recovery rows, source search, English language, no page overflow, no console errors",
-  "older_mixed_language_release": "retained as unpublished draft"
+  "schema": "publication-qa-v1",
+  "release": "v0.5.0-executable-factories",
+  "checked_at": "2026-09-23T15:49:58.596570+00:00",
+  "report_sha256": "52896b9a57119c6d357f2480f007567cae1d36bca26ecc8987eadfdbe6fa25b8",
+  "pdf_pages": 14,
+  "all_pdf_pages_visually_reviewed": true,
+  "layout_findings_resolved": true,
+  "english_only": true,
+  "unit_tests_passed": 145,
+  "independent_evidence_audit_pass": true,
+  "independent_evidence_checks_passed": 380,
+  "website": {
+    "all_controls_match_evidence": true,
+    "research_round_checks": 20,
+    "desktop_mobile_widths": [
+      1440,
+      390
+    ],
+    "horizontal_page_overflow": false,
+    "javascript_errors": [],
+    "all_images_loaded": true
+  },
+  "audited_evidence_sha256": {
+    "factory-study.json": "e41d8486b5c6f168ad2cad62f7c7b4c91fbd103db160a4a739606443ea2779dd",
+    "model6-study.json": "08d2b5148c73823eb6556c8d5c9233932351e147f6c34112b76f74053fa58a18",
+    "combined-study.json": "d4971a330ba8d92b442a20b56982e9869420efe9b0fdbe861bc8661c283392ed"
+  },
+  "scope": "Native Kanboard DOM-assisted browser data-research pilot; separate cohorts; no sustained RSI or broad desktop claim."
 }

@@ -13,3 +13,9 @@ class SamplingCache:
         if len(self.entries)>=self.limit:raise ValueError('request cache cap reached')
         future=start();self.entries[request_id]=(digest,future)
         return future,False
+
+
+def request_capacity(task_count,max_actions=90):
+    if type(task_count) is not int or not 1<=task_count<=64:raise ValueError('task count outside proxy resource contract')
+    if type(max_actions) is not int or not 1<=max_actions<=128:raise ValueError('action count outside proxy resource contract')
+    return max(256,task_count*max_actions)

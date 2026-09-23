@@ -1,11 +1,14 @@
 # Computer-use task and verifier contract
 
-This is the part that must be real before claiming a computer-use result. A JSON fixture is only a
-development substitute for a resettable application environment.
+This document specifies future multi-application profiles. The evaluated release currently implements
+only native Kanboard with DOM-assisted browser interaction and a separate saved-state verifier.
+The Office, desktop, and cross-application profiles below are proposed, not measured capabilities.
+Current source-ID splits share application and task templates; they do not meet the broader
+template/application split proposed here. See DATA_FACTORY.md for the executed profile.
 
 ## Domain packs
 
-The first release should report six independent domain cells, with no aggregate score:
+A future broader release should report six separate domain cells, with no aggregate score:
 
 1. **Browser transactions**: search, filter, edit, submit, and recover from an interrupted page.
 2. **Office artifacts**: Word, spreadsheet, and presentation edits with structural and visual checks.
@@ -14,7 +17,7 @@ The first release should report six independent domain cells, with no aggregate 
 5. **Expert digital work**: layout, diagram, CAD-like or media operations with artifact readback.
 6. **Environment learning**: unfamiliar app behavior that must be inferred from visible feedback.
 
-Each cell has independent train, acceptance-anchor, and hidden test tasks. Splits are by task template,
+Each proposed cell should have independent train, acceptance-anchor, and hidden test tasks. Splits should be by task template,
 application, workflow, and source artifact—not just by a random task ID.
 
 ## Task package

@@ -21,16 +21,16 @@ def validate_records(records):
         if row.get('source_split')!='train':raise ValueError('only training-split demonstrations are allowed')
 
 
-def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
-    if not 1<=steps<=16:raise ValueError('bounded pilot training allows 1..16 steps')
+def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1,profile='pilot-v1'):
+    from .training_contract import schedule
     import tinker
     from tinker import types
     out=Path(out);out.mkdir(parents=True,exist_ok=False)
     records=[json.loads(l) for l in Path(data_path).read_text().splitlines() if l.strip()]
     validate_records(records)
-    if len(records)>32:raise ValueError('smoke record limit 32')
+    config,indices=schedule(len(records),steps,profile)
     service=tinker.ServiceClient(user_metadata={'purpose':'cua-rsibench-training-smoke'})
-    status='errored';started=time.monotonic();report={'model':model,'steps_requested':steps,'record_count':len(records),'data_sha256':hashlib.sha256(Path(data_path).read_bytes()).hexdigest(),'cost_usd':None}
+    status='errored';started=time.monotonic();report={'model':model,'steps_requested':steps,'record_count':len(records),'training_profile':profile,'batch_size':config['batch_size'],'covered_records':len({i for batch in indices for i in batch}),'data_sha256':hashlib.sha256(Path(data_path).read_bytes()).hexdigest(),'cost_usd':None}
     def save():out.joinpath('training.json').write_text(json.dumps(report,indent=2,default=str))
     save()
     try:
@@ -43,12 +43,12 @@ def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
             target=tokenizer.encode(messages[-1]['content'],add_special_tokens=False)
             if tokenizer.eos_token_id is not None:target.append(tokenizer.eos_token_id)
             tokens=prefix+target
-            if len(tokens)>16384:raise ValueError('training record exceeds fixed 16384 token limit')
+            if len(tokens)>config['sequence_tokens']:raise ValueError('training record exceeds fixed sequence token limit')
             examples.append(types.Datum(model_input=types.ModelInput.from_ints(tokens[:-1]),loss_fn_inputs={'target_tokens':tokens[1:],'weights':[0.0]*(len(prefix)-1)+[1.0]*len(target)}))
             prompts.append(prefix)
-        batches=[[examples[(step*2+i)%len(examples)] for i in range(2)] for step in range(steps)]
+        batches=[[examples[i] for i in batch] for batch in indices]
         report['scheduled_tokens']=sum(len(ex.model_input.to_ints()) for batch in batches for ex in batch)
-        report['token_cap']=262144
+        report['token_cap']=config['scheduled_tokens']
         if report['scheduled_tokens']>report['token_cap']:raise ValueError('scheduled training exceeds token cap')
         report['events']=[];save()
         for step in range(steps):
@@ -70,4 +70,4 @@ def train(data_path,out,model='Qwen/Qwen3.5-4B',steps=1):
         service.close(status).result(timeout=30)
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--data',required=True);p.add_argument('--out',required=True);p.add_argument('--model',default='Qwen/Qwen3.5-4B');p.add_argument('--steps',type=int,default=1);a=p.parse_args();print(json.dumps(train(a.data,a.out,a.model,a.steps),default=str))
+    p=argparse.ArgumentParser();p.add_argument('--data',required=True);p.add_argument('--out',required=True);p.add_argument('--model',default='Qwen/Qwen3.5-4B');p.add_argument('--steps',type=int,default=1);p.add_argument('--profile',choices=['pilot-v1','factory-v1'],default='pilot-v1');a=p.parse_args();print(json.dumps(train(a.data,a.out,a.model,a.steps,a.profile),default=str))

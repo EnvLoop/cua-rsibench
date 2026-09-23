@@ -19,6 +19,7 @@ S={
 def inline(text):
  text=escape(text)
  text=re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
+ text=re.sub(r'`([^`]+)`',r'<font name="Courier">\1</font>',text)
  text=re.sub(r'\[([^\]]+)\]\((https?://[^)]+)\)',r'<link href="\2" color="#3154a5">\1</link>',text)
  return text
 
@@ -52,9 +53,9 @@ def manuscript(e):
  if re.search(r'[\u3400-\u9fff]',source):raise ValueError('non-English CJK content in manuscript')
  return source
 
-def build(out):
- e=json.loads((ROOT/'outputs/evidence.json').read_text());text=manuscript(e)
- (ROOT/'outputs/CUA-RSIBench-Technical-Report.md').write_text(text)
+def render(text,out,asset_root=None):
+ asset_root=Path(asset_root) if asset_root else ROOT/'outputs'
+ title=next((line[2:].strip() for line in text.splitlines() if line.startswith('# ')), 'CUA-RSIBench - Technical Report')
  story=[]
  for block in text.split('\n\n'):
   block=block.strip()
@@ -66,11 +67,13 @@ def build(out):
   if block.startswith('!['):
    match=re.fullmatch(r'!\[(.*?)\]\((.*?)\)',block,re.S)
    if not match:raise ValueError('bad figure block')
-   caption,path=match.groups();im=Image(str(ROOT/'outputs'/path));height=WIDTH*im.imageHeight/im.imageWidth
-   story.append(KeepTogether([Image(str(ROOT/'outputs'/path),width=WIDTH,height=height),P(caption,'small')]));continue
+   caption,path=match.groups();im=Image(str(asset_root/path));height=WIDTH*im.imageHeight/im.imageWidth
+   story.append(KeepTogether([Image(str(asset_root/path),width=WIDTH,height=height),P(caption,'small')]));continue
   if block.startswith('|'):
    rows=[[x.strip() for x in line.strip().strip('|').split('|')] for line in block.splitlines()]
+   rows=[row for row in rows if not all(re.fullmatch(r':?-{3,}:?',cell) for cell in row)]
    columns=len(rows[0]);weights={2:[.27,.73],3:[.48,.20,.32],5:[.25,.18,.16,.22,.19]}.get(columns,[1/columns]*columns)
+   if 'Task family' in block:weights=[.20,.47,.33]
    if 'First / best' in block:weights=[.17,.17,.31,.14,.21]
    if 'Final executions' in block:weights=[.34,.44,.22]
    t=Table([[P(x,'cell') for x in row] for row in rows],colWidths=[WIDTH*w for w in weights],repeatRows=1)
@@ -83,7 +86,12 @@ def build(out):
   c.setFillColor(GRAY);c.setFont('Times-Roman',8);c.drawRightString(539,815,'CUA-RSIBench - Technical Report')
   c.drawString(56,29,'github.com/EnvLoop/cua-rsibench');c.drawRightString(539,29,str(doc.page))
  out=Path(out)
- SimpleDocTemplate(str(out),pagesize=(595,842),leftMargin=56,rightMargin=56,topMargin=56,bottomMargin=50,title='CUA-RSIBench: Data-Centric Research for Verifiable Computer Use',author='EnvLoop').build(story,onFirstPage=page,onLaterPages=page)
+ SimpleDocTemplate(str(out),pagesize=(595,842),leftMargin=56,rightMargin=56,topMargin=56,bottomMargin=50,title=title,author='EnvLoop').build(story,onFirstPage=page,onLaterPages=page)
  print(out)
+def build(out):
+ e=json.loads((ROOT/'outputs/evidence.json').read_text());text=manuscript(e)
+ (ROOT/'outputs/CUA-RSIBench-Technical-Report.md').write_text(text)
+ render(text,out)
+
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--out',default='outputs/CUA-RSIBench-Technical-Report.pdf');a=p.parse_args();build(a.out)
