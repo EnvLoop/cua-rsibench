@@ -1,0 +1,91 @@
+{
+  "schema": "public-artifact-fetchback-v1",
+  "verified_at": "2026-09-23T15:56:49.050417+00:00",
+  "release_url": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories",
+  "explorer_url": "https://envloop.github.io/cua-rsibench/site/",
+  "release_commit": "e53622914c87ed70a4bf5ad54127e5a46b0c698f",
+  "pages_build_commit": "e53622914c87ed70a4bf5ad54127e5a46b0c698f",
+  "release_assets": {
+    "CUA-RSIBench-Offline-Explorer.zip": {
+      "bytes": 1615226,
+      "sha256": "ad094ff54e4b4f048179d475df7285b982d9e92e65f51fe1bf35474293084d22",
+      "matches_local": true
+    },
+    "model6-study.json": {
+      "bytes": 111359,
+      "sha256": "08d2b5148c73823eb6556c8d5c9233932351e147f6c34112b76f74053fa58a18",
+      "matches_local": true
+    },
+    "CUA-RSIBench-Technical-Report.pdf": {
+      "bytes": 754693,
+      "sha256": "52896b9a57119c6d357f2480f007567cae1d36bca26ecc8987eadfdbe6fa25b8",
+      "matches_local": true
+    },
+    "checksums.sha256": {
+      "bytes": 731,
+      "sha256": "d2c6d11c8198f571680df2ebf54c23dc40ef01a17c05a940d75b84e3a56c081b",
+      "matches_local": true
+    },
+    "CUA-RSIBench-Figures.zip": {
+      "bytes": 691840,
+      "sha256": "f17eda2c3fbb6a6f7465fd97bf732adbcc3718504b16d73b1cced59a8d635099",
+      "matches_local": true
+    },
+    "factory-study.json": {
+      "bytes": 140982,
+      "sha256": "e41d8486b5c6f168ad2cad62f7c7b4c91fbd103db160a4a739606443ea2779dd",
+      "matches_local": true
+    },
+    "combined-study.json": {
+      "bytes": 296790,
+      "sha256": "d4971a330ba8d92b442a20b56982e9869420efe9b0fdbe861bc8661c283392ed",
+      "matches_local": true
+    },
+    "CUA-RSIBench-Technical-Report.md": {
+      "bytes": 30323,
+      "sha256": "a072457ac071a501ca704391fbc5d0b54a3ffb7e5c44c1258c8cbcdfd515659e",
+      "matches_local": true
+    },
+    "publication-qa.json": {
+      "bytes": 1157,
+      "sha256": "3aef072da22f195f17fc177b19c076a20b477ea2126326d6af443106657ae7ff",
+      "matches_local": true
+    }
+  },
+  "pages_assets": {
+    "CUA-RSIBench-Technical-Report.pdf": {
+      "bytes": 754693,
+      "sha256": "52896b9a57119c6d357f2480f007567cae1d36bca26ecc8987eadfdbe6fa25b8",
+      "matches_staged": true
+    },
+    "factory-study.json": {
+      "bytes": 140982,
+      "sha256": "e41d8486b5c6f168ad2cad62f7c7b4c91fbd103db160a4a739606443ea2779dd",
+      "matches_staged": true
+    },
+    "model6-study.json": {
+      "bytes": 111359,
+      "sha256": "08d2b5148c73823eb6556c8d5c9233932351e147f6c34112b76f74053fa58a18",
+      "matches_staged": true
+    },
+    "combined-study.json": {
+      "bytes": 296790,
+      "sha256": "d4971a330ba8d92b442a20b56982e9869420efe9b0fdbe861bc8661c283392ed",
+      "matches_staged": true
+    },
+    "index.html": {
+      "bytes": 181047,
+      "sha256": "3fc2e3c5ea4fcdcbf5d489dc60b6acdcdfd53fb15cb6abb69f4113d05ea84bd8",
+      "matches_staged": true
+    },
+    "self-check.json": {
+      "bytes": 1157,
+      "sha256": "3aef072da22f195f17fc177b19c076a20b477ea2126326d6af443106657ae7ff",
+      "matches_staged": true
+    }
+  },
+  "offline_zip_integrity_pass": true,
+  "legacy_flat_programs_excluded": true,
+  "pdf_pages": 14,
+  "all_pages_visually_reviewed": true
+}

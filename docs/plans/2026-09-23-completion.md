@@ -61,6 +61,8 @@ See [RSIBench alignment](../RSIBENCH_ALIGNMENT.md) for the source-reviewed next-
 - [x] Both cohorts freeze selections before sealed final tests. All 10 prescribed initial final slots and four original-cohort full-suite operational replays are complete.
 - [x] Original failures remain preserved; full-suite replays and shared checkpoints are labeled without adding independent samples.
 - [x] Independent data/numeric audit and visual review of every page of the 14-page English PDF.
-- [ ] Publish the final PDF, figures, explorer, and evidence bundle under EnvLoop and verify fetched hashes.
+- [x] Publish the final PDF, figures, explorer, and evidence bundle under EnvLoop and verify fetched hashes.
 
 The extension final result is 2/12 for the Sol 6-selected student and 0/12 for base; Luna 6 retains the same base. All 24 extension final trials are valid. Original-cohort recovery comparisons disclose the Mac/Linux difference. This bounded pilot does not establish sustained RSI or broad desktop generalization.
+
+Publication completed: [v0.5 release](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories) and [live explorer](https://envloop.github.io/cua-rsibench/site/). All nine release assets and six live-site assets were downloaded and matched the reviewed local files. See [publication verification](../evidence/v0.5-publication-verification.json).
