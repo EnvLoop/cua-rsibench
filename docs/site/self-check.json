@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-09-23T04:17:12.939911+00:00",
+  "pdf_pages": 10,
+  "language": "English",
+  "cjk_text_scan": "passed",
+  "pdf_visual_review": "all 10 final pages inspected; figures inspected at full resolution",
+  "pdf_sha256": "1306fb493c119fab630703afb19e233273337a58c3877618943fec0ea7fe4c16",
+  "unit_tests_passed": 35,
+  "browser_checks": "researcher and metric filters, hypothesis selection, source-state filtering and issue search passed locally",
+  "publication_verification": "pending",
+  "scope": "pilot; no sustained RSI claim"
+}

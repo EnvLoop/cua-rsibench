@@ -1,51 +1,95 @@
 # CUA-RSIBench
 
-A computer-use benchmark under active development, inspired by [RSIBench-Data](https://github.com/evolvent-ai/RSIBench-Data). The primary environment is **real Kanboard 1.2.54**, deployed in disposable E2B sandboxes. Tasks use public issue metadata with explicit provenance; policies and staff assignments are marked synthetic.
+**EnvLoop's controlled pilot of data-centric research for verifiable computer use.**
 
-## Evidence, not a simulated score
+A real Kanboard application, public-source issue metadata, actual Tinker LoRA training, an E2B sampling proxy, Harbor task execution, and an independent saved-state verifier. Inspired by [RSIBench-Data](https://github.com/evolvent-ai/RSIBench-Data).
 
-- **Real Tinker**: LoRA update, persistent checkpoint and checkpoint sampling verified on Qwen/Qwen3.5-4B.
-- **Real E2B + Harbor**: browser oracle and a separate verifier executed successfully.
-- **Full service chain**: Tinker checkpoint → E2B sampling proxy → Harbor E2B browser task → separate verifier. One completed trial, no infrastructure errors, reward **0**. This negative result proves execution, not capability improvement.
-- **Real Kanboard GUI**: AgentRouterHub Sol completed a native form edit; independent SQLite readback confirmed intended changes and preserved other tasks.
-- **Real-source data**: 37 public issue metadata records; source URLs, timestamps and content hash retained. No authors or issue bodies copied.
-- **Difficulty calibration in progress**: original handwritten tasks saturated and were excluded from formal RSI claims. Astra/Sol are being evaluated on native workflows with distributed information and real metadata.
+- [English technical report](docs/site/CUA-RSIBench-Technical-Report.pdf)
+- [Interactive evidence explorer](https://envloop.github.io/cua-rsibench/site/)
+- [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot)
+- [Campaign audit](docs/site/data-campaigns.json) and [recovery evidence](docs/site/journal-recovery.json)
 
-No sustained recursive improvement, unseen-application transfer or mature leaderboard is claimed. The old deterministic fixture remains a unit regression check only. Mock providers return no score and cannot qualify for final submission.
+## Results
 
-## Reproduce
+| Researcher | Training attempts | Scheduled training tokens | Original scored / invalid | Selected model |
+|---|---:|---:|---:|---|
+| gpt-6-astra | 5 | 510,182 | 4 / 1 | Base student |
+| gpt-5.6-sol | 5 | 548,726 | 3 / 2 | Base student |
+
+All seven originally scored candidates receive zero strict task reward. Three interrupted candidates are replayed under separately recorded transport repairs; all also score zero. Both researchers retain the same Qwen3.5-4B base model. Three journaled final stability checks complete with zero task reward and no infrastructure error. Original failures remain in the published evidence rather than being overwritten.
+
+Direct frontier-actor calibration is a separate experiment. Sol completes a native form edit, a public-backlog workflow, and a constrained planning task. In one planning pair, Astra finds a maximum-value set but misses the minimum-cost tie-break. This distinguishes those executions; it does not establish a general model ranking.
+
+No sustained RSI, broad generalization, or mature leaderboard is claimed. Data research currently selects and augments demonstrations from one verified trajectory. It does not yet provide the open-ended experience-synthesis interface of the reference benchmark.
+
+## Install and validate
 
 ```sh
 uv venv --python 3.12 .venv
-uv pip install --python .venv/bin/python -e '.[browser,cloud,harbor]'
-PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+uv pip install --python .venv/bin/python -e '.[browser,cloud,harbor,report]'
+source .venv/bin/activate
+PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-Configure `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TINKER_API_KEY`, and `E2B_API_KEY` outside the repository. Never commit credentials. AgentRouterHub uses the Responses API with `gpt-6-astra` and `gpt-5.6-sol`; fees remain unknown unless account prices are supplied.
+Configure `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TINKER_API_KEY`, and `E2B_API_KEY` outside the repository. AgentRouterHub uses the Responses API with the requested researcher identifiers. No keys belong in the source or report.
 
-Local browser fixtures require installed Google Chrome. The real-app path uses the E2B Kanboard template. See [realism](docs/REALISM.md), [cloud validation](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
+## Run on your provider accounts
+
+Build the application and proxy templates from pinned public dependencies:
 
 ```sh
-python -m cursibench.kanboard_runner --kind public --model gpt-5.6-sol --out work/native-trial
-python -m cursibench.kanboard_harbor_export --kind public --out work/harbor-native
-harbor run -p work/harbor-native -a cursibench.kanboard_harbor:KanboardAgent \
-  -m gpt-5.6-sol --env cursibench.cloud_env:BoundedE2B -n 1
+python tools/build_kanboard_template.py
+python tools/build_proxy_template.py
 ```
 
-The E2B template builder currently requires the pinned source archive and the recorded browser base template; cloud setup is account-specific and is not yet a one-command public installation. Exported Harbor tasks have Dockerfiles for independent rebuilds.
+Collect a verified training trajectory, then launch an explicit data campaign:
 
-## Boundaries
+```sh
+python -m cursibench.kanboard_runner --kind public --seed 51 \
+  --model gpt-5.6-sol --out work/teacher
+python -m cursibench.data_campaign --teacher work/teacher/result.json \
+  --researcher gpt-6-astra --out work/research-astra
+```
 
-The actor receives native visible DOM text and controls and can click, fill, select, press limited keys, go back or finish. It cannot access shell, SQL, application APIs or host files. Screenshots are recorded for audit; this is **DOM-assisted browser use**, not pixel-only computer use or a full Windows/macOS benchmark.
+The teacher must pass saved-state verification before it can supply training data. Baseline sampling no longer depends on a training manifest from the author's private workspace. Cloud runs use the configured provider accounts and record unknown prices as unknown.
 
-Task success is based on actual saved database state. Infrastructure errors, invalid model actions and task failures are different outcomes. The evaluator normalizes only known semantically equivalent application fields; source records, comments and unrelated objects are preserved.
+The original experiment is frozen at commit `62b99b9`. To use the repaired observer explicitly:
 
-The implementation contains separate harness-adaptation and data-training paths. Metadata flags are not treated as isolation or promotion enforcement. Formal experiments require discriminative tasks, source-disjoint splits, matched controls, repeated final evaluation, and complete evidence.
+```sh
+python -m cursibench.kanboard_harbor_export_v3 --kind basic --out work/native-v3
+harbor run -p work/native-v3 \
+  -a cursibench.kanboard_harbor_v3:ResilientKanboardAgent \
+  -m gpt-5.6-sol --env cursibench.journal_env:JournalE2B -n 1
+```
 
-## Publication
+To sample the base student through the complete service chain, with no prior training artifact:
 
-- [Interactive evidence explorer](https://nanobanana123.github.io/cua-rsibench/site/)
-- [Pilot technical report and offline bundle](https://github.com/nanobanana123/cua-rsibench/releases/tag/v0.3.0-pilot)
-- [PDF in this repository](docs/site/CUA-RSIBench-Technical-Report.pdf)
+```sh
+python tools/run_cloud_chain.py --out work/base-check --native --base \
+  --model Qwen/Qwen3.5-4B --task work/native-v3 --environment journal
+```
 
-The 9-page report was rendered, visually inspected, published, fetched back and checked byte-for-byte. The live visualization's filters and PDF link were tested. It reports real data provenance, real cloud execution, native GUI calibration results, infrastructure exclusions and limitations. The historical toy `+0.1429` fixture delta is not an RSI result. Multi-round data-research campaigns are still running; the goal is not yet marked complete.
+Journaled transport reuses the result of the same logical command after response loss. It refuses to replay an incomplete intent whose effects are uncertain. The model retains its GUI-only action space.
+
+## Scope and evidence boundaries
+
+The environment is unmodified Kanboard 1.2.54. Thirty-seven issue metadata records have source URLs, timestamps, and a content hash. Twelve source IDs each are assigned to training, selection, and final-test packs. Policies, staff, planning inputs, and archive distractors are explicitly constructed. Source IDs are disjoint; the workflow template is shared.
+
+This is DOM-assisted browser use, not pixel-only grounding, full Windows/macOS operation, or original Microsoft Office evaluation. Screenshots are audit artifacts; actual saved database state determines task success. Infrastructure interruptions and model task failures are different outcomes.
+
+The earlier deterministic workbench remains a regression fixture. Its historical `+0.1429` delta is not an RSI result. See [realism](docs/REALISM.md), [cloud evidence](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
+
+## Build the English report
+
+The released `docs/site/` directory contains the sanitized inputs and application screenshot. Copy them to `outputs/`, then run:
+
+```sh
+mkdir -p outputs
+cp docs/site/evidence.json docs/site/data-campaigns.json \
+   docs/site/journal-recovery.json docs/site/kanboard-real-ui.png outputs/
+python tools/build_figures.py
+python tools/build_report.py
+python tools/build_visualization.py
+```
+
+Figures are exported as PNG, SVG, and PDF. The manuscript is also emitted as Markdown. Generating a fresh campaign audit requires the original local execution artifacts; rebuilding the report from the released evidence does not.

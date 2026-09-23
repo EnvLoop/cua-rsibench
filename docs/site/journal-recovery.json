@@ -1,0 +1,131 @@
+{
+  "protocol": "journal-env-v1",
+  "original_results_preserved": true,
+  "runs": [
+    {
+      "run": "shared-final-0",
+      "evaluation": {
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.05555555555555555,
+        "input_tokens": 311534,
+        "output_tokens": 7018,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:36:40.275240Z",
+        "finished_at": "2026-09-23T03:56:58.908270Z",
+        "result_sha256": "6af0452e7ff03a0c354927e9990b3f336b721bc1a15a681c852a5f7807283101",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 5,
+        "trace_sha256": "32fc3ea4209944f50becd5943a222a28a5641bfd43818521fa38ae5f506983c5",
+        "proxy_destroyed": true
+      }
+    },
+    {
+      "run": "shared-final-1",
+      "evaluation": {
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.05555555555555555,
+        "input_tokens": 312107,
+        "output_tokens": 8386,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:38:31.077735Z",
+        "finished_at": "2026-09-23T03:58:31.671768Z",
+        "result_sha256": "e3e86f478a5bdb8370880f2923d4c44b39695416d5dc36f41f26dab78118f7b7",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "4699ea386153c808c52f71dfa01015101f70c3c0596f342f6f6ae773987f008a",
+        "proxy_destroyed": true
+      }
+    },
+    {
+      "run": "shared-final-2",
+      "evaluation": {
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.05555555555555555,
+        "input_tokens": 312709,
+        "output_tokens": 8386,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:38:33.652570Z",
+        "finished_at": "2026-09-23T03:58:45.446391Z",
+        "result_sha256": "fddd57a19dfa3322eecabee1ce03a2daab15d6946b95ce29a8409fbf6c29a784",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "b18711770cd39453ef273b0631a9e63b09d895d83b4849d4883851bbddbcd2bb",
+        "proxy_destroyed": true
+      }
+    },
+    {
+      "run": "sol-a01",
+      "evaluation": {
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 1.0,
+        "input_tokens": 200182,
+        "output_tokens": 10505,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:36:33.720382Z",
+        "finished_at": "2026-09-23T03:44:31.600067Z",
+        "result_sha256": "e42c752d0ad8e626949b3ff9e9cf3293bf721af81d2b012f644aeb681c5b2787",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 4,
+        "trace_sha256": "e4ebc56fa2dfdc08c94eed3f85d7484950fcdc476dbe6631b7d4d5c2cd71fb19",
+        "proxy_destroyed": true
+      }
+    }
+  ],
+  "all_scored": true
+}

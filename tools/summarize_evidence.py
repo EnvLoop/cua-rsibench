@@ -32,9 +32,18 @@ for p in (root/'work').glob('kanboard-planning-*/decision-analysis.json'):
  evidence['planning_analysis'].append(dict(run=p.parent.name,**json.loads(p.read_text())))
 native=load('work/kanboard-harbor-jobs/native-basic-02/result.json')
 evidence['native_harbor']={'completed':native['stats']['n_completed_trials'],'errors':native['stats']['n_errored_trials'],'reward':next(iter(native['stats']['evals'].values()))['metrics'][0]['mean']} if native else None
+native_v3=load('work/kanboard-harbor-jobs/native-v3-basic-03/result.json')
+if native_v3 and native_v3.get('finished_at'):
+ evidence['native_v3_harbor']={'run':'native-v3-basic-03','completed':native_v3['stats']['n_completed_trials'],'errors':native_v3['stats']['n_errored_trials'],'reward':next(iter(native_v3['stats']['evals'].values()))['metrics'][0]['mean'],'track':'observer and transport integration check, not data-campaign score'}
 evidence['native_training_runs']=[]
 for p in (root/'work').glob('native-tinker-*/training.json'):
  r=json.loads(p.read_text())
  evidence['native_training_runs'].append({'run':p.parent.name,'model':r['model'],'records':r['record_count'],'steps_completed':len(r.get('events',[])),'scheduled_tokens':r.get('scheduled_tokens'),'verified':r.get('verified_training_and_sampling',False)})
+evidence['data_campaigns']=load('outputs/data-campaigns.json') or []
+evidence['journal_recovery']=load('outputs/journal-recovery.json')
+repair=load('work/observer-v3-cloud-check-06/result.json')
+evidence['observer_repair']={k:v for k,v in (repair or {}).items() if k!='checks'}
+if repair:evidence['observer_repair']['checks']=[{k:v for k,v in row.items() if k!='differences'} for row in repair.get('checks',[])]
+evidence['release_status']='research_pilot_completed' if evidence['data_campaigns'] and all(r['campaign_process_finished'] for r in evidence['data_campaigns']) else 'research_pilot_in_progress'
 (out/'evidence.json').write_text(json.dumps(evidence,indent=2))
 print('curated',len(evidence['trials']),'trial records')

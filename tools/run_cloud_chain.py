@@ -1,16 +1,16 @@
 """Real checkpoint -> E2B proxy -> Harbor/E2B browser task -> separate verifier."""
-import json,os,secrets,subprocess,time
+import json,os,secrets,subprocess,sys,time
 from pathlib import Path
 from e2b import Sandbox
 root=Path(__file__).resolve().parents[1]
 import argparse
-p=argparse.ArgumentParser();p.add_argument('--out',default='work/cloud-chain-01');p.add_argument('--training',default='work/tinker-sft-03/training.json');p.add_argument('--task',default='work/harbor-tasks/support-train');p.add_argument('--native',action='store_true');p.add_argument('--base',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--out',default='work/cloud-chain-01');p.add_argument('--training');p.add_argument('--model');p.add_argument('--task',default='work/harbor-tasks/support-train');p.add_argument('--native',action='store_true');p.add_argument('--base',action='store_true');p.add_argument('--environment',choices=['bounded','read-retry','journal'],default='bounded');a=p.parse_args()
+from cursibench.cloud_launch import model_input
+training=model_input(root/a.training if a.training else None,a.base,a.model)
 out=root/a.out;out.mkdir(exist_ok=False)
-training=json.loads((root/a.training).read_text())
-if a.base:training['checkpoint']=training['model']
-if not training.get('verified_training_and_sampling'):raise SystemExit('verified training required')
+environment={'bounded':'cursibench.cloud_env:BoundedE2B','read-retry':'cursibench.recovery_env:ReadRetryE2B','journal':'cursibench.journal_env:JournalE2B'}[a.environment]
 secret=secrets.token_urlsafe(32);sb=None
-result={'training_checkpoint':training['checkpoint'],'training_model':training['model']}
+result={'training_checkpoint':training['checkpoint'],'training_model':training['model'],'inference_kind':training['inference_kind'],'environment':a.environment}
 try:
  sb=Sandbox.create(template='cua-tinker-proxy-v1',timeout=3000,envs={'TINKER_API_KEY':os.environ['TINKER_API_KEY'],'TINKER_MODEL_PATH':training['checkpoint'],'TINKER_BASE_MODEL':training['model'],'CUA_PROXY_TOKEN':secret})
  sb.commands.run('python -c "import tinker, jinja2"',user='root',timeout=20)
@@ -26,7 +26,10 @@ try:
  else:raise RuntimeError('proxy not ready')
  result['proxy_ready']=True
  env=os.environ.copy();env['CUA_TINKER_PROXY_URL']='https://'+sb.get_host(8088);env['CUA_PROXY_TOKEN']=secret;env['PYTHONPATH']=str(root/'src')
- cmd=[str(root/'work/harbor-venv/bin/harbor'),'run','-p',str(root/a.task),'-a',('cursibench.kanboard_harbor:TinkerKanboardAgent' if a.native else 'cursibench.harbor_adapter:TinkerBrowserAgent'),'-m',training['checkpoint'],'--env','cursibench.cloud_env:BoundedE2B','-n','1','--jobs-dir',str(out/'harbor'),'--job-name','checkpoint-browser']
+ import shutil
+ local_harbor=Path(sys.executable).parent/'harbor'
+ harbor=str(local_harbor) if local_harbor.exists() else (shutil.which('harbor') or str(root/'work/harbor-venv/bin/harbor'))
+ cmd=[harbor,'run','-p',str(root/a.task),'-a',('cursibench.kanboard_harbor:TinkerKanboardAgent' if a.native else 'cursibench.harbor_adapter:TinkerBrowserAgent'),'-m',training['checkpoint'],'--env',environment,'-n','1','--jobs-dir',str(out/'harbor'),'--job-name','checkpoint-browser']
  with (out/'harbor.log').open('w') as log:
   process=subprocess.Popen(cmd,env=env,stdout=log,stderr=subprocess.STDOUT)
   (out/'process.json').write_text(json.dumps({'pid':process.pid,'started':time.time()}))

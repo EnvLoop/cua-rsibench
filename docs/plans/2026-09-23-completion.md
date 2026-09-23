@@ -21,10 +21,30 @@ Reference: evolvent-ai/RSIBench-Data, commit 4c807610243e7b481d382c5ed360c71c79a
 5. Add Harbor task format export and validate it against the actual upstream schema; integrate cloud adapters.
 6. Render and inspect PDF, build result visualization, publish and fetch back release assets.
 
-## Open dependency
+## Current evidence and remaining work
 
-Tinker returned billing 402 and E2B rejected supplied credentials on September 22.
-Await user-side account correction; continue local implementation and verification independently.
+The September 22 credential/billing blocks are resolved. Real Tinker training,
+checkpoint sampling, E2B execution and Harbor separate verification have run.
+The public pilot PDF/site were published and fetched back. Kanboard public-source
+planning calibrated differently for Astra and Sol in one matched pair; this is
+discrimination evidence for that task, not a general model ranking.
+
+Both frozen v2 data campaigns completed all five real training attempts. They
+used 510,182 and 548,726 scheduled training tokens. No scored candidate improved
+on the baseline. The original final trials and all bounded transport-recovery executions have
+finished. Three original final trials were invalid; three shared journaled final
+checks completed with zero reward and no infrastructure error. Invalid originals
+remain undefined, rather than being converted to zero.
+
+Remaining release gates:
+
+- [x] Finish and audit original held-out trials plus separately labeled recovery runs.
+- [x] Verify the opt-in v3 observer in real Kanboard, including a saved native edit.
+- Publish the expanded research PDF/site and fetch back exact artifacts.
+- [x] Remove historical-manifest dependencies from fresh-clone campaign bootstrapping.
+- Broaden the single-trajectory selection track into new data synthesis, add task
+  and application coverage, and establish non-recursive controls before stronger
+  RSIBench-equivalence or RSI-effect claims. These remain research gaps.
 
 ## Claim discipline
 

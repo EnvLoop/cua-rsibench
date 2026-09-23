@@ -1,0 +1,1262 @@
+[
+  {
+    "run": "formal-data-astra-v2",
+    "researcher": "gpt-6-astra",
+    "student": "Qwen/Qwen3.5-4B",
+    "source_commit": "62b99b9",
+    "baseline": {
+      "reward": 0.0,
+      "infrastructure_errors": 0,
+      "actions": 90,
+      "valid_action_rate": 0.15555555555555556,
+      "input_tokens": 61672,
+      "output_tokens": 7826,
+      "cost_usd": null,
+      "status": "scored",
+      "started_at": "2026-09-23T01:55:39.638179Z",
+      "finished_at": "2026-09-23T02:01:33.617461Z",
+      "result_sha256": "971ded09c47036235047d58d93313997c486f529ef9aeeefd57a89ddedcff0c2",
+      "separate_verifier": true,
+      "saved_state_verification": {
+        "success": false,
+        "wrong_tables": [
+          "tasks"
+        ],
+        "correct_target_tasks": 0,
+        "target_tasks": 3
+      },
+      "action_types": {
+        "click": 90
+      },
+      "distinct_action_labels": 14,
+      "trace_sha256": "213944984e01ccb66054795fc103c2c541ca2566cda8a54b144bf0ea200e48a7",
+      "proxy_destroyed": true
+    },
+    "attempts": [
+      {
+        "attempt": 1,
+        "hypothesis": "Baseline reward 0 with only 15.56% valid actions across 90 actions and no infrastructure errors suggests action grounding or protocol compliance is a primary bottleneck. Aggregate feedback does not establish a specific policy, memory, or target-ranking failure. Mix early discovery and inspection demonstrations with complete native-form editing, saving, verification, and stopping sequences; consistently alias numeric control references to discourage memorizing control IDs.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            8,
+            9,
+            20,
+            21,
+            28,
+            29,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "bijective_numeric_control_aliases",
+          "expected_effect": "Improve grounding of actions in current observations while retaining source facts and remaining work in memory. Cover policy discovery and inspection alongside all three sets of field updates, saves, post-save transitions, and verified completion. Aliasing preserves source facts and action values while encouraging transferable control selection. Expected gains are higher valid-action rate and more reliable completion; the aggregate baseline alone cannot guarantee improved target selection."
+        },
+        "training_tokens": 105803,
+        "cumulative_training_tokens": 105803,
+        "checkpoint_sha256": "4a51a1ca7d8ba6efbe27a46a624c0f0294cb248ba8a940fdd29fe7193f63eae4",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 0.1111111111111111,
+          "input_tokens": 321065,
+          "output_tokens": 9630,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:03:56.181660Z",
+          "finished_at": "2026-09-23T02:15:18.521201Z",
+          "result_sha256": "f192f231387bdd13b2529882fc40fc8cea44e2fc4ad020b660fccd636e2104a4",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 4,
+          "trace_sha256": "1b2ef04bffa6b1d8ab119df1b8bed2cd62f8ed7031aa91f5293874c4adc8345c",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 2,
+        "hypothesis": "Aggregate feedback points to action validity as a major bottleneck: baseline validity was 15.56%, and the aliased mixture achieved 11.11%, with both receiving zero reward after 90 actions and no infrastructure errors. This does not isolate aliasing as the cause or establish a specific policy, memory, or ranking failure. Disable augmentation and retain the parent's selection to test the mixture with original control references while preserving coverage of discovery, source-fact memory, target selection, native forms, saving, verification, and stopping.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            8,
+            9,
+            20,
+            21,
+            28,
+            29,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "none",
+          "expected_effect": "Removing control-reference relabeling may improve valid actions under the observed interface representation. Holding the selected records fixed makes the comparison with the previous attempt easier to interpret. The mixture continues to reinforce preserving policy and source facts in memory, editing only selected targets, saving through native controls, and stopping after visible verification. Improved validity and completion remain hypotheses to evaluate, not established outcomes."
+        },
+        "training_tokens": 103010,
+        "cumulative_training_tokens": 208813,
+        "checkpoint_sha256": "3a86e2228e4da2244b2dd38cb97ec6d9dddf6ebf78d63df9d91d2f037ce93fba",
+        "evaluation": {
+          "reward": null,
+          "infrastructure_errors": 1,
+          "actions": 20,
+          "valid_action_rate": 1.0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "status": "infrastructure_error",
+          "started_at": "2026-09-23T02:17:39.900535Z",
+          "finished_at": "2026-09-23T02:20:30.152987Z",
+          "result_sha256": "04851aa7b4309d3803b0b9df54509eca6c1130c038eca5852f6036c33c61fdf4",
+          "separate_verifier": true,
+          "error_type": "TimeoutException",
+          "error_stage": "observe",
+          "transport_disconnect": false,
+          "action_types": {
+            "click": 20
+          },
+          "distinct_action_labels": 4,
+          "trace_sha256": "b977c42798686fdff0b19dcc3b27e103cef0854e78343cfed1f7fc59a46f7ebb",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 3,
+        "hypothesis": "Action validity remains the strongest evidenced bottleneck: baseline and the aliased mixture produced zero reward with 15.56% and 11.11% valid actions, respectively. The unaugmented parent achieved 100% validity over 20 actions before an infrastructure error, so its completion performance is unknown and the improvement cannot confidently be attributed to augmentation alone. Retain the same unaugmented mixture for another evaluation rather than change data based on an interrupted result. Aggregate feedback does not establish a specific policy-discovery, memory, or target-ranking failure.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            8,
+            9,
+            20,
+            21,
+            28,
+            29,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "none",
+          "expected_effect": "Preserve coverage of discovery, source-fact memory, target reasoning, native form entry, saving, visible verification, and stopping while testing whether the parent's promising early action validity persists through completion. Reusing the mixture avoids confounding an infrastructure-interrupted result with another selection change; successful completion remains unverified."
+        },
+        "training_tokens": 103010,
+        "cumulative_training_tokens": 311823,
+        "checkpoint_sha256": "a9f64f378148b7c13f3198ee8b5feaf113dce09127b407bd2e156bf3f06bda4c",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 257303,
+          "output_tokens": 7874,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:23:19.535570Z",
+          "finished_at": "2026-09-23T02:33:28.062368Z",
+          "result_sha256": "ded2edecd4fb179c0b67f07463ca12c7e52fdc91eb84a67b00730158eb80cecb",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 4,
+          "trace_sha256": "cd4c53d9d38350a2f95178e37dcf57a88163e8f9d6df1176f08619d9df1d691e",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 4,
+        "hypothesis": "The latest uninterrupted evaluation achieved 100% valid actions but zero reward across 90 actions, shifting the evidenced bottleneck from action validity to task completion. Aggregate feedback cannot distinguish repeated navigation, incomplete source-fact memory, incorrect target selection, or failure to save and stop. Test a mixture that reduces inspection-navigation coverage and includes the entire final editing sequence, while retaining early discovery and inspection examples spanning the trace. Keep augmentation disabled to preserve the configuration that achieved full action validity.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            5,
+            9,
+            21,
+            29,
+            33,
+            35,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "none",
+          "expected_effect": "Increase training emphasis on progressing from accumulated source facts and selected targets through all three native-form edits, saves, visible verification, and stopping. Retained discovery and inspection examples support policy acquisition and memory preservation. This tests whether stronger coverage of completion behavior improves reward while maintaining action validity; the aggregate evidence does not establish the specific cause of noncompletion."
+        },
+        "training_tokens": 99219,
+        "cumulative_training_tokens": 411042,
+        "checkpoint_sha256": "e4d8ec1807546c9291cf7fcb17fb87421146fd6ae4d145a7d261f4dfe76a77e1",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 0.15555555555555556,
+          "input_tokens": 298409,
+          "output_tokens": 17238,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:35:58.591428Z",
+          "finished_at": "2026-09-23T02:49:43.720325Z",
+          "result_sha256": "fc7b405a4dd6cbd427d555075323daf0d8fc587cf29e9ebeaa13f3a4474ff21b",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 7,
+          "trace_sha256": "917a9efd006dc34d225e66b2780d0b4a199eb4375c5ad2884b3e5392c10fe04e",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 5,
+        "hypothesis": "The latest mixture regressed to 15.56% valid actions and zero reward, while an earlier unaugmented mixture reached 100% validity but still zero reward after 90 actions. Aggregate feedback therefore supports testing both action grounding and task progression; it does not identify a specific navigation, memory, ranking, or saving failure. Replace redundant later editing examples with broader discovery and inspection coverage, retain one complete editing-to-verification sequence and the final target's editing-to-stopping sequence, and repeat the demonstrated policy-rich form-entry and verified stopping examples. Keep augmentation disabled because aliasing has not shown an aggregate benefit.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            8,
+            9,
+            12,
+            13,
+            20,
+            21,
+            24,
+            25,
+            28,
+            29,
+            33,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            58
+          ],
+          "augmentation": "none",
+          "expected_effect": "Broader inspection coverage should support grounding actions in current observations and retaining source facts before choosing targets. Complete native-form sequences preserve supervision for selecting options, filling fields, saving, and checking the resulting state. Repeating the verified stopping example increases emphasis on ending after all required edits are confirmed. This tests a more balanced discovery-to-completion mixture; improved validity and successful completion remain unproven."
+        },
+        "training_tokens": 99140,
+        "cumulative_training_tokens": 510182,
+        "checkpoint_sha256": "eaee1507920c619770088ac6d92db6dc5732d87b70ca73dcc06ad20c86164aa8",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 267046,
+          "output_tokens": 17970,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:52:23.011067Z",
+          "finished_at": "2026-09-23T03:01:28.269969Z",
+          "result_sha256": "535623619a6e086550794469772cd4ffd356c3743a9658a825b159b7b1dbd23e",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 5,
+          "trace_sha256": "55066c8249727e075ae86e803eefffa17595634a004a2e0daa0c0a649032e025",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      }
+    ],
+    "final_tests": [
+      {
+        "repeat": 0,
+        "reward": null,
+        "infrastructure_errors": 1,
+        "actions": 32,
+        "valid_action_rate": 0.15625,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost_usd": null,
+        "status": "infrastructure_error",
+        "started_at": "2026-09-23T03:01:51.084928Z",
+        "finished_at": "2026-09-23T03:09:00.505162Z",
+        "result_sha256": "29a135545071f873bed25749587dc7a63a418d19a4fd4bcea5895c1933b3d882",
+        "separate_verifier": true,
+        "error_type": "ConnectError",
+        "error_stage": "act",
+        "transport_disconnect": true,
+        "action_types": {
+          "click": 32
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "1c3612de4fdbeb072ef44dc33e01fd3c81b3c7f87b53583b982046a52baf5519",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      },
+      {
+        "repeat": 1,
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.05555555555555555,
+        "input_tokens": 313044,
+        "output_tokens": 8638,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:09:26.056611Z",
+        "finished_at": "2026-09-23T03:29:26.075826Z",
+        "result_sha256": "9b2c411fbbf78a743b7b50273d02540bb2ad4be0d9bd143d02acdbd83d511674",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "8fb442d0e54b79ac7b49d48b0791bc4427cc5cb83af1124539840cf6788aeec8",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      },
+      {
+        "repeat": 2,
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.5111111111111111,
+        "input_tokens": 273184,
+        "output_tokens": 8618,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:29:44.973706Z",
+        "finished_at": "2026-09-23T03:43:33.708769Z",
+        "result_sha256": "f74b153449260ff1ae5f5fa262e519ef948d39ed7b0eb39d49d9c4acd2535b71",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 11,
+        "trace_sha256": "31f664632a6bb35a0dd76430b09aa66fe787315aac8810d10476d63f81739b78",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      }
+    ],
+    "checks": {
+      "frozen_engine_available_at_source_commit": true,
+      "train_source_only": true,
+      "total_training_budget": true,
+      "history_prefix_complete": true,
+      "source_packs_disjoint": true,
+      "answers_excluded_from_agent_scenario": true,
+      "selection_matches_history": true
+    },
+    "cost_usd": null,
+    "engine_hashes": {
+      "kanboard_cases.py": "ab5bb8950199076c892f6b70aef826c4ff683d5679316700fb76a65f197af345",
+      "kanboard_seed.py": "43d732db0b5e4e9ac5db339eacb663915abcf1ebde1a726245d4dfcf909d2259",
+      "kanboard_rpc.py": "daddbf5b844c9f9739d4361637675158aa3445ce0f20f2ff4c0c8230865872cf",
+      "kanboard_harbor.py": "fca5b1ea865abad63fd22148eabc6e47549ae3a330f2bf0596aa8b56c28ffbb4",
+      "tinker_backend.py": "4061b3af8eab39ad493262b7d895b2ff69971632268d29140b1fdd61854fa904",
+      "tinker_proxy.py": "95cc4037d16215150edc2a400b781d043835ffd76da4eab6d12430162b7fab2e",
+      "native_data_factory.py": "3b1257038894586fce52b2b85011195ab1a0ba43d0d8ba66be686239c843b16a",
+      "data_campaign.py": "976d7127fbf287d35a488c8b4030efb787f62a89630164870b211dddd64d5b0b",
+      "agentrouter.py": "f1bfb9378bf83214286db40c166d7faf0be425a9dc55d919d268589ea0f003b7",
+      "harbor_adapter.py": "df8605a8d938d979bfad8159ba3bc09b36a676437b418018d19baff15089bb83",
+      "http_transport.py": "39e380ba70cb8ca6d9fb23dfc32ce4d6f246ca9c9a3328b0c29c227c3006c31c",
+      "sample_cache.py": "c24529ada780f5dc6fe713d3d5e8d05bb3bf1905a479424ee461800a33cf60ad"
+    },
+    "source_counts": {
+      "train": 12,
+      "acceptance": 12,
+      "test": 12
+    },
+    "training_tokens": 510182,
+    "selection": {
+      "selected_baseline": true,
+      "acceptance_reward": 0.0,
+      "attempts_completed": 5,
+      "training_tokens": 510182,
+      "selected_attempt": null
+    },
+    "all_final_tests_scored": false,
+    "final_avg": null,
+    "campaign_process_finished": true,
+    "transport_recoveries": [
+      {
+        "run": "recovery-astra-a02",
+        "original_attempt": 2,
+        "protocol": "read-retries-v1",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 257678,
+          "output_tokens": 8234,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T03:19:21.592328Z",
+          "finished_at": "2026-09-23T03:28:01.873523Z",
+          "result_sha256": "90a65d46317ad4b980bd66123ef1516f7291f77d4e9e8a9d3136ba5c463e8ceb",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 4,
+          "trace_sha256": "c52641b8b6b0b8fb0589f02bd9872f64764c30493593bdd254b7c50fd1bc4e40",
+          "proxy_destroyed": true
+        }
+      }
+    ],
+    "audit_pass": true,
+    "limitations": [
+      "one task per source pack; shared task template",
+      "bounded selection / ID augmentation of one verified teacher trajectory",
+      "same seed and temperature across three final executions; not three independent task samples",
+      "training and evaluation use semantically similar but different instruction headers",
+      "no non-recursive search control; no sustained RSI claim"
+    ]
+  },
+  {
+    "run": "formal-data-sol-v2",
+    "researcher": "gpt-5.6-sol",
+    "student": "Qwen/Qwen3.5-4B",
+    "source_commit": "62b99b9",
+    "baseline": {
+      "reward": 0.0,
+      "infrastructure_errors": 0,
+      "actions": 90,
+      "valid_action_rate": 0.1111111111111111,
+      "input_tokens": 209205,
+      "output_tokens": 7540,
+      "cost_usd": null,
+      "status": "scored",
+      "started_at": "2026-09-23T01:57:07.670734Z",
+      "finished_at": "2026-09-23T02:14:26.817961Z",
+      "result_sha256": "2a0dcf6290b19e6ae659e9ff0b06859345b15604fea0b98ff6665280eb982bc1",
+      "separate_verifier": true,
+      "saved_state_verification": {
+        "success": false,
+        "wrong_tables": [
+          "tasks"
+        ],
+        "correct_target_tasks": 0,
+        "target_tasks": 3
+      },
+      "action_types": {
+        "click": 90
+      },
+      "distinct_action_labels": 11,
+      "trace_sha256": "096bca80dda1a3b2de2deceace89f8dae9522db545601a402434d5071a2b5574",
+      "proxy_destroyed": true
+    },
+    "attempts": [
+      {
+        "attempt": 1,
+        "hypothesis": "The zero reward is primarily a long-horizon workflow failure: the model is not reliably discovering the RUNBOOK, retaining source metadata while inspecting many issues, ranking unresolved issues by source updated_at, and completing the native edit-save-verify sequence before stopping. Low valid-action rate also suggests overfitting or confusion around transient numeric control IDs.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            12,
+            13,
+            20,
+            21,
+            30,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "bijective_numeric_control_aliases",
+          "expected_effect": "Provides end-to-end coverage of project and policy discovery, repeated issue inspection with fact preservation, target selection, three complete native form-edit workflows, visible save verification, navigation between targets, and correct termination. Bijective control relabeling should reduce memorization of observer-assigned IDs while preserving action semantics, improving valid actions and transfer to fresh observations."
+        },
+        "training_tokens": 106861,
+        "cumulative_training_tokens": 106861,
+        "checkpoint_sha256": "4c48d638ddc0a8265df9c89cc25438537bc9625dc054121df40b26a51a138626",
+        "evaluation": {
+          "reward": null,
+          "infrastructure_errors": 1,
+          "actions": 12,
+          "valid_action_rate": 0.25,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "status": "infrastructure_error",
+          "started_at": "2026-09-23T02:17:10.089100Z",
+          "finished_at": "2026-09-23T02:20:26.452096Z",
+          "result_sha256": "cc9f07a650105d6a820a8298ac07f2dacc70f4499983e22d779dfd05fe2d0dee",
+          "separate_verifier": true,
+          "error_type": "TimeoutException",
+          "error_stage": "observe",
+          "transport_disconnect": false,
+          "action_types": {
+            "click": 12
+          },
+          "distinct_action_labels": 6,
+          "trace_sha256": "dde7780cb559dccb49be239cc1805063b33b74b46a4a634964ec6337cdc37283",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 2,
+        "hypothesis": "The prior evaluation was invalidated by an infrastructure error, so it provides no evidence against the long-horizon diagnosis. The main behavioral gap remains chaining policy discovery and source-fact preservation into correct target ranking, then executing all three native edit-save-verify workflows and stopping only after visible confirmation. A more coherent mixture should emphasize the opening discovery steps and the contiguous final reasoning-and-execution segment instead of sparse intermediate navigation.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "bijective_numeric_control_aliases",
+          "expected_effect": "This mixture preserves early project and policy discovery while densely covering the point where accumulated source facts determine the three targets, all native assignee/priority/complexity edits, saves, visible verification, navigation between targets, and final done. Consistent bijective control relabeling should discourage memorization of transient numeric IDs and improve grounding to current observations, increasing valid-action rate and end-to-end completion."
+        },
+        "training_tokens": 107031,
+        "cumulative_training_tokens": 213892,
+        "checkpoint_sha256": "154f75ef95ff4940ce2566954a5f8d3d8705f81a103205d5e915509b97ffc402",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 252380,
+          "output_tokens": 10753,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:22:45.424461Z",
+          "finished_at": "2026-09-23T02:31:10.842105Z",
+          "result_sha256": "9d14ed3e893af46a141bdb2adf076f5f2320aa56d2aa6ee3ed6b2a585a904ccf",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 6,
+          "trace_sha256": "61b34bb96909ea0561fe56e1b1cc69e830db3946872b07c8d4dcaf7915c9640a",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 3,
+        "hypothesis": "The valid-action rate recovered to 1.0, but zero reward indicates the remaining failure is semantic and long-horizon rather than control grounding: the model likely does not preserve enough source issue facts across inspection to rank the three oldest unresolved issues correctly, or it fails the complete save-verify-stop sequence. The previous mixture overrepresented opening navigation and only the tail of discovery. Sampled records spanning the full issue-inspection progression, followed by the contiguous complete execution segment, should better connect accumulated source metadata to target selection and exact updates.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            4,
+            8,
+            12,
+            16,
+            20,
+            24,
+            28,
+            32,
+            36,
+            38,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58
+          ],
+          "augmentation": "bijective_numeric_control_aliases",
+          "expected_effect": "The inspection samples cover policy discovery and source-fact accumulation across the candidate set, while records 40-58 preserve the uninterrupted sequence for all three native forms: selecting Chen, setting priority 3, filling complexity 8, saving, visibly verifying, navigating to the next target, and stopping only after final confirmation. Control aliasing should retain the achieved valid-action rate while preventing transient numeric-ID memorization."
+        },
+        "training_tokens": 115151,
+        "cumulative_training_tokens": 329043,
+        "checkpoint_sha256": "225c5704c080570f473ec914d2bacba049dc6bffc5bb20c778930d1e8863800a",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 86267,
+          "output_tokens": 12976,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:35:41.716776Z",
+          "finished_at": "2026-09-23T02:41:48.582733Z",
+          "result_sha256": "67a7e434747bb0fc6f574da15393a00e96aa02c97e1647a909e425673fb3dd9d",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 6,
+          "trace_sha256": "a6cf0016989c0a519e238ef2c8b0c3858c2f58232785e59b47193625ab3bbbfc",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 4,
+        "hypothesis": "With valid-action rate at 1.0 but reward still zero, the likely failure is semantic navigation and state continuity during the final candidate inspections. The prior mixture omitted the alternating returns to the task list, weakening the demonstrated loop of inspect source metadata, preserve facts in memory, return, and inspect the next issue. A contiguous late-stage trajectory should better teach completion of ranking followed by all three edit-save-verify cycles and final stopping.",
+        "recipe": {
+          "record_ids": [
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            58
+          ],
+          "augmentation": "bijective_numeric_control_aliases",
+          "expected_effect": "The contiguous records preserve the actual inspection/list-navigation rhythm through final target selection, then demonstrate native form entry, saving, visible verification, movement between targets, and stopping only after the third verified update. Repeating the terminal record reinforces that completion occurs only after all selected tasks are visibly confirmed, while control aliasing discourages memorization of transient numeric IDs."
+        },
+        "training_tokens": 112243,
+        "cumulative_training_tokens": 441286,
+        "checkpoint_sha256": "a84ade2ca72e10847673ebe44a07a52057f718678aec16afccfa2534a8c19253",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 0.6777777777777778,
+          "input_tokens": 296782,
+          "output_tokens": 18025,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T02:44:11.997795Z",
+          "finished_at": "2026-09-23T02:54:25.046744Z",
+          "result_sha256": "0fb530b8fb05676b8593be2c02cf7a3a054a4251435004ce75365f44b55d7e30",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 6,
+          "trace_sha256": "3fe0f0709ee4aacca332ddc20350bebeb0dfb1ee8fd1d41e5ca866e2696a180f",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      },
+      {
+        "attempt": 5,
+        "hypothesis": "Reward remains zero despite previously achieving a 1.0 valid-action rate, so the dominant failure is semantic completion rather than basic control grounding. The model needs a coherent demonstration connecting initial project and policy discovery, late source-issue inspection with accumulated facts, correct oldest-unresolved target selection, all three native form updates, visible post-save verification, and stopping only after the third verified save. The last alias-augmented mixture also reduced valid-action rate, so control relabeling should be removed.",
+        "recipe": {
+          "record_ids": [
+            0,
+            1,
+            2,
+            3,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            43,
+            50,
+            57
+          ],
+          "augmentation": "none",
+          "expected_effect": "This mixture restores the opening policy-discovery context, preserves the final inspection loop where source facts and ranking are consolidated, and retains the complete three-target edit-save-verify trajectory. Repeating each save action emphasizes committing every native form while the following original records teach visible verification and continued work; the terminal done record remains conditioned on confirmation of all three targets."
+        },
+        "training_tokens": 107440,
+        "cumulative_training_tokens": 548726,
+        "checkpoint_sha256": "76bcdd0b10c6e23194a47c37df74533b5c5c12b00ec98c3ca58ae5a17c1da432",
+        "evaluation": {
+          "reward": null,
+          "infrastructure_errors": 1,
+          "actions": 15,
+          "valid_action_rate": 1.0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "status": "infrastructure_error",
+          "started_at": "2026-09-23T02:57:19.291227Z",
+          "finished_at": "2026-09-23T02:59:37.112156Z",
+          "result_sha256": "cd17f60bd642aed097ea7d8a94856c7c91383efc8ab3c23340c5703a52afebd0",
+          "separate_verifier": true,
+          "error_type": "TimeoutException",
+          "error_stage": "act",
+          "transport_disconnect": true,
+          "action_types": {
+            "click": 15
+          },
+          "distinct_action_labels": 7,
+          "trace_sha256": "391d3a859c0bc84c58f0e0e8882475c16aa1cd1a9d803fc89a631f8e4989094c",
+          "proxy_destroyed": true
+        },
+        "promoted": false,
+        "best_reward": 0.0,
+        "checks": {
+          "data_hash_matches_training": true,
+          "recipe_hash_matches_history": true,
+          "verified_training_and_sampling": true,
+          "fixed_16_updates": true,
+          "within_attempt_budget": true,
+          "history_matches_actual_score": true,
+          "strict_promotion_rule": true
+        }
+      }
+    ],
+    "final_tests": [
+      {
+        "repeat": 0,
+        "reward": null,
+        "infrastructure_errors": 1,
+        "actions": 40,
+        "valid_action_rate": 0.125,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost_usd": null,
+        "status": "infrastructure_error",
+        "started_at": "2026-09-23T03:00:00.459954Z",
+        "finished_at": "2026-09-23T03:09:05.582374Z",
+        "result_sha256": "f84b752c2f34401d3dcec23c4a32d8371b12d926acb3bf1f6c495d12c3fb473f",
+        "separate_verifier": true,
+        "error_type": "ConnectError",
+        "error_stage": "act",
+        "transport_disconnect": true,
+        "action_types": {
+          "click": 40
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "46aed240d2337c2c07921f4f58edec17e27b921740a1dfc88166beef93f6cb58",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      },
+      {
+        "repeat": 1,
+        "reward": null,
+        "infrastructure_errors": 1,
+        "actions": 54,
+        "valid_action_rate": 1.0,
+        "input_tokens": null,
+        "output_tokens": null,
+        "cost_usd": null,
+        "status": "infrastructure_error",
+        "started_at": "2026-09-23T03:09:25.039693Z",
+        "finished_at": "2026-09-23T03:14:54.028146Z",
+        "result_sha256": "686fb9f68d6b7514f526e9ae5897be725381114714333c9a9d81ffc82a49d32c",
+        "separate_verifier": true,
+        "error_type": "ConnectError",
+        "error_stage": "observe",
+        "transport_disconnect": true,
+        "action_types": {
+          "click": 54
+        },
+        "distinct_action_labels": 5,
+        "trace_sha256": "8df003ff411e16cc0ddcb3404a2f75df55f95c8cd9444efe86c58dd1a1425f9f",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      },
+      {
+        "repeat": 2,
+        "reward": 0.0,
+        "infrastructure_errors": 0,
+        "actions": 90,
+        "valid_action_rate": 0.05555555555555555,
+        "input_tokens": 311590,
+        "output_tokens": 7430,
+        "cost_usd": null,
+        "status": "scored",
+        "started_at": "2026-09-23T03:15:14.340377Z",
+        "finished_at": "2026-09-23T03:34:32.927306Z",
+        "result_sha256": "398e62323c71c429f55cbd93472d785a6e90cfe31c714279b15227e9c187891f",
+        "separate_verifier": true,
+        "saved_state_verification": {
+          "success": false,
+          "wrong_tables": [
+            "tasks"
+          ],
+          "correct_target_tasks": 0,
+          "target_tasks": 3
+        },
+        "action_types": {
+          "click": 90
+        },
+        "distinct_action_labels": 6,
+        "trace_sha256": "fed75cdbd8b5bfdb1db50faaf5f3cec5fc1198ccbe3f3f83b11e40f3a657523c",
+        "proxy_destroyed": true,
+        "selection_precedes_test": true
+      }
+    ],
+    "checks": {
+      "frozen_engine_available_at_source_commit": true,
+      "train_source_only": true,
+      "total_training_budget": true,
+      "history_prefix_complete": true,
+      "source_packs_disjoint": true,
+      "answers_excluded_from_agent_scenario": true,
+      "selection_matches_history": true
+    },
+    "cost_usd": null,
+    "engine_hashes": {
+      "kanboard_cases.py": "ab5bb8950199076c892f6b70aef826c4ff683d5679316700fb76a65f197af345",
+      "kanboard_seed.py": "43d732db0b5e4e9ac5db339eacb663915abcf1ebde1a726245d4dfcf909d2259",
+      "kanboard_rpc.py": "daddbf5b844c9f9739d4361637675158aa3445ce0f20f2ff4c0c8230865872cf",
+      "kanboard_harbor.py": "fca5b1ea865abad63fd22148eabc6e47549ae3a330f2bf0596aa8b56c28ffbb4",
+      "tinker_backend.py": "4061b3af8eab39ad493262b7d895b2ff69971632268d29140b1fdd61854fa904",
+      "tinker_proxy.py": "95cc4037d16215150edc2a400b781d043835ffd76da4eab6d12430162b7fab2e",
+      "native_data_factory.py": "3b1257038894586fce52b2b85011195ab1a0ba43d0d8ba66be686239c843b16a",
+      "data_campaign.py": "976d7127fbf287d35a488c8b4030efb787f62a89630164870b211dddd64d5b0b",
+      "agentrouter.py": "f1bfb9378bf83214286db40c166d7faf0be425a9dc55d919d268589ea0f003b7",
+      "harbor_adapter.py": "df8605a8d938d979bfad8159ba3bc09b36a676437b418018d19baff15089bb83",
+      "http_transport.py": "39e380ba70cb8ca6d9fb23dfc32ce4d6f246ca9c9a3328b0c29c227c3006c31c",
+      "sample_cache.py": "c24529ada780f5dc6fe713d3d5e8d05bb3bf1905a479424ee461800a33cf60ad"
+    },
+    "source_counts": {
+      "train": 12,
+      "acceptance": 12,
+      "test": 12
+    },
+    "training_tokens": 548726,
+    "selection": {
+      "selected_baseline": true,
+      "acceptance_reward": 0.0,
+      "attempts_completed": 5,
+      "training_tokens": 548726,
+      "selected_attempt": null
+    },
+    "all_final_tests_scored": false,
+    "final_avg": null,
+    "campaign_process_finished": true,
+    "transport_recoveries": [
+      {
+        "run": "recovery-sol-a01",
+        "original_attempt": 1,
+        "protocol": "read-retries-v1",
+        "evaluation": {
+          "reward": null,
+          "infrastructure_errors": 1,
+          "actions": 24,
+          "valid_action_rate": 0.125,
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost_usd": null,
+          "status": "infrastructure_error",
+          "started_at": "2026-09-23T03:19:22.258404Z",
+          "finished_at": "2026-09-23T03:25:14.105876Z",
+          "result_sha256": "4af339486eb3c78298dfa3b31849f6b1c53466b02742ee3f6688c26391fc1d9e",
+          "separate_verifier": true,
+          "error_type": "ConnectError",
+          "error_stage": "act",
+          "transport_disconnect": true,
+          "action_types": {
+            "click": 24
+          },
+          "distinct_action_labels": 6,
+          "trace_sha256": "8694793c90c3c18272ba5474660ae2daedc7496ccbb405b1993b0745aca632b4",
+          "proxy_destroyed": true
+        }
+      },
+      {
+        "run": "recovery-sol-a05",
+        "original_attempt": 5,
+        "protocol": "read-retries-v1",
+        "evaluation": {
+          "reward": 0.0,
+          "infrastructure_errors": 0,
+          "actions": 90,
+          "valid_action_rate": 1.0,
+          "input_tokens": 261186,
+          "output_tokens": 9847,
+          "cost_usd": null,
+          "status": "scored",
+          "started_at": "2026-09-23T03:27:35.733502Z",
+          "finished_at": "2026-09-23T03:36:21.515682Z",
+          "result_sha256": "cf9eaa623cfe3e881eacad47ee7b74f72361fb45dbf98b86b9f06f44d895de40",
+          "separate_verifier": true,
+          "saved_state_verification": {
+            "success": false,
+            "wrong_tables": [
+              "tasks"
+            ],
+            "correct_target_tasks": 0,
+            "target_tasks": 3
+          },
+          "action_types": {
+            "click": 90
+          },
+          "distinct_action_labels": 5,
+          "trace_sha256": "34618105705a80e3a92bc5b95e4d6ef4926dc5aed0ef863d861085aa84c873c4",
+          "proxy_destroyed": true
+        }
+      }
+    ],
+    "audit_pass": true,
+    "limitations": [
+      "one task per source pack; shared task template",
+      "bounded selection / ID augmentation of one verified teacher trajectory",
+      "same seed and temperature across three final executions; not three independent task samples",
+      "training and evaluation use semantically similar but different instruction headers",
+      "no non-recursive search control; no sustained RSI claim"
+    ]
+  }
+]
