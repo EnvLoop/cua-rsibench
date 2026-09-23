@@ -22,7 +22,7 @@ def child(command,directory,label):
     write(status,{'pid':process.pid,'finished_at':time.time(),'return_code':result,'label':label})
     if result:raise RuntimeError(label+' process failed')
 
-def run(study,name,number):
+def run(study,name,number,stop_before_evaluation=False):
     if name not in RESEARCHER_MODELS:raise ValueError('researcher alias outside registered choices')
     model=RESEARCHER_MODELS[name]
     study=Path(study).resolve();registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
@@ -51,10 +51,10 @@ def run(study,name,number):
     command=[sys.executable,'-m','cursibench.factory_research','--out',str(factory),'--researcher',model,'--feedback',str(feedback_path)]
     if parent:command+=['--parent',str(parent)]
     child(command,work,name+'-factory')
-    finish_submission(study,name,number,factory)
+    finish_submission(study,name,number,factory,stop_before_evaluation=stop_before_evaluation)
 
 
-def finish_submission(study,name,number,factory):
+def finish_submission(study,name,number,factory,stop_before_evaluation=False):
     study=Path(study).resolve();factory=Path(factory).resolve()
     registry=CampaignRegistry(study/(name+'-campaign.json'));state=registry.snapshot()
     if state['final_selection'] is not None or number!=len(state['attempts'])+1:raise ValueError('submission is not the next open research round')
@@ -82,6 +82,16 @@ def finish_submission(study,name,number,factory):
     metadata=json.loads((training/'training.json').read_text())
     if not metadata.get('verified_training_and_sampling') or metadata['scheduled_tokens']!=pre['scheduled_tokens'] or metadata['data_sha256']!=pre['data_sha256']:
         registry.record_training_failure(attempt,'training evidence does not match frozen preflight');raise RuntimeError('training mismatch')
+    if stop_before_evaluation:
+        pending={'status':'awaiting_evaluation','researcher':name,'attempt':attempt,'created_at':time.time(),
+            'training_manifest':str((training/'training.json').relative_to(study)),
+            'training_manifest_sha256':hashlib.sha256((training/'training.json').read_bytes()).hexdigest(),
+            'data_sha256':pre['data_sha256'],'scheduled_tokens':metadata['scheduled_tokens'],
+            'selection_manifest_sha256':state['protocol'].get('selection_manifest_sha256'),
+            'training_reservation_retained':True,'evaluation_started':False}
+        write(work/(name+'-evaluation-pending.json'),pending)
+        print(json.dumps({k:pending[k] for k in ['status','researcher','attempt','training_reservation_retained','evaluation_started']}),flush=True)
+        return pending
     evaluation=work/('eval-'+name)
     child([sys.executable,str(ROOT/'tools/run_cloud_chain.py'),'--out',str(evaluation),'--training',str(training/'training.json'),
            '--task',str(study/'selection'),'--factory','--environment','journal','--concurrency','3','--job-timeout','2700'],work,name+'-evaluation')
@@ -90,4 +100,4 @@ def finish_submission(study,name,number,factory):
     print(json.dumps({'researcher':name,'attempt':attempt,'status':summary['status'],'score':summary['score'],'promoted':admitted['promoted']}),flush=True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--study',default='work/factory-study-02');parser.add_argument('--researcher',choices=tuple(RESEARCHER_MODELS),required=True);parser.add_argument('--round',type=int,required=True);a=parser.parse_args();run(a.study,a.researcher,a.round)
+    parser=argparse.ArgumentParser();parser.add_argument('--study',default='work/factory-study-02');parser.add_argument('--researcher',choices=tuple(RESEARCHER_MODELS),required=True);parser.add_argument('--round',type=int,required=True);parser.add_argument('--stop-before-evaluation',action='store_true');a=parser.parse_args();run(a.study,a.researcher,a.round,a.stop_before_evaluation)
