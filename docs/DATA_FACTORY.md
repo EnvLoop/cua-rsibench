@@ -37,7 +37,7 @@ Both datasets have completed real 32-step Tinker LoRA training on Qwen3.5-4B und
 
 A three-family selection suite was frozen before student runs. The initial multi-task evaluation exposed a proxy-cache capacity defect: 256 entries did not cover three 90-action trials. Those interrupted results are retained as unscored. The repaired proxy derives its bounded capacity from the task count and keeps retry idempotency. Paired reruns use unchanged datasets, weights, tasks, observer and verifier.
 
-The repaired initial selection comparison completed without infrastructure errors: base student 0/3, Astra-data checkpoint 1/3, and Sol-data checkpoint 0/3. These are three-task calibration results. No final-task or generalization claim follows. The original small suite also needs counterbalanced source order, changed target attributes, and additional instances to test positional shortcuts.
+The repaired initial selection comparison completed without infrastructure errors: base student 0/3, Astra-data checkpoint 1/3, and Sol-data checkpoint 0/3. These are three-task calibration results. No final-task or generalization claim follows. The sealed six-variant final suite subsequently adds reversed insertion order, changed target attributes, ranking direction, and planning alternatives. These are joint robustness checks; the pilot does not isolate positional shortcuts causally.
 
 ## Run
 
@@ -60,7 +60,7 @@ Training still enforces the fixed sequence and scheduled-token bounds. In the fa
 
 ## Study status and research limits
 
-Both cohorts have finished their five-round searches and frozen selection. The original cohort retains Astra round 1 and Sol5.6 round 5 at 1/3 on selection. The separate extension retains Sol6 round 2 at 1/3 and the base for Luna6 at 0/3. Final execution and declared operational recovery are tracked separately and gate publication.
+Both cohorts have finished their five-round searches and frozen selection. The original cohort retains Astra round 1 and Sol5.6 round 5 at 1/3 on selection. The separate extension retains Sol6 round 2 at 1/3 and the base for Luna6 at 0/3. All prescribed final executions and declared operational recoveries are now complete and independently audited. The extension selected student scores 2/12 versus base 0/12 across the two six-task repetitions; Luna 6 shares that base evidence. See the report for separate original/recovery views and their platform caveat.
 
 A broader study still needs more task instances and applications, repeated research seeds, calibrated difficulty tiers, and equal-budget non-adaptive controls. The current pilot does not establish sustained RSI or a general frontier-model ranking.
 
@@ -82,6 +82,8 @@ PYTHONPATH=src python tools/audit_factory_study.py
 ```
 
 These commands require the corresponding local execution artifacts and configured provider accounts. The released sanitized evidence supports offline report rebuilding; it does not include private sampler checkpoint identifiers.
+
+The later cohorts use the versioned trusted remote controller for initial finals. See [remote evaluation and evidence admission](REMOTE_EVALUATION.md) for preparation, collection, source binding, cleanup, and one-time registration. The original study's full-suite operational recoveries are a separate policy and preserve its original outcomes.
 
 ## Start a fresh study
 

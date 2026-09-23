@@ -78,6 +78,18 @@ def validate_study(data, expected_models):
         require(valid_number(campaign.get('selection_score')), 'missing retained selection score')
         require(campaign.get('training_token_budget') == 1048576 and campaign.get('max_attempts') == 5,
                 'campaign limits differ from the report methods')
+        for attempt in campaign['attempts']:
+            if not attempt.get('optimizer_steps'):
+                continue
+            mixture = attempt.get('corpus_mix') or {}
+            representations = mixture.get('representation_counts') or {}
+            require(set(representations) <= {'decision', 'history'} and
+                    all(type(value) is int and value > 0 for value in representations.values()) and
+                    sum(representations.values()) == attempt['records'], 'dataset representation counts differ')
+            require(type(mixture.get('distinct_message_records')) is int and
+                    0 < mixture['distinct_message_records'] <= attempt['records'], 'invalid distinct training record count')
+            require(type(mixture.get('verified_episode_count')) is int and
+                    2 <= mixture['verified_episode_count'] <= attempt['records'], 'invalid verified episode coverage')
     comparison = data.get('final_comparison') or {}
     bindings = comparison.get('bindings') or {}
     require(set(bindings) == {'base', *names}, 'final comparison roles do not match researchers')
@@ -184,7 +196,9 @@ def final_rows(data, recovered=False):
 
 
 def table(rows):
-    return '\n'.join('| ' + ' | '.join(str(cell) for cell in row) + ' |' for row in rows)
+    formatted = ['| ' + ' | '.join(str(cell) for cell in row) + ' |' for row in rows]
+    formatted.insert(1, '| ' + ' | '.join('---' for _ in rows[0]) + ' |')
+    return '\n'.join(formatted)
 
 
 def cohort_selection(cohort):
@@ -197,15 +211,18 @@ def cohort_selection(cohort):
         trained = sum(bool(attempt.get('optimizer_steps')) for attempt in attempts)
         series = ' / '.join(score(value) for value in (values[0], max(values), values[-1])) if values else 'Unscored'
         rows.append([campaign['researcher'], f'{trained} / {len(attempts)}', series, campaign['selected'], f'{campaign["used_training_tokens"]:,}'])
+        missing = len(attempts) - len(values)
         text.append(f'{campaign["researcher"]} retains {campaign["selected"]} at {score(campaign["selection_score"])} after {len(attempts)} research rounds. '
-                    f'{trained} candidates completed training; {len(attempts) - len(values)} rounds have no scored candidate. '
+                    f'{trained} candidate{"s" if trained != 1 else ""} completed training; {missing} round{"s" if missing != 1 else ""} {"have" if missing != 1 else "has"} no scored candidate. '
                     'Its scored candidate sequence is ' + (', '.join(score(value) for value in values) if values else 'empty') + '.')
         recovered = sum(bool(attempt.get('original_evaluation')) for attempt in attempts)
         if recovered:
             text.append(f'{campaign["researcher"]} has {recovered} recorded evaluation recovery; the audit retains the original execution separately.')
         historical = sum(attempt.get('accounting') == 'historical import' for attempt in attempts)
         if historical:
-            text.append(f'{historical} of its rounds were imported historically because they preceded the pre-execution training reservation guard.')
+            text.append(f'{historical} round{"s were" if historical != 1 else " was"} imported historically, predating the pre-execution training reservation guard.')
+    if any(attempt.get('remote_execution') for campaign in data['campaigns'] for attempt in campaign['attempts']):
+        text.append('The reused selection baseline was orchestrated from the Mac. Recorded later candidate evaluations use the Linux remote controller. Promotion applies the declared score gate to those operationally versioned results; selection deltas do not isolate a training-data effect from controller or observation variation. The extension final comparison evaluates both its base and selected checkpoint through the same Linux controller setup.')
     return table(rows), '\n\n'.join(text)
 
 
@@ -235,8 +252,8 @@ def cohort_final(cohort, recovered=False):
     if any(row['mean'] is None for row in finals):
         paragraphs.append('Undefined complete means remain unscored; partial successful executions are not substituted for the prescribed mean.')
     if recovered:
-        paragraphs.append('The full-suite operational amendment replays all six tasks for each eligible infrastructure-invalid slot on a separate trusted Linux E2B controller. Each recovered score uses six fresh results; no original rows are mixed into it. Frozen checkpoints, task packages, actor, verifier, and sampling settings are preserved. Valid original slots are never replayed. These are the same prescribed repetitions, not new independent samples or research seeds. The unchanged original outcomes remain in the preceding table and evidence.')
-        paragraphs.append('In the original cohort this view combines valid Astra-selected executions orchestrated from the Mac with Linux-orchestrated replays for the base and Sol-selected slots. The controller platform is therefore not matched across those roles. Any numerical difference is descriptive and cannot isolate a training-data effect from operational or observation variation.')
+        paragraphs.append('Each eligible infrastructure-invalid slot is replayed once as a fresh six-task suite on the trusted Linux E2B controller. Frozen checkpoints, tasks, actor, verifier, and sampling are unchanged. Recovery scores use only fresh rows. Valid original slots are never replayed. These are the same prescribed repetitions, not new independent samples or research seeds. Original outcomes remain above.')
+        paragraphs.append('Astra\'s retained originals use the Mac controller; base and Sol replays use Linux. This view is not platform-matched. Its differences cannot isolate training-data effects from controller or observation variation.')
     return table(rows), '\n\n'.join(paragraphs)
 
 
@@ -247,8 +264,10 @@ def manuscript(publication):
         validate_study(cohort['data'], spec['models'])
     values = {'COMPARABILITY': BOUNDARY}
     summaries = []
+    final_summaries = []
     design = [['Cohort / researcher models', 'Protocol and evidence boundary']]
     sources = [['Cohort', 'Selection / final source IDs used', 'Training supervision IDs used']]
+    policies = [['Factory / round', 'Records / distinct', 'Episodes', 'Decision / history', 'Selection outcome']]
     sections = []
     for index, cohort in enumerate(publication['cohorts']):
         data = cohort['data']
@@ -257,10 +276,30 @@ def manuscript(publication):
         trained = sum(bool(attempt.get('optimizer_steps')) for campaign in data['campaigns'] for attempt in campaign['attempts'])
         tokens = sum(campaign['used_training_tokens'] for campaign in data['campaigns'])
         summaries.append(f'{cohort["label"]} ({models}) completes {rounds} research rounds, {trained} training candidates, and {tokens:,} scheduled training tokens.')
+        outcomes = final_rows(data)
+        final_summaries.append(cohort['label'] + ': original final means are ' +
+            '; '.join(row['label'] + ' ' + score(row['mean']) for row in outcomes) + '.')
+        if has_recovery(data):
+            final_summaries.append('Its infrastructure-invalid originals remain unscored; separately reported whole-suite recoveries preserve those originals and disclose controller-platform differences.')
         design.append([cohort['label'] + ': ' + models, cohort['interface_note'] + ' ' +
                        f'{data["final_tasks"]} final variants; {data["final_comparison"]["repetitions"]} same-seed environment repetitions. ' + cohort['baseline_note']])
         used = data['source_records_used']
         sources.append([cohort['label'], f'{used["selection"]} / {used["final"]}', used['training_supervision']])
+        for campaign in data['campaigns']:
+            trained_attempts = [a for a in campaign['attempts'] if a.get('optimizer_steps')]
+            selected_round = int(campaign['selected'].split('-')[-1]) if campaign['selected'] != 'base' else None
+            shown = {trained_attempts[-1]['round']} if trained_attempts else set()
+            if selected_round is not None:
+                shown.add(selected_round)
+            for attempt in trained_attempts:
+                if attempt['round'] not in shown:
+                    continue
+                mixture = attempt['corpus_mix']
+                reps = mixture['representation_counts']
+                status = 'Retained' if attempt['round'] == selected_round else 'Base retained' if selected_round is None else 'Not retained'
+                policies.append([f'{campaign["researcher"]} / {attempt["round"]}',
+                    f'{attempt["records"]} / {mixture["distinct_message_records"]}', mixture['verified_episode_count'],
+                    f'{reps.get("decision", 0)} / {reps.get("history", 0)}', status])
         selection_table, selection_text = cohort_selection(cohort)
         final_table, final_text = cohort_final(cohort)
         recovery_section = ''
@@ -309,7 +348,7 @@ Final outcomes are not fed back into research or used to choose a replacement ch
 {recovery_section}
 
 ---PAGEBREAK---''')
-    values.update(COHORT_SUMMARY=' '.join(summaries), COHORT_DESIGN_TABLE=table(design), SOURCE_TABLE=table(sources), COHORT_RESULTS='\n\n'.join(sections))
+    values.update(COHORT_SUMMARY=' '.join(summaries), FINAL_SUMMARY=' '.join(final_summaries), COHORT_DESIGN_TABLE=table(design), SOURCE_TABLE=table(sources), DATA_POLICY_TABLE=table(policies), COHORT_RESULTS='\n\n'.join(sections))
     text = (ROOT / 'tools/factory_report_template.md').read_text()
     for key, value in values.items():
         text = text.replace('{{' + key + '}}', value)

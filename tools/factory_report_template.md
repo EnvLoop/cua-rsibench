@@ -6,7 +6,9 @@
 
 ## Abstract
 
-Can a researcher agent turn browser-agent failures into better training data? We study this question in two separate cohorts of executable data research. Frontier researchers write Python factories, construct native Kanboard task states from public issue metadata, collect independently verified GUI demonstrations, and revise datasets using selection feedback. The fixed teacher is **gpt-5.6-sol**. Each valid candidate trains a fresh **Qwen/Qwen3.5-4B** LoRA adapter through Tinker; Harbor evaluates the student in E2B with an independent saved-state verifier. {{COHORT_SUMMARY}} Selected students are evaluated on each cohort's own sealed final instances. Scores, training resources, invalid submissions, and infrastructure failures are reported separately by cohort. This is a small data-research pilot, not evidence of sustained recursive self-improvement or broad computer-use generalization.
+Can a researcher agent turn browser-agent failures into better training data? We study this question in two separate cohorts of executable data research. Frontier researchers write Python factories, construct native Kanboard task states from public issue metadata, collect independently verified GUI demonstrations, and revise datasets using selection feedback. The fixed teacher is **gpt-5.6-sol**. Each valid candidate trains a fresh **Qwen/Qwen3.5-4B** LoRA adapter through Tinker; Harbor evaluates the student in E2B with an independent saved-state verifier. {{COHORT_SUMMARY}} Selected students are evaluated on each cohort's own sealed final instances.
+
+{{FINAL_SUMMARY}} Scores, training resources, invalid submissions, and infrastructure failures are reported separately by cohort. This is a small data-research pilot, not evidence of sustained recursive self-improvement or broad computer-use generalization.
 
 {{COMPARABILITY}}
 
@@ -53,6 +55,7 @@ The table counts distinct records actually used within each cohort. Instances wi
 ![Figure 2. Native Kanboard interface recorded in E2B. The application and saved database are real; project contents and workflow constraints are benchmark fixtures.](kanboard-real-ui.png)
 
 | Task family | Required behavior | Common valid failure |
+| --- | --- | --- |
 | Direct updates | Find specified records; change assignee, priority, and complexity; save | Edit another record or select the wrong value |
 | Conditional ranking | Apply source predicates; sort with a tie-break; update each selected record | Stop after one target or confuse source state with local state |
 | Constrained allocation | Maximize value under budget and dependency rules; minimize cost on value ties | Choose a feasible but suboptimal set |
@@ -74,6 +77,7 @@ Teacher and student receive visible page text, control references, memory, and t
 All researcher API requests use AgentRouterHub's Responses interface. Exact model IDs are requested provider identifiers, not independent attestations of hosted weights. The fixed teacher remains **gpt-5.6-sol**, including for the Sol 6 and Luna 6 researchers. The student is **Qwen/Qwen3.5-4B**. Tinker performs real LoRA updates and sampler checkpoint creation; an authenticated E2B proxy serves the checkpoint; Harbor runs native tasks with separate verification [3-5].
 
 | Component | Declared setting |
+| --- | --- |
 | Research budget | At most 5 rounds and 1,048,576 scheduled training tokens per researcher |
 | Per-round generation | 20 logical turns; up to 40 charged calls with retries; 12 program runs; 3 new rollouts; 100 teacher calls |
 | Training | 32 updates; batch 2; rank 8; learning rate 0.0001; seed 23 |
@@ -95,6 +99,8 @@ Final runners verify frozen selection, training and checkpoint identities, seale
 The remote-control-plane-v1 amendment moves trusted orchestration from the Mac host to a separate Linux E2B instance. Frozen actor, verifier, application packages, checkpoints, and sampling settings remain bound by hashes. The remote controller verifies 98 package versions and nine installed source files before inference; Python patch versions differ (3.12.13 on the host and 3.12.14 remotely). Downloaded evidence archives and every member are checked before admission. Original invalid runs remain available. Eligible original final slots use one whole-suite replay, preserving the same logical repetition; their recovery means contain only the six fresh outcomes.
 
 Fresh environments still expose nuisance variation. In Luna 6 round two, the original direct task passed while its declared remote recovery failed. First prompt and response hashes matched on all three tasks. At step three, observed differences were CSRF query values and displayed creation/modification/move times; masking those fields made the observations identical. Action sequences later diverged. This documents a reproducibility limitation without attributing causality to either field or excluding inference variability. The controller does not remove these fields or change the actor during the study.
+
+---PAGEBREAK---
 
 {{COHORT_RESULTS}}
 
@@ -125,6 +131,7 @@ The historical v0.4 selection-only pilot stays separate. Its scores and recovery
 The extension's `model6-final-allocation-a` places the following records in the native application. Issue IDs and source metadata come from the public Kanboard snapshot. Every numeric planning field and dependency below is synthetic and is visibly labeled as such in the task descriptions.
 
 | Public issue reference | Cost | Hours | Value | Dependency | Blocked |
+| --- | --- | --- | --- | --- | --- |
 | GH-5827 | 3 | 2 | 8 | None | No |
 | GH-5835 | 5 | 2 | 9 | GH-5827 | No |
 | GH-5837 | 9 | 4 | 17 | None | No |
@@ -134,9 +141,23 @@ The extension's `model6-final-allocation-a` places the following records in the 
 
 The RUNBOOK caps total cost at 9 and hours at 4. The agent must exclude blocked records, honor dependencies, maximize value, and then minimize cost. The pair GH-5827 + GH-5835 has value 17, cost 8, and 4 hours. GH-5837 also has value 17 but costs 9, so choosing that feasible single task fails the tie-break. The high-value GH-5815 distractor is blocked and cannot be selected.
 
-The correct browser workflow assigns Singh, priority 1, and complexity 3 to both records in the pair, saves the edits, and preserves every other record, description, comment, RUNBOOK entry, and archive item. The verifier independently derives those targets and compares the saved database. Editing only one target, choosing the feasible but more expensive alternative, or modifying unrelated state receives zero strict reward.
+The correct browser workflow assigns Singh, priority 1, and complexity 3 to both records in the pair, saves the edits, and preserves every other record, description, comment, RUNBOOK entry, and archive item. The trusted compiler derives those targets; the separate verifier independently checks the saved database against them. Editing only one target, choosing the feasible but more expensive alternative, or modifying unrelated state receives zero strict reward.
 
 This small instance tests a specific conjunction of navigation, reading, planning, multi-record editing, and preservation. It does not represent the scale or ambiguity of a production enterprise backlog. Larger worlds and longer cross-application dependencies remain future profiles.
+
+---PAGEBREAK---
+
+## Appendix B. What the data policies produced
+
+The following rows describe each retained trained candidate and the last trained candidate of its research lineage. Luna 6 retained the base, so its only trained candidate is shown for context. Distinct records count unique message sequences; repeated copies still consume exposure and scheduled training tokens. Episode counts are reconstructed from independently verified trajectory provenance.
+
+{{DATA_POLICY_TABLE}}
+
+**Table B1.** Measured dataset composition. The two cohorts remain separate experimental groups. These examples describe policy outputs and selection outcomes; they are not a controlled comparison of representation choices.
+
+The selected Sol 6 dataset contains 32 decision records and one history record from two verified episodes. Its final research candidate expands to 64 records from three episodes, but only 50 message sequences are distinct. That larger mixture scores 0/3 on selection and does not replace the earlier 1/3 checkpoint. Astra likewise retains its initial 26-record dataset over a later 61-record candidate. More data and more successful teacher experience did not automatically yield a better selected student under this fixed training schedule.
+
+The release includes recorded Python factory programs and their hashes, including unsuccessful rounds. The trusted controller validates provenance and resource limits; it does not rewrite a researcher's submitted data to make it pass. Interface failures, rejected submissions, valid but unsuccessful students, and infrastructure-invalid executions remain separate outcomes.
 
 ## References
 

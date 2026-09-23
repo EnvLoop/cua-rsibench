@@ -1,0 +1,12 @@
+[
+  {
+    "cohort": "original",
+    "manifest": "original/manifest.json",
+    "manifest_sha256": "72565bfc80d3a260ac023b5864d24ea76f9d886661269a2efd9528557bf097c7"
+  },
+  {
+    "cohort": "model6",
+    "manifest": "model6/manifest.json",
+    "manifest_sha256": "4cc9d6b777f1037bf31ec9dcb7db1a348ca9f3e84728a1d6b9bbfdb745ddc2f0"
+  }
+]

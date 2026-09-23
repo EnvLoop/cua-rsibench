@@ -1,0 +1,146 @@
+[
+  {
+    "researcher": "sol6",
+    "researcher_model": "gpt-6-sol",
+    "round": 1,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol6-round-01/factory.py",
+        "sha256": "a0f9e29fb299561ff047e1f9afd16cc6820cefc3d6c597c60500723f0abc8fa3"
+      }
+    ]
+  },
+  {
+    "researcher": "sol6",
+    "researcher_model": "gpt-6-sol",
+    "round": 2,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol6-round-02/factory.py",
+        "sha256": "6ce0dd2a85996f4ce2f85656371056ff58c04e54d07e78c2b4f33ed303381b84"
+      },
+      {
+        "path": "sol6-round-02/inspect_trace.py",
+        "sha256": "28e2d1530a0c87898785f58f6349d3c177c2bc2587982159134effb4b1c9a2c1"
+      }
+    ]
+  },
+  {
+    "researcher": "sol6",
+    "researcher_model": "gpt-6-sol",
+    "round": 3,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol6-round-03/factory.py",
+        "sha256": "2783e2e4c2f229ff6567c66b254756791f900230324518de41b55fcb89d43171"
+      },
+      {
+        "path": "sol6-round-03/inspect_trace.py",
+        "sha256": "28e2d1530a0c87898785f58f6349d3c177c2bc2587982159134effb4b1c9a2c1"
+      }
+    ]
+  },
+  {
+    "researcher": "sol6",
+    "researcher_model": "gpt-6-sol",
+    "round": 4,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol6-round-04/factory.py",
+        "sha256": "38abd99202b6e7561903f773a8651c170dbe860c890be4fe0de3df338a76d664"
+      },
+      {
+        "path": "sol6-round-04/inspect.py",
+        "sha256": "d9c2715a233a4e4f472f012502205910ef5b8e0d98a34a6b76dab6d2470c6864"
+      },
+      {
+        "path": "sol6-round-04/inspect_trace.py",
+        "sha256": "28e2d1530a0c87898785f58f6349d3c177c2bc2587982159134effb4b1c9a2c1"
+      }
+    ]
+  },
+  {
+    "researcher": "sol6",
+    "researcher_model": "gpt-6-sol",
+    "round": 5,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol6-round-05/factory.py",
+        "sha256": "ad85353acfb9232f54fc8d88d97841cb01edd25b6410ba24e6f8067b22fb6635"
+      },
+      {
+        "path": "sol6-round-05/inspect.py",
+        "sha256": "a05ecbe92148a2c028290b734553af51e09a91bb5ce471812d841d77751b3258"
+      },
+      {
+        "path": "sol6-round-05/inspect_trace.py",
+        "sha256": "28e2d1530a0c87898785f58f6349d3c177c2bc2587982159134effb4b1c9a2c1"
+      }
+    ]
+  },
+  {
+    "researcher": "luna6",
+    "researcher_model": "gpt-6-luna",
+    "round": 1,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "luna6-round-01/factory.py",
+        "sha256": "ab24ece7de5b7fdf6fbfec78ecea31045163fec99a4b7d388d72efa82c855dc8"
+      }
+    ]
+  },
+  {
+    "researcher": "luna6",
+    "researcher_model": "gpt-6-luna",
+    "round": 2,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "luna6-round-02/factory.py",
+        "sha256": "44247f253b95aa4552c5497650790d31ab9af346d9e31469e97348351b3474cd"
+      }
+    ]
+  },
+  {
+    "researcher": "luna6",
+    "researcher_model": "gpt-6-luna",
+    "round": 3,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "luna6-round-03/factory.py",
+        "sha256": "2cdef8fe2edb267b5801ad750fe8c3b48662f2445b357afe840dfbc497110250"
+      }
+    ]
+  },
+  {
+    "researcher": "luna6",
+    "researcher_model": "gpt-6-luna",
+    "round": 4,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "luna6-round-04/factory.py",
+        "sha256": "2cdef8fe2edb267b5801ad750fe8c3b48662f2445b357afe840dfbc497110250"
+      }
+    ]
+  },
+  {
+    "researcher": "luna6",
+    "researcher_model": "gpt-6-luna",
+    "round": 5,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "luna6-round-05/factory.py",
+        "sha256": "2cdef8fe2edb267b5801ad750fe8c3b48662f2445b357afe840dfbc497110250"
+      }
+    ]
+  }
+]

@@ -157,7 +157,10 @@ def audit(study):
                         {'task_package_hashes':selection_integrity['task_package_hashes'],'runtime_hashes':integrity['runtime_hashes']})
                 if public_summary(ev)!=public_summary(record['evaluation']):raise ValueError('registered score differs from execution')
                 row.update(evaluation=ev,records=len(rows),checkpoint_sha256=digest(training['checkpoint']),
-                    data_provenance_verified=True,optimizer_steps=32)
+                    data_provenance_verified=True,optimizer_steps=32,
+                    corpus_mix={'distinct_message_records':len({digest(r['messages']) for r in rows}),
+                        'verified_episode_count':len({r['episode_sha256'] for r in rows}),
+                        'representation_counts':dict(collections.Counter(r['representation'] for r in rows))})
             else:
                 row.update(evaluation=record['evaluation'],submission_feedback=record.get('submission_feedback'),records=None)
             ev=row['evaluation'];scores=valid_scores(ev,state['protocol']['selection_tasks'])

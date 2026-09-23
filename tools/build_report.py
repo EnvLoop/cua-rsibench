@@ -19,6 +19,7 @@ S={
 def inline(text):
  text=escape(text)
  text=re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
+ text=re.sub(r'`([^`]+)`',r'<font name="Courier">\1</font>',text)
  text=re.sub(r'\[([^\]]+)\]\((https?://[^)]+)\)',r'<link href="\2" color="#3154a5">\1</link>',text)
  return text
 
@@ -70,6 +71,7 @@ def render(text,out,asset_root=None):
    story.append(KeepTogether([Image(str(asset_root/path),width=WIDTH,height=height),P(caption,'small')]));continue
   if block.startswith('|'):
    rows=[[x.strip() for x in line.strip().strip('|').split('|')] for line in block.splitlines()]
+   rows=[row for row in rows if not all(re.fullmatch(r':?-{3,}:?',cell) for cell in row)]
    columns=len(rows[0]);weights={2:[.27,.73],3:[.48,.20,.32],5:[.25,.18,.16,.22,.19]}.get(columns,[1/columns]*columns)
    if 'Task family' in block:weights=[.20,.47,.33]
    if 'First / best' in block:weights=[.17,.17,.31,.14,.21]

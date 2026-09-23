@@ -1,0 +1,4092 @@
+{
+  "schema": "factory-study-v1",
+  "generated_at": "2026-09-23T15:16:44.199213+00:00",
+  "study": "Executable data factories for native browser use",
+  "student": "Qwen/Qwen3.5-4B",
+  "teacher": "gpt-5.6-sol",
+  "training": {
+    "profile": "factory-v1",
+    "steps": 32,
+    "batch_size": 2,
+    "rank": 8,
+    "learning_rate": 0.0001,
+    "seed": 23,
+    "token_cap_per_run": 262144
+  },
+  "sampling": {
+    "max_tokens": 512,
+    "temperature": 0,
+    "seed": 23
+  },
+  "selection_tasks": 3,
+  "final_tasks": 6,
+  "source_records": 37,
+  "source_partition_counts": {
+    "train": 12,
+    "selection": 12,
+    "final": 12,
+    "unused": 1
+  },
+  "application": "Kanboard 1.2.54",
+  "interaction": "DOM-assisted browser use",
+  "cost_usd": null,
+  "campaigns": [
+    {
+      "name": "astra",
+      "researcher": "gpt-6-astra",
+      "baseline": {
+        "status": "scored",
+        "score": 0.0,
+        "expected_tasks": [
+          "selection-direct-01",
+          "selection-rank-01",
+          "selection-allocation-01"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "selection-allocation-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 2,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "select": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 11,
+              "most_repeated_visible_state": 65
+            }
+          },
+          {
+            "task": "selection-direct-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "invalid_response": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 13,
+              "most_repeated_visible_state": 52
+            }
+          },
+          {
+            "task": "selection-rank-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 78,
+              "action_types": {
+                "click": 84,
+                "fill": 4,
+                "select": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 86
+            }
+          }
+        ],
+        "proof": [
+          {
+            "task": "selection-allocation-01",
+            "result_sha256": "f92418337627d75e0dd7e0cd001795cee1fde37724fb87680b5d20441d0fa545",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.937281Z",
+            "finished_at": "2026-09-23T06:02:44.898799Z"
+          },
+          {
+            "task": "selection-direct-01",
+            "result_sha256": "b0eb768b92fa61a351fa7c9f68c25a422b7f822e4ae75b787fdf68eb94533249",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.929911Z",
+            "finished_at": "2026-09-23T06:03:14.459707Z"
+          },
+          {
+            "task": "selection-rank-01",
+            "result_sha256": "3f751b851339d37a9b3d8f57cf3b6d11d757f25ba54cddc90e7818099eb2f773",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.857934Z",
+            "finished_at": "2026-09-23T06:03:04.739873Z"
+          }
+        ],
+        "proxy_destroyed": true
+      },
+      "attempts": [
+        {
+          "round": 1,
+          "dataset_sha256": "6a014af40d4c89a0110481fa60bdb72f2d164db2c5696e56c27770a23235f530",
+          "training_tokens": 116177,
+          "promoted": true,
+          "accounting": "historical import before reservation guard",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.3333333333333333,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 4,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 3,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 4,
+                  "most_repeated_visible_state": 1
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 1.0,
+                "error_type": null,
+                "verification": {
+                  "success": true,
+                  "wrong_tables": [],
+                  "correct_target_tasks": 1,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 11,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 7,
+                    "select": 2,
+                    "fill": 1,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 8,
+                  "most_repeated_visible_state": 4
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 4,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 3,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 4,
+                  "most_repeated_visible_state": 1
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "057e3e74c2e45897321625bdef78a7c97f07ceb0add64b4f562a397a64652241",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:12:59.809740Z",
+                "finished_at": "2026-09-23T06:13:56.864322Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "4460f2f124368872e3eb644391213a6fe5c237b18033bfabb2ed79687b3464f5",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:12:59.802140Z",
+                "finished_at": "2026-09-23T06:14:21.580346Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "2fe63d7643261648d4e04bb2d76d369388102f14492255a7a17b0f959bcb575c",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:12:59.727241Z",
+                "finished_at": "2026-09-23T06:13:55.163894Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 26,
+          "checkpoint_sha256": "145259820d5418fde77c81aa10b16609f19bf700f7972ca5f9e07f06966ebf21",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 26,
+            "verified_episode_count": 2,
+            "representation_counts": {
+              "decision": 26
+            }
+          },
+          "incumbent_after": "round-1",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 116177
+        },
+        {
+          "round": 2,
+          "dataset_sha256": "b2c001664f965e4d7d25ef0deeb0a3ebd638fe3b832b9ce048fa1bf7be4aed6d",
+          "training_tokens": 132215,
+          "promoted": false,
+          "accounting": "historical import",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.0,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 27,
+                  "action_types": {
+                    "click": 35,
+                    "select": 2,
+                    "fill": 26,
+                    "invalid_response": 27
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 17,
+                  "most_repeated_visible_state": 25
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 10,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 5,
+                    "select": 2,
+                    "fill": 2,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 6,
+                  "most_repeated_visible_state": 5
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks",
+                    "projects"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 89,
+                    "select": 1
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 43
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "583fed721dbf8b5c00e0c5f8457d6b48a0490970b3a562425169e20cdd7c9918",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:31.230285Z",
+                "finished_at": "2026-09-23T06:59:54.023827Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "86911d29900f6449366c27513e19106b1b1f34c5ac94c4e25ae8c85ba40cf661",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:31.222377Z",
+                "finished_at": "2026-09-23T06:52:59.525663Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "bc2f3ff744407254b49ba0ad3ec568d6a42b5e90542c874e29f2fb312b4b34ee",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:31.146729Z",
+                "finished_at": "2026-09-23T07:01:02.772731Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 64,
+          "checkpoint_sha256": "0de6472a518a2a6a51a0f26f0db3af61850b09e0b32de4739bbba62e0827ca03",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 64,
+            "verified_episode_count": 4,
+            "representation_counts": {
+              "decision": 64
+            }
+          },
+          "incumbent_after": "round-1",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 248392
+        },
+        {
+          "round": 3,
+          "dataset_sha256": null,
+          "training_tokens": 0,
+          "promoted": false,
+          "accounting": "no training executed",
+          "evaluation": {
+            "status": "submission_rejected",
+            "score": null,
+            "tasks": []
+          },
+          "submission_feedback": {
+            "accepted": false,
+            "reason": "research-turn budget exhausted without a verified submission",
+            "research_turns": 20
+          },
+          "records": null,
+          "incumbent_after": "round-1",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 248392
+        },
+        {
+          "round": 4,
+          "dataset_sha256": null,
+          "training_tokens": 0,
+          "promoted": false,
+          "accounting": "no training executed",
+          "evaluation": {
+            "status": "submission_rejected",
+            "score": null,
+            "tasks": []
+          },
+          "submission_feedback": {
+            "accepted": false,
+            "reason": "research round ended without a verified submission",
+            "research_turns": 20
+          },
+          "records": null,
+          "incumbent_after": "round-1",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 248392
+        },
+        {
+          "round": 5,
+          "dataset_sha256": "48435df240eb2c178500c6f85864c6b33a3b51f84cbbe755caa05ea35bfc79b2",
+          "training_tokens": 123495,
+          "promoted": false,
+          "accounting": "pre-execution reservation",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.0,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 87,
+                    "select": 2,
+                    "fill": 1
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 8,
+                  "most_repeated_visible_state": 41
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 90
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 5,
+                  "most_repeated_visible_state": 44
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 90
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 6,
+                  "most_repeated_visible_state": 43
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "38fdb8e628a2b1981bb4964550b22e06bf0556fe5c339ab8007caa3a712268bc",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:56:26.432005Z",
+                "finished_at": "2026-09-23T08:04:19.483709Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "57b2f67413ef0fe03ebcac0289b86385307775b2368e2b9fe9de37cb51202dd6",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:56:26.425061Z",
+                "finished_at": "2026-09-23T08:04:31.771698Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "0b6cd0cb7bb6b955a5b7c53a19e0e9f9bf1053c780587aa7fde1831f13136719",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:56:26.365856Z",
+                "finished_at": "2026-09-23T08:04:35.149954Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 61,
+          "checkpoint_sha256": "8a75cf878ccbdbd3c922bcfe630a5d134ce90c68a1ef099670d0c3bf97a288e4",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 61,
+            "verified_episode_count": 3,
+            "representation_counts": {
+              "decision": 61
+            }
+          },
+          "incumbent_after": "round-1",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 371887
+        }
+      ],
+      "factories": [
+        {
+          "round": 1,
+          "complete": true,
+          "research_turns": 17,
+          "resources": {
+            "researcher_calls": 17,
+            "program_runs": 6,
+            "rollouts": 2,
+            "teacher_calls": 29
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 2,
+          "new_episodes": [
+            {
+              "episode": "episode-00",
+              "mode": "factory-direct",
+              "steps": 11,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "05dbb332baf8a9d68e02a9034be173e0ae238d91203513a22573d7ea52053cdf",
+              "available_receipts": 11,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-01",
+              "mode": "factory-rank",
+              "steps": 18,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "728e0727dec75ef9a21240f1b231c2f556af2709cd0fb67743eeb2a7da897b64",
+              "available_receipts": 18,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-6-astra",
+              "reported_model": "gpt-6-astra",
+              "status": "completed",
+              "count": 17
+            }
+          ],
+          "wall_seconds": 519.4722171249996,
+          "history_sha256": "0c893276a6e0d1d16f66cae47d3d5a46b8e45f55df6dbcf81680e66e0aeb9e9d"
+        },
+        {
+          "round": 2,
+          "complete": true,
+          "research_turns": 20,
+          "resources": {
+            "researcher_calls": 20,
+            "program_runs": 7,
+            "rollouts": 2,
+            "teacher_calls": 53
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 4,
+          "new_episodes": [
+            {
+              "episode": "episode-02",
+              "mode": "factory-rank",
+              "steps": 27,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "f03d2696bf2e20f926b9c1fb9a1218ef972a171086d56b0c7e862e12a33ecfce",
+              "available_receipts": 27,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-03",
+              "mode": "factory-allocation",
+              "steps": 26,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "b1924810cd50654d26c2ec869504163c7b46415a385af30b1ebb421465a5d360",
+              "available_receipts": 26,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-6-astra",
+              "reported_model": "gpt-6-astra",
+              "status": "completed",
+              "count": 20
+            }
+          ],
+          "wall_seconds": 935.6700489521027,
+          "history_sha256": "f4dd63eae70ab10c17d12d6b8f99abaf9341d5be97ebe466b68efd6ba15ff0ce"
+        },
+        {
+          "round": 3,
+          "complete": false,
+          "research_turns": 20,
+          "resources": {
+            "researcher_calls": 20,
+            "program_runs": 6,
+            "rollouts": 2,
+            "teacher_calls": 42
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 5,
+          "new_episodes": [
+            {
+              "episode": "episode-04",
+              "mode": "factory-rank",
+              "steps": 25,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "012aaca4cbba8093928ad439ffb9505981fc45529aa237b187fb097aded2447a",
+              "available_receipts": 25,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-05",
+              "mode": "factory-allocation",
+              "steps": 17,
+              "success": false,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "b5077f79627a7fe43d9557e0b2f17219c5935de48b9cb25a4cda9d74caf59e4d",
+              "available_receipts": 17,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-6-astra",
+              "reported_model": "gpt-6-astra",
+              "status": "completed",
+              "count": 20
+            }
+          ],
+          "wall_seconds": 800.530366897583,
+          "history_sha256": "97a3b5a00d69616f8b6f4dd8f67035409f0760a35b53c8e82510c5b19b6e6278"
+        },
+        {
+          "round": 4,
+          "complete": false,
+          "research_turns": 20,
+          "resources": {
+            "researcher_calls": 21,
+            "program_runs": 6,
+            "rollouts": 1,
+            "teacher_calls": 31
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 5,
+          "new_episodes": [
+            {
+              "episode": "episode-06",
+              "mode": "factory-rank",
+              "steps": 28,
+              "success": null,
+              "infrastructure_error": "ProviderFailure",
+              "sandbox_destroyed": true,
+              "result_sha256": "fcc4553b86973663937434c9cad388fd079db11d730d700969335b980ba9e6b4",
+              "available_receipts": 28,
+              "terminal_error_receipt_available": false
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-6-astra",
+              "reported_model": "gpt-6-astra",
+              "status": "completed",
+              "count": 20
+            }
+          ],
+          "wall_seconds": 648.1833052635193,
+          "history_sha256": "4f75830099e6052d3a37b913302bc93d5510d49a177951dfb05a4c2a11db1eca"
+        },
+        {
+          "round": 5,
+          "complete": true,
+          "research_turns": 16,
+          "resources": {
+            "researcher_calls": 16,
+            "program_runs": 7,
+            "rollouts": 2,
+            "teacher_calls": 51
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 7,
+          "new_episodes": [
+            {
+              "episode": "episode-07",
+              "mode": "factory-rank",
+              "steps": 25,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "7043783a39c7fb0143a9bdf741c01124f18085ec72dc42655e7955d98d65ef46",
+              "available_receipts": 26,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-08",
+              "mode": "factory-allocation",
+              "steps": 25,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "4aa625a984a281302c45d03e179be08592d1dc06caff2a1c7beacffc1f0e37e7",
+              "available_receipts": 25,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-6-astra",
+              "reported_model": "gpt-6-astra",
+              "status": "completed",
+              "count": 16
+            }
+          ],
+          "wall_seconds": 923.2119240760803,
+          "history_sha256": "dcb193eef9d52eaa153bd12732c1ee9faaff12ee09a4e49617661276be16aa66"
+        }
+      ],
+      "used_training_tokens": 371887,
+      "training_token_budget": 1048576,
+      "max_attempts": 5,
+      "selected": "round-1",
+      "selection_score": 0.3333333333333333,
+      "selection_frozen": true,
+      "pending_training": 0,
+      "protocol_hash": "5f1834be4a4d4e0aed5e591f33f98dbd727516ac669aa1f7062c05cf09f1f078",
+      "runtime_hashes": {
+        "src/cursibench/factory_cases.py": "33aca9f8f851a2b7105235e333f5ba694f8956f5944539454be802d839d451ff",
+        "src/cursibench/factory_export.py": "4cab579e47cedb02492dfd81b97fe54fe380eaf8cb21ec5679768cf5ac872bf2",
+        "src/cursibench/factory_harbor.py": "35d0d3fcea0ca72464010972fcb6b39900a4c0921821e141bbd8983eeb2835f4",
+        "src/cursibench/gui_contract.py": "766288084a8f7ab5de2e1f19aac13cd7fb0f342112a32184dec49c351d86fecf",
+        "src/cursibench/kanboard_rpc_v3.py": "d3266a9193e661b480f7de902d4a34ae967f1e79b0b57c0c765959da596b4eb5",
+        "src/cursibench/stable_observer.py": "cbf46f8e681165b111532e5cd2be8a2b6e6298978908e9b073e4bcd831a42372",
+        "src/cursibench/kanboard_cases.py": "c102e27964713e36e0e32f1ca597bb1f5aca4294e1113ca6e630de42feb5529e",
+        "src/cursibench/tinker_backend.py": "96db7c7d9e64e6ee2504e00ec5c4d402c8b742c05031023f7574460a1d4ac185",
+        "src/cursibench/training_contract.py": "1bc967991d4950ebffda9ab45b2d3af1bdca8ca0db9eebe624b8be38ced3b18f",
+        "src/cursibench/tinker_proxy.py": "503df86196efa9034fbefcf3f5e9eb3d7cb81c5d6b46d94a52042fbbd3ef94a9",
+        "src/cursibench/journal_env.py": "165cf860854b4fbf46051180ca0017227c5dd3c53420cdbd3c0ed0c8a21be5b6",
+        "src/cursibench/command_journal.py": "ef674bb1d432efcccf9ab78aa17fa3b654ee590fc66500793be8351f84983db6",
+        "src/cursibench/sample_cache.py": "8ef86655f5e97c39e49f236df0603bff5ff1106961d0997be2d345cc8bd54804",
+        "tools/run_cloud_chain.py": "62342b8366ae000efcd6bb4d06d838ceb916f6b307f41d47d182d73970018225",
+        "src/cursibench/harbor_adapter.py": "f9200ba40ce8f54c4e754101b3b56dc204ed4f19fc3b81d64c341c9c693e97f5",
+        "src/cursibench/cloud_launch.py": "83d77708b3ca5ff3da409462a1612f1704f9c09feec59c8b3b76146b8f7d859f",
+        "src/cursibench/cloud_env.py": "391be140fb0652f101ae96c1adf3d199acfd2ff0565ceabd38cd29c1c6f02824",
+        "src/cursibench/factory_final.py": "bbf17b2a6a1794fab3d09fe1178f0d877a71143b9a4ee6171e7f2ffb4cba975d"
+      },
+      "selection_package_hashes": {
+        "selection-direct-01": "147ca8471f2f998e76c5b0e8f6a9a8fcfab14590809d9807c628b6e0639a253e",
+        "selection-rank-01": "4d63ce90ab4b538f9c3e787792840a6d37b3bef048c47018d8b9f072ed77b785",
+        "selection-allocation-01": "1b3e8d8a565f39faf9428af65c6d44a1a989172cfe81a47c0eea4fee3c341bc3"
+      },
+      "frozen_at": 1790150780.1037922,
+      "stopping_reason": "declared round, selection-ceiling, or conservative token-budget stopping condition reached"
+    },
+    {
+      "name": "sol",
+      "researcher": "gpt-5.6-sol",
+      "baseline": {
+        "status": "scored",
+        "score": 0.0,
+        "expected_tasks": [
+          "selection-direct-01",
+          "selection-rank-01",
+          "selection-allocation-01"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "selection-allocation-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 2,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "select": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 11,
+              "most_repeated_visible_state": 65
+            }
+          },
+          {
+            "task": "selection-direct-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "invalid_response": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 13,
+              "most_repeated_visible_state": 52
+            }
+          },
+          {
+            "task": "selection-rank-01",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 78,
+              "action_types": {
+                "click": 84,
+                "fill": 4,
+                "select": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 86
+            }
+          }
+        ],
+        "proof": [
+          {
+            "task": "selection-allocation-01",
+            "result_sha256": "f92418337627d75e0dd7e0cd001795cee1fde37724fb87680b5d20441d0fa545",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.937281Z",
+            "finished_at": "2026-09-23T06:02:44.898799Z"
+          },
+          {
+            "task": "selection-direct-01",
+            "result_sha256": "b0eb768b92fa61a351fa7c9f68c25a422b7f822e4ae75b787fdf68eb94533249",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.929911Z",
+            "finished_at": "2026-09-23T06:03:14.459707Z"
+          },
+          {
+            "task": "selection-rank-01",
+            "result_sha256": "3f751b851339d37a9b3d8f57cf3b6d11d757f25ba54cddc90e7818099eb2f773",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T05:54:50.857934Z",
+            "finished_at": "2026-09-23T06:03:04.739873Z"
+          }
+        ],
+        "proxy_destroyed": true
+      },
+      "attempts": [
+        {
+          "round": 1,
+          "dataset_sha256": "3cc89db79bfd239546f03f53cc1f95a4e8a5489bb93319a6bd91f0c2f03e2813",
+          "training_tokens": 128738,
+          "promoted": false,
+          "accounting": "historical import before reservation guard",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.0,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 90
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 5,
+                  "most_repeated_visible_state": 44
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 11,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 7,
+                    "select": 2,
+                    "fill": 1,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 4
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 90
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 8,
+                  "most_repeated_visible_state": 43
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "d42525d622c74c101bb2666a1c1a12ba160a3b3a8bd1678cfaabde84dfc5c692",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:13:55.731076Z",
+                "finished_at": "2026-09-23T06:21:18.860843Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "694dbb9cb08265c29016459e0f1a169fb8e844000cc71eafc88755d1b66aae3f",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:13:55.722652Z",
+                "finished_at": "2026-09-23T06:15:36.646282Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "1c7feec1b9101ea1a71703f1a72a2cf8a94e2fb8a6be5259da51367408782974",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:13:55.640298Z",
+                "finished_at": "2026-09-23T06:21:24.023027Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 35,
+          "checkpoint_sha256": "5e336c99c0af90cd71ae8e5e83884b221e98dd4af97afa1a014ab7aa13e563e3",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 35,
+            "verified_episode_count": 2,
+            "representation_counts": {
+              "decision": 35
+            }
+          },
+          "incumbent_after": "base",
+          "best_after": 0.0,
+          "cumulative_training_tokens": 128738
+        },
+        {
+          "round": 2,
+          "dataset_sha256": "83aeb0ffd605c50cd4b5da0e07a91f2c5332fc20a03c941f780c32cb809647b1",
+          "training_tokens": 110707,
+          "promoted": false,
+          "accounting": "historical import",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.0,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 90
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 5,
+                  "most_repeated_visible_state": 44
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 11,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 7,
+                    "select": 2,
+                    "fill": 1,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 4
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 88,
+                    "select": 1,
+                    "fill": 1
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 12,
+                  "most_repeated_visible_state": 38
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "7dd16465f9f026e20f2f091830500401e927ec47032c558dfa5040b1f6fb3329",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:27.410159Z",
+                "finished_at": "2026-09-23T06:59:12.743131Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "cab018834c5c427581359a27fc71259cbf6bfcb6cfb0781adc9ae7c333b40e7b",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:27.402334Z",
+                "finished_at": "2026-09-23T06:53:02.745285Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "edb32058c97b1eefdab0f85fa58f695c382204224d87d597b71b0d0871df4aa8",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T06:51:27.323735Z",
+                "finished_at": "2026-09-23T06:59:07.147634Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 28,
+          "checkpoint_sha256": "e7bc0fd04fea146e9ea67c0f4ce25cf4f3bad1a48f29408f94d152ed661376f5",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 28,
+            "verified_episode_count": 2,
+            "representation_counts": {
+              "decision": 28
+            }
+          },
+          "incumbent_after": "base",
+          "best_after": 0.0,
+          "cumulative_training_tokens": 239445
+        },
+        {
+          "round": 3,
+          "dataset_sha256": "cdd69b35532323b89b7c0a3ff29c902920740bf9a652cc1cf90590fc3d47608d",
+          "training_tokens": 0,
+          "promoted": false,
+          "accounting": "no training executed",
+          "evaluation": {
+            "status": "submission_rejected",
+            "score": null,
+            "tasks": []
+          },
+          "submission_feedback": {
+            "records": 28,
+            "scheduled_tokens": 168103,
+            "max_sequence": 16485,
+            "max_target": 145,
+            "record_violations": [
+              {
+                "record_id": "episode-04:9:history",
+                "sequence_tokens": 16485,
+                "target_tokens": 96
+              }
+            ],
+            "limits": {
+              "sequence_tokens": 16384,
+              "scheduled_tokens": 262144,
+              "target_tokens": 512
+            },
+            "accepted": false
+          },
+          "records": null,
+          "incumbent_after": "base",
+          "best_after": 0.0,
+          "cumulative_training_tokens": 239445
+        },
+        {
+          "round": 4,
+          "dataset_sha256": "219a1ca98eb0a100c1bc36bc1b69a64c5194063571dffb2d95d014cd7a978062",
+          "training_tokens": 111730,
+          "promoted": false,
+          "accounting": "pre-execution reservation",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.0,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 38,
+                    "select": 51,
+                    "fill": 1
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 6,
+                  "most_repeated_visible_state": 52
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 12,
+                  "invalid_actions": 2,
+                  "action_types": {
+                    "click": 6,
+                    "select": 4,
+                    "fill": 1,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 6
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 47,
+                    "back": 43
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 8,
+                  "most_repeated_visible_state": 43
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "e454c6cbb0a94759cafd4e6d573a8f3b7b06e3cfde0a381c77ac0adc445f2e5f",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:28:50.122048Z",
+                "finished_at": "2026-09-23T07:35:42.420689Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "63bcd1fb1623128f6f117387573dce2c178dd0502ee65cdedd14b30e7b22e379",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:28:50.114598Z",
+                "finished_at": "2026-09-23T07:30:38.520716Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "96525a42c0e28431cffc2867da686789aa5dac2e2a55a5ed3f5ea05742d94bd5",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:28:50.042465Z",
+                "finished_at": "2026-09-23T07:35:40.204294Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 26,
+          "checkpoint_sha256": "de420f18b523bd705a2af7a2b18c07ebf944aafeea519e5eb120d3aebce0e028",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 26,
+            "verified_episode_count": 2,
+            "representation_counts": {
+              "decision": 26
+            }
+          },
+          "incumbent_after": "base",
+          "best_after": 0.0,
+          "cumulative_training_tokens": 351175
+        },
+        {
+          "round": 5,
+          "dataset_sha256": "13399b2739e96f08127899218ece10d26584f0e99d3dc471bc7e7098b29ade4b",
+          "training_tokens": 109593,
+          "promoted": true,
+          "accounting": "pre-execution reservation",
+          "original_evaluation": {
+            "status": "infrastructure_error",
+            "score": null,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": null,
+                "error_type": "ConnectError"
+              },
+              {
+                "task": "selection-direct-01",
+                "score": null,
+                "error_type": "ConnectError"
+              },
+              {
+                "task": "selection-rank-01",
+                "score": null,
+                "error_type": "ConnectError"
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "2eb19a059c0a887520d10d413cb267e4a386de242b5ef3a28fe62442c8dd8297",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:55:19.299213Z",
+                "finished_at": "2026-09-23T07:55:47.953553Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "53562273309a5d5564fe40519743c57b1e1a892f2a58532425ad396e55a8f84a",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:55:19.292024Z",
+                "finished_at": "2026-09-23T07:55:41.949963Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "92927343cddfd620745be27cda86311624d887c085e6a979e31eb1bbc566abdf",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:55:19.229141Z",
+                "finished_at": "2026-09-23T07:55:41.944322Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "recovery_plan_sha256": "cbae9e5eba548c627468222ef98470c583e727d3782d6024c26520fc949a15e0",
+          "evaluation": {
+            "status": "scored",
+            "score": 0.3333333333333333,
+            "expected_tasks": [
+              "selection-direct-01",
+              "selection-rank-01",
+              "selection-allocation-01"
+            ],
+            "task_identity_matches": true,
+            "tasks": [
+              {
+                "task": "selection-allocation-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 48,
+                    "back": 42
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 43
+                }
+              },
+              {
+                "task": "selection-direct-01",
+                "score": 1.0,
+                "error_type": null,
+                "verification": {
+                  "success": true,
+                  "wrong_tables": [],
+                  "correct_target_tasks": 1,
+                  "target_tasks": 1
+                },
+                "diagnostics": {
+                  "actions": 11,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 7,
+                    "select": 2,
+                    "fill": 1,
+                    "done": 1
+                  },
+                  "finished_with_done": true,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 8,
+                  "most_repeated_visible_state": 4
+                }
+              },
+              {
+                "task": "selection-rank-01",
+                "score": 0.0,
+                "error_type": null,
+                "verification": {
+                  "success": false,
+                  "wrong_tables": [
+                    "tasks"
+                  ],
+                  "correct_target_tasks": 0,
+                  "target_tasks": 2
+                },
+                "diagnostics": {
+                  "actions": 90,
+                  "invalid_actions": 0,
+                  "action_types": {
+                    "click": 87,
+                    "back": 3
+                  },
+                  "finished_with_done": false,
+                  "unknown_control_references": 0,
+                  "unique_visible_states": 7,
+                  "most_repeated_visible_state": 43
+                }
+              }
+            ],
+            "proof": [
+              {
+                "task": "selection-allocation-01",
+                "result_sha256": "c279ecf8878b5ac7f8db962aa4012146f1dd9e3d6073426469c6a377d4098628",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:59:29.996151Z",
+                "finished_at": "2026-09-23T08:05:36.546669Z"
+              },
+              {
+                "task": "selection-direct-01",
+                "result_sha256": "d4b62c156977c83d524826ae1d5333b172556cc5d84426d837aae468a1a82d62",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:59:29.989125Z",
+                "finished_at": "2026-09-23T08:00:54.002493Z"
+              },
+              {
+                "task": "selection-rank-01",
+                "result_sha256": "2b1f52b0dc2880ede953fcce3ee45b05ae31e1c213d95960eddc615e1ac23c95",
+                "separate_verifier": true,
+                "started_at": "2026-09-23T07:59:29.925880Z",
+                "finished_at": "2026-09-23T08:05:38.677098Z"
+              }
+            ],
+            "proxy_destroyed": true
+          },
+          "records": 25,
+          "checkpoint_sha256": "1d6755ca8c4891aef5d54fcd18c6501af245647d633c190d8404dbcf0d8b3982",
+          "data_provenance_verified": true,
+          "optimizer_steps": 32,
+          "corpus_mix": {
+            "distinct_message_records": 25,
+            "verified_episode_count": 2,
+            "representation_counts": {
+              "decision": 25
+            }
+          },
+          "incumbent_after": "round-5",
+          "best_after": 0.3333333333333333,
+          "cumulative_training_tokens": 460768
+        }
+      ],
+      "factories": [
+        {
+          "round": 1,
+          "complete": true,
+          "research_turns": 9,
+          "resources": {
+            "researcher_calls": 10,
+            "program_runs": 2,
+            "rollouts": 2,
+            "teacher_calls": 35
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 2,
+          "new_episodes": [
+            {
+              "episode": "episode-00",
+              "mode": "factory-direct",
+              "steps": 11,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "ce79b85cc851bd7ec351d2b38ac357b1b8017a011d99b1472742433409762e77",
+              "available_receipts": 11,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-01",
+              "mode": "factory-rank",
+              "steps": 24,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "38ab5b9062eb05c62dd85c147336203a2c7bcaec8b4b5b13b93a12a8c43a05e8",
+              "available_receipts": 24,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-5.6-sol",
+              "reported_model": "gpt-5.6-sol",
+              "status": "completed",
+              "count": 9
+            }
+          ],
+          "wall_seconds": 26.008353583001735,
+          "history_sha256": "772df699e04fe848754dbbd00effba74fdc64dd2e58979cfd4f41cfdf4d58c20"
+        },
+        {
+          "round": 2,
+          "complete": true,
+          "research_turns": 10,
+          "resources": {
+            "researcher_calls": 10,
+            "program_runs": 2,
+            "rollouts": 2,
+            "teacher_calls": 28
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 4,
+          "new_episodes": [
+            {
+              "episode": "episode-02",
+              "mode": "factory-direct",
+              "steps": 11,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "c4294ffc71b204d15e69caf4187d5dd32e4081c4f954ac9f272a4e9948680c6c",
+              "available_receipts": 11,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-03",
+              "mode": "factory-rank",
+              "steps": 17,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "65745403da7a4b5c18e40358b65d0f64d139061ee4b76c48dabb71269f60fc10",
+              "available_receipts": 17,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-5.6-sol",
+              "reported_model": "gpt-5.6-sol",
+              "status": "completed",
+              "count": 10
+            }
+          ],
+          "wall_seconds": 450.37140107154846,
+          "history_sha256": "45e2f3ea24e92690d7cb5295fc059a6e8410b3f09a5680bdc2198f46690bf69b"
+        },
+        {
+          "round": 3,
+          "complete": true,
+          "research_turns": 11,
+          "resources": {
+            "researcher_calls": 11,
+            "program_runs": 3,
+            "rollouts": 2,
+            "teacher_calls": 26
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 6,
+          "new_episodes": [
+            {
+              "episode": "episode-04",
+              "mode": "factory-direct",
+              "steps": 11,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "7c721964eb6d3b4f868fe587a99ace5f17d81c2efd5a1afb413bf095bbd130bc",
+              "available_receipts": 11,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-05",
+              "mode": "factory-rank",
+              "steps": 15,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "857ec5f7ce075864d5f66c3e69d50e62181b4be75a7cec32c1fe2733de470df2",
+              "available_receipts": 15,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-5.6-sol",
+              "reported_model": "gpt-5.6-sol",
+              "status": "completed",
+              "count": 11
+            }
+          ],
+          "wall_seconds": 473.20166397094727,
+          "history_sha256": "c12c3fea1970926f1402e3f38ef178fee6a643bc6d5c5a1d1f540b1d4ca26067"
+        },
+        {
+          "round": 4,
+          "complete": true,
+          "research_turns": 8,
+          "resources": {
+            "researcher_calls": 8,
+            "program_runs": 2,
+            "rollouts": 0,
+            "teacher_calls": 0
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 6,
+          "new_episodes": [],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-5.6-sol",
+              "reported_model": "gpt-5.6-sol",
+              "status": "completed",
+              "count": 8
+            }
+          ],
+          "wall_seconds": 153.67751812934875,
+          "history_sha256": "989520d637e2365df9b6db6a6ccd4961f3e955d151231ce949edebeb60793072"
+        },
+        {
+          "round": 5,
+          "complete": true,
+          "research_turns": 13,
+          "resources": {
+            "researcher_calls": 14,
+            "program_runs": 3,
+            "rollouts": 2,
+            "teacher_calls": 26
+          },
+          "resource_limits": {
+            "researcher_calls": 40,
+            "program_runs": 12,
+            "rollouts": 3,
+            "teacher_calls": 100
+          },
+          "verified_episodes_available": 7,
+          "new_episodes": [
+            {
+              "episode": "episode-06",
+              "mode": "factory-direct",
+              "steps": 10,
+              "success": true,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "7700ff29420d6c7b1646e0f2f43f8889af164a8c9f08dd8609d9cb7bbce70a80",
+              "available_receipts": 10,
+              "terminal_error_receipt_available": null
+            },
+            {
+              "episode": "episode-07",
+              "mode": "factory-rank",
+              "steps": 16,
+              "success": false,
+              "infrastructure_error": null,
+              "sandbox_destroyed": true,
+              "result_sha256": "b2185882ab0f2a429ea074a2cbabcd4d1feb8f1b5163d8be5d5340569e678397",
+              "available_receipts": 16,
+              "terminal_error_receipt_available": null
+            }
+          ],
+          "model_receipts": [
+            {
+              "requested_model": "gpt-5.6-sol",
+              "reported_model": "gpt-5.6-sol",
+              "status": "completed",
+              "count": 13
+            }
+          ],
+          "wall_seconds": 675.370353937149,
+          "history_sha256": "c741ab6de1e6da90ad6ef407bcdc202f83d711a3014dc6f9c53579b151b7c3dc"
+        }
+      ],
+      "used_training_tokens": 460768,
+      "training_token_budget": 1048576,
+      "max_attempts": 5,
+      "selected": "round-5",
+      "selection_score": 0.3333333333333333,
+      "selection_frozen": true,
+      "pending_training": 0,
+      "protocol_hash": "5f1834be4a4d4e0aed5e591f33f98dbd727516ac669aa1f7062c05cf09f1f078",
+      "runtime_hashes": {
+        "src/cursibench/factory_cases.py": "33aca9f8f851a2b7105235e333f5ba694f8956f5944539454be802d839d451ff",
+        "src/cursibench/factory_export.py": "4cab579e47cedb02492dfd81b97fe54fe380eaf8cb21ec5679768cf5ac872bf2",
+        "src/cursibench/factory_harbor.py": "35d0d3fcea0ca72464010972fcb6b39900a4c0921821e141bbd8983eeb2835f4",
+        "src/cursibench/gui_contract.py": "766288084a8f7ab5de2e1f19aac13cd7fb0f342112a32184dec49c351d86fecf",
+        "src/cursibench/kanboard_rpc_v3.py": "d3266a9193e661b480f7de902d4a34ae967f1e79b0b57c0c765959da596b4eb5",
+        "src/cursibench/stable_observer.py": "cbf46f8e681165b111532e5cd2be8a2b6e6298978908e9b073e4bcd831a42372",
+        "src/cursibench/kanboard_cases.py": "c102e27964713e36e0e32f1ca597bb1f5aca4294e1113ca6e630de42feb5529e",
+        "src/cursibench/tinker_backend.py": "96db7c7d9e64e6ee2504e00ec5c4d402c8b742c05031023f7574460a1d4ac185",
+        "src/cursibench/training_contract.py": "1bc967991d4950ebffda9ab45b2d3af1bdca8ca0db9eebe624b8be38ced3b18f",
+        "src/cursibench/tinker_proxy.py": "503df86196efa9034fbefcf3f5e9eb3d7cb81c5d6b46d94a52042fbbd3ef94a9",
+        "src/cursibench/journal_env.py": "165cf860854b4fbf46051180ca0017227c5dd3c53420cdbd3c0ed0c8a21be5b6",
+        "src/cursibench/command_journal.py": "ef674bb1d432efcccf9ab78aa17fa3b654ee590fc66500793be8351f84983db6",
+        "src/cursibench/sample_cache.py": "8ef86655f5e97c39e49f236df0603bff5ff1106961d0997be2d345cc8bd54804",
+        "tools/run_cloud_chain.py": "62342b8366ae000efcd6bb4d06d838ceb916f6b307f41d47d182d73970018225",
+        "src/cursibench/harbor_adapter.py": "f9200ba40ce8f54c4e754101b3b56dc204ed4f19fc3b81d64c341c9c693e97f5",
+        "src/cursibench/cloud_launch.py": "83d77708b3ca5ff3da409462a1612f1704f9c09feec59c8b3b76146b8f7d859f",
+        "src/cursibench/cloud_env.py": "391be140fb0652f101ae96c1adf3d199acfd2ff0565ceabd38cd29c1c6f02824",
+        "src/cursibench/factory_final.py": "bbf17b2a6a1794fab3d09fe1178f0d877a71143b9a4ee6171e7f2ffb4cba975d"
+      },
+      "selection_package_hashes": {
+        "selection-direct-01": "147ca8471f2f998e76c5b0e8f6a9a8fcfab14590809d9807c628b6e0639a253e",
+        "selection-rank-01": "4d63ce90ab4b538f9c3e787792840a6d37b3bef048c47018d8b9f072ed77b785",
+        "selection-allocation-01": "1b3e8d8a565f39faf9428af65c6d44a1a989172cfe81a47c0eea4fee3c341bc3"
+      },
+      "frozen_at": 1790150780.104191,
+      "stopping_reason": "declared round, selection-ceiling, or conservative token-budget stopping condition reached"
+    }
+  ],
+  "final_executions": [
+    {
+      "label": "astra-base-repeat-1",
+      "role": "base",
+      "candidate": "base",
+      "checkpoint_sha256": "f2da2d4fd266693adb83fbae9c26725f66c4168615703c48aca7105521185b2c",
+      "repetition": 1,
+      "started_at": 1790150845.768086,
+      "evaluation": {
+        "status": "infrastructure_error",
+        "score": null,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": null,
+            "error_type": "BuildException"
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 87,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": null,
+            "error_type": "BuildException"
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 85,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 88,
+                "select": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 13,
+              "most_repeated_visible_state": 47
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 2,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 17,
+              "most_repeated_visible_state": 41
+            }
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "912c519b1d7bbfbd78b22fc97227cf768de059f02f443b411cf64bfe38f80892",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.348621Z",
+            "finished_at": "2026-09-23T08:08:01.507099Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "8bc2bd97cccbcfdaa03a6a0048fb54b5aa1a26e7afa9549a3d9def4d17d105f3",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.426010Z",
+            "finished_at": "2026-09-23T08:13:19.332813Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "5701ff5dcaedbc4de95a7e8fefbe58b392eba96451d45b1345a557f40127cdee",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.434012Z",
+            "finished_at": "2026-09-23T08:07:52.309881Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "0e49600b47bf313451185d50a99cde76fcd65e3a0bbff68ae18e6b8ba3f54f43",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:13:40.928615Z",
+            "finished_at": "2026-09-23T08:21:45.236011Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "750bebf93c3306d3f2d27cfc6adb6211cbfdff40fe682a1c23ede7d095c61685",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:13:41.001198Z",
+            "finished_at": "2026-09-23T08:22:10.456737Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "67eb3e61a9db2febbf5a0bbbdd220d615cb904e7eca0379eb5c5f7b7b055c2d3",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:13:40.994186Z",
+            "finished_at": "2026-09-23T08:22:15.169556Z"
+          }
+        ]
+      ],
+      "plan_sha256": "2524d640c74082413f39b7ddfc56387b0c3d1211ab897d49ff12320ca5b68aa4",
+      "selection_precedes_test": true,
+      "recovered_evaluation": {
+        "status": "scored",
+        "score": 0.0,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 1,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 9,
+              "most_repeated_visible_state": 65
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 87,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 85,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 2,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "select": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 14,
+              "most_repeated_visible_state": 43
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 76,
+                "select": 5,
+                "fill": 8,
+                "invalid_response": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 21,
+              "most_repeated_visible_state": 25
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 1,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 13,
+              "most_repeated_visible_state": 41
+            }
+          }
+        ]
+      },
+      "recovery": {
+        "policy_kind": "full_suite_replay",
+        "original_rows_reused": false,
+        "new_independent_repetition": false,
+        "new_research_seed": false,
+        "logical_comparison_slot": "astra-base-repeat-1",
+        "retried_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "amendment_sha256": "043055669ae6fd6117af1dddd4443a6a3690dd8cd37a8b0e82ee23a5fda7bc58",
+        "chunk_plan_sha256": {
+          "chunk-0": "cc6ee455a5c2b9e572908cb388d5d0c919400af3b369dffff96ebe83b8e54238",
+          "chunk-1": "9762e41b48d9f4dceaa5855630c70797d9e7de2043454197caad265f0f6d60f2"
+        },
+        "runtime_platform_change": "Mac control plane to separate trusted Linux E2B control plane",
+        "started_at": 1790170762.379369,
+        "proof": {
+          "chunk-0": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "cc6ee455a5c2b9e572908cb388d5d0c919400af3b369dffff96ebe83b8e54238",
+            "payload_sha256": "d74d656425dc06d838c7aa4d415d2b57d900eed590a13fb1b1edc2c534767223",
+            "archive_sha256": "6b96a1a6211c5049caa6fc8a50e4a467af0327268f3aa1daa2270c09468faee6",
+            "evidence_files": 323,
+            "started_at": 1790170832.7460177,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          },
+          "chunk-1": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "9762e41b48d9f4dceaa5855630c70797d9e7de2043454197caad265f0f6d60f2",
+            "payload_sha256": "744dcb51140404f4ddcff7b0c4dc958d67da2f53b00b5557fe1fd761d4cd1dff",
+            "archive_sha256": "c131064289a7be0368fce5197a8730dac24c02c1c38ede1f24071f5d3defdd91",
+            "evidence_files": 323,
+            "started_at": 1790171345.16911,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          }
+        }
+      }
+    },
+    {
+      "label": "astra-base-repeat-2",
+      "role": "base",
+      "candidate": "base",
+      "checkpoint_sha256": "f2da2d4fd266693adb83fbae9c26725f66c4168615703c48aca7105521185b2c",
+      "repetition": 2,
+      "started_at": 1790152883.887864,
+      "evaluation": {
+        "status": "infrastructure_error",
+        "score": null,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 14,
+              "most_repeated_visible_state": 43
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 87,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 8,
+              "action_types": {
+                "click": 87,
+                "fill": 2,
+                "select": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 12,
+              "most_repeated_visible_state": 57
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": null,
+            "error_type": "TimeoutException",
+            "diagnostics": {
+              "actions": 73,
+              "invalid_actions": 1,
+              "action_types": {
+                "click": 69,
+                "fill": 3,
+                "select": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 19,
+              "most_repeated_visible_state": 22
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": null,
+            "error_type": "RemoteProtocolError",
+            "diagnostics": {
+              "actions": 38,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 36,
+                "select": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 10,
+              "most_repeated_visible_state": 20
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": null,
+            "error_type": "TimeoutException",
+            "diagnostics": {
+              "actions": 77,
+              "invalid_actions": 72,
+              "action_types": {
+                "click": 75,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 74
+            }
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "c69b882bc05e20f1e1717d0beae71e54e3f0f51af361fd0626451531eb9aedb1",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:41:39.382080Z",
+            "finished_at": "2026-09-23T08:52:48.791202Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "5b8e70add9b131cc4d4c4b54771e5caa4669b0e0526fac896a743098852edac9",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:41:39.447449Z",
+            "finished_at": "2026-09-23T08:52:09.214249Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "8568da9fe4666000247a091dacf6b519f3abf63d16ad00ec00515b74cd07758c",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:41:39.454526Z",
+            "finished_at": "2026-09-23T08:52:19.401215Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "4ffe7cfa0f62b56bb0eb8b3ee2f9fe5d8dfa31981d6ed20489a3ed69274125db",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:53:06.245872Z",
+            "finished_at": "2026-09-23T09:16:03.759432Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "39365913f2944f6099e96d9b5f40a6f5c83de144fcff47c95f9eb0a77769ac03",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:53:06.312678Z",
+            "finished_at": "2026-09-23T08:59:21.556299Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "ffd343f3af109304914aedd886c1d7034f6f83ab15fdfbf72b2a2080c650b732",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:53:06.305529Z",
+            "finished_at": "2026-09-23T09:15:35.829287Z"
+          }
+        ]
+      ],
+      "plan_sha256": "807ba010544965b50779db927d2874c324bfd27deb72ac8f8826e0fdd4b041e8",
+      "selection_precedes_test": true,
+      "recovered_evaluation": {
+        "status": "scored",
+        "score": 0.0,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 63,
+              "action_types": {
+                "click": 25,
+                "fill": 2,
+                "invalid_response": 63
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 76
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 87,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 85,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 1,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 87
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 4,
+              "action_types": {
+                "click": 87,
+                "select": 3
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 14,
+              "most_repeated_visible_state": 46
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 2,
+              "action_types": {
+                "click": 88,
+                "fill": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 14,
+              "most_repeated_visible_state": 41
+            }
+          }
+        ]
+      },
+      "recovery": {
+        "policy_kind": "full_suite_replay",
+        "original_rows_reused": false,
+        "new_independent_repetition": false,
+        "new_research_seed": false,
+        "logical_comparison_slot": "astra-base-repeat-2",
+        "retried_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "amendment_sha256": "043055669ae6fd6117af1dddd4443a6a3690dd8cd37a8b0e82ee23a5fda7bc58",
+        "chunk_plan_sha256": {
+          "chunk-0": "1d94b7b6f9d39fccd73ac6302bf2d3e3fc4f90d762f5123a1f9aeb4a54590fce",
+          "chunk-1": "403e0dfbbeceb0e3b8aaedbc994a946546804b2f6afe41d06dfe1142443ac432"
+        },
+        "runtime_platform_change": "Mac control plane to separate trusted Linux E2B control plane",
+        "started_at": 1790174063.2124228,
+        "proof": {
+          "chunk-0": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "1d94b7b6f9d39fccd73ac6302bf2d3e3fc4f90d762f5123a1f9aeb4a54590fce",
+            "payload_sha256": "782b18f5ba48d6187b829d0e33e258fdd2007dbc5184db6055ad01782483ec56",
+            "archive_sha256": "40ea5583b53f45daa18b6d75e3de8a9250b357513b308ca7351de32b813687d3",
+            "evidence_files": 323,
+            "started_at": 1790174070.3431854,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          },
+          "chunk-1": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "403e0dfbbeceb0e3b8aaedbc994a946546804b2f6afe41d06dfe1142443ac432",
+            "payload_sha256": "27f5d0beb74c9e3467d5b12166c882841e09661c9c352d1c9e95438a6e7178e2",
+            "archive_sha256": "e04844ab9cacea05503c70ec47a8b41c0ade64201ae93a91e2908611b22d45a0",
+            "evidence_files": 323,
+            "started_at": 1790174532.8098238,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          }
+        }
+      }
+    },
+    {
+      "label": "astra-selected-repeat-1",
+      "role": "selected",
+      "candidate": "round-1",
+      "checkpoint_sha256": "145259820d5418fde77c81aa10b16609f19bf700f7972ca5f9e07f06966ebf21",
+      "repetition": 1,
+      "started_at": 1790152351.7699368,
+      "evaluation": {
+        "status": "scored",
+        "score": 0.16666666666666666,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 7,
+              "most_repeated_visible_state": 43
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 10,
+              "most_repeated_visible_state": 43
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "6a4b02402a681a42734e796305dbf744209f11d9b827573e02d985a3e377d5f0",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:53.722381Z",
+            "finished_at": "2026-09-23T08:39:18.997114Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "8b36950bffeba1f5a088cafc0318b30f961244ef18eb2eb627206b332f6bd231",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:53.795035Z",
+            "finished_at": "2026-09-23T08:34:12.690937Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "91e7ca9f6f4840f63d901254dd5985bb3b98cadbf4f381bba2cc6fa0dfc3da86",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:53.802455Z",
+            "finished_at": "2026-09-23T08:39:17.198200Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "9c2663575e02148871cc1e5231fd924f3cb8338b17680c818c444d037affa16e",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:39:48.215003Z",
+            "finished_at": "2026-09-23T08:40:43.251375Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "0b426589aba853d534a61e10e318635d2cde4bee4e341c8bbb10d3af303a2496",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:39:48.289625Z",
+            "finished_at": "2026-09-23T08:40:42.132534Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "f5feca5c997f1eecaa2ab6052f9867887d937801bf5edc14274f04615f8d86db",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:39:48.282228Z",
+            "finished_at": "2026-09-23T08:40:43.719162Z"
+          }
+        ]
+      ],
+      "plan_sha256": "4e87ada8c7302e8ff22e17fdbafe112cad025732008a8e139c52aee078bbfe9c",
+      "selection_precedes_test": true
+    },
+    {
+      "label": "astra-selected-repeat-2",
+      "role": "selected",
+      "candidate": "round-1",
+      "checkpoint_sha256": "145259820d5418fde77c81aa10b16609f19bf700f7972ca5f9e07f06966ebf21",
+      "repetition": 2,
+      "started_at": 1790152351.7699258,
+      "evaluation": {
+        "status": "scored",
+        "score": 0.3333333333333333,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 15,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 11,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 4,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 3,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 4,
+              "most_repeated_visible_state": 1
+            }
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "76f5bfebeb65ad129225f40859ba749f51171f6248f43d119f102b2e1fad0ad1",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:55.526217Z",
+            "finished_at": "2026-09-23T08:34:21.267103Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "59eb085c548b2cbbe33d7c689d4e7ca23ecb309b173bc32533ffa8f058929c4d",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:55.590839Z",
+            "finished_at": "2026-09-23T08:34:10.316471Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "44747a372c34a1a2a0c8021e796134b2bc5d957f75d6243dd6c3479cd0975bf5",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:32:55.598199Z",
+            "finished_at": "2026-09-23T08:33:44.167051Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "fef44fb4527ea49501695ecef915c62d324e622fa2444534b889f9774928be9b",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:34:41.065368Z",
+            "finished_at": "2026-09-23T08:35:28.287762Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "f600f202884197884324fda892ab8905d69f9d84e9969ff448a7950c864ef6a8",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:34:41.139350Z",
+            "finished_at": "2026-09-23T08:35:30.938145Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "9c93999dc250a61029efe57ca94a7ed1ddbb073e057f72fdae5f248fb86eae99",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:34:41.131967Z",
+            "finished_at": "2026-09-23T08:35:30.085577Z"
+          }
+        ]
+      ],
+      "plan_sha256": "e642ecc12dc70694d3cf81155646285ecf7f61b1121c4e651993d79c6af7495a",
+      "selection_precedes_test": true
+    },
+    {
+      "label": "sol-selected-repeat-1",
+      "role": "selected",
+      "candidate": "round-5",
+      "checkpoint_sha256": "1d6755ca8c4891aef5d54fcd18c6501af245647d633c190d8404dbcf0d8b3982",
+      "repetition": 1,
+      "started_at": 1790150845.7682822,
+      "evaluation": {
+        "status": "infrastructure_error",
+        "score": null,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": null,
+            "error_type": "BuildException"
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 1,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 21,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 14,
+                "select": 4,
+                "fill": 2,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 12,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 5,
+              "most_repeated_visible_state": 44
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 5,
+              "most_repeated_visible_state": 44
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 89,
+                "back": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 5,
+              "most_repeated_visible_state": 85
+            }
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "23a062ab1d8f7f2bdda63a264804bd95834afc987c0872599c2fa6a90abf66f0",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.348273Z",
+            "finished_at": "2026-09-23T08:09:27.674573Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "41d0e76b950538b8d4f6993853ef2893d540ee718841dec9b7bb878cfd2ab8e0",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.426257Z",
+            "finished_at": "2026-09-23T08:07:55.533409Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "101c32a975798add1a8d3aa1a7cb943b2a855fbdff5dc03a93cf77d3657754a9",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:07:39.434012Z",
+            "finished_at": "2026-09-23T08:09:53.304981Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "541374d4d56c9ab57dc0f13baab443fc1683d263564b02f39ac7279f96f5e8e3",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:10:11.364384Z",
+            "finished_at": "2026-09-23T08:18:41.845797Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "da1c4877b0978c4215e5e9d40a6461b1ab9590f0e024504e5a1e2eae71044730",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:10:11.447294Z",
+            "finished_at": "2026-09-23T08:18:35.821911Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "9b200ede31112d29b4d37e1ef3171322ca9be50e66e0f2b8f9a61b3fa55a319c",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:10:11.439645Z",
+            "finished_at": "2026-09-23T08:19:31.906433Z"
+          }
+        ]
+      ],
+      "plan_sha256": "91fe6762cd5e884b77bcc0d11614bd205808cd1f17688c3c2c5da429aa670070",
+      "selection_precedes_test": true,
+      "recovered_evaluation": {
+        "status": "scored",
+        "score": 0.16666666666666666,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 9,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 5,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 6,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 89,
+                "back": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 9,
+              "most_repeated_visible_state": 59
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 89,
+                "back": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 6,
+              "most_repeated_visible_state": 43
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 5,
+              "most_repeated_visible_state": 44
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 9,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 5,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 6,
+              "most_repeated_visible_state": 4
+            }
+          }
+        ]
+      },
+      "recovery": {
+        "policy_kind": "full_suite_replay",
+        "original_rows_reused": false,
+        "new_independent_repetition": false,
+        "new_research_seed": false,
+        "logical_comparison_slot": "sol-selected-repeat-1",
+        "retried_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "amendment_sha256": "043055669ae6fd6117af1dddd4443a6a3690dd8cd37a8b0e82ee23a5fda7bc58",
+        "chunk_plan_sha256": {
+          "chunk-0": "2a0209728449ceb118854accaf1ecee76951d74972a13650ec138da8a8c01bc4",
+          "chunk-1": "ed74c94850620f0d79ec12a00a6ed44b801d5f65c9171ae46a2bbd3e04a737d8"
+        },
+        "runtime_platform_change": "Mac control plane to separate trusted Linux E2B control plane",
+        "started_at": 1790174994.249412,
+        "proof": {
+          "chunk-0": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "2a0209728449ceb118854accaf1ecee76951d74972a13650ec138da8a8c01bc4",
+            "payload_sha256": "b21b3b91078c709011aa66e6f598182c3c9bd050ed4c3cfbbed31b9935bed8bd",
+            "archive_sha256": "44699d73ba3b89ca87c17e70c6cf028e283cef62ab7c1ea653f20bb0bbadbfb7",
+            "evidence_files": 163,
+            "started_at": 1790175000.5714672,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          },
+          "chunk-1": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "ed74c94850620f0d79ec12a00a6ed44b801d5f65c9171ae46a2bbd3e04a737d8",
+            "payload_sha256": "c69a03d2711ee683ad41adf64741eeda3a5a0683e369f60ca99e67de4b7497ef",
+            "archive_sha256": "dc39cc1902e905a37f3fabea0ac169656bbc9bbd2ff4451ff88c3ba2ac0a9fa3",
+            "evidence_files": 242,
+            "started_at": 1790175260.409369,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          }
+        }
+      }
+    },
+    {
+      "label": "sol-selected-repeat-2",
+      "role": "selected",
+      "candidate": "round-5",
+      "checkpoint_sha256": "1d6755ca8c4891aef5d54fcd18c6501af245647d633c190d8404dbcf0d8b3982",
+      "repetition": 2,
+      "started_at": 1790153515.8022668,
+      "evaluation": {
+        "status": "infrastructure_error",
+        "score": null,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 9,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 5,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 6,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 89,
+                "back": 1
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 7,
+              "most_repeated_visible_state": 70
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": null,
+            "error_type": "ConnectError"
+          },
+          {
+            "task": "final-allocation-b",
+            "score": null,
+            "error_type": "ConnectError"
+          },
+          {
+            "task": "final-rank-b",
+            "score": null,
+            "error_type": "ConnectError"
+          }
+        ]
+      },
+      "chunk_proofs": [
+        [
+          {
+            "task": "final-direct-a",
+            "result_sha256": "08fede4901c8e52621d2c231303d4a7ab8ab6a1c84b52fd2bf5ba19382093be9",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:52:14.404915Z",
+            "finished_at": "2026-09-23T08:53:52.063162Z"
+          },
+          {
+            "task": "final-direct-b",
+            "result_sha256": "9365edf65cfd980ebf32dfa332382bba115bb4245e16afbd612c50613a70451e",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:52:14.470002Z",
+            "finished_at": "2026-09-23T08:53:51.511912Z"
+          },
+          {
+            "task": "final-rank-a",
+            "result_sha256": "ba30b21385c3699ce72f7dca7873978aac43b44fecaf50c63eb6f9733880e228",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T08:52:14.477167Z",
+            "finished_at": "2026-09-23T09:16:02.896943Z"
+          }
+        ],
+        [
+          {
+            "task": "final-allocation-a",
+            "result_sha256": "ca0c4a6e216506d85d4c0c0db590a20a7e56568f20701ce4171e636667afae3d",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T09:16:25.881565Z",
+            "finished_at": "2026-09-23T09:20:11.901229Z"
+          },
+          {
+            "task": "final-allocation-b",
+            "result_sha256": "9a975dca613137c36ac43c8787461c4a7f63ef288a011d4e3a200d8402d66cac",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T09:16:25.956950Z",
+            "finished_at": "2026-09-23T09:20:11.533338Z"
+          },
+          {
+            "task": "final-rank-b",
+            "result_sha256": "8dd917348b1f6485b2b54e4b0215dfc5694a3463cb59023c1aea7ffd6575af13",
+            "separate_verifier": true,
+            "started_at": "2026-09-23T09:16:25.949664Z",
+            "finished_at": "2026-09-23T09:20:11.535107Z"
+          }
+        ]
+      ],
+      "plan_sha256": "54079a66231c9c9001c7c16c9eefed451588e4fa1c98be2ab2b80423e8947161",
+      "selection_precedes_test": true,
+      "recovered_evaluation": {
+        "status": "scored",
+        "score": 0.16666666666666666,
+        "expected_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "task_identity_matches": true,
+        "tasks": [
+          {
+            "task": "final-direct-a",
+            "score": 1.0,
+            "error_type": null,
+            "verification": {
+              "success": true,
+              "wrong_tables": [],
+              "correct_target_tasks": 1,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 11,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 7,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-direct-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 9,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 5,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 6,
+              "most_repeated_visible_state": 4
+            }
+          },
+          {
+            "task": "final-rank-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 49,
+                "back": 41
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 8,
+              "most_repeated_visible_state": 42
+            }
+          },
+          {
+            "task": "final-allocation-a",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 42,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 33,
+                "back": 5,
+                "select": 2,
+                "fill": 1,
+                "done": 1
+              },
+              "finished_with_done": true,
+              "unknown_control_references": 0,
+              "unique_visible_states": 9,
+              "most_repeated_visible_state": 17
+            }
+          },
+          {
+            "task": "final-allocation-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 1
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 90
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 5,
+              "most_repeated_visible_state": 44
+            }
+          },
+          {
+            "task": "final-rank-b",
+            "score": 0.0,
+            "error_type": null,
+            "verification": {
+              "success": false,
+              "wrong_tables": [
+                "tasks"
+              ],
+              "correct_target_tasks": 0,
+              "target_tasks": 2
+            },
+            "diagnostics": {
+              "actions": 90,
+              "invalid_actions": 0,
+              "action_types": {
+                "click": 85,
+                "select": 2,
+                "fill": 1,
+                "back": 2
+              },
+              "finished_with_done": false,
+              "unknown_control_references": 0,
+              "unique_visible_states": 9,
+              "most_repeated_visible_state": 78
+            }
+          }
+        ]
+      },
+      "recovery": {
+        "policy_kind": "full_suite_replay",
+        "original_rows_reused": false,
+        "new_independent_repetition": false,
+        "new_research_seed": false,
+        "logical_comparison_slot": "sol-selected-repeat-2",
+        "retried_tasks": [
+          "final-direct-a",
+          "final-direct-b",
+          "final-rank-a",
+          "final-rank-b",
+          "final-allocation-a",
+          "final-allocation-b"
+        ],
+        "amendment_sha256": "043055669ae6fd6117af1dddd4443a6a3690dd8cd37a8b0e82ee23a5fda7bc58",
+        "chunk_plan_sha256": {
+          "chunk-0": "0deb3107169a2e8427fcdb9f1bc45f2019121d0a282ee096d995c2107c553300",
+          "chunk-1": "996e943b940ce839be2984a0daf2d676676ab701cf425cbdb76b1ad25c447bbd"
+        },
+        "runtime_platform_change": "Mac control plane to separate trusted Linux E2B control plane",
+        "started_at": 1790175594.898877,
+        "proof": {
+          "chunk-0": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "0deb3107169a2e8427fcdb9f1bc45f2019121d0a282ee096d995c2107c553300",
+            "payload_sha256": "eae2ce4fb344ff52b33c1fa4392b57351438aa8f915c888c24e49cac29c6754d",
+            "archive_sha256": "e7184420eba35ade40fdd916af3d1773748cee5ef2f85809f1f6e0cc0aac2527",
+            "evidence_files": 163,
+            "started_at": 1790175601.829064,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          },
+          "chunk-1": {
+            "operational_version": "remote-control-plane-v1",
+            "admission_kind": "frozen_final_full_suite_replay",
+            "plan_sha256": "996e943b940ce839be2984a0daf2d676676ab701cf425cbdb76b1ad25c447bbd",
+            "payload_sha256": "4207429896e9dadfab5d7967bd1b1f38ba045e0c529c717a5cdcee6534586020",
+            "archive_sha256": "c93191edc8ab1b67c1d0be170aa58822d4ab49c3d56b9478cb0a749c27be8007",
+            "evidence_files": 275,
+            "started_at": 1790175861.294005,
+            "controller_platform": "linux",
+            "controller_python": "3.12.14",
+            "runtime_and_member_hashes_verified": true,
+            "trusted_source_snapshot_sha256": "9b362d8c8249c3c108fbaef932d8dd861cb86378db31fab25c027bd7a505df3f",
+            "proxy_destroyed": true,
+            "orchestrator_destroyed": true
+          }
+        }
+      }
+    }
+  ],
+  "claim": "bounded data-centric research pilot; no sustained RSI or broad model ranking",
+  "cohort": {
+    "id": "original-factory-study",
+    "purpose": "paired student calibration of newly synthesized training datasets; not a final leaderboard",
+    "created_at": "2026-09-23T05:34:54.106268+00:00",
+    "researchers": {
+      "astra": "gpt-6-astra",
+      "sol": "gpt-5.6-sol"
+    },
+    "teacher": "gpt-5.6-sol",
+    "prior_lineages_inherited": false
+  },
+  "source_record_ids": {
+    "selection": [
+      5855,
+      5858,
+      5859,
+      5860,
+      5862
+    ],
+    "final": [
+      5803,
+      5810,
+      5812,
+      5813
+    ]
+  },
+  "baseline_reuse": null,
+  "source_records_used": {
+    "selection": 5,
+    "final": 4,
+    "training_supervision": 9
+  },
+  "source_partitions_disjoint": true,
+  "final_comparison": {
+    "created_at": 1790150780.172302,
+    "repetitions": 2,
+    "bindings": {
+      "base": [
+        "astra-base-repeat-1",
+        "astra-base-repeat-2"
+      ],
+      "astra": [
+        "astra-selected-repeat-1",
+        "astra-selected-repeat-2"
+      ],
+      "sol": [
+        "sol-selected-repeat-1",
+        "sol-selected-repeat-2"
+      ]
+    },
+    "executions": [
+      {
+        "label": "astra-base-repeat-1",
+        "researcher": "astra",
+        "role": "base",
+        "repetition": 1,
+        "checkpoint_sha256": "f2da2d4fd266693adb83fbae9c26725f66c4168615703c48aca7105521185b2c"
+      },
+      {
+        "label": "astra-base-repeat-2",
+        "researcher": "astra",
+        "role": "base",
+        "repetition": 2,
+        "checkpoint_sha256": "f2da2d4fd266693adb83fbae9c26725f66c4168615703c48aca7105521185b2c"
+      },
+      {
+        "label": "astra-selected-repeat-1",
+        "researcher": "astra",
+        "role": "selected",
+        "repetition": 1,
+        "checkpoint_sha256": "145259820d5418fde77c81aa10b16609f19bf700f7972ca5f9e07f06966ebf21"
+      },
+      {
+        "label": "astra-selected-repeat-2",
+        "researcher": "astra",
+        "role": "selected",
+        "repetition": 2,
+        "checkpoint_sha256": "145259820d5418fde77c81aa10b16609f19bf700f7972ca5f9e07f06966ebf21"
+      },
+      {
+        "label": "sol-selected-repeat-1",
+        "researcher": "sol",
+        "role": "selected",
+        "repetition": 1,
+        "checkpoint_sha256": "1d6755ca8c4891aef5d54fcd18c6501af245647d633c190d8404dbcf0d8b3982"
+      },
+      {
+        "label": "sol-selected-repeat-2",
+        "researcher": "sol",
+        "role": "selected",
+        "repetition": 2,
+        "checkpoint_sha256": "1d6755ca8c4891aef5d54fcd18c6501af245647d633c190d8404dbcf0d8b3982"
+      }
+    ],
+    "comparison": "same-seed fresh-environment repetitions; identical checkpoints share execution evidence",
+    "selection_frozen_at": {
+      "astra": 1790150780.1037922,
+      "sol": 1790150780.104191
+    }
+  },
+  "all_final_executions_finished": true,
+  "all_final_recoveries_finished": true,
+  "audit_pass": true,
+  "search_finished": true,
+  "limitations": [
+    "one application and three task families",
+    "one research seed per system",
+    "no equal-budget non-adaptive search control",
+    "final repetitions use the same sampling seed",
+    "public issue metadata plus synthetic workflow rules; no unseen-application claim",
+    "provider monetary totals unavailable; token and call budgets are reported instead"
+  ]
+}

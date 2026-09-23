@@ -1,6 +1,16 @@
 # Real cloud validation
 
-Evidence is indexed by `outputs/evidence.json` after running `tools/summarize_evidence.py`.
+## Current executable-factory studies
+
+The original and Sol 6 / Luna 6 extension cohorts completed 13 accepted datasets and real 32-step LoRA training/sampling runs on Qwen/Qwen3.5-4B, totaling 1,636,954 scheduled training tokens. The fixed teacher is gpt-5.6-sol. Each cohort has a frozen selection and source-disjoint final instances. These are separate cohorts, with different final records and researcher-interface timing.
+
+Current evidence is exported by `tools/audit_factory_study.py` to `factory-study.json` and `model6-study.json`. It verifies accepted data, training and checkpoint bindings, exact task results from separate saved-state verifiers, promotion, accounting, and frozen-final timing. Recorded remote executions additionally bind the trusted source/worker snapshot, task packages, runtime versions, archive and member hashes, and cleanup. See [remote evaluation](REMOTE_EVALUATION.md).
+
+A valid failure is a model score. An infrastructure-invalid execution has no complete model score and remains visible beside its declared recovery. Provider monetary totals are unknown. These runs establish real service execution; they do not establish sustained RSI.
+
+## Historical v0.4 integration and campaigns
+
+The following sections record the earlier integration and single-trajectory experiment. Their totals and scores are not pooled with the executable-factory studies. Historical evidence is indexed by `outputs/evidence.json` after running `tools/summarize_evidence.py`.
 
 1. E2B: successful creation, command execution, and destruction after credential correction.
 2. Tinker: Qwen/Qwen3.5-4B, rank-8 LoRA, one real optimizer step on verified training-split demonstrations, persistent sampler checkpoint and actual checkpoint sampling. Training smoke is not capability improvement evidence.
@@ -10,9 +20,9 @@ Evidence is indexed by `outputs/evidence.json` after running `tools/summarize_ev
 
 The stock Harbor E2B implementation requests 86400-second lifetimes. This account allows one hour. `BoundedE2B` requests 1800 seconds; the adaptation changes lifecycle only, preserving agent and verifier behavior.
 
-All provider receipts retain usage counts and timestamps. Monetary cost remains null unless an authoritative account price is available; null is not zero. Tinker checkpoints are hashed in public summaries to avoid publishing account-specific identifiers.
+Available provider receipts retain usage counts and timestamps. Some terminal teacher transport failures lack a flushed terminal receipt; unavailable usage is unknown, not zero. Monetary cost remains null unless an authoritative account price is available. Tinker checkpoints are hashed in public summaries to avoid publishing account-specific identifiers.
 
-## Frozen data-research campaigns
+### Historical frozen data-research campaigns
 
 `formal-data-astra-v2` and `formal-data-sol-v2` each executed five 16-step LoRA
 attempts using the same Qwen3.5-4B base, teacher corpus and training settings.
@@ -26,7 +36,7 @@ source disjointness, original scores, selection rules and test-start ordering.
 It exports sanitized evidence without account/checkpoint identifiers. Current
 completion and held-out outcomes are in `data-campaigns.json` in the release.
 
-## Versioned repairs
+### Historical versioned repairs
 
 The original observer/runtime remains frozen. `stable_observer.py` and
 `kanboard_rpc_v3.py` are an explicit opt-in runtime: one batched snapshot, actual

@@ -1,0 +1,290 @@
+[
+  {
+    "researcher": "astra",
+    "researcher_model": "gpt-6-astra",
+    "round": 1,
+    "origin": "controller-recorded source writes; complete historical snapshot unavailable",
+    "files": [
+      {
+        "path": "astra-round-01/extend_factory.py",
+        "sha256": "10ea4daacfc7223c29cbd8982d9a459ae5ca60f37bac63a014549bbd4e9f15b6"
+      },
+      {
+        "path": "astra-round-01/factory.py",
+        "sha256": "9247633913f070c69f598cab26651bc160e072e7483c49aa931d7af8f51e9334"
+      },
+      {
+        "path": "astra-round-01/inspect_brief.py",
+        "sha256": "b0406c5ee75c10775231bb60065cf0329f3af8a18cad9c3a45f8f5fbebc305c2"
+      },
+      {
+        "path": "astra-round-01/inspect_data.py",
+        "sha256": "c47c7910bc52939a8471657bb35e3a342855e11fa6aca5ae9f7252a04f9a5918"
+      },
+      {
+        "path": "astra-round-01/inspect_outcomes.py",
+        "sha256": "f8112ab76299a4f0ba3e280dc865cd095edec4a39ad39376caa185ef403d12b2"
+      }
+    ]
+  },
+  {
+    "researcher": "astra",
+    "researcher_model": "gpt-6-astra",
+    "round": 2,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "astra-round-02/extend_factory.py",
+        "sha256": "aa91544b8be6b4d1c9c9dae573496b04d15016dcdeff9f18e966be936032e05d"
+      },
+      {
+        "path": "astra-round-02/factory.py",
+        "sha256": "b060cb81335c1c7361953b65e857005cc5c1d9429a904c6bdb105579b1e7ca39"
+      },
+      {
+        "path": "astra-round-02/inspect_brief.py",
+        "sha256": "b0406c5ee75c10775231bb60065cf0329f3af8a18cad9c3a45f8f5fbebc305c2"
+      },
+      {
+        "path": "astra-round-02/inspect_compact.py",
+        "sha256": "c2a471baf65505c583c703f4e146da95ca25bbc32a6367316b07e6dcb8aafb95"
+      },
+      {
+        "path": "astra-round-02/inspect_data.py",
+        "sha256": "35c531bc7846a060b58ca073299cfd6afb09b65378879392a668b3531c493eb4"
+      },
+      {
+        "path": "astra-round-02/inspect_outcomes.py",
+        "sha256": "f8112ab76299a4f0ba3e280dc865cd095edec4a39ad39376caa185ef403d12b2"
+      },
+      {
+        "path": "astra-round-02/inspect_schema.py",
+        "sha256": "c081bee7f5a043e6341b1edcc4d48c3e80d88ecc2158fbfce4a9867aa0ac8709"
+      }
+    ]
+  },
+  {
+    "researcher": "astra",
+    "researcher_model": "gpt-6-astra",
+    "round": 3,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "astra-round-03/diagnose.py",
+        "sha256": "5999bdea7921e3f075f7489a2207f04d0410c9eb58e08ed54ea754e444b5fd6b"
+      },
+      {
+        "path": "astra-round-03/extend_factory.py",
+        "sha256": "aa91544b8be6b4d1c9c9dae573496b04d15016dcdeff9f18e966be936032e05d"
+      },
+      {
+        "path": "astra-round-03/factory.py",
+        "sha256": "9a3a2588f67787bc28f02fae84561782b7607ad364df8cb279169c79eb01c3d3"
+      },
+      {
+        "path": "astra-round-03/inspect.py",
+        "sha256": "8147167439859410606406aea7cddd23722738e47d635b38bf869453046fc142"
+      },
+      {
+        "path": "astra-round-03/inspect_brief.py",
+        "sha256": "b0406c5ee75c10775231bb60065cf0329f3af8a18cad9c3a45f8f5fbebc305c2"
+      },
+      {
+        "path": "astra-round-03/inspect_compact.py",
+        "sha256": "c2a471baf65505c583c703f4e146da95ca25bbc32a6367316b07e6dcb8aafb95"
+      },
+      {
+        "path": "astra-round-03/inspect_data.py",
+        "sha256": "2b47fc043bdee6169a218b8221d9d0a385708ef61c18730b699e8e6ce104f331"
+      },
+      {
+        "path": "astra-round-03/inspect_outcomes.py",
+        "sha256": "f8112ab76299a4f0ba3e280dc865cd095edec4a39ad39376caa185ef403d12b2"
+      },
+      {
+        "path": "astra-round-03/inspect_schema.py",
+        "sha256": "c081bee7f5a043e6341b1edcc4d48c3e80d88ecc2158fbfce4a9867aa0ac8709"
+      },
+      {
+        "path": "astra-round-03/revise.py",
+        "sha256": "1bcfcfdbb260b2a755cfd23ae84e6aba06ad9a632861b332cf0058af6a58df7f"
+      },
+      {
+        "path": "astra-round-03/revise_factory.py",
+        "sha256": "de0c7771a605be7b7fd730d254dc9536bdd6519a5009c9aa563def8a2abff99d"
+      }
+    ]
+  },
+  {
+    "researcher": "astra",
+    "researcher_model": "gpt-6-astra",
+    "round": 4,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "astra-round-04/diagnose.py",
+        "sha256": "d991a6500ecb3ebb4a3411a1492bbb5590d6b4c6626fa79ed8020d4d7941896a"
+      },
+      {
+        "path": "astra-round-04/extend_factory.py",
+        "sha256": "aa91544b8be6b4d1c9c9dae573496b04d15016dcdeff9f18e966be936032e05d"
+      },
+      {
+        "path": "astra-round-04/factory.py",
+        "sha256": "ef8d6808c02b15cc395450f235da66271ac058a54b18ed4c07d3e88f1bd33fd2"
+      },
+      {
+        "path": "astra-round-04/inspect.py",
+        "sha256": "8147167439859410606406aea7cddd23722738e47d635b38bf869453046fc142"
+      },
+      {
+        "path": "astra-round-04/inspect_brief.py",
+        "sha256": "b0406c5ee75c10775231bb60065cf0329f3af8a18cad9c3a45f8f5fbebc305c2"
+      },
+      {
+        "path": "astra-round-04/inspect_compact.py",
+        "sha256": "474be65139107e890dd5e9c653f52813d1cba6fa34beaa60d67f027309ed2699"
+      },
+      {
+        "path": "astra-round-04/inspect_data.py",
+        "sha256": "c25661a3ccbcc1f05d684a14bf8a5889bc9ebfd6677c628b9d53a458defa1960"
+      },
+      {
+        "path": "astra-round-04/inspect_outcomes.py",
+        "sha256": "f8112ab76299a4f0ba3e280dc865cd095edec4a39ad39376caa185ef403d12b2"
+      },
+      {
+        "path": "astra-round-04/inspect_schema.py",
+        "sha256": "c081bee7f5a043e6341b1edcc4d48c3e80d88ecc2158fbfce4a9867aa0ac8709"
+      },
+      {
+        "path": "astra-round-04/revise.py",
+        "sha256": "2193faa4628f3ff9e48deaeda5a90c9846ded3b5b4aa9f4416a5a4c652232e24"
+      },
+      {
+        "path": "astra-round-04/revise_factory.py",
+        "sha256": "de0c7771a605be7b7fd730d254dc9536bdd6519a5009c9aa563def8a2abff99d"
+      }
+    ]
+  },
+  {
+    "researcher": "astra",
+    "researcher_model": "gpt-6-astra",
+    "round": 5,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "astra-round-05/diagnose.py",
+        "sha256": "d991a6500ecb3ebb4a3411a1492bbb5590d6b4c6626fa79ed8020d4d7941896a"
+      },
+      {
+        "path": "astra-round-05/extend_factory.py",
+        "sha256": "aa91544b8be6b4d1c9c9dae573496b04d15016dcdeff9f18e966be936032e05d"
+      },
+      {
+        "path": "astra-round-05/factory.py",
+        "sha256": "2a28b0aa7ea7e2fa017cea4180a2fc22ed1c005f2389a2e0c3b4cb7a5b52fa82"
+      },
+      {
+        "path": "astra-round-05/finalize_factory.py",
+        "sha256": "21bad12cb04e7f3cade886e56790d958fa532fcb9f470f2ea1e3a7aa43fc2de4"
+      },
+      {
+        "path": "astra-round-05/inspect.py",
+        "sha256": "8147167439859410606406aea7cddd23722738e47d635b38bf869453046fc142"
+      },
+      {
+        "path": "astra-round-05/inspect_brief.py",
+        "sha256": "b0406c5ee75c10775231bb60065cf0329f3af8a18cad9c3a45f8f5fbebc305c2"
+      },
+      {
+        "path": "astra-round-05/inspect_compact.py",
+        "sha256": "474be65139107e890dd5e9c653f52813d1cba6fa34beaa60d67f027309ed2699"
+      },
+      {
+        "path": "astra-round-05/inspect_data.py",
+        "sha256": "c25661a3ccbcc1f05d684a14bf8a5889bc9ebfd6677c628b9d53a458defa1960"
+      },
+      {
+        "path": "astra-round-05/inspect_outcomes.py",
+        "sha256": "f8112ab76299a4f0ba3e280dc865cd095edec4a39ad39376caa185ef403d12b2"
+      },
+      {
+        "path": "astra-round-05/inspect_records.py",
+        "sha256": "1508be574691dabf0b14bca6eb1b8101dfb8225b4c13dc42d3c431340f741687"
+      },
+      {
+        "path": "astra-round-05/inspect_schema.py",
+        "sha256": "c081bee7f5a043e6341b1edcc4d48c3e80d88ecc2158fbfce4a9867aa0ac8709"
+      },
+      {
+        "path": "astra-round-05/revise.py",
+        "sha256": "2193faa4628f3ff9e48deaeda5a90c9846ded3b5b4aa9f4416a5a4c652232e24"
+      },
+      {
+        "path": "astra-round-05/revise_factory.py",
+        "sha256": "de0c7771a605be7b7fd730d254dc9536bdd6519a5009c9aa563def8a2abff99d"
+      }
+    ]
+  },
+  {
+    "researcher": "sol",
+    "researcher_model": "gpt-5.6-sol",
+    "round": 1,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol-round-01/factory.py",
+        "sha256": "052f5e3e7c29e120b8b4019a32ca723843862156d753d6f009342f4b7f6bb798"
+      }
+    ]
+  },
+  {
+    "researcher": "sol",
+    "researcher_model": "gpt-5.6-sol",
+    "round": 2,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol-round-02/factory.py",
+        "sha256": "f6cee904db58e92de7d96da3a90d2b688101844a6ffc1649e904d9115e1d3416"
+      }
+    ]
+  },
+  {
+    "researcher": "sol",
+    "researcher_model": "gpt-5.6-sol",
+    "round": 3,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol-round-03/factory.py",
+        "sha256": "6311754e0d23f7526c5f19a208cba5205a7f53c7b812bd1b578513f3c3d30fd1"
+      }
+    ]
+  },
+  {
+    "researcher": "sol",
+    "researcher_model": "gpt-5.6-sol",
+    "round": 4,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol-round-04/factory.py",
+        "sha256": "fed5d93e46ba4bcad866f17036e1cb468e3cb9c0b3e152264660e92f490a0d22"
+      }
+    ]
+  },
+  {
+    "researcher": "sol",
+    "researcher_model": "gpt-5.6-sol",
+    "round": 5,
+    "origin": "bounded end-of-round workspace snapshot",
+    "files": [
+      {
+        "path": "sol-round-05/factory.py",
+        "sha256": "2b47e60e6b6e7e1f1c4ef455b32edbe864d7ef3acbddeca85f316eb744345988"
+      }
+    ]
+  }
+]

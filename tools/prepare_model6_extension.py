@@ -56,6 +56,29 @@ def case_from_package(path):
     return case
 
 
+def resolve_baseline_directory(original, protocols):
+    """Resolve one agreed, contained evidence directory; preserve legacy layout."""
+    original = Path(original).resolve()
+    require(set(protocols) == {'astra', 'sol'}, 'both original campaign protocols are required')
+    declared = []
+    for alias in ('astra', 'sol'):
+        value = protocols[alias].get('baseline_directory', 'cache-repair/base')
+        require(isinstance(value, str) and bool(value), 'baseline directory must be a safe relative path')
+        require(not Path(value).is_absolute() and '\\' not in value and ':' not in value
+                and all(part not in ('', '.', '..') for part in value.split('/')),
+                'baseline directory must be a safe relative path')
+        declared.append(value)
+    require(declared[0] == declared[1], 'original campaigns disagree on the baseline directory')
+    baseline = original
+    for part in declared[0].split('/'):
+        baseline = baseline / part
+        require(not baseline.is_symlink(), 'baseline directory contains a symlink')
+    require(baseline.resolve().is_relative_to(original) and baseline.resolve() != original,
+            'baseline directory escapes the original study')
+    require(baseline.is_dir(), 'baseline evidence directory is missing')
+    return baseline
+
+
 def planning_profile(spec):
     """Check the alternatives exhaustively, independently of the task compiler."""
     entries = spec['planning']
@@ -133,11 +156,14 @@ def final_recipes(ids):
 def inspect_original(original):
     manifest = read(original / 'manifest.json')
     original_seal = read(original / 'sealed-final/manifest.json')
+    states = {}
     for alias in ('astra', 'sol'):
         state = read(original / f'{alias}-campaign.json')
         require(protocol_digest(state['protocol']) == state['protocol_hash'], 'original protocol hash mismatch')
         require(state['protocol']['selection_manifest_sha256'] == sha(original / 'manifest.json'), 'original selection manifest changed')
         require(state['protocol']['final_manifest_sha256'] == digest(original_seal), 'original final manifest changed')
+        states[alias] = state
+    base = resolve_baseline_directory(original, {alias: state['protocol'] for alias, state in states.items()})
     require(sorted(path.name for path in (original / 'selection').iterdir()) == sorted(SELECTION), 'original selection identities changed')
     by_id = {entry['id']: entry for entry in manifest['cases']}
     for task in SELECTION:
@@ -148,7 +174,6 @@ def inspect_original(original):
         case = case_from_package(original / 'sealed-final' / row['chunk'] / row['task'])
         require(digest(case) == row['case_sha256'], 'original final package differs from its seal')
         used.update(case['source_numbers'])
-    base = original / 'cache-repair/base'
     summary = summarize(base, SELECTION)
     require(summary['status'] == 'scored', 'complete matched baseline is required')
     result = read(base / 'result.json')
@@ -158,8 +183,8 @@ def inspect_original(original):
                 'proxy_destroyed': True, 'proxy_ready': True, 'harbor_exit': 0}
     require(all(result.get(key) == value for key, value in expected.items()), 'baseline runtime is not the matched repaired base execution')
     for alias in ('astra', 'sol'):
-        require(read(original / f'{alias}-campaign.json')['baseline'] == summary, 'baseline summary does not match original campaign evidence')
-    return manifest, original_seal, used, summary
+        require(states[alias]['baseline'] == summary, 'baseline summary does not match original campaign evidence')
+    return manifest, original_seal, used, summary, base
 
 
 def prepare(original, destination, check_only=False):
@@ -167,7 +192,7 @@ def prepare(original, destination, check_only=False):
     require(not destination.exists(), 'destination already exists; refuse to overwrite a study')
     require(ROOT in original.parents and ROOT in destination.parents, 'study paths must stay inside this checkout')
     require(original != destination and original not in destination.parents, 'extension must be separate from the original study')
-    manifest, original_seal, used, baseline = inspect_original(original)
+    manifest, original_seal, used, baseline, baseline_path = inspect_original(original)
     snapshot = read(ROOT / 'datasets/public/kanboard_issues.json')
     final_rows = snapshot['records'][24:36]
     available = [row for row in final_rows if row['number'] not in used]
@@ -195,22 +220,24 @@ def prepare(original, destination, check_only=False):
                 {key: value for key, value in new_profile.items() if key != 'winner_numbers'},
                 'fresh allocation difficulty profile differs from the original sealed task')
     selection_hashes = tree_hashes(original / 'selection')
-    baseline_hashes = tree_hashes(original / 'cache-repair/base')
+    baseline_hashes = tree_hashes(baseline_path)
     if check_only:
         return {'status': 'ready_to_prepare', 'researchers': MODELS, 'teacher': TEACHER,
+                'source_baseline': baseline_path.relative_to(original).as_posix(),
                 'unused_final_open_records': len(opened), 'unused_final_closed_records': len(closed),
                 'final_source_overlap_with_original_instances': False,
                 'target_counts': [len(case['targets']) for case in compiled], 'provider_calls': 0}
     destination.mkdir(parents=True, exist_ok=False)
     (destination / 'factories').mkdir()
     shutil.copytree(original / 'selection', destination / 'selection')
-    shutil.copytree(original / 'cache-repair/base', destination / 'baseline')
+    shutil.copytree(baseline_path, destination / 'baseline')
     require(tree_hashes(destination / 'selection') == selection_hashes, 'selection copy is not byte-identical')
     require(tree_hashes(destination / 'baseline') == baseline_hashes, 'baseline copy is not byte-identical')
     require(summarize(destination / 'baseline', SELECTION) == baseline, 'copied baseline summary changed')
     created = datetime.datetime.now(datetime.timezone.utc).isoformat()
     provenance = {'kind': 'reused_execution_evidence', 'new_execution': False,
-                  'source_study': original.relative_to(ROOT).as_posix(), 'source_baseline': 'cache-repair/base',
+                  'source_study': original.relative_to(ROOT).as_posix(),
+                  'source_baseline': baseline_path.relative_to(original).as_posix(),
                   'source_manifest_sha256': sha(original / 'manifest.json'),
                   'selection_file_hashes': selection_hashes, 'baseline_file_hashes': baseline_hashes,
                   'baseline_summary_sha256': digest(baseline),

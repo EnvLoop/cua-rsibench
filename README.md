@@ -6,8 +6,8 @@ A real Kanboard application, public-source issue metadata, actual Tinker LoRA tr
 
 - [English technical report](docs/site/CUA-RSIBench-Technical-Report.pdf)
 - [Interactive evidence explorer](https://envloop.github.io/cua-rsibench/site/)
-- [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot)
-- [Campaign audit](docs/site/data-campaigns.json) and [recovery evidence](docs/site/journal-recovery.json)
+- [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories)
+- [Original-cohort audit](docs/site/factory-study.json) and [Sol 6 / Luna 6 audit](docs/site/model6-study.json)
 
 ## Executable data-research studies
 
@@ -20,9 +20,11 @@ Researchers write Python data factories in isolated E2B workspaces, generate nat
 | Separate extension | gpt-6-sol | 5 | 5 | 664,132 | Round 2, 1/3 |
 | Separate extension | gpt-6-luna | 5 | 1 | 140,167 | Base, 0/3 |
 
-Selections are frozen after the declared search limit. Final tests and operational recoveries are being completed before the new report is released. These are separate cohorts, not a matched four-model ranking: final source records and researcher-facing interface timing differ. Original Sol5.6 results are never relabeled Sol6. The extension explicitly reuses the selection baseline and starts fresh researcher lineages.
+All four searches, prescribed final evaluations, and declared operational recoveries are complete. In the Sol 6 / Luna 6 extension, the student selected by Sol 6 scores **2/12 (16.7%)** across two six-task repetitions; the base scores **0/12**. Luna 6 retains that same base checkpoint and shares its execution evidence. All 24 extension final trials are valid, without infrastructure errors. These are separate cohorts, not a matched four-model ranking: final source records and researcher-facing interface timing differ. Original Sol5.6 results are never relabeled Sol6. The extension explicitly reuses the selection baseline and starts fresh researcher lineages.
 
 The [historical v0.4 release](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.4.0-research-pilot) used selection/augmentation from one teacher trace. Its published artifacts remain unchanged and are not pooled with executable-factory results. See [the factory contract](docs/DATA_FACTORY.md) and [alignment with RSIBench-Data](docs/RSIBENCH_ALIGNMENT.md).
+
+The original cohort retains its infrastructure-invalid original comparisons. In its separate recovery view, base scores 0/12 and the Sol 5.6-selected student scores 2/12; valid Astra originals score 3/12. Astra originals use the Mac controller and replays use Linux, so that view is not a platform-matched estimate of training-data effects.
 
 No sustained RSI, broad desktop generalization, or mature leaderboard is claimed. Rejected submissions receive no training score. Infrastructure failures remain unscored, and declared recoveries retain the original evidence.
 
@@ -37,43 +39,33 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 
 Configure `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TINKER_API_KEY`, and `E2B_API_KEY` outside the repository. AgentRouterHub uses the Responses API with the requested researcher identifiers. No keys belong in the source or report.
 
-## Run on your provider accounts
+## Run an executable-factory study
 
-Build the application and proxy templates from pinned public dependencies:
+Build the native application and proxy templates using the configured E2B account:
 
 ```sh
 python tools/build_kanboard_template.py
 python tools/build_proxy_template.py
 ```
 
-Collect a verified training trajectory, then launch an explicit data campaign:
+The fresh-study launcher implements the original gpt-6-astra / gpt-5.6-sol researcher protocol. Preparation exports and seals the task packages without model calls; full execution consumes the configured provider accounts.
 
 ```sh
-python -m cursibench.kanboard_runner --kind public --seed 51 \
-  --model gpt-5.6-sol --out work/teacher
-python -m cursibench.data_campaign --teacher work/teacher/result.json \
-  --researcher gpt-6-astra --out work/research-astra
+PYTHONPATH=src python tools/run_factory_study.py \
+  --out work/new-study-preview --prepare-only
+PYTHONPATH=src python tools/run_factory_study.py --out work/new-study
 ```
 
-The teacher must pass saved-state verification before it can supply training data. Baseline sampling no longer depends on a training manifest from the author's private workspace. Cloud runs use the configured provider accounts and record unknown prices as unknown.
-
-The original experiment is frozen at commit `62b99b9`. To use the repaired observer explicitly:
+For a separate Sol 6 / Luna 6 cohort, prepare new factory lineages from the verified original study. This explicitly reuses its selection baseline and creates disjoint final instances; it does not relabel or inherit its researcher programs.
 
 ```sh
-python -m cursibench.kanboard_harbor_export_v3 --kind basic --out work/native-v3
-harbor run -p work/native-v3 \
-  -a cursibench.kanboard_harbor_v3:ResilientKanboardAgent \
-  -m gpt-5.6-sol --env cursibench.journal_env:JournalE2B -n 1
+PYTHONPATH=src python tools/prepare_model6_extension.py \
+  --original work/new-study --out work/new-model6-study
 ```
 
-To sample the base student through the complete service chain, with no prior training artifact:
+Use `tools/run_factory_round.py` for the bounded rounds, then `tools/prepare_factory_comparison.py` to freeze both selections after the declared stop. The [factory guide](docs/DATA_FACTORY.md) describes generation, training, feedback and budget enforcement. The [remote evaluation guide](docs/REMOTE_EVALUATION.md) covers the trusted Linux controller, exact prepared payloads, collection, and reviewed final admission. Local and remote controller paths are separately versioned and must not be silently mixed.
 
-```sh
-python tools/run_cloud_chain.py --out work/base-check --native --base \
-  --model Qwen/Qwen3.5-4B --task work/native-v3 --environment journal
-```
-
-Journaled transport reuses the result of the same logical command after response loss. It refuses to replay an incomplete intent whose effects are uncertain. The model retains its GUI-only action space.
+The local preparation path and individual cloud components have been validated. The convenience launcher has not been rerun as an additional full paid study. Exact replication also depends on current provider availability and the declared software versions. Historical single-trajectory `data_campaign` examples and their report builders belong to the [v0.4 release](https://github.com/EnvLoop/cua-rsibench/tree/v0.4.0-research-pilot).
 
 ## Scope and evidence boundaries
 
@@ -83,17 +75,19 @@ This is DOM-assisted browser use, not pixel-only grounding, full Windows/macOS o
 
 The earlier deterministic workbench remains a regression fixture. Its historical `+0.1429` delta is not an RSI result. See [reference alignment and remaining work](docs/RSIBENCH_ALIGNMENT.md), [realism](docs/REALISM.md), [cloud evidence](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
 
-## Build the English report
+## Rebuild the English report and explorer
 
-The released `docs/site/` directory contains the sanitized inputs and application screenshot. Copy them to `outputs/`, then run:
+The release contains separate sanitized cohort inputs, program snapshots, and the native application screenshot. These suffice for offline report/figure rebuilding without private checkpoints or provider credentials:
 
 ```sh
 mkdir -p outputs
-cp docs/site/evidence.json docs/site/data-campaigns.json \
-   docs/site/journal-recovery.json docs/site/kanboard-real-ui.png outputs/
-python tools/build_figures.py
-python tools/build_report.py
-python tools/build_visualization.py
+cp docs/site/factory-study.json docs/site/model6-study.json \
+   docs/site/kanboard-real-ui.png outputs/
+cp -R docs/site/factory-programs outputs/
+python tools/build_factory_figures.py
+python tools/build_factory_report.py
+python tools/build_factory_visualization.py
+python tools/package_factory_release.py
 ```
 
-Figures are exported as PNG, SVG, and PDF. The manuscript is also emitted as Markdown. Generating a fresh campaign audit requires the original local execution artifacts; rebuilding the report from the released evidence does not.
+Figures are exported as PNG, SVG, and PDF; the manuscript is also emitted as Markdown. The builders check completion, model identities, cohort separation, dataset composition, and original/recovery boundaries. Regenerating an independent study audit requires its raw local execution artifacts; rebuilding from released evidence does not.
