@@ -40,7 +40,7 @@ Remaining release gates:
 
 - [x] Finish and audit original held-out trials plus separately labeled recovery runs.
 - [x] Verify the opt-in v3 observer in real Kanboard, including a saved native edit.
-- Publish the expanded research PDF/site and fetch back exact artifacts.
+- [x] Publish the English research PDF/site under EnvLoop and verify fetched artifacts.
 - [x] Remove historical-manifest dependencies from fresh-clone campaign bootstrapping.
 - Broaden the single-trajectory selection track into new data synthesis, add task
   and application coverage, and establish non-recursive controls before stronger
@@ -50,3 +50,5 @@ Remaining release gates:
 
 A fixed mock score, five iterations of the same hand-written rule, or metadata-only isolation is not RSI evidence.
 A zero or negative gain is a valid experimental result. Do not manufacture improvement.
+
+See [RSIBench alignment](../RSIBENCH_ALIGNMENT.md) for the source-reviewed next-stage requirements.

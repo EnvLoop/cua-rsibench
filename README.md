@@ -77,7 +77,7 @@ The environment is unmodified Kanboard 1.2.54. Thirty-seven issue metadata recor
 
 This is DOM-assisted browser use, not pixel-only grounding, full Windows/macOS operation, or original Microsoft Office evaluation. Screenshots are audit artifacts; actual saved database state determines task success. Infrastructure interruptions and model task failures are different outcomes.
 
-The earlier deterministic workbench remains a regression fixture. Its historical `+0.1429` delta is not an RSI result. See [realism](docs/REALISM.md), [cloud evidence](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
+The earlier deterministic workbench remains a regression fixture. Its historical `+0.1429` delta is not an RSI result. See [reference alignment and remaining work](docs/RSIBENCH_ALIGNMENT.md), [realism](docs/REALISM.md), [cloud evidence](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
 
 ## Build the English report
 

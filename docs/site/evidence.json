@@ -883,7 +883,7 @@
         }
       ],
       "checks": {
-        "frozen_engine_matches_current_tree": true,
+        "frozen_engine_available_at_source_commit": true,
         "train_source_only": true,
         "total_training_budget": true,
         "history_prefix_complete": true,
@@ -1494,7 +1494,7 @@
         }
       ],
       "checks": {
-        "frozen_engine_matches_current_tree": true,
+        "frozen_engine_available_at_source_commit": true,
         "train_source_only": true,
         "total_training_budget": true,
         "history_prefix_complete": true,
