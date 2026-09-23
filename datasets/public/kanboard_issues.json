@@ -1,0 +1,438 @@
+{
+  "source_repo": "kanboard/kanboard",
+  "collected_at": "2026-09-23T00:19:37.276675+00:00",
+  "source_type": "public GitHub issue metadata",
+  "transformations": [
+    "PRs excluded",
+    "titles capped at 24 words",
+    "authors and bodies excluded"
+  ],
+  "records": [
+    {
+      "number": 5895,
+      "title": "[Feature]: `createTaskFile`/`createProjectFile` cannot set the uploader: Add optional `creator_id`",
+      "state": "open",
+      "created_at": "2026-09-04T07:11:32Z",
+      "updated_at": "2026-09-04T07:11:32Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5895"
+    },
+    {
+      "number": 5894,
+      "title": "[Bug][Security]: Project authorization is bypassed by identifiers supplied in the request body (3 exploitable instances: cross-project task exfiltration, mass task closure, subtask position write)",
+      "state": "open",
+      "created_at": "2026-09-01T00:16:03Z",
+      "updated_at": "2026-09-21T04:52:23Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5894"
+    },
+    {
+      "number": 5893,
+      "title": "[Bug]: http page login not working",
+      "state": "open",
+      "created_at": "2026-08-30T14:08:38Z",
+      "updated_at": "2026-08-30T14:08:38Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5893"
+    },
+    {
+      "number": 5880,
+      "title": "Cross-project task file disclosure via FileViewerController: authorization anchored to user-supplied `project_id` + dead `project_id` ownership check for task files",
+      "state": "closed",
+      "created_at": "2026-08-17T01:07:26Z",
+      "updated_at": "2026-08-27T03:16:56Z",
+      "closed_at": "2026-08-27T03:16:56Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5880"
+    },
+    {
+      "number": 5879,
+      "title": "setTaskTags lacks task-project binding check: cross-project tag injection",
+      "state": "closed",
+      "created_at": "2026-08-15T14:28:32Z",
+      "updated_at": "2026-08-26T03:45:24Z",
+      "closed_at": "2026-08-26T03:45:24Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5879"
+    },
+    {
+      "number": 5878,
+      "title": "getProjectByName/ByIdentifier/ByEmail: distinguishable responses allow probing existence of arbitrary (private) projects",
+      "state": "open",
+      "created_at": "2026-08-15T14:28:27Z",
+      "updated_at": "2026-08-15T14:28:27Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5878"
+    },
+    {
+      "number": 5877,
+      "title": "getUser/getUserByName/getAllUsers return bcrypt password hashes (and twofactor_secret / api_access_token keys)",
+      "state": "closed",
+      "created_at": "2026-08-15T14:28:22Z",
+      "updated_at": "2026-08-25T03:08:27Z",
+      "closed_at": "2026-08-25T03:08:27Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5877"
+    },
+    {
+      "number": 5876,
+      "title": "Activity and comment APIs expose other users' email addresses to project members (getMyActivityStream/getProjectActivity/getProjectActivities/getComment/getAllComments)",
+      "state": "open",
+      "created_at": "2026-08-15T14:27:58Z",
+      "updated_at": "2026-08-15T14:27:58Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5876"
+    },
+    {
+      "number": 5875,
+      "title": "createSubtask/updateSubtask accept arbitrary user_id: private task content injected into arbitrary user's dashboard",
+      "state": "closed",
+      "created_at": "2026-08-15T14:27:52Z",
+      "updated_at": "2026-08-25T01:07:03Z",
+      "closed_at": "2026-08-25T01:07:03Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5875"
+    },
+    {
+      "number": 5874,
+      "title": "Revoked project members keep reading assigned tasks via getMyDashboard/getMyOverdueTasks (no membership filter in getUserQuery)",
+      "state": "open",
+      "created_at": "2026-08-15T14:27:44Z",
+      "updated_at": "2026-08-15T14:27:44Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5874"
+    },
+    {
+      "number": 5871,
+      "title": "[Security] SSRF: isPrivateURL() bypassed by decimal/hex IPv4 and IPv6-literal hosts (external links & webhooks)",
+      "state": "open",
+      "created_at": "2026-07-31T12:38:43Z",
+      "updated_at": "2026-07-31T12:38:43Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5871"
+    },
+    {
+      "number": 5869,
+      "title": "[Bug]: New LDAP-users don't get notifications even if the app settings force this",
+      "state": "open",
+      "created_at": "2026-07-29T06:59:31Z",
+      "updated_at": "2026-07-29T07:13:40Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5869"
+    },
+    {
+      "number": 5868,
+      "title": "[Security] Cross-project authorization bypass in CustomFilterController",
+      "state": "closed",
+      "created_at": "2026-07-26T13:45:22Z",
+      "updated_at": "2026-08-24T20:02:58Z",
+      "closed_at": "2026-08-24T20:02:58Z",
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5868"
+    },
+    {
+      "number": 5867,
+      "title": "CSV exports are written without formula neutralisation (Csv::write)",
+      "state": "closed",
+      "created_at": "2026-07-26T08:18:19Z",
+      "updated_at": "2026-08-26T03:45:10Z",
+      "closed_at": "2026-08-26T03:45:10Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5867"
+    },
+    {
+      "number": 5866,
+      "title": "WebNotificationController::redirect reads any notification by id, disclosing task/comment ids from inaccessible projects",
+      "state": "closed",
+      "created_at": "2026-07-26T08:18:13Z",
+      "updated_at": "2026-08-25T11:34:15Z",
+      "closed_at": "2026-08-24T20:03:45Z",
+      "labels": [],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5866"
+    },
+    {
+      "number": 5865,
+      "title": "Official Docker image executes any .php under the web root, bypassing index.php and all middleware",
+      "state": "closed",
+      "created_at": "2026-07-26T08:18:07Z",
+      "updated_at": "2026-08-25T11:33:35Z",
+      "closed_at": "2026-08-11T20:03:16Z",
+      "labels": [],
+      "comment_count": 2,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5865"
+    },
+    {
+      "number": 5864,
+      "title": "Changing a password does not invalidate existing sessions or \"remember me\" tokens",
+      "state": "closed",
+      "created_at": "2026-07-26T08:18:02Z",
+      "updated_at": "2026-08-28T21:51:17Z",
+      "closed_at": "2026-08-28T21:51:17Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5864"
+    },
+    {
+      "number": 5863,
+      "title": "Missing CSRF check on ProjectTagController::makeGlobalTag (GET, admin, no token)",
+      "state": "closed",
+      "created_at": "2026-07-26T08:17:57Z",
+      "updated_at": "2026-08-25T11:32:39Z",
+      "closed_at": "2026-08-23T23:03:55Z",
+      "labels": [],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5863"
+    },
+    {
+      "number": 5862,
+      "title": "Brute-force lockout is keyed on the leftmost X-Forwarded-For value (incomplete fix for CVE-2025-52576)",
+      "state": "open",
+      "created_at": "2026-07-26T08:17:51Z",
+      "updated_at": "2026-07-26T08:17:51Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5862"
+    },
+    {
+      "number": 5861,
+      "title": "Project creation ACL is enforced on the form but not on the handler (ProjectCreationController::save)",
+      "state": "closed",
+      "created_at": "2026-07-26T08:17:45Z",
+      "updated_at": "2026-08-28T02:23:06Z",
+      "closed_at": "2026-08-28T02:23:06Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5861"
+    },
+    {
+      "number": 5860,
+      "title": "Automatic-action parameters are not validated: write tasks into any project (ActionCreationController)",
+      "state": "closed",
+      "created_at": "2026-07-26T08:17:40Z",
+      "updated_at": "2026-08-25T11:31:47Z",
+      "closed_at": "2026-08-11T19:47:54Z",
+      "labels": [],
+      "comment_count": 3,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5860"
+    },
+    {
+      "number": 5859,
+      "title": "No rate limiting on two-factor code verification allows TOTP brute-force (TwoFactorController::check)",
+      "state": "open",
+      "created_at": "2026-07-26T08:17:35Z",
+      "updated_at": "2026-07-26T08:17:35Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5859"
+    },
+    {
+      "number": 5858,
+      "title": "SSRF protection bypass: bracketed IPv6 literals defeat isPrivateURL() (loopback, RFC1918, cloud metadata)",
+      "state": "open",
+      "created_at": "2026-07-26T08:17:20Z",
+      "updated_at": "2026-07-26T08:17:20Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5858"
+    },
+    {
+      "number": 5855,
+      "title": "Cross-project deletion of role and column restrictions",
+      "state": "closed",
+      "created_at": "2026-07-22T15:07:40Z",
+      "updated_at": "2026-08-28T02:23:46Z",
+      "closed_at": "2026-08-28T02:23:45Z",
+      "labels": [],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5855"
+    },
+    {
+      "number": 5852,
+      "title": "Cross-project task hijack via missing project ownership check in BoardAjaxController drag-and-drop endpoint",
+      "state": "closed",
+      "created_at": "2026-07-13T09:51:39Z",
+      "updated_at": "2026-07-14T03:18:47Z",
+      "closed_at": "2026-07-14T03:18:47Z",
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5852"
+    },
+    {
+      "number": 5840,
+      "title": "[Bug]: Problem with notification",
+      "state": "open",
+      "created_at": "2026-06-26T13:31:34Z",
+      "updated_at": "2026-06-26T13:31:34Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5840"
+    },
+    {
+      "number": 5837,
+      "title": "[Feature]: I hope to be able to move tasks in bulk (or select all) to other columns",
+      "state": "open",
+      "created_at": "2026-06-16T02:24:03Z",
+      "updated_at": "2026-06-16T02:24:03Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5837"
+    },
+    {
+      "number": 5835,
+      "title": "[Feature]: add action to open branch when moved to specific swimlane on the project",
+      "state": "open",
+      "created_at": "2026-06-10T09:04:28Z",
+      "updated_at": "2026-06-10T09:04:28Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5835"
+    },
+    {
+      "number": 5833,
+      "title": "Stored XSS: project name rendered unescaped in task-links tooltip (tooltip_tasklinks.php)",
+      "state": "closed",
+      "created_at": "2026-06-08T22:43:14Z",
+      "updated_at": "2026-06-09T06:37:23Z",
+      "closed_at": "2026-06-09T04:48:06Z",
+      "labels": [],
+      "comment_count": 2,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5833"
+    },
+    {
+      "number": 5829,
+      "title": "[Security]: Cross-user deletion of persistent login sessions via removeSession IDOR",
+      "state": "closed",
+      "created_at": "2026-06-04T00:46:45Z",
+      "updated_at": "2026-06-05T03:50:33Z",
+      "closed_at": "2026-06-05T03:41:00Z",
+      "labels": [],
+      "comment_count": 1,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5829"
+    },
+    {
+      "number": 5827,
+      "title": "[Feature]: MCP",
+      "state": "open",
+      "created_at": "2026-06-03T08:14:07Z",
+      "updated_at": "2026-06-03T08:14:07Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5827"
+    },
+    {
+      "number": 5815,
+      "title": "vendor.min.js bundles select2 4.0.2 (CVE-2016-10744)",
+      "state": "closed",
+      "created_at": "2026-05-09T12:29:18Z",
+      "updated_at": "2026-06-05T04:22:42Z",
+      "closed_at": "2026-06-05T04:22:42Z",
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5815"
+    },
+    {
+      "number": 5813,
+      "title": "[Feature]: Ask To Close when writing something",
+      "state": "open",
+      "created_at": "2026-05-05T20:17:44Z",
+      "updated_at": "2026-05-05T20:17:44Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5813"
+    },
+    {
+      "number": 5812,
+      "title": "[Bug]: Edit Tasks in Bulk does not work",
+      "state": "open",
+      "created_at": "2026-05-05T12:39:24Z",
+      "updated_at": "2026-06-14T21:11:18Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 2,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5812"
+    },
+    {
+      "number": 5810,
+      "title": "[Feature]: Improve task text search across title, description, and comments",
+      "state": "closed",
+      "created_at": "2026-04-25T09:03:22Z",
+      "updated_at": "2026-05-14T02:31:46Z",
+      "closed_at": "2026-05-14T02:31:46Z",
+      "labels": [],
+      "comment_count": 2,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5810"
+    },
+    {
+      "number": 5803,
+      "title": "[Configuration]: Lost in setting TRUSTED_PROXY_NETWORKS",
+      "state": "open",
+      "created_at": "2026-04-09T13:08:03Z",
+      "updated_at": "2026-04-09T13:47:36Z",
+      "closed_at": null,
+      "labels": [
+        "triage needed"
+      ],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5803"
+    },
+    {
+      "number": 5800,
+      "title": "Notifications for the current user based on their own actions",
+      "state": "open",
+      "created_at": "2026-04-03T05:06:29Z",
+      "updated_at": "2026-04-03T05:06:29Z",
+      "closed_at": null,
+      "labels": [],
+      "comment_count": 0,
+      "source_url": "https://github.com/kanboard/kanboard/issues/5800"
+    }
+  ],
+  "records_sha256": "1b6bbcb89f173a391faf269735bb58726c51d6d540ccc26406c612fa37dffaf2"
+}

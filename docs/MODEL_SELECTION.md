@@ -1,35 +1,9 @@
-# Model/provider selection
+# Model roles and provider evidence
 
-The researcher/controller model is separate from the computer-use task model. It should inspect train
-trajectories, propose a bounded harness/data change, and write a structured rationale; it must never see
-hidden test tasks or verifier internals.
+`gpt-6-astra` and `gpt-5.6-sol` are the requested AgentRouterHub model IDs. Both have completed live Responses requests. Use the former or latter for browser execution, candidate research, or review under explicit fixed settings. A returned alias is provider metadata, not independent proof of model identity. No pricing or overall superiority is asserted.
 
-The repository supports the two requested AgentRouterHub model IDs:
+The Tinker training target is separate: the verified smoke uses `Qwen/Qwen3.5-4B`, rank 8, one optimizer step. It does not train Astra or Sol. The resulting checkpoint was actually sampled and evaluated through E2B and Harbor; it failed the task with reward 0 and no infrastructure error.
 
-- `gpt-6-astra`: recommended for the meta-researcher, failure diagnosis, causal review, and candidate
-  proposal. Its higher reasoning budget is useful when the trajectory evidence is long and mixed.
-- `gpt-5.6-sol`: recommended as a lower-cost independent reviewer, control proposer, or repeated rollout
-  worker. It is also useful for checking whether Astra's proposed change is supported by the evidence.
+Credentials remain outside the repository. Current bounded native-app calls use low reasoning effort, 1200 requested output tokens, 180-second request timeout, one retry for designated transient errors, and a fixed GUI action budget. Earlier timeouts are preserved as infrastructure exclusions.
 
-Both were live-probed through `https://sub2api.agentrouterhub.com/v1/responses` and returned the expected
-sentinel response during this release. The probe does not establish benchmark performance.
-
-Example shell configuration, with secrets kept outside the repository:
-
-```bash
-export OPENAI_BASE_URL=https://sub2api.agentrouterhub.com
-export OPENAI_API_KEY=...                 # user-owned secret, never commit
-```
-
-The `cursibench.agentrouter` module uses only the Responses API, validates the model allowlist, adds a
-stable user-agent, and fails closed when the key is missing or the provider returns an error.
-
-## Provider status observed for this release
-
-- AgentRouterHub: reachable; Astra and Sol sentinel calls passed.
-- Tinker: SDK import passed, but a real service capability call returned HTTP 402 because the account's
-  billing status blocks access. No paid training attempt was started.
-- E2B: SDK import passed, but sandbox creation returned HTTP 401 because the supplied key was rejected as
-  malformed and the service requires the `e2b_` key format. No sandbox task was run.
-
-The local fake chain remains useful for protocol/CI checks, but it is not external evaluation evidence.
+E2B is now usable with corrected credentials. Tinker became usable after the account was funded. Old 401/402 observations are historical diagnostics, not current blockers.

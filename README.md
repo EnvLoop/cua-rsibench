@@ -1,40 +1,47 @@
-# CUA-RSIBench — work in progress
+# CUA-RSIBench
 
-An experimental computer-use benchmark inspired by RSIBench-Data. **The full benchmark is not implemented or validated yet.** No recursive improvement or leaderboard result is claimed.
+A computer-use benchmark under active development, inspired by [RSIBench-Data](https://github.com/evolvent-ai/RSIBench-Data). The primary environment is **real Kanboard 1.2.54**, deployed in disposable E2B sandboxes. Tasks use public issue metadata with explicit provenance; policies and staff assignments are marked synthetic.
 
-## Current evidence
+## Evidence, not a simulated score
 
-- Legacy deterministic document fixtures and integrity regression tests.
-- A real Chrome runner for a synthetic expense-review application, with model-driven DOM actions, clean browser contexts, screenshot traces, reload-before-verification and exact final-state checks.
-- AgentRouterHub Responses API support for `gpt-6-astra` and `gpt-5.6-sol`.
-- Service-chain mocks for development only. Mock scores are null and cannot qualify for final submission.
+- **Real Tinker**: LoRA update, persistent checkpoint and checkpoint sampling verified on Qwen/Qwen3.5-4B.
+- **Real E2B + Harbor**: browser oracle and a separate verifier executed successfully.
+- **Full service chain**: Tinker checkpoint → E2B sampling proxy → Harbor E2B browser task → separate verifier. One completed trial, no infrastructure errors, reward **0**. This negative result proves execution, not capability improvement.
+- **Real Kanboard GUI**: AgentRouterHub Sol completed a native form edit; independent SQLite readback confirmed intended changes and preserved other tasks.
+- **Real-source data**: 37 public issue metadata records; source URLs, timestamps and content hash retained. No authors or issue bodies copied.
+- **Difficulty calibration in progress**: original handwritten tasks saturated and were excluded from formal RSI claims. Astra/Sol are being evaluated on native workflows with distributed information and real metadata.
 
-## Run
+No sustained recursive improvement, unseen-application transfer or mature leaderboard is claimed. The old deterministic fixture remains a unit regression check only. Mock providers return no score and cannot qualify for final submission.
 
-Install the package and browser extra in a virtual environment:
+## Reproduce
 
 ```sh
-pip install -e '.[browser]'
-python -m unittest discover -s tests -v
-python -m cursibench.browser_trial --out work/browser-run --model gpt-5.6-sol
+uv venv --python 3.12 .venv
+uv pip install --python .venv/bin/python -e '.[browser,cloud,harbor]'
+PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
 ```
 
-The browser runner requires installed Google Chrome. Set `OPENAI_API_KEY` and `OPENAI_BASE_URL` outside the repository. Never commit keys or raw provider responses containing private configuration.
+Configure `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `TINKER_API_KEY`, and `E2B_API_KEY` outside the repository. Never commit credentials. AgentRouterHub uses the Responses API with `gpt-6-astra` and `gpt-5.6-sol`; fees remain unknown unless account prices are supplied.
 
-Browser actions currently use visible DOM selectors. This is a synthetic browser-use integration check, not pixel-only computer use, real enterprise-app evaluation, a held-out benchmark, or an RSI experiment.
+Local browser fixtures require installed Google Chrome. The real-app path uses the E2B Kanboard template. See [realism](docs/REALISM.md), [cloud validation](docs/CLOUD_VALIDATION.md), and the [completion plan](docs/plans/2026-09-23-completion.md).
 
-## Remaining requirements
+```sh
+python -m cursibench.kanboard_runner --kind public --model gpt-5.6-sol --out work/native-trial
+python -m cursibench.kanboard_harbor_export --kind public --out work/harbor-native
+harbor run -p work/harbor-native -a cursibench.kanboard_harbor:KanboardAgent \
+  -m gpt-5.6-sol --env cursibench.cloud_env:BoundedE2B -n 1
+```
 
-1. Real application task families and source-artifact/template-disjoint splits.
-2. Enforced wall-time, token and monetary budgets plus complete provider accounting.
-3. Model-generated, inherited harness proposals and independent acceptance evaluation.
-4. Verifier/test assets isolated from editable agent code, with host-side result integrity.
-5. Matched frozen/nonrecursive controls, independent seeds, confidence intervals and ablations.
-6. Actual Tinker training/checkpoints, E2B lifecycle and Harbor evaluation integration.
-7. A technical report and visualizations tied to auditable run artifacts.
+The E2B template builder currently requires the pinned source archive and the recorded browser base template; cloud setup is account-specific and is not yet a one-command public installation. Exported Harbor tasks have Dockerfiles for independent rebuilds.
 
-The legacy `python -m cursibench` command is only a deterministic regression fixture. Its five iterations reuse a hand-written candidate; its score is not evidence of learning. Test assets in this repository are public and not sealed. Configuration fields do not constitute runtime enforcement. Documentation under `docs/` describes the target design, not an implemented production system.
+## Boundaries
 
-## Browser smoke evidence
+The actor receives native visible DOM text and controls and can click, fill, select, press limited keys, go back or finish. It cannot access shell, SQL, application APIs or host files. Screenshots are recorded for audit; this is **DOM-assisted browser use**, not pixel-only computer use or a full Windows/macOS benchmark.
 
-On 2026-09-23 both Astra and Sol completed one synthetic expense task through real Chrome. Persisted state was checked after reload; unrelated records were unchanged. See [traces and screenshots](docs/evidence/browser-smoke/). These are single integration trials, not comparable performance measurements or RSI results.
+Task success is based on actual saved database state. Infrastructure errors, invalid model actions and task failures are different outcomes. The evaluator normalizes only known semantically equivalent application fields; source records, comments and unrelated objects are preserved.
+
+The implementation contains separate harness-adaptation and data-training paths. Metadata flags are not treated as isolation or promotion enforcement. Formal experiments require discriminative tasks, source-disjoint splits, matched controls, repeated final evaluation, and complete evidence.
+
+## Publication
+
+A technical PDF and visual evidence explorer are being assembled from the current results. They will distinguish validated facts, negative outcomes and remaining work; the historical toy `+0.1429` fixture delta is not an RSI result.

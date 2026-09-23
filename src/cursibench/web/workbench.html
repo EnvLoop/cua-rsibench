@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Fieldwork / Operations</title>
+<style>
+:root{--ink:#173139;--muted:#576f73;--line:#cad6d4;--paper:#f4f2eb;--accent:#005c52;--warm:#cf653d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px 'Avenir Next',Verdana,sans-serif}header{background:var(--ink);color:white;display:flex;justify-content:space-between;padding:20px 36px;letter-spacing:1px}header b{font-size:20px}header span{font:12px monospace;align-self:center}main{max-width:1350px;margin:30px auto;padding:0 32px}.eyebrow{font:12px monospace;color:var(--accent);text-transform:uppercase}h1{font:40px Georgia,serif;margin:14px 0}p{line-height:1.6;max-width:1000px}nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:25px}button{cursor:pointer;font:inherit;border:1px solid var(--line);padding:11px 20px;background:#fff;color:var(--ink)}button:hover{border-color:var(--accent)}nav button{border:0;border-bottom:3px solid transparent;background:transparent}nav button.active{border-bottom-color:var(--accent);font-weight:600}section{background:white;padding:22px;margin-top:20px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:12px 9px;text-align:left;border-bottom:1px solid #e2e8e6}th{font:11px monospace;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}input,select{font:inherit;color:var(--ink);padding:8px;width:135px;border:1px solid #b3c4c1;background:#fff}button.primary{background:var(--accent);color:white;border-color:var(--accent)}.bar{display:flex;align-items:center;gap:18px;margin-top:20px}.notice{font:13px monospace;color:var(--accent)}.rule{font:19px Georgia,serif;line-height:1.7;padding:18px;border-left:4px solid var(--warm);background:#fbf5ef}dialog{border:1px solid var(--line);box-shadow:0 12px 50px #17313933;max-width:500px;padding:32px}footer{font:11px monospace;color:var(--muted);margin-top:24px}
+</style>
+<header><b>FIELDWORK / OPS</b><span>CUA-RSIBENCH · SYNTHETIC WORKBENCH</span></header>
+<main><span class="eyebrow" id="family"></span><h1>Reconciliation queue</h1><p id="instruction"></p>
+<nav><button data-control="queue" class="active">Queue</button><button data-control="source">Source</button><button data-control="rules">Rules</button></nav><section id="panel"></section>
+<div class="bar"><button data-control="save" class="primary">Save changes</button><span id="notice" class="notice">No changes saved</span></div>
+<footer>Match records by exact ID. Source data is read-only. Save requires confirmation.</footer></main>
+<dialog><h2>Confirm queue update</h2><p>Commit edited rows to the persistent queue?</p><button data-control="confirm" class="primary">Confirm save</button><button data-control="cancel">Cancel</button></dialog>
+<script>
+const task=VISIBLE_TASK;document.querySelector('#family').textContent=task.family;document.querySelector('#instruction').textContent=task.instruction;
+const initial={records:task.records,source:task.source,policy:task.policy};
+let state=JSON.parse(localStorage.getItem('state')||JSON.stringify(initial));localStorage.setItem('state',JSON.stringify(state));
+let active='queue',pageIndex=0,filter='';const pageSize=8;
+function node(tag,text){let e=document.createElement(tag);e.textContent=String(text);return e}
+function table(rows,editable){let t=document.createElement('table'),head=document.createElement('tr');for(const col of Object.keys(rows[0]))head.append(node('th',col));t.append(head);
+for(const row of rows){let tr=document.createElement('tr');for(const [key,value] of Object.entries(row)){let td=document.createElement('td');if(editable&&key in task.fields){let options=task.fields[key],input=document.createElement(Array.isArray(options)?'select':'input');input.dataset.control=row.id+':'+key;input.setAttribute('aria-label',row.id+' '+key);if(Array.isArray(options))for(const option of options){let o=node('option',option);o.value=option;input.append(o)}input.value=value;input.onchange=()=>row[key]=input.value;td.append(input)}else td.textContent=String(value);tr.append(td)}t.append(tr)}return t}
+function render(){let panel=document.querySelector('#panel');panel.replaceChildren();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.control===active));if(active==='rules'){let rule=node('div',state.policy);rule.className='rule';panel.append(rule)}else{
+let data=active==='source'?state.source:state.records;
+let search=document.createElement('input');search.dataset.control='filter';search.setAttribute('aria-label','Filter rows by exact ID or text');search.placeholder='Filter rows';search.value=filter;search.style.width='320px';search.onchange=()=>{filter=search.value;pageIndex=0;render()};panel.append(search);
+let rows=data.filter(r=>JSON.stringify(r).toLowerCase().includes(filter.toLowerCase()));let pages=Math.max(1,Math.ceil(rows.length/pageSize));pageIndex=Math.min(pageIndex,pages-1);
+if(rows.length)panel.append(table(rows.slice(pageIndex*pageSize,(pageIndex+1)*pageSize),active==='queue'));else panel.append(node('p','No matching rows'));
+let bar=document.createElement('div');bar.className='bar';let prev=node('button','Previous'),next=node('button','Next');prev.dataset.control='previous';next.dataset.control='next';prev.disabled=pageIndex===0;next.disabled=pageIndex===pages-1;prev.onclick=()=>{pageIndex--;render()};next.onclick=()=>{pageIndex++;render()};bar.append(prev,node('span',`Page ${pageIndex+1} of ${pages} / ${rows.length} rows`),next);panel.append(bar);
+}}
+for(const b of document.querySelectorAll('nav button'))b.onclick=()=>{active=b.dataset.control;pageIndex=0;filter='';render()};
+document.querySelector('[data-control=save]').onclick=()=>document.querySelector('dialog').showModal();
+document.querySelector('[data-control=cancel]').onclick=()=>document.querySelector('dialog').close();
+document.querySelector('[data-control=confirm]').onclick=()=>{localStorage.setItem('state',JSON.stringify(state));document.querySelector('dialog').close();document.querySelector('#notice').textContent='Saved successfully';};render();
+</script></html>
