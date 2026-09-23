@@ -5,18 +5,18 @@ from pathlib import Path
 import tinker
 from tinker import types
 from transformers import AutoTokenizer
-from sample_cache import SamplingCache
+from sample_cache import SamplingCache,request_capacity
 
 
 def main():
     service=tinker.ServiceClient();checkpoint=os.environ['TINKER_MODEL_PATH'];base=os.environ['TINKER_BASE_MODEL']
     sampling=service.create_sampling_client(model_path=checkpoint) if checkpoint.startswith('tinker://') else service.create_sampling_client(base_model=base)
     tokenizer=AutoTokenizer.from_pretrained(base)
-    token=os.environ['CUA_PROXY_TOKEN'];cache=SamplingCache();finished={}
+    token=os.environ['CUA_PROXY_TOKEN'];capacity=request_capacity(int(os.environ.get('CUA_TASK_COUNT','1')));cache=SamplingCache(limit=capacity);finished={}
     class H(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def do_GET(self):
-            if self.path=='/health':self.respond({'ready':True})
+            if self.path=='/health':self.respond({'ready':True,'request_capacity':capacity})
             else:self.send_error(404)
         def do_POST(self):
             if not hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+token):self.send_error(401);return
