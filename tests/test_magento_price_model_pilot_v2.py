@@ -384,6 +384,75 @@ class ActionContractTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 await browser.close()
 
+    async def test_menu_overlay_excludes_occluded_product_ref(self):
+        from playwright.async_api import async_playwright
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            try:
+                page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                await page.set_content('''<style>
+                  button { position: absolute; width: 120px; height: 40px; }
+                  #product { left: 220px; top: 120px; }
+                  #outside { left: 490px; top: 120px; }
+                  .admin__menu-overlay { position: fixed; inset: 0 240px 0 0;
+                    z-index: 10; background: rgba(0, 0, 0, .2); }
+                  .admin__menu { position: fixed; left: 0; top: 0;
+                    width: 180px; height: 480px; z-index: 11; background: white; }
+                  #catalog { left: 20px; top: 120px; }
+                </style>
+                <button id="product">Product row</button>
+                <button id="outside">Outside overlay</button>
+                <div class="admin__menu-overlay"></div>
+                <nav class="admin__menu"><button id="catalog"><span>Catalog</span>
+                </button></nav>''')
+                self.assertTrue(await page.locator('#product').is_visible())
+                self.assertTrue(await page.locator('#product').is_enabled())
+                controls, handles = await pilot.viewport_controls(page)
+                self.assertEqual({row['label'] for row in controls},
+                                 {'Catalog', 'Outside overlay'})
+                self.assertEqual({await h.get_attribute('id') for h in handles.values()},
+                                 {'catalog', 'outside'})
+            finally:
+                await browser.close()
+
+    async def test_invisible_pointer_overlay_invalidates_same_visible_ref(self):
+        from playwright.async_api import async_playwright
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            try:
+                page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                await page.set_content('''<button id="product" style="position:absolute;
+                  left:200px;top:100px;width:120px;height:40px">Product row</button>''')
+                image = await pilot.screenshot_for_observation(page)
+                controls, handles = await pilot.viewport_controls(page)
+                self.assertEqual([row['label'] for row in controls], ['Product row'])
+                observation = pilot.make_observation(
+                    task_id='webarena.shopping_admin.777', task_binding_sha256='a' * 64,
+                    instruction='Inspect product row', step=0, screenshot_bytes=image,
+                    controls=controls)
+                action = {'type': 'click', 'target': {'ref': controls[0]['ref']}}
+                with patch.object(pilot.v063.host, '_visible_controls',
+                                  pilot.viewport_controls):
+                    self.assertTrue(await pilot.v063._same_visible_refs(
+                        page, action, observation, handles))
+                    await page.evaluate('''() => {
+                      const overlay = document.createElement('div');
+                      overlay.id = 'interceptor';
+                      overlay.style.cssText =
+                        'position:fixed;left:200px;top:100px;width:120px;'
+                        + 'height:40px;z-index:10;opacity:0;pointer-events:auto';
+                      document.body.appendChild(overlay);
+                    }''')
+                    self.assertEqual(await pilot._same_pixels(
+                        page, observation, page.url), (True, None))
+                    self.assertFalse(await pilot.v063._same_visible_refs(
+                        page, action, observation, handles))
+                    await page.locator('#interceptor').evaluate('node => node.remove()')
+                    self.assertTrue(await pilot.v063._same_visible_refs(
+                        page, action, observation, handles))
+            finally:
+                await browser.close()
+
     async def test_icon_only_button_is_screenshot_bound_and_model_visible(self):
         from playwright.async_api import async_playwright
         async with async_playwright() as playwright:

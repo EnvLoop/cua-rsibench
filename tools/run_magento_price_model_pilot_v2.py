@@ -402,7 +402,7 @@ async def _same_pixels(page, observation, frame_url):
 
 
 async def viewport_controls(page):
-    """Expose only controls whose click center occurs inside observed pixels."""
+    """Expose controls whose screenshot center is inside the viewport and clickable."""
     viewport = page.viewport_size or {'width': 1440, 'height': 1000}
     controls, handles = [], {}
     for handle in await page.locator(v063.host.CONTROL_SELECTOR).element_handles():
@@ -422,6 +422,14 @@ async def viewport_controls(page):
             center_y = box['y'] + box['height'] / 2
             if not (0 <= center_x < viewport['width'] and
                     0 <= center_y < viewport['height']):
+                continue
+            # is_visible() does not account for a menu scrim or another
+            # element intercepting pointer events above this control. The
+            # advertised ref must be the element a center click can reach.
+            if not await handle.evaluate('''(element, point) => {
+                const hit = document.elementFromPoint(point.x, point.y);
+                return hit !== null && (hit === element || element.contains(hit));
+            }''', {'x': center_x, 'y': center_y}):
                 continue
             tag = (await handle.evaluate('(element) => element.tagName')).lower()
             input_type = (await handle.get_attribute('type') or '').lower() if tag == 'input' else ''
