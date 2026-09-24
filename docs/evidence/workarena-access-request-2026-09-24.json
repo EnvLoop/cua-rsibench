@@ -1,0 +1,12 @@
+{
+  "schema": "cua-workarena-access-status-v1",
+  "date": "2026-09-24",
+  "source": "https://huggingface.co/datasets/ServiceNow/WorkArena-Instances",
+  "observation_method": "user-authorized system-browser form submission and visible confirmation",
+  "request_state": "submitted_awaiting_repository_author_review",
+  "instance_access_verified": false,
+  "task_execution_verified": false,
+  "usage_scope_observed": "benchmark evaluation and research only; no training, production workload, or sensitive-data storage",
+  "account_name_email_username_and_document_links_published": false,
+  "limitation": "This is a one-time browser observation, not a live status monitor or approval receipt."
+}

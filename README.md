@@ -9,6 +9,10 @@ A real Kanboard application, public-source issue metadata, actual Tinker LoRA tr
 - [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories)
 - [Original-cohort audit](docs/site/factory-study.json) and [Sol 6 / Luna 6 audit](docs/site/model6-study.json)
 
+## v0.6 real-software qualification note
+
+The [English qualification PDF](docs/qualification-v06/EnvLoop-Computer-Use-Qualification-Report.pdf), [interactive six-application explorer](https://envloop.github.io/cua-rsibench/qualification-v06/), and [source-hashed evidence data](docs/evidence/v0.6-qualification-report-data.json) document the next benchmark's environment and verifier work. This is a **separate methods release**, not a new full-scale score: the planned Qwen3.8-27B study has zero completed researcher campaigns, zero official final task instances, and no application with 100 admitted tasks. Human GUI controls, one-task model pilots, published source inventories, and provisional splits are labeled separately. The v0.5 Qwen3.5-4B Kanboard results below remain unchanged.
+
 ## Executable data-research studies
 
 Researchers write Python data factories in isolated E2B workspaces, generate native task states, request verified GUI demonstrations, and revise their training mixtures from selection feedback. Each accepted dataset trains a fresh Qwen3.5-4B LoRA adapter. The fixed teacher is **gpt-5.6-sol**; the researcher model and the evaluated student are different roles.
