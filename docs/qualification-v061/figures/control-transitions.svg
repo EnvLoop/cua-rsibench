@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="491" height="218" preserveAspectRatio="xMinYMin meet" viewBox="0 0 491 218" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="491" height="218"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-218)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="0" width="491" height="218" style="stroke: rgb(84%,88%,87%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<text x="12" y="198" style="font-family: Helvetica-Bold; font-size: 9px;fill: rgb(3%,48%,44%); stroke:none;" transform="translate(0,396) scale(1,-1)">REAL-SOFTWARE DEVELOPMENT CONTROLS</text>
+			<text x="12" y="184" style="font-family: Helvetica; font-size: 8px;fill: rgb(33%,42%,45%); stroke:none;" transform="translate(0,368) scale(1,-1)">Each row has its own verifier and denominator.</text>
+			<path d="M 12,176 L 479,176 Z" style="stroke: rgb(90%,92%,92%); stroke-linecap: butt; stroke-width: 0.6;"/>
+			<text x="12" y="154" style="font-family: Helvetica-Bold; font-size: 8.5px;fill: rgb(9%,20%,23%); stroke:none;" transform="translate(0,308) scale(1,-1)">EXCEL WEB</text>
+			<text x="12" y="141" style="font-family: Helvetica; font-size: 7.1px;fill: rgb(33%,42%,45%); stroke:none;" transform="translate(0,282) scale(1,-1)">faults repaired</text>
+			<rect x="168" y="123" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(83%,63%,21%); fill-rule: evenodd;"/>
+			<text x="177" y="147" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,294) scale(1,-1)">1/9</text>
+			<text x="177" y="133" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,266) scale(1,-1)">partial</text>
+			<rect x="274" y="123" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(14%,54%,40%); fill-rule: evenodd;"/>
+			<text x="283" y="147" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,294) scale(1,-1)">9/9</text>
+			<text x="283" y="133" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,266) scale(1,-1)">full + replays</text>
+			<rect x="380" y="123" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(78%,35%,28%); fill-rule: evenodd;"/>
+			<text x="389" y="147" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,294) scale(1,-1)">0/9</text>
+			<text x="389" y="133" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,266) scale(1,-1)">manual reset</text>
+			<path d="M 260,145 L 272,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 267,148 L 272,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 267,142 L 272,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 366,145 L 378,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 373,148 L 378,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 373,142 L 378,145 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 12,119 L 479,119 Z" style="stroke: rgb(90%,92%,92%); stroke-linecap: butt; stroke-width: 0.6;"/>
+			<text x="12" y="97" style="font-family: Helvetica-Bold; font-size: 8.5px;fill: rgb(9%,20%,23%); stroke:none;" transform="translate(0,194) scale(1,-1)">POWERPOINT WEB</text>
+			<text x="12" y="84" style="font-family: Helvetica; font-size: 7.1px;fill: rgb(33%,42%,45%); stroke:none;" transform="translate(0,168) scale(1,-1)">official / guard</text>
+			<rect x="168" y="66" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(78%,35%,28%); fill-rule: evenodd;"/>
+			<text x="177" y="90" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,180) scale(1,-1)">1 / 0</text>
+			<text x="177" y="76" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,152) scale(1,-1)">mixed-size</text>
+			<rect x="274" y="66" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(14%,54%,40%); fill-rule: evenodd;"/>
+			<text x="283" y="90" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,180) scale(1,-1)">1 / 1</text>
+			<text x="283" y="76" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,152) scale(1,-1)">full title</text>
+			<rect x="380" y="66" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(83%,63%,21%); fill-rule: evenodd;"/>
+			<text x="389" y="90" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,180) scale(1,-1)">0</text>
+			<text x="389" y="76" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,152) scale(1,-1)">reset target</text>
+			<path d="M 260,88 L 272,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 267,91 L 272,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 267,85 L 272,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 366,88 L 378,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 373,91 L 378,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 373,85 L 378,88 Z" style="stroke: rgb(33%,42%,45%); stroke-linecap: butt; stroke-width: 1;"/>
+			<path d="M 12,62 L 479,62 Z" style="stroke: rgb(90%,92%,92%); stroke-linecap: butt; stroke-width: 0.6;"/>
+			<text x="12" y="40" style="font-family: Helvetica-Bold; font-size: 8.5px;fill: rgb(9%,20%,23%); stroke:none;" transform="translate(0,80) scale(1,-1)">MAGENTO ADMIN</text>
+			<text x="12" y="27" style="font-family: Helvetica; font-size: 7.1px;fill: rgb(33%,42%,45%); stroke:none;" transform="translate(0,54) scale(1,-1)">published evaluator</text>
+			<rect x="168" y="9" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(14%,54%,40%); fill-rule: evenodd;"/>
+			<text x="177" y="33" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,66) scale(1,-1)">1.0</text>
+			<text x="177" y="19" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,38) scale(1,-1)">five target SKUs</text>
+			<rect x="274" y="9" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(78%,35%,28%); fill-rule: evenodd;"/>
+			<text x="283" y="33" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,66) scale(1,-1)">0.0</text>
+			<text x="283" y="19" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,38) scale(1,-1)">wrong color</text>
+			<rect x="380" y="9" width="92" height="45" rx="5" ry="5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(83%,63%,21%); fill-rule: evenodd;"/>
+			<text x="389" y="33" style="font-family: Helvetica-Bold; font-size: 15px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,66) scale(1,-1)">match</text>
+			<text x="389" y="19" style="font-family: Helvetica; font-size: 7.4px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,38) scale(1,-1)">reset after each</text>
+		</g>
+	</g>
+</svg>

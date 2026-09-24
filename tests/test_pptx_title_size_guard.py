@@ -63,6 +63,39 @@ class TitleSizeGuardTests(unittest.TestCase):
         self.assertEqual(result['score'], 0.0)
         self.assertEqual(result['unexpected_parts'], ['ppt/slides/slide1.xml'])
 
+    def test_office_run_splitting_is_allowed_only_when_all_title_text_has_target_size(self):
+        split = '<a:r><a:rPr sz="4800"/><a:t>Same </a:t></a:r><a:r><a:rPr sz="4800"/><a:t>title</a:t></a:r>'
+        slide = SLIDE.format(properties='', subtitle='Untouched subtitle').replace(
+            '<a:r><a:t>Same title</a:t></a:r>', split)
+        deck(self.modified, extra={'ppt/slides/slide1.xml': slide.encode()})
+        self.assertEqual(guard.verify(self.original, self.modified, self.contract)['score'], 1.0)
+
+        mixed = split.replace('sz="4800"', '', 1)
+        slide = SLIDE.format(properties='', subtitle='Untouched subtitle').replace(
+            '<a:r><a:t>Same title</a:t></a:r>', mixed)
+        deck(self.modified, extra={'ppt/slides/slide1.xml': slide.encode()})
+        result = guard.verify(self.original, self.modified, self.contract)
+        self.assertEqual(result['score'], 0.0)
+        self.assertFalse(result['target_correct'])
+
+        changed = split.replace('title</a:t>', 'titles</a:t>')
+        slide = SLIDE.format(properties='', subtitle='Untouched subtitle').replace(
+            '<a:r><a:t>Same title</a:t></a:r>', changed)
+        deck(self.modified, extra={'ppt/slides/slide1.xml': slide.encode()})
+        result = guard.verify(self.original, self.modified, self.contract)
+        self.assertEqual(result['score'], 0.0)
+        self.assertIn('ppt/slides/slide1.xml', result['unexpected_parts'])
+
+        changed_format = split.replace('<a:rPr sz="4800"/><a:t>title',
+                                       '<a:rPr sz="4800" b="1"/><a:t>title')
+        slide = SLIDE.format(properties='', subtitle='Untouched subtitle').replace(
+            '<a:r><a:t>Same title</a:t></a:r>', changed_format)
+        deck(self.modified, extra={'ppt/slides/slide1.xml': slide.encode()})
+        result = guard.verify(self.original, self.modified, self.contract)
+        self.assertEqual(result['score'], 0.0)
+        self.assertTrue(result['target_correct'])
+        self.assertFalse(result['preservation_pass'])
+
     def test_unrelated_image_relationship_notes_and_new_slide_changes_fail(self):
         for part, data in [('ppt/media/image1.png', b'changed image'),
                            ('ppt/slides/_rels/slide1.xml.rels', b'<Relationships><relationship/></Relationships>'),

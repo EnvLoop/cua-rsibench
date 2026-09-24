@@ -182,6 +182,62 @@ def php_exec(code):
                           input=code, text=True, check=True, capture_output=True, timeout=120).stdout
 
 
+def clone_base_url():
+    result = subprocess.run(['docker', '--context', CONTEXT, 'exec', CONTAINER,
+                             'php', '/var/www/magento2/bin/magento', 'config:show',
+                             'web/unsecure/base_url'], check=True, capture_output=True,
+                            text=True, timeout=60)
+    value = result.stdout.strip()
+    require(value == 'http://localhost:7792/',
+            'clone base URL must point to isolated localhost:7792 before GUI use')
+    return value
+
+
+def search_json(path):
+    result = subprocess.run(['docker', '--context', CONTEXT, 'exec', CONTAINER,
+                             'curl', '-fsS', '--max-time', '30',
+                             'http://127.0.0.1:9200/' + path],
+                            check=True, capture_output=True, text=True, timeout=45)
+    return json.loads(result.stdout)
+
+
+def search_health():
+    data = search_json('_cluster/health')
+    require(data.get('status') in ('yellow', 'green') and not data.get('timed_out')
+            and data.get('number_of_nodes') == 1
+            and data.get('number_of_data_nodes') == 1
+            and data.get('number_of_pending_tasks') == 0,
+            'isolated Magento Elasticsearch is not ready')
+    return {'status': data['status'], 'number_of_nodes': 1,
+            'active_primary_shards': data['active_primary_shards'],
+            'pending_tasks': 0}
+
+
+def read_search_index():
+    data = search_json('magento2_product_1/_search?size=1000')
+    hits = data['hits']['hits']
+    total = data['hits']['total']['value']
+    require(total == len(hits) == 181, 'Magento search index document count changed')
+    docs = {hit['_id']: hit['_source'] for hit in hits}
+    require(len(docs) == total and docs['126']['sku'] == 'MH05',
+            'configurable parent missing from search index')
+    return {'document_count': total, 'sha256': digest(docs),
+            'parent_price_0_1': docs['126']['price_0_1']}
+
+
+def reindex_search():
+    result = subprocess.run(['docker', '--context', CONTEXT, 'exec', CONTAINER,
+                             'sh', '-lc', 'cd /var/www/magento2 && php bin/magento '
+                             'indexer:reindex catalogsearch_fulltext'],
+                            check=True, capture_output=True, text=True, timeout=180)
+    require('Catalog Search index has been rebuilt successfully' in result.stdout,
+            'Magento search reindex did not report success')
+
+
+def validate_search_reset(before, after):
+    require(after == before, 'search index did not recover monitored baseline')
+
+
 DB_READ = r'''<?php
 $cfg=include '/var/www/magento2/app/etc/env.php';$d=$cfg['db']['connection']['default'];
 $db=new PDO('mysql:host='.$d['host'].';dbname='.$d['dbname'],$d['username'],$d['password']);
@@ -344,6 +400,7 @@ async def edit_variant(page, entity_id, sku, destination):
         await page.get_by_role('button', name='Save', exact=True).click()
     response = await response_info.value
     require(response.status == 302, 'native product save did not redirect')
+    await page.get_by_text('You saved the product.', exact=True).wait_for(timeout=120000)
     await page.screenshot(path=str(destination / f'after-{entity_id}.png'), full_page=True,
                           mask=[page.locator('.admin-user')])
     return {'entity_id': entity_id, 'sku': sku, 'save_response_status': response.status,
@@ -414,16 +471,22 @@ async def run(source, out):
               'user_account_accessed': False, 'hundred_task_ready': False,
               'qualification_scope': 'one scripted five-variant Magento price mutation and rollback'}
     original = None
+    original_search = None
     private_rollback = out / 'rollback.private.json'
     try:
         task, source_info = source_proof(source)
         report.update(source=source_info, container=container_proof(),
+                      clone_base_url=clone_base_url(), search_health=search_health(),
                       task_intent=task['intent'], tool_sha256=sha(Path(__file__).read_bytes()))
         original = read_db()
+        original_search = read_search_index()
         require(all(float(prices(original)[key]) == 52.0 for key in (*TARGETS, *WRONG)),
                 'baseline prices differ from published task')
+        require(float(original_search['parent_price_0_1']) == 52.0,
+                'baseline search price differs from published task')
         write_new(private_rollback, original)
         write_new(out / 'db-before.json', public_db(original))
+        write_new(out / 'search-before.json', original_search)
         cases = []
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
@@ -436,24 +499,34 @@ async def run(source, out):
                     after = read_db()
                     write_new(out / f'db-after-{name}.json', public_db(after))
                     validator(original, after)
+                    search_after = read_search_index()
+                    write_new(out / f'search-after-{name}.json', search_after)
+                    require(float(search_after['parent_price_0_1']) == 47.0,
+                            'product price did not reach the search index')
                     score = receipt['published_evaluator']
                     require(score['score'] == expected and
                             score['status'] == ('success' if expected else 'failure') and
                             not score['error_present'],
                             'official evaluator did not discriminate positive and wrong color')
                     restore_rows(original)
+                    reindex_search()
                     reset = read_db()
                     write_new(out / f'db-restored-{name}.json', public_db(reset))
                     validate_reset(original, reset)
+                    search_reset = read_search_index()
+                    write_new(out / f'search-restored-{name}.json', search_reset)
+                    validate_search_reset(original_search, search_reset)
                     cases.append({'name': name, 'official_score': expected,
                                   'database_reset_verified': True,
+                                  'search_index_reset_verified': True,
                                   'receipt_sha256': sha((out / name / 'receipt.json').read_bytes())})
                     print(json.dumps({'case': name, 'official_score': expected,
-                                      'database_reset_verified': True}), flush=True)
+                                      'database_reset_verified': True,
+                                      'search_index_reset_verified': True}), flush=True)
             finally:
                 await browser.close()
         report.update(complete=True, qualified_task_count=1, cases=cases,
-                      database_reset_verified=True,
+                      database_reset_verified=True, search_index_reset_verified=True,
                       limitation='One scripted task in one clone. No model rollout, 100-task-ready population, or generic Magento reset proved.')
     except Exception as exc:
         report.update(error_type=type(exc).__name__, error=str(exc)[:500])
@@ -462,7 +535,11 @@ async def run(source, out):
         if original is not None:
             try:
                 restore_rows(original)
+                if original_search is not None:
+                    reindex_search()
                 validate_reset(original, read_db())
+                if original_search is not None:
+                    validate_search_reset(original_search, read_search_index())
                 report['final_reset_verified'] = True
                 private_rollback.unlink()
             except Exception as rollback_error:

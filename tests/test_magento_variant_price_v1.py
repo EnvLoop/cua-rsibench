@@ -78,6 +78,32 @@ class MagentoVariantPriceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'monitored baseline'):
             qualify.validate_reset(before, after)
 
+    def test_search_reset_rejects_stale_price_or_other_document_drift(self):
+        before = {'document_count': 181, 'sha256': 'baseline',
+                  'parent_price_0_1': '52.000000'}
+        qualify.validate_search_reset(before, copy.deepcopy(before))
+        stale = {**before, 'sha256': 'changed', 'parent_price_0_1': '47.000000'}
+        with self.assertRaisesRegex(ValueError, 'search index'):
+            qualify.validate_search_reset(before, stale)
+        unrelated = {**before, 'sha256': 'unrelated-drift'}
+        with self.assertRaisesRegex(ValueError, 'search index'):
+            qualify.validate_search_reset(before, unrelated)
+
+    def test_search_health_rejects_unready_or_multi_node_cluster(self):
+        original = qualify.search_json
+        try:
+            qualify.search_json = lambda path: {'status': 'yellow', 'timed_out': False,
+                'number_of_nodes': 1, 'number_of_data_nodes': 1,
+                'number_of_pending_tasks': 0, 'active_primary_shards': 7}
+            self.assertEqual(qualify.search_health()['number_of_nodes'], 1)
+            qualify.search_json = lambda path: {'status': 'red', 'timed_out': False,
+                'number_of_nodes': 1, 'number_of_data_nodes': 1,
+                'number_of_pending_tasks': 0, 'active_primary_shards': 0}
+            with self.assertRaisesRegex(ValueError, 'not ready'):
+                qualify.search_health()
+        finally:
+            qualify.search_json = original
+
 
 if __name__ == '__main__':
     unittest.main()

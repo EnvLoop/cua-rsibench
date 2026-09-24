@@ -1,0 +1,351 @@
+{
+  "schema": "sec-excel-candidate-audit-v1",
+  "candidate_manifest_sha256": "6fe7bd4c582414d8006306d18e5113cc9f7b0138d4950c3e404421b523c41383",
+  "identity_source": "https://www.sec.gov/files/company_tickers.json",
+  "target_fiscal_years": [
+    2023,
+    2024
+  ],
+  "required_us_gaap_concepts": {
+    "Revenue": "RevenueFromContractWithCustomerExcludingAssessedTax",
+    "Operating income": "OperatingIncomeLoss",
+    "Operating cash flow": "NetCashProvidedByUsedInOperatingActivities",
+    "Capital expenditures": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "Assets": "Assets",
+    "Liabilities": "Liabilities",
+    "Equity": "StockholdersEquity"
+  },
+  "selection_policy": "An exact USD fact for each of seven tags and each year, from one original FY2024 10-K accession; FY2023/FY2024 issuer-specific end dates, 330-380 day flows, instant stocks, common start date/filed date, and assets=liabilities+equity within USD 1.5m.",
+  "counts": {
+    "candidates": 18,
+    "snapshots_audited": 18,
+    "eligible_sources": 6,
+    "rejected_sources": 12,
+    "pending_snapshots": 0,
+    "fetch_errors": 0
+  },
+  "scope_note": "Eligible means source facts qualify. No additional workbook, independent workbook family, Excel-web round trip, or benchmark score was created by this audit.",
+  "audit_date": "2026-09-24",
+  "snapshot_policy": "The full frozen companyfacts downloads remain under ignored work/sec-expansion/raw. Re-fetch from source_url and verify sha256_raw_json to reproduce; the published summary contains no account data.",
+  "results": [
+    {
+      "ticker": "AAPL",
+      "cik": 320193,
+      "entity_name": "Apple Inc.",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "sha256_raw_json": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+      "sha256_snapshot_file": "ea6b4b8210c789174b7c455033c48be601daa3ced92e960d6e371a09349a7674",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0000320193-24-000123",
+      "filed": "2024-11-01",
+      "year_ends": {
+        "2023": "2023-09-30",
+        "2024": "2024-09-28"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "09"
+        ],
+        "same_end_other_accession_fact_count": 43,
+        "nearby_quarterly_fact_count": 120,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1144,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    },
+    {
+      "ticker": "MSFT",
+      "cik": 789019,
+      "entity_name": "MICROSOFT CORPORATION",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+      "sha256_raw_json": "f8aae2965b20ad0df44bdf7ccbedf797d275b6b8dc030154a7a311361bb7246f",
+      "sha256_snapshot_file": "eae0c57c5afa1775febf2b6e3b2db2ab6506f145f56f0da05bb3cb9109d7507b",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0000950170-24-087843",
+      "filed": "2024-07-30",
+      "year_ends": {
+        "2023": "2023-06-30",
+        "2024": "2024-06-30"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "06"
+        ],
+        "same_end_other_accession_fact_count": 56,
+        "nearby_quarterly_fact_count": 122,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1301,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    },
+    {
+      "ticker": "NVDA",
+      "cik": 1045810,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json",
+      "sha256_raw_json": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff",
+      "sha256_snapshot_file": "373cd9b09b5e3bd21ea29f006444b1e6a05f058d4c4ed3ba479e9afca04e165d",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "WMT",
+      "cik": 104169,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000104169.json",
+      "sha256_raw_json": "54ec3fbf36dc203dd00a0333396b3df2b6695ecdf6cbb19b6ec41b053d86b517",
+      "sha256_snapshot_file": "e1cd057c37379297fbdfc18c4402cb54a3d71da8b31e5250c60ccd8ac1aa6363",
+      "status": "rejected",
+      "reason_codes": [
+        "missing_usd_concept:Liabilities"
+      ]
+    },
+    {
+      "ticker": "COST",
+      "cik": 909832,
+      "entity_name": "COSTCO WHOLESALE CORP /NEW",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000909832.json",
+      "sha256_raw_json": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f",
+      "sha256_snapshot_file": "a067a32a5e50222651e0e480039a19c8086b63fddf621d14aa6a1075db58655d",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0000909832-24-000049",
+      "filed": "2024-10-09",
+      "year_ends": {
+        "2023": "2023-09-03",
+        "2024": "2024-09-01"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "09"
+        ],
+        "same_end_other_accession_fact_count": 49,
+        "nearby_quarterly_fact_count": 120,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1274,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    },
+    {
+      "ticker": "HD",
+      "cik": 354950,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000354950.json",
+      "sha256_raw_json": "aaf03befa1695d87ce1252bc08ca278b65be63782e46dc0b2858aab7a32c1be2",
+      "sha256_snapshot_file": "f1f6c6ec343e0ae988fedc105706d5ed67ff04bded12db45f9fcb33383340007",
+      "status": "rejected",
+      "reason_codes": [
+        "missing_usd_concept:PaymentsToAcquirePropertyPlantAndEquipment",
+        "non_unique_annual_fact:2023:Assets",
+        "non_unique_annual_fact:2023:Liabilities"
+      ]
+    },
+    {
+      "ticker": "AMZN",
+      "cik": 1018724,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json",
+      "sha256_raw_json": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4",
+      "sha256_snapshot_file": "159cac13ba156cde55a974510ddbd74c94d5c6a494662261618435f70e23ddb7",
+      "status": "rejected",
+      "reason_codes": [
+        "missing_usd_concept:Liabilities",
+        "non_unique_annual_fact:2023:PaymentsToAcquirePropertyPlantAndEquipment",
+        "non_unique_annual_fact:2024:PaymentsToAcquirePropertyPlantAndEquipment"
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "cik": 1652044,
+      "entity_name": "Alphabet Inc.",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
+      "sha256_raw_json": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
+      "sha256_snapshot_file": "76768be758fc2509519904e8b630af480e5a2dcf8677b8439776db2dc463ffa6",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0001652044-25-000014",
+      "filed": "2025-02-05",
+      "year_ends": {
+        "2023": "2023-12-31",
+        "2024": "2024-12-31"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "12"
+        ],
+        "same_end_other_accession_fact_count": 40,
+        "nearby_quarterly_fact_count": 115,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 821,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    },
+    {
+      "ticker": "META",
+      "cik": 1326801,
+      "entity_name": "Meta Platforms, Inc.",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json",
+      "sha256_raw_json": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
+      "sha256_snapshot_file": "213fc6813d08fd5f6d1981f743241de27d35ab39af734071d835123222501347",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0001326801-25-000017",
+      "filed": "2025-01-30",
+      "year_ends": {
+        "2023": "2023-12-31",
+        "2024": "2024-12-31"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "12"
+        ],
+        "same_end_other_accession_fact_count": 42,
+        "nearby_quarterly_fact_count": 119,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1003,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    },
+    {
+      "ticker": "NFLX",
+      "cik": 1065280,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001065280.json",
+      "sha256_raw_json": "00f3449073d90dfa3aec4e384de24b70d92d897f90c67d6bca61f23e33d38634",
+      "sha256_snapshot_file": "d48a7d280fd756a7ab05dd9458e4ed5a088976f7154709c3eb22635d0575f21e",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "DIS",
+      "cik": 1744489,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001744489.json",
+      "sha256_raw_json": "f737e2272b6fb76cda801a8a5d493621a917ad4f73e0752b4ab14ffda694a57b",
+      "sha256_snapshot_file": "b44a63aa135585119220c203174f86233e9abfdb47062fd3fc9d41a843472111",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "PFE",
+      "cik": 78003,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000078003.json",
+      "sha256_raw_json": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
+      "sha256_snapshot_file": "ed4f013308265eee841312775ddda7917f648a8b630a3bd0cfb7eb7d35d3bf8e",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "BA",
+      "cik": 12927,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000012927.json",
+      "sha256_raw_json": "0c63f1ae7cc10b3c27e0c94f2add0c461e6293036dd4e52e52ae6dbb6f206e15",
+      "sha256_snapshot_file": "893ad414d6b19503611b908a87b7d03607eedbe35dd86d04b5b9136987770be5",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "CAT",
+      "cik": 18230,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000018230.json",
+      "sha256_raw_json": "01ddc6ffa741f0a7da440e2949b2ed19cec14fab35435a398e3f3d0100019715",
+      "sha256_snapshot_file": "32f34bff1cdfd78fa61cd0a18251a70dc3dec40f1b4c98d25332dede7c9c0fc5",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "CVX",
+      "cik": 93410,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000093410.json",
+      "sha256_raw_json": "c09b160603412cb45acf1bb9bf3732e531dedfb548afa0e275fd8aefd7ab397e",
+      "sha256_snapshot_file": "e00190bd5d4c0b28d5c95a7052f50c6515edf0abb8caaf65c02ff3b041b9be8b",
+      "status": "rejected",
+      "reason_codes": [
+        "balance_sheet_gap:2023",
+        "balance_sheet_gap:2024",
+        "missing_usd_concept:OperatingIncomeLoss",
+        "missing_usd_concept:PaymentsToAcquirePropertyPlantAndEquipment"
+      ]
+    },
+    {
+      "ticker": "KO",
+      "cik": 21344,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000021344.json",
+      "sha256_raw_json": "53d363a9aa3071406cda9857654358f4dca42e174a1defb8cc1ce9ad2a4c9e40",
+      "sha256_snapshot_file": "742d9fcd942219af39e56730ec3daa2fd3bbe2f702ac46c97f7e8d5213f389ae",
+      "status": "rejected",
+      "reason_codes": [
+        "no_fy2024_10k_revenue_anchor"
+      ]
+    },
+    {
+      "ticker": "ORCL",
+      "cik": 1341439,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001341439.json",
+      "sha256_raw_json": "0d7b72e393501d13b2d61b2d6663689e14b9abf83427315bc0820cd2802c43f7",
+      "sha256_snapshot_file": "a9371e1b8d30566707bd03fd3a2b9db15134c5b784da77b8c8e64f03a94a450b",
+      "status": "rejected",
+      "reason_codes": [
+        "missing_usd_concept:Liabilities"
+      ]
+    },
+    {
+      "ticker": "CRM",
+      "cik": 1108524,
+      "entity_name": "Salesforce, Inc.",
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json",
+      "sha256_raw_json": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "sha256_snapshot_file": "c621ce09f9e5f1d25088f0a60ef04d121e2e213776056d50bb7bc4a7133ae855",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0001108524-24-000005",
+      "filed": "2024-03-06",
+      "year_ends": {
+        "2023": "2023-01-31",
+        "2024": "2024-01-31"
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "01"
+        ],
+        "same_end_other_accession_fact_count": 49,
+        "nearby_quarterly_fact_count": 140,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1458,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      }
+    }
+  ]
+}
