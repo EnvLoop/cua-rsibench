@@ -1,0 +1,53 @@
+{
+  "schema": "v0.6-sec-excel-web-smoke-v1",
+  "date": "2026-09-24",
+  "status": "partial_gui_compatibility_smoke",
+  "source": {
+    "type": "EnvLoop prototype built from public SEC EDGAR companyfacts",
+    "issuers": ["Apple", "Microsoft"],
+    "source_rows": 132,
+    "actor_workbook_sha256": "ed3915f5cf5a7f565b72ac6e5fe14992c433060d4d9e3de998f44b070a2ab5f7",
+    "worksheets": 5,
+    "target_formula_cells": 84,
+    "source_reference": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces"
+  },
+  "excel_web_observation": {
+    "dedicated_test_account_upload": true,
+    "opened_in_editing_mode": true,
+    "all_five_sheet_names_visible": true,
+    "task_layout_and_yellow_targets_rendered": true,
+    "one_cross_sheet_formula_entered_in_gui": true,
+    "formula_cell": "FY Selection!D5",
+    "formula_reference": "Raw SEC!O65",
+    "visible_computed_value_usd_millions": 383285,
+    "saved_status_observed": true,
+    "same_result_persisted_after_reload": true,
+    "saved_workbook_downloaded_from_onedrive": true,
+    "download_sha256": "69911d77679ebbe698728b8a049c6bcf8976ca2f8e89dae42692efefc5206f90"
+  },
+  "independent_ooxml_readback": {
+    "source_and_output_sheet_order_equal": true,
+    "source_and_output_merged_ranges_equal": true,
+    "non_target_semantic_cell_changes": 0,
+    "completed_target_formulas": 1,
+    "total_target_formulas": 84,
+    "FY_Selection_D5_expected": 383285,
+    "FY_Selection_D5_downloaded_formula_result": 383285,
+    "FY_Selection_D5_private_source_plus_1bn_result": 384285,
+    "office_numeric_and_string_serialization_normalized": true,
+    "non_target_raw_number_spelling_change": "2.18 to 2.1800000000000002; same IEEE-754 double",
+    "full_task_verifier_pass": false,
+    "full_task_verifier_failure_reason": "83 target formulas remain blank"
+  },
+  "admission": {
+    "all_84_targets_solved_in_gui": false,
+    "saved_ooxml_downloaded_and_independently_checked": true,
+    "deterministic_reset_qualified": false,
+    "hidden_perturbation_run_in_excel_web": false,
+    "official_benchmark_score": null
+  },
+  "privacy": {
+    "account_identity_or_document_link_published": false,
+    "raw_sec_snapshot_or_workbook_binary_embedded": false
+  }
+}
