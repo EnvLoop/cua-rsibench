@@ -105,6 +105,30 @@ def erase_permitted_font_sizes(slide, shape_id):
             props.attrib.pop('sz', None)
             if not props.attrib and not len(props) and not (props.text or '').strip():
                 run.remove(props)
+    # PowerPoint web may split one text run into several adjacent runs when a
+    # font-size command is applied to a selection. Once the permitted size
+    # change is erased, merge only runs with identical remaining properties.
+    # This preserves every character, paragraph boundary and other formatting
+    # attribute while avoiding a false rejection of an otherwise exact edit.
+    for paragraph in shape.iter(A + 'p'):
+        previous = None
+        for run in list(paragraph):
+            if run.tag != A + 'r':
+                previous = None
+                continue
+            text_node = run.find(A + 't')
+            props = run.find(A + 'rPr')
+            if (run.attrib or text_node is None or text_node.attrib or
+                    any(node.tag not in (A + 'rPr', A + 't') for node in run) or
+                    len([node for node in run if node.tag == A + 't']) != 1):
+                previous = None
+                continue
+            signature = canonical(props) if props is not None else None
+            if previous is not None and previous[1] == signature:
+                previous[0].text = (previous[0].text or '') + (text_node.text or '')
+                paragraph.remove(run)
+            else:
+                previous = (text_node, signature)
     return result
 
 
@@ -150,7 +174,7 @@ def freeze_contract(original, target_part, shape_id, target_size_pt, *, office_w
     return {'schema': SCHEMA, 'original_sha256': sha(data),
             'original_member_sha256': {name: sha(content) for name, content in sorted(members.items())},
             'target_part': target_part, 'target_shape_id': str(shape_id), 'target_size_pt': target_size_pt,
-            'permitted_mutation': 'only the sz attribute of nonempty target title a:r/a:rPr nodes',
+            'permitted_mutation': 'target title run sz attributes and adjacent run segmentation with identical remaining properties; no text or other formatting change',
             'office_web_normalized': bool(office_web_normalized),
             'normalization_boundary': ('Trusted evaluator-generated Office-saved baseline; only four specified derived package parts have narrow allowances.'
                                        if office_web_normalized else

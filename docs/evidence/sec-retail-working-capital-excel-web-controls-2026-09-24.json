@@ -1,0 +1,85 @@
+{
+  "schema": "cua-sec-retail-working-capital-web-controls-v1",
+  "date": "2026-09-24",
+  "evidence_type": "two sequential human GUI controls on one public development workbook in Microsoft Excel for the web",
+  "source": {
+    "actor_seed_sha256": "bc77f87adea225cb19fdc668d604afbd11815d7e329a0780fb71ee50fe9eea02",
+    "reference_sha256_evaluator_only": "b41f78c132bda4f90a343f1d6d69536b61ca2900cb444ab60b2cb0e357667033",
+    "sheets": 5,
+    "authentic_sec_companyfacts_rows": 112,
+    "formula_targets": 92,
+    "causal_faults": 9,
+    "issuers": ["Costco", "Walmart"],
+    "source_excerpt": "sec_excel_factory/sources/retail_excerpt.json"
+  },
+  "observed_gui": {
+    "application": "Microsoft Excel for the web",
+    "dedicated_test_account": true,
+    "editing_mode": true,
+    "partial_repair_count": 1,
+    "full_repair_count": 9,
+    "each_full_repair_formula_read_back_in_editor": true,
+    "cloud_saved_indicator_seen": true,
+    "partial_copy_reloaded_and_downloaded": true,
+    "full_copy_reloaded_and_downloaded": true,
+    "reset_copy_reloaded_and_downloaded": true,
+    "same_cloud_file_used_sequentially": true,
+    "model_calls": 0
+  },
+  "partial_control": {
+    "download_sha256": "53515297024ae54b35865404e20665addfe3f558c2074702f112e3a32850f53f",
+    "private_oracle_receipt_sha256": "f25682f56e220c354551982da8e0bdca16cad19a24232b0bcf01858ca23228ed",
+    "repaired_faults": 1,
+    "repair_score": 0.1111111111111111,
+    "full_pass": false
+  },
+  "full_control": {
+    "download_sha256": "7e854bb987978e301a47cb657c3652e47055b67fee18113b2ead5ed075afeb9f",
+    "private_oracle_receipt_sha256": "65574a1d325a2842f86773949dba3a99a8b8ff2eca6286840c6f8e6aa6ac3aaf",
+    "repaired_faults": 9,
+    "repair_score": 1.0,
+    "checked_targets": 92,
+    "evaluator_side_replay_profiles_passed": 2,
+    "full_pass": true,
+    "sheet_order_preserved": true,
+    "tables_preserved": true,
+    "checked_sheet_structure_preserved": true,
+    "changed_formula_count": 9,
+    "all_changed_formulas_match_evaluator_reference": true,
+    "missing_or_added_semantic_cells": 0,
+    "unchanged_formula_result_caches_populated_by_excel": 83,
+    "all_92_formula_caches_match_independent_evaluation": true,
+    "non_formula_source_value_changes": 0,
+    "office_added_package_part_count": 2
+  },
+  "reset_control": {
+    "download_sha256": "c8c24b2d0b0d4c67251779f4fb635eecca066995bc6f17fd1c4cbaaaa349e29a",
+    "private_oracle_receipt_sha256": "9a89f6a347a6272b6c103e64afdb132622417f56584eb7456ccc503a6076536e",
+    "same_cloud_file_manually_reverted_through_gui": true,
+    "saved_reloaded_and_downloaded_after_full_positive": true,
+    "all_formula_texts_match_seed": true,
+    "non_formula_source_value_changes": 0,
+    "sheet_order_tables_and_checked_structure_preserved": true,
+    "formula_result_cache_changes_from_seed": 92,
+    "all_92_formula_caches_match_independent_evaluation": true,
+    "repaired_faults_remaining": 0,
+    "repair_score": 0.0,
+    "full_task_pass": false,
+    "automated_reset_proven": false
+  },
+  "admission_limits": {
+    "official_hidden_final_task": false,
+    "official_benchmark_score": null,
+    "student_model_score": null,
+    "fresh_independent_full_positive_attempt": false,
+    "manual_same_file_gui_reset_proven": true,
+    "automated_cloud_reset_proven": false,
+    "visual_style_equivalence_verified": false,
+    "hundred_task_cell_ready": false
+  },
+  "privacy": {
+    "account_identity_or_document_link_published": false,
+    "workbook_or_reference_binary_published": false,
+    "fault_coordinates_or_reference_formulas_published_in_receipt": false
+  }
+}

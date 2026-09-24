@@ -1,0 +1,50 @@
+{
+  "schema": "ppt-eval-office-web-gate-public-receipt-v1",
+  "task_id": "4._Pre-Colonial_Filipino_Culture-001",
+  "task_split": "selection",
+  "operator": "human GUI control, not a model result",
+  "source_revision": "1b8b55a29e48fdc65d423689b6f2370ad91beeea",
+  "source_sha256": "cf4574ab7795d6ed17ca2bb731470fdd56f2c3e7aa426a6e0c39f46bdfe51e30",
+  "rubric_sha256": "5c7d73218073750ec0db320a895dd83d9dd4e20a37c876f68d3d8b0c41f7d602",
+  "office_normalized_baseline_sha256": "71a06838dfe24595aa39ab6c0c7bdaeed127ea78079a94323de99c28b30029cd",
+  "baseline_noop_official_score": 0.0,
+  "baseline_frozen_before_candidate_files": true,
+  "source_baseline_structural_screen": {
+    "slides": 32,
+    "media_parts_unchanged": 33,
+    "speaker_note_bodies_unchanged": 15,
+    "diagram_parts_text_unchanged": 12,
+    "office_first_save_changed_package_parts": 81,
+    "limit": "not a complete visual equivalence proof"
+  },
+  "real_gui_mixed_size_negative": {
+    "candidate_sha256": "a0cbecd8bbcda1b2905933ec295727cdda1a0b67da4a8846afe5d467b660caee",
+    "title_run_sizes_pt": [null, 48.0, null],
+    "official_score_against_raw_source": 0.925,
+    "official_score_against_office_baseline": 1.0,
+    "independent_guard_score": 0.0,
+    "independent_preservation_pass": true,
+    "interpretation": "Upstream target check falsely accepted one-word formatting as a complete 48 pt title edit."
+  },
+  "real_gui_full_title_positive": {
+    "candidate_sha256": "0115e92b82720d7f6b43ef1ccf1fadeecaef64ff91957324d0351a322e22ec28",
+    "title_run_sizes_pt": [48.0],
+    "official_score_against_raw_source": 0.925,
+    "official_score_against_office_baseline": 1.0,
+    "independent_guard_score": 1.0,
+    "independent_preservation_pass": true
+  },
+  "rollback": {
+    "reset_sha256": "0d06b04be169b00f1241e028adee6328a6efccab89a5daaaa6a1cdffd4324c0c",
+    "same_cloud_file_gui_title_pt_after_save_reload": 42.0,
+    "downloaded_after_full_positive": true,
+    "artifact_reset_pass": true,
+    "unexpected_package_parts": [],
+    "title_run_sizes_pt": [null],
+    "official_target_score_after_reset": 0.0
+  },
+  "qualified_selection_task": true,
+  "qualified_final_tasks": 0,
+  "model_calls": 0,
+  "note": "One GUI-qualified selection task under a narrow direct-title profile. No final-task cell or trained-model result is claimed."
+}

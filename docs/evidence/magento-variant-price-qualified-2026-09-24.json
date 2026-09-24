@@ -1,0 +1,109 @@
+{
+  "admission": {
+    "hundred_task_ready": false,
+    "limitation": "One scripted GUI oracle task in one local clone; not a Qwen run or full Magento population.",
+    "model_calls": 0,
+    "official_final_task_count": 0,
+    "qualified_task_count": 1
+  },
+  "clone_repair": {
+    "baked_base_url_repointed_to_isolated_clone": true,
+    "search_health_http_200_before_gui": true,
+    "search_service_restarted_in_disposable_clone": true,
+    "shared_container_modified": false
+  },
+  "environment": {
+    "clone_base_url": "http://localhost:7792/",
+    "image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+    "localhost_only": true,
+    "mounts": 0,
+    "search_health_at_preflight": {
+      "active_primary_shards": 5,
+      "number_of_nodes": 1,
+      "pending_tasks": 0,
+      "status": "yellow"
+    }
+  },
+  "intent": "Reduce the price of green Hollister backyard sweatshirt in all sizes by $5",
+  "negative": {
+    "green_target_prices_unchanged": "52.000000",
+    "independent_sql_wrong_object_pass": true,
+    "published_evaluator_score": 0.0,
+    "raw_and_sanitized_evaluator_equal": true,
+    "visible_save_confirmation": true,
+    "wrong_color_entity_id": 112,
+    "wrong_color_price_after": "47.000000",
+    "wrong_color_price_before": "52.000000"
+  },
+  "positive": {
+    "independent_sql_persisted_state_pass": true,
+    "native_save_post_count": 5,
+    "price_after": "47.000000",
+    "price_before": "52.000000",
+    "published_evaluator_score": 1.0,
+    "raw_and_sanitized_evaluator_equal": true,
+    "target_entity_ids": [
+      111,
+      114,
+      117,
+      120,
+      123
+    ],
+    "visible_save_confirmation_for_each": true,
+    "wrong_color_entity_id": 112,
+    "wrong_color_price_unchanged": "52.000000"
+  },
+  "privacy": {
+    "auth_state_retained": false,
+    "credentials_published": false,
+    "private_sanitized_har_published": false,
+    "raw_har_retained": false
+  },
+  "provenance": {
+    "earlier_rejection_receipt_sha256": "7d1c2cde069a2591e47517cb7ce2e966aaff931480e2c86d2f50954f92a2afd3",
+    "negative_private_receipt_sha256": "ae35e8d948d11a3063619ccd82a51f4260920aca1b970322c61ecb0e584a61e8",
+    "positive_private_receipt_sha256": "7f37f92a2cd6e58a3575e339de601ed71441d0c7eec304983c43841056f434f1",
+    "private_result_sha256": "489619d1600c2267b392463e44578f1a7a98333d0f22bb8294e40b64711efad7",
+    "private_run_label": "magento-variant-price-v1-run7",
+    "run_tool_sha256": "79e31654b8f4258afe878f6827c41b049c58bd540b9916580e1aeb6aeb806867",
+    "screenshots": {
+      "positive-five-green": {
+        "admin_user_masked": true,
+        "file": "magento-variant-price-qualified-positive-2026-09-24.png",
+        "sha256": "82b2a58cbc2c67e31cec684c398e2eb7f656b2c83c5554cb70f2a0fec72890f6",
+        "visible_save_confirmation": true
+      },
+      "wrong-color-red-xs": {
+        "admin_user_masked": true,
+        "file": "magento-variant-price-qualified-negative-2026-09-24.png",
+        "sha256": "0bbbb4717da4972d95ba2a585690476ff90a60067238bb0dde5bb902465ff32f",
+        "visible_save_confirmation": true
+      }
+    }
+  },
+  "reset": {
+    "complete_search_documents_match_baseline_after_each_case": true,
+    "configurable_parent_search_price_after_each_mutation": "47.000000",
+    "configurable_parent_search_price_before_and_restored": "52.000000",
+    "final_reset_verified": true,
+    "search_index_mutated_after_negative_sha256": "f1e355eff64cfd6094db192a33d269ae0d5c4d7a6129df4240b1188798dd79e7",
+    "search_index_mutated_after_positive_sha256": "f1e355eff64cfd6094db192a33d269ae0d5c4d7a6129df4240b1188798dd79e7",
+    "search_index_before_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+    "search_index_restored_after_negative_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+    "search_index_restored_after_positive_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+    "search_index_document_count": 181,
+    "search_index_rebuilt_from_restored_sql_after_each_case": true,
+    "selected_sql_rows_match_baseline_after_each_case": true,
+    "sql_monitored_business_table_count": 9,
+    "sql_monitored_tables_match_baseline_after_each_case": true
+  },
+  "schema": "envloop.magento.variant_price.qualification.v1",
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "evaluator_source_sha256": "a2e6d2be96debd2bbaec36690d3e6c94b12be067a686998bbf58e2118f4605c5",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "task_sha256": "a39bdffcb64ffc8cbb5305858853c6c87664eac0060fedfd554b5bf6bfe9f177"
+  },
+  "status": "qualified_single_scripted_gui_task",
+  "task_id": 777
+}
