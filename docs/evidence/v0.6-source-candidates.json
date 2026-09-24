@@ -14,14 +14,14 @@
       "license": "MIT code; individual source decks retain attribution-specific Public Domain Mark/CC0/CC-BY terms",
       "inventory_count": 120,
       "cluster_definition": "canonical input deck path",
-      "split_status": "offline family-disjoint 20-selection/100-provisional-final candidates prepared from 18 base workbook families; not frozen or GUI-qualified",
+      "split_status": "offline deck-disjoint 20-selection/100-provisional-final candidates prepared from 12 source deck families; not frozen or GUI-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
-        "gui_implementation": "blank deck edited in real PowerPoint for the web and reopened after save; dataset tasks not executed",
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "a disposable deck and one PPT-Eval title-size task were edited through real PowerPoint for the web, saved, reloaded, and downloaded; the published task has no official scored result",
         "account_login": "dedicated test account signed in and used for a disposable deck on 2026-09-24; identity and file URLs private",
         "software_entitlement": "free web editing observed; bulk benchmark entitlement and dataset feature coverage unverified",
-        "reset": "save/reload readback passed on one disposable deck; fresh task hydration and rollback unverified",
-        "verifier": "disposable web deck independently downloaded and checked for one slide plus title/subtitle; published PPT-Eval task not run in GUI; an artifact-only guard catches upstream unrelated-subtitle false acceptance and unscored screenshot failure"
+        "reset": "save/reload readback passed on a disposable deck and one PPT-Eval task copy; manual Office-saved control exists, but automated pre-actor freeze and rollback are unverified",
+        "verifier": "artifact guard rejects an upstream unrelated-subtitle false acceptance; the 48-point task edit passes a narrow Office-normalized paired artifact check, but upstream PPT-Eval rendering and official score remain unverified"
       },
       "primary_references": [
         "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/README.md",
@@ -42,9 +42,9 @@
       "license": "SpreadsheetBench 2 paper says CC-BY-SA-4.0 dataset; Hugging Face metadata says MIT; conflict unresolved, no public redistribution",
       "inventory_count": 200,
       "cluster_definition": "Financial_Model and Debugging base golden workbook; 200 task instances from 30 distinct workbook files",
-      "split_status": "proposed; not frozen or runtime-qualified",
+      "split_status": "offline family-disjoint 20-selection/100-provisional-final candidates prepared from 18 base workbook families; not frozen or GUI-qualified",
       "readiness": {
-        "all_200_runtime_ready": false,
+        "all_inventory_runtime_ready": false,
         "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved; a separate six-sheet SEC blind-audit development prototype had all nine defects repaired by a human through visible Excel web, saved, reloaded, downloaded, and independently checked",
         "account_license": "dedicated test account signed in; free web editing observed; bulk benchmark use and dataset feature coverage unverified",
         "reset": "save/reload readback passed on a disposable workbook and an easy predecessor task; one hard workbook had zero semantic cell changes after untouched web download but lost two VML note drawings; deterministic cloud rollback unverified",
@@ -71,10 +71,10 @@
       "cluster_definition": "task config ID only; source-asset and application clustering pending",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
-        "gui_implementation": "verified source supports screenshot/a11y desktop actions; no local execution",
-        "reset": "reported VM/task initialization; no smoke",
-        "verifier": "source execution-based functions; no smoke",
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "one real E2B Desktop Linux LibreOffice Calc GUI saved a synthetic XLSX and independent local readback passed; no OSWorld task was executed",
+        "reset": "the E2B smoke sandbox was killed and confirmed stopped; OSWorld task initialization and reset remain untested",
+        "verifier": "synthetic Calc A1/B1 XLSX readback passed; no OSWorld task evaluator has been run",
         "qwen38_27b_screenshot_compatibility": "one synthetic-image Tinker LoRA update and checkpoint sampling passed; desktop task integration untested"
       },
       "primary_references": [
@@ -94,7 +94,7 @@
       "cluster_definition": "L2taskclass; seeds are instances within a template",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
+        "all_inventory_runtime_ready": false,
         "gui_implementation": "source implemented; not executed",
         "instance_access": "official WorkArena setup requires approval for gated ServiceNow benchmark instances; no access or personal developer instance has been obtained in this study",
         "reset": "source setup/teardown present; no smoke",
@@ -118,7 +118,7 @@
       "cluster_definition": "intent_template_id; 180 GitLab-only task IDs collapse to 41 templates",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
+        "all_inventory_runtime_ready": false,
         "gui_implementation": "one real GitLab CE task 44 read-only navigation smoke passed in an unseeded local demo; full seeded dataset not executed",
         "reset": "fresh browser login and unchanged business-table fingerprints passed for one read-only task; mutation rollback unverified",
         "verifier": "pinned evaluator scored two positives 1 and one wrong-route negative 0; 100-task coverage unverified",
@@ -141,10 +141,10 @@
       "cluster_definition": "intent_template_id",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
-        "gui_implementation": "browser source environment verified; not executed",
-        "reset": "fresh browser sessions and unchanged customer business tables verified for one read-only navigation task; mutation rollback unverified",
-        "verifier": "pinned evaluator scored task 157 on two customer-navigation positives and one wrong-route negative; one Qwen3.8-27B base-model GUI pilot reached official score 1 under versioned bounded protocol; 100-task coverage unverified"
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "real GUI navigation task 157 and order-address mutation task 538 were executed on isolated Magento containers; one Qwen3.8-27B base-model navigation pilot scored 1",
+        "reset": "read-only task preserved customer tables; task 538 positive and wrong-order negative each restored five monitored business-table hashes to baseline on a disposable clone; arbitrary mutation reset remains unverified",
+        "verifier": "pinned evaluator scored task 157 navigation positive/negative and task 538 mutation positive 1.0 versus wrong-order 0.0; independent SQL readback confirmed target state and rollback; 100-task coverage unverified"
       },
       "primary_references": [
         "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
