@@ -1,0 +1,55 @@
+{
+  "schema": "v0.6-office-web-smoke-v1",
+  "date": "2026-09-24",
+  "status": "infrastructure_and_one_easy_task_smoke_only",
+  "private_account_identity_or_document_links_included": false,
+  "powerpoint_web": {
+    "application": "Microsoft PowerPoint for the web",
+    "dedicated_test_account_signed_in": true,
+    "disposable_deck_created_and_edited_in_gui": true,
+    "title_and_subtitle_persisted_after_reload": true,
+    "native_pptx_download_offered": true,
+    "native_pptx_downloaded_from_onedrive": true,
+    "download_sha256": "007643bec526b0688efc3fbe208a3d110aefb2c43fce3fa582e6bd8348ffaf11",
+    "independent_ooxml_readback": {
+      "slide_count": 1,
+      "expected_title_and_subtitle_text_present": true,
+      "unexpected_slide_present": false
+    },
+    "independent_ooxml_verifier_passed": true,
+    "published_dataset_task_qualified": false,
+    "deterministic_reset_qualified": false
+  },
+  "excel_web": {
+    "application": "Microsoft Excel for the web",
+    "dedicated_test_account_signed_in": true,
+    "disposable_workbook_created_and_edited_in_gui": true,
+    "edit_persisted_after_reload": true,
+    "published_easy_task_id": "SpreadsheetBench-50250",
+    "published_source_input_sha256": "ef4a5b4e0e14ce023ca1b207361578b0c19327b8b4aa1898d32f4007b35f6578",
+    "gui_task_result_observed": 867,
+    "native_recalculation_probe": {
+      "source_value_before": 123,
+      "source_value_during_probe": 124,
+      "source_value_restored": 123,
+      "result_before": 867,
+      "result_during_probe": 868,
+      "result_after_restore_and_reload": 867,
+      "observation": "visible Excel web grid; no provider/model inference"
+    },
+    "downloaded_ooxml_sha256": "94929211606d516ef8f13c6232f03d8ff9273a0c2b1b6f806ba04ca8bf28cbdb",
+    "independent_ooxml_oracle": "independent-ooxml-task-50250-v1",
+    "independent_artifact_value_pass": true,
+    "independent_oracle_errors": [],
+    "unrelated_cell_values_and_formulas_preserved": true,
+    "official_benchmark_model_attempt": false,
+    "hard_task_or_cell_qualification": false,
+    "deterministic_cloud_reset_qualified": false
+  },
+  "limitations": [
+    "The PowerPoint disposable deck passed basic slide-count/text readback; it has not passed a published PPT-Eval task or whole-deck no-regression comparison.",
+    "The Excel OOXML checker cannot infer GUI provenance or recalculation from file bytes alone; the GUI probe is separately observed.",
+    "Task 50250 is an easy infrastructure check and is not representative of the planned difficult Excel cell.",
+    "No 100-task Office cell is frozen or scored."
+  ]
+}

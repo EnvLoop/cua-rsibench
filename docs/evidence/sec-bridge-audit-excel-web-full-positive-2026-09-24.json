@@ -1,0 +1,66 @@
+{
+  "schema": "cua-sec-bridge-audit-excel-web-full-positive-v1",
+  "date": "2026-09-24",
+  "evidence_type": "human-operated visible Excel-web positive control on a public development task",
+  "source": {
+    "fixture_sha256": "3f74ee941b49ed07859d89e1be8fc13e77b69584f0edc1e56c7b891d4ba0eec6",
+    "sheets": 6,
+    "authentic_sec_rows": 177,
+    "formula_targets": 114,
+    "blind_injected_faults": 9,
+    "fresh_disposable_upload": true
+  },
+  "observed_gui": {
+    "application": "Microsoft Excel for the web",
+    "dedicated_test_account": true,
+    "editing_mode": true,
+    "repairs_entered_through_visible_ui": 9,
+    "each_repaired_formula_read_back_in_editor": true,
+    "cloud_last_saved_indicator_seen": true,
+    "workbook_reloaded": true,
+    "last_repaired_formula_persisted_after_reload": true,
+    "saved_workbook_downloaded": true,
+    "model_calls": 0
+  },
+  "independent_download_readback": {
+    "download_sha256": "d82e998c851100a1dbce7c2a4f4f1179836238a98de3bb7869118919d1c476d4",
+    "private_oracle_receipt_sha256": "ecfc5ca792c12b52c7c65c92375bf1052f3edf04beb11551ce00d30fa2a342d0",
+    "sheet_order_preserved": true,
+    "tables_preserved": true,
+    "checked_sheet_structure_preserved": true,
+    "changed_formula_count": 9,
+    "all_changed_formulas_match_private_reference": true,
+    "missing_or_added_semantic_cells": 0,
+    "unchanged_formula_result_caches_populated": 105,
+    "non_formula_source_value_changes": 0,
+    "office_added_package_parts": ["xl/calcChain.xml", "xl/sharedStrings.xml"]
+  },
+  "independent_oracle": {
+    "full_pass": true,
+    "checked_targets": 114,
+    "repaired_faults": 9,
+    "repair_score": 1.0,
+    "private_replay_profiles_passed": 2,
+    "errors": 0
+  },
+  "negative_control": {
+    "source": "separate one-edit Excel-web attempt on a semantically identical previous build",
+    "receipt": "sec-bridge-audit-excel-web-one-edit-2026-09-24.json",
+    "repaired_faults": 1,
+    "repair_score": 0.1111111111111111,
+    "full_pass": false
+  },
+  "qualification_limits": {
+    "official_hidden_final_task": false,
+    "student_model_score": null,
+    "automated_cloud_reset_proven": false,
+    "unverified_visual_style_equivalence": true,
+    "distinct_issuer_source_families": 1,
+    "hundred_task_cell_ready": false
+  },
+  "privacy": {
+    "account_identity_or_document_url_published": false,
+    "workbook_or_reference_binary_published": false,
+    "fault_coordinates_or_gold_formulas_published_in_receipt": false
+  }
+}

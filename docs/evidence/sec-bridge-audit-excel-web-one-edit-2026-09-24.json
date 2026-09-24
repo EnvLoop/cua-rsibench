@@ -1,0 +1,65 @@
+{
+  "schema": "cua-sec-bridge-audit-excel-web-one-edit-v1",
+  "date": "2026-09-24",
+  "evidence_type": "visible Microsoft Excel for the web one-formula persistence smoke",
+  "source": {
+    "fixture": "public development prototype with frozen SEC facts, not an official hidden task",
+    "uploaded_previous_build_sha256": "6fc44f1ff65185058837fd619f67e102fa60df6cd2908a03c94cfa731dd4d933",
+    "current_deterministic_fixture_sha256": "3f74ee941b49ed07859d89e1be8fc13e77b69584f0edc1e56c7b891d4ba0eec6",
+    "package_difference": "The current deterministic fixture changed ZIP timestamps and core creation/modified metadata only; worksheet XML, formulas, tables, styles, and source rows are byte-identical to the uploaded previous build.",
+    "sheets": 6,
+    "authentic_sec_rows": 177,
+    "formula_targets": 114,
+    "blind_injected_faults": 9
+  },
+  "observed_gui": {
+    "dedicated_test_account": true,
+    "uploaded_disposable_copy": true,
+    "opened_in_editing_mode": true,
+    "before": {
+      "cell": "Q4 Bridge!E11",
+      "formula": "=D11+C11",
+      "displayed_value_usd_millions": 75081
+    },
+    "after": {
+      "cell": "Q4 Bridge!E11",
+      "formula": "=D11-C11",
+      "displayed_value_usd_millions": 13873
+    },
+    "cloud_saved_indicator_seen": true,
+    "formula_and_value_persisted_after_reload": true,
+    "downloaded_saved_copy": true
+  },
+  "independent_download_readback": {
+    "download_sha256": "6b5487e930f7ff6c50f0e77a794ff11df99b1355aa64dd38c31ccda7547fb4d3",
+    "sheet_order_preserved": true,
+    "tables_preserved": true,
+    "checked_sheet_structure_preserved": true,
+    "changed_formula_cells": 1,
+    "changed_formula_cell": "Q4 Bridge!E11",
+    "missing_or_added_semantic_cells": 0,
+    "non_target_formula_changes": 0,
+    "other_value_or_cache_changes": 113,
+    "other_value_or_cache_change_explanation": "Office filled formula result caches that were absent in the seed workbook; these are target formula cells, not edits to frozen source records."
+  },
+  "independent_oracle": {
+    "private_receipt_sha256": "1e2af46855aeac2052c430f3c344554905e0b4d359e2d8406593b1ed8763419b",
+    "full_pass": false,
+    "repaired_faults": 1,
+    "total_faults": 9,
+    "partial_repair_score": 0.1111111111111111,
+    "checked_formula_targets": 114,
+    "reason_not_full_pass": "Eight other injected faults remain; the oracle reports derived output and private replay mismatches."
+  },
+  "qualification": {
+    "one_edit_persistence_verified": true,
+    "complete_task_gui_solution_verified": false,
+    "automated_reset_verified": false,
+    "official_benchmark_score": null,
+    "hundred_task_ready": false
+  },
+  "privacy": {
+    "account_identity_or_document_link_published": false,
+    "workbook_binary_published": false
+  }
+}

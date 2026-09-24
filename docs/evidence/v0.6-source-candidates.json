@@ -1,0 +1,156 @@
+{
+  "schema": "v0.6-source-candidates-v1",
+  "status": "candidate_inventory_only",
+  "live_qualified_cells": 0,
+  "full_matrix_executed": false,
+  "freeze_permitted": false,
+  "cells": [
+    {
+      "id": "powerpoint-online",
+      "repository": {
+        "url": "https://github.com/microsoft/ppteval",
+        "commit": "1b8b55a29e48fdc65d423689b6f2370ad91beeea"
+      },
+      "license": "MIT code; individual source decks retain attribution-specific Public Domain Mark/CC0/CC-BY terms",
+      "inventory_count": 120,
+      "cluster_definition": "canonical input deck path",
+      "split_status": "offline deck-disjoint 20-selection/100-provisional-final candidates prepared from 12 source deck families; not frozen or GUI-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "a disposable deck and one PPT-Eval title-size task were edited through real PowerPoint for the web, saved, reloaded, and downloaded; the published task has no official scored result",
+        "account_login": "dedicated test account signed in and used for a disposable deck on 2026-09-24; identity and file URLs private",
+        "software_entitlement": "free web editing observed; bulk benchmark entitlement and dataset feature coverage unverified",
+        "reset": "save/reload readback passed on a disposable deck and one PPT-Eval task copy; manual Office-saved control exists, but automated pre-actor freeze and rollback are unverified",
+        "verifier": "artifact guard rejects an upstream unrelated-subtitle false acceptance; the 48-point task edit passes a narrow Office-normalized paired artifact check, but upstream PPT-Eval rendering and official score remain unverified"
+      },
+      "primary_references": [
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/README.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/SETUP.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/ATTRIBUTION.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/LICENSE",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/ppteval/verify/ppt/verifier.py"
+      ]
+    },
+    {
+      "id": "microsoft-excel",
+      "repository": {
+        "url": "https://github.com/RUCKBReasoning/SpreadsheetBench-2",
+        "commit": null
+      },
+      "dataset_revision": "5a2215ed4121945ab09d8723df2995602090b042",
+      "dataset_archive_sha256": "17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c",
+      "license": "SpreadsheetBench 2 paper says CC-BY-SA-4.0 dataset; Hugging Face metadata says MIT; conflict unresolved, no public redistribution",
+      "inventory_count": 200,
+      "cluster_definition": "Financial_Model and Debugging base golden workbook; 200 task instances from 30 distinct workbook files",
+      "split_status": "offline family-disjoint 20-selection/100-provisional-final candidates prepared from 18 base workbook families; not frozen or GUI-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved; a separate six-sheet SEC blind-audit development prototype had all nine defects repaired by a human through visible Excel web, saved, reloaded, downloaded, and independently checked",
+        "account_license": "dedicated test account signed in; free web editing observed; bulk benchmark use and dataset feature coverage unverified",
+        "reset": "save/reload readback passed on a disposable workbook and an easy predecessor task; one hard workbook had zero semantic cell changes after untouched web download but lost two VML note drawings; deterministic cloud rollback unverified",
+        "verifier": "independent OOXML oracle passed an easy predecessor task; offline hard SpreadsheetBench 2 task 01_01 gold and wrong-target/unrelated-edit controls passed but Excel-web qualification is pending; a separate SEC blind-audit verifier scored a one-repair GUI negative 1/9 and a nine-repair human GUI positive 9/9 across 114 targets and two private replay profiles",
+        "source_family_diversity": "30 hard-source workbook files; a 100-independent-family final set requires new families or broader audited sources",
+        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked; a harder six-sheet blind audit uses 177 authentic rows, 114 formulas, nine faults, two-source-calendar Q4 bridges and hidden perturbations, with one human GUI-positive full repair and one partial negative; it is a public development task, not a hidden final case, and automated cloud reset is unqualified"
+      },
+      "primary_references": [
+        "https://arxiv.org/html/2606.29955",
+        "https://github.com/RUCKBReasoning/SpreadsheetBench-2",
+        "https://huggingface.co/datasets/KAKA22/SpreadsheetBench-v2/tree/5a2215ed4121945ab09d8723df2995602090b042",
+        "https://support.microsoft.com/en-us/excel/edit-a-workbook-that-contains-features-unsupported-by-excel-for-the-web"
+      ]
+    },
+    {
+      "id": "native-desktop",
+      "repository": {
+        "url": "https://github.com/xlang-ai/OSWorld",
+        "commit": "b138d348256078fa634fc3b73567a7337c793e6b"
+      },
+      "license": "Apache-2.0 benchmark code; applications/assets retain own terms",
+      "inventory_count": 369,
+      "inventory_note": "Exact official test_all.json count at pinned commit: 369 IDs across ten domains; LibreOffice Calc alone has 47, so a 100-task cell must mix applications and qualify every setup/evaluator",
+      "cluster_definition": "task config ID only; source-asset and application clustering pending",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "one real E2B Desktop Linux LibreOffice Calc GUI saved a synthetic XLSX and independent local readback passed; no OSWorld task was executed",
+        "reset": "the E2B smoke sandbox was killed and confirmed stopped; OSWorld task initialization and reset remain untested",
+        "verifier": "synthetic Calc A1/B1 XLSX readback passed; no OSWorld task evaluator has been run",
+        "qwen38_27b_screenshot_compatibility": "one synthetic-image Tinker LoRA update and checkpoint sampling passed; desktop task integration untested"
+      },
+      "primary_references": [
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/LICENSE",
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/desktop_env",
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/evaluation_examples/test_all.json"
+      ]
+    },
+    {
+      "id": "servicenow-compositional",
+      "repository": {
+        "url": "https://github.com/ServiceNow/WorkArena",
+        "commit": "87a9e61c2bf9c1d8271effe0f7e290860f0b252d"
+      },
+      "license": "Apache-2.0 benchmark code; gated ServiceNow instance access terms separate",
+      "inventory_count": 175,
+      "cluster_definition": "L2taskclass; seeds are instances within a template",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "source implemented; not executed",
+        "instance_access": "official WorkArena setup requires approval for gated ServiceNow benchmark instances; no access or personal developer instance has been obtained in this study",
+        "reset": "source setup/teardown present; no smoke",
+        "verifier": "source validate uses ServiceNow record readback; no smoke"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/LICENSE",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/README.md",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/src/browsergym/workarena/tasks/base.py",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/src/browsergym/workarena/tasks/form.py"
+      ]
+    },
+    {
+      "id": "gitlab-project-operations",
+      "repository": {
+        "url": "https://github.com/ServiceNow/webarena-verified",
+        "commit": "6473f72db5dcefc97b5725b59e734504edc28a21"
+      },
+      "license": "Apache-2.0 benchmark/evaluator; site software and bundled source data retain separate terms",
+      "inventory_count": 180,
+      "cluster_definition": "intent_template_id; 180 GitLab-only task IDs collapse to 41 templates",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "one real GitLab CE task 44 read-only navigation smoke passed in an unseeded local demo; full seeded dataset not executed",
+        "reset": "fresh browser login and unchanged business-table fingerprints passed for one read-only task; mutation rollback unverified",
+        "verifier": "pinned evaluator scored two positives 1 and one wrong-route negative 0; 100-task coverage unverified",
+        "seeded_environment": "unverified; official optimized image does not fit the isolated 24-GB demo profile"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/README.md",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/assets/dataset/webarena-verified.json"
+      ]
+    },
+    {
+      "id": "magento-admin",
+      "repository": {
+        "url": "https://github.com/ServiceNow/webarena-verified",
+        "commit": "6473f72db5dcefc97b5725b59e734504edc28a21"
+      },
+      "license": "Apache-2.0 benchmark/evaluator; site software and bundled source data retain separate terms",
+      "inventory_count": 182,
+      "cluster_definition": "intent_template_id",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_inventory_runtime_ready": false,
+        "gui_implementation": "real GUI navigation task 157 and order-address mutation task 538 were executed on isolated Magento containers; one Qwen3.8-27B base-model navigation pilot scored 1",
+        "reset": "read-only task preserved customer tables; task 538 positive and wrong-order negative each restored five monitored business-table hashes to baseline on a disposable clone; arbitrary mutation reset remains unverified",
+        "verifier": "pinned evaluator scored task 157 navigation positive/negative and task 538 mutation positive 1.0 versus wrong-order 0.0; independent SQL readback confirmed target state and rollback; 100-task coverage unverified"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/README.md",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/assets/dataset/webarena-verified.json"
+      ]
+    }
+  ]
+}

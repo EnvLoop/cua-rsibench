@@ -1,0 +1,13 @@
+# Private test-account boundary for the full-scale study
+
+The test account is a runtime input, never benchmark content. Public source, task manifests, datasets, reports, figures, code, and release archives must contain no account address, password, refresh/access token, tenant or client identifier, live OneDrive/SharePoint edit link, browser cookie, authentication storage state, or raw HAR. The source tasks may contain public document facts only when their own rights permit redistribution.
+
+Use a dedicated Microsoft benchmark account and a dedicated OneDrive directory. Its benchmark files are disposable copies; the controller records which copies it creates and resets each task without touching unrelated user content. The account owner retains control of its credentials and recovery methods. A personal library is not assumed to be disposable or authorized for bulk test-data injection.
+
+Private runtime configuration and OAuth caches live under `work/scale-v06/private/` or an external secret manager, outside the public asset inventory. `work/` is ignored by Git. Files containing secrets use mode `0600`; directories use `0700`. Credentials are injected only into the trusted setup/controller and never into researcher-generated programs, student task sandboxes, or verifier containers. The same boundaries apply to ServiceNow and any other account-backed application.
+
+PowerPoint Online task setup may create edit links to disposable files. These are operational capabilities: they stay in the trusted run ledger and are never copied into released task JSON, model-visible training rows, screenshots, logs, or reports. If a link must reach the GUI agent, it is scoped to one disposable test file and is removed from public evidence. Account or app permissions are inspected before granting them; the benchmark does not silently broaden access to a user's personal files.
+
+At export, publish from an explicit allowlist. `tools/scale_release_boundary.py` rejects raw authentication paths, provider keys, account emails, Microsoft share links, and unreviewed binary assets. The gate records hashes and sizes without printing marker values. It cannot inspect pixels inside an approved screenshot or establish that an external OAuth grant is appropriately scoped. Human visual review, a separate PDF text scan, and fetched-asset hash verification complete that boundary.
+
+The existing v0.5 release contains no test account. A future v0.6 report may describe the account type, application version, task split, costs and error rates in aggregate. It must not include the account identity or data that grants access to the benchmark workspace.

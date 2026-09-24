@@ -1,0 +1,69 @@
+{
+  "schema": "v0.6-magento-qwen38-pilot-evidence-v1",
+  "date": "2026-09-24",
+  "model": "Qwen/Qwen3.8-27B",
+  "model_kind": "base",
+  "training_or_checkpoint_selection_performed": false,
+  "application": "Magento 2.4.6 admin in a disposable local container",
+  "published_source": {
+    "repository": "https://github.com/ServiceNow/webarena-verified",
+    "commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "task_id": 157,
+    "task_kind": "read_only_navigation",
+    "task_intent": "View the details of all customers"
+  },
+  "protocol_development_attempts": [
+    {
+      "version": "magento-model-pilot-v0.6",
+      "status": "completed",
+      "official_score": 0,
+      "applied_gui_actions": 0,
+      "sample_attempts": 1,
+      "failure_class": "model_failure",
+      "failure_code": "invalid_action_json",
+      "diagnosis": "A single fenced action object was rejected by the original exact-JSON boundary before any GUI action.",
+      "private_result_sha256": "c9f22fad5091df332993043ddd222eeec9ec17359d18d0f89f057a9af0507da2"
+    },
+    {
+      "version": "magento-model-pilot-v0.6.1",
+      "status": "completed",
+      "official_score": 0,
+      "applied_gui_actions": 0,
+      "sample_attempts": 1,
+      "failure_class": "model_failure",
+      "failure_code": "invalid_action",
+      "diagnosis": "The model proposed the visible CUSTOMERS control but omitted a bookkeeping memory field; no GUI action was dispatched.",
+      "private_result_sha256": "2cb93a778b8c85771ae868925b1431fea33d43ae588ca9e97c5be59475bd2d6a"
+    },
+    {
+      "version": "magento-model-pilot-v0.6.2",
+      "status": "unscored",
+      "official_score": null,
+      "applied_gui_actions": 3,
+      "sample_attempts": 4,
+      "failure_class": "environment_failure",
+      "failure_code": "stale_frame",
+      "diagnosis": "The target customer grid was visibly loaded, but a later screenshot changed during sampling; the original result remains unscored.",
+      "private_result_sha256": "3a201587cec1a78937a008ccf82df18b48ec13e3c7cd78de0af732881eb7a050"
+    },
+    {
+      "version": "magento-model-pilot-v0.6.3",
+      "status": "completed",
+      "official_score": 1,
+      "applied_gui_actions": 5,
+      "sample_attempts": 6,
+      "stale_samples_discarded": 1,
+      "failure_class": null,
+      "failure_code": null,
+      "final_visible_customer_rows": 70,
+      "raw_and_sanitized_evaluator_equal": true,
+      "customer_business_state_unchanged": true,
+      "blocked_network_requests": 0,
+      "rendered_multimodal_input_tokens": 15191,
+      "sampled_output_tokens": 120,
+      "provider_billed_tokens_or_usd_known": false,
+      "private_result_sha256": "79ec4b4b6c544cb9a9c467db5fe2bd057c6952c36d45db88dcdde5d41c9d6908"
+    }
+  ],
+  "interpretation": "Four separate protocol-development attempts on one read-only task. The valid v0.6.3 attempt demonstrates a complete model-to-GUI-to-independent-evaluator path. The versions differ and are not comparable model scores, a 100-task benchmark, or an improvement from training."
+}

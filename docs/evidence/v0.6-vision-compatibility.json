@@ -1,0 +1,18 @@
+{
+  "schema": "v0.6-vision-compatibility-evidence-v1",
+  "student": "Qwen/Qwen3.8-27B",
+  "renderer": "qwen3_5_disable_thinking",
+  "image_processor": "Qwen2VLImageProcessorPil",
+  "supervised_image_chunk": true,
+  "sample_prompt_image_chunk": true,
+  "optimizer_steps_completed": 1,
+  "checkpoint_saved": true,
+  "sampling_verified": true,
+  "sample_tokens": 16,
+  "task_reward": null,
+  "scope": "Disposable synthetic image API compatibility only. No benchmark task or capability improvement is claimed.",
+  "private_checkpoint_path_published": false,
+  "receipt_sha256": "18fd8ba4d79d5dab689b2f1b250d4f92277ad5c259d782aeaa9c9dfc93878194",
+  "code_sha256": "43e51cad8e7e8c812f1e160228676f4c1caeb32e0ec0808fb439536fb6ed3677",
+  "reference": "https://tinker-docs.thinkingmachines.ai/tutorials/core-concepts/rendering/"
+}

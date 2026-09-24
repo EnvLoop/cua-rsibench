@@ -1,0 +1,51 @@
+{
+  "schema": "v0.6-excel-hard-web-roundtrip-v1",
+  "date": "2026-09-24",
+  "source": {
+    "benchmark": "SpreadsheetBench 2",
+    "category": "Financial_Model",
+    "sample_id": "01_01",
+    "dataset_revision": "5a2215ed4121945ab09d8723df2995602090b042",
+    "dataset_archive_sha256": "17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c",
+    "input_sha256": "a01657c0cc7116569be1d649bb259d32073d3fa6261d7d9da22c461875e1080c",
+    "input_bytes": 794948
+  },
+  "observed_excel_web": {
+    "uploaded_into_dedicated_test_account": true,
+    "opened_in_editing_mode": true,
+    "worksheet_count": 25,
+    "visible_sheet": "Consolidated P&L",
+    "visible_financial_model_rendered": true,
+    "untouched_copy_downloaded": true,
+    "download_sha256": "dc35aa36dd9c12bd674a2b52df2cc76c282fda46c43daa26893dcdcb0f9525c1",
+    "download_bytes": 939454
+  },
+  "independent_ooxml_comparison": {
+    "worksheet_order_preserved": true,
+    "semantic_cell_value_type_formula_differences": 0,
+    "formula_cache_presence_differences": 0,
+    "merged_range_differences": 0,
+    "raw_style_index_differences": 22113,
+    "source_package_parts": 40,
+    "download_package_parts": 36,
+    "removed_parts": [
+      "xl/drawings/vmlDrawing1.vml",
+      "xl/drawings/vmlDrawing2.vml",
+      "xl/worksheets/_rels/sheet7.xml.rels",
+      "xl/worksheets/_rels/sheet16.xml.rels"
+    ],
+    "removed_vml_shape_types": ["Note", "Note"],
+    "style_and_note_visual_equivalence_verified": false
+  },
+  "admission": {
+    "complex_task_solved_in_gui": false,
+    "whole_workbook_no_regression_qualified": false,
+    "deterministic_cloud_reset_qualified": false,
+    "candidate_status": "loaded_and_cell_semantics_roundtripped; object/style churn requires task-specific review",
+    "official_benchmark_score": null
+  },
+  "privacy": {
+    "account_identity_or_document_link_published": false,
+    "dataset_workbook_binary_published": false
+  }
+}

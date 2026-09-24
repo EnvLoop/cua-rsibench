@@ -1,0 +1,9 @@
+# v0.6 vision sampling environment
+
+The v0.6 computer-use student is `Qwen/Qwen3.8-27B`. It has a separate runtime from the frozen v0.5 text-only proxy. The compatibility checks on 2026-09-24 used Python 3.12, Tinker 0.30.1, Pillow 12.3.0, PyTorch 2.14.0, Transformers 5.5.4, and the [Tinker cookbook](https://github.com/thinking-machines-lab/tinker-cookbook) at commit `1e53aa3d1cdd6389b3290c2574641eccc0503242`.
+
+Install the cookbook from that exact commit in a dedicated environment, then verify the package versions above. The adapter imports `tinker_cookbook` at runtime and rejects a renderer or image processor that differs from its bound identity. The executable implementation is [`scale_vision_proxy.py`](../src/cursibench/scale_vision_proxy.py); the one-request synthetic-image proof is [`v0.6-vision-proxy-smoke.json`](evidence/v0.6-vision-proxy-smoke.json).
+
+Use a private, per-task journal directory and pass a declared `--campaign-id` so Tinker session metadata can be reconciled with hourly billing events. Supply `TINKER_API_KEY` and a fresh `CUA_VISION_PROXY_TOKEN` through the process environment; never write them to task packages, model-visible rows, screenshots, public logs, or the repository. Set `TINKER_SAMPLER_PATH` only for a trusted checkpoint URI. The server binds to `127.0.0.1` by default and accepts one authenticated `/sample` request per action ID. An uncertain dispatch remains in the journal and is not silently retried.
+
+The adapter has passed a real paid Qwen3.8-27B image request, as well as offline tests. This establishes API compatibility, not a browser-task score. A runner must still capture the current application screenshot and visible controls, call the versioned action contract, dispatch only validated GUI actions, and feed independent saved-state verification into scoring. Billing remains unknown until actual provider receipts are available; rendered token counts in the adapter are not invoices.
