@@ -14,6 +14,16 @@ SPEC.loader.exec_module(guard)
 SLIDE = '''<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><p:cSld><p:spTree><p:sp><p:nvSpPr><p:cNvPr id="2" name="Title"/><p:nvPr><p:ph type="ctrTitle"/></p:nvPr></p:nvSpPr><p:txBody><a:p><a:r>{properties}<a:t>Same title</a:t></a:r></a:p></p:txBody></p:sp><p:sp><p:nvSpPr><p:cNvPr id="3" name="Subtitle"/><p:nvPr><p:ph type="subTitle"/></p:nvPr></p:nvSpPr><p:txBody><a:p><a:r><a:t>{subtitle}</a:t></a:r></a:p></p:txBody></p:sp></p:spTree></p:cSld></p:sld>'''
 
 
+def office_parts(revision='1', changed='2026-09-24T00:00:00Z', title='Same title',
+                 change_name='Keep', client='one', thumbnail=b'old'):
+    return {
+        'docProps/core.xml': f'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dcterms="http://purl.org/dc/terms/"><cp:revision>{revision}</cp:revision><dcterms:modified>{changed}</dcterms:modified><cp:title>{title}</cp:title></cp:coreProperties>'.encode(),
+        'ppt/changesInfos/changesInfo1.xml': f'<root xmlns:c="http://schemas.microsoft.com/office/powerpoint/2013/main/command"><c:chgData name="{change_name}" clId="{client}" dt="{changed}" v="{revision}" userId="stable"/></root>'.encode(),
+        'ppt/revisionInfo.xml': f'<root xmlns:r="http://schemas.microsoft.com/office/powerpoint/2015/10/main"><r:client id="{client}" dt="{changed}" v="{revision}"/></root>'.encode(),
+        'docProps/thumbnail.jpeg': b'\xff\xd8' + thumbnail + b'\xff\xd9',
+    }
+
+
 def deck(path, size=None, subtitle='Untouched subtitle', extra=None):
     props = '' if size is None else f'<a:rPr sz="{size}"/>'
     entries = {'[Content_Types].xml': b'<Types/>', 'ppt/presentation.xml': b'<presentation/>',
@@ -97,6 +107,50 @@ class TitleSizeGuardTests(unittest.TestCase):
         contract = copy.deepcopy(self.contract)
         contract['schema'] = 'unknown'
         self.assertIsNone(guard.verify(self.original, self.modified, contract)['score'])
+
+    def test_trusted_office_baseline_only_allows_narrow_derived_changes(self):
+        deck(self.original, extra=office_parts())
+        deck(self.modified, size=4800, extra=office_parts(
+            revision='2', changed='2026-09-24T00:01:00Z', client='two', thumbnail=b'new'))
+        strict = guard.freeze_contract(self.original, 'ppt/slides/slide1.xml', '2', 48)
+        normalized = guard.freeze_contract(self.original, 'ppt/slides/slide1.xml', '2', 48,
+                                           office_web_normalized=True)
+        self.assertEqual(guard.verify(self.original, self.modified, strict)['score'], 0.0)
+        self.assertEqual(guard.verify(self.original, self.modified, normalized)['score'], 1.0)
+        self.assertEqual(normalized['office_web_normalized'], True)
+
+    def test_office_metadata_allowance_does_not_mask_other_changes(self):
+        deck(self.original, extra=office_parts())
+        normalized = guard.freeze_contract(self.original, 'ppt/slides/slide1.xml', '2', 48,
+                                           office_web_normalized=True)
+        variants = [
+            (office_parts(title='Altered document title'), 'docProps/core.xml'),
+            (office_parts(change_name='Altered change name'), 'ppt/changesInfos/changesInfo1.xml'),
+            (office_parts() | {'docProps/thumbnail.jpeg': b'bad'}, 'docProps/thumbnail.jpeg'),
+            (office_parts() | {'ppt/media/image1.png': b'altered image'}, 'ppt/media/image1.png'),
+        ]
+        for parts, expected_part in variants:
+            with self.subTest(expected_part=expected_part):
+                deck(self.modified, size=4800, extra=parts)
+                result = guard.verify(self.original, self.modified, normalized)
+                self.assertEqual(result['score'], 0.0)
+                self.assertIn(expected_part, result['unexpected_parts'])
+
+        deck(self.modified, size=4800, subtitle='Wrong subtitle', extra=office_parts())
+        result = guard.verify(self.original, self.modified, normalized)
+        self.assertEqual(result['score'], 0.0)
+        self.assertIn('ppt/slides/slide1.xml', result['unexpected_parts'])
+
+    def test_office_baseline_still_rejects_other_slides_and_missing_metadata(self):
+        deck(self.original, extra=office_parts() | {'ppt/slides/slide2.xml': b'<slide>stable</slide>'})
+        normalized = guard.freeze_contract(self.original, 'ppt/slides/slide1.xml', '2', 48,
+                                           office_web_normalized=True)
+        deck(self.modified, size=4800, extra=office_parts() | {'ppt/slides/slide2.xml': b'<slide>changed</slide>'})
+        self.assertIn('ppt/slides/slide2.xml', guard.verify(self.original, self.modified, normalized)['unexpected_parts'])
+        changed_parts = office_parts()
+        changed_parts.pop('docProps/thumbnail.jpeg')
+        deck(self.modified, size=4800, extra=changed_parts | {'ppt/slides/slide2.xml': b'<slide>stable</slide>'})
+        self.assertIn('docProps/thumbnail.jpeg', guard.verify(self.original, self.modified, normalized)['unexpected_parts'])
 
 
 if __name__ == '__main__':

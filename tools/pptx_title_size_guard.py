@@ -3,7 +3,8 @@
 This guards paired PPTX artifacts. It neither drives nor proves Microsoft GUI
 execution. Freeze the source contract in trusted evaluator storage before the
 actor runs. A PowerPoint-normalized source must be frozen separately from a raw
-download; this guard deliberately permits no unqualified normalization changes.
+download. A narrowly scoped Office metadata allowance can be enabled only for
+such an evaluator-generated, normalized baseline.
 """
 import argparse
 import copy
@@ -20,6 +21,15 @@ MAX_MEMBERS = 5000
 P = '{http://schemas.openxmlformats.org/presentationml/2006/main}'
 A = '{http://schemas.openxmlformats.org/drawingml/2006/main}'
 SCHEMA = 'pptx-direct-title-font-size-guard-v1'
+CP = '{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}'
+DCTERMS = '{http://purl.org/dc/terms/}'
+P13_COMMAND = '{http://schemas.microsoft.com/office/powerpoint/2013/main/command}'
+D13_COMMAND = '{http://schemas.microsoft.com/office/drawing/2013/main/command}'
+P15 = '{http://schemas.microsoft.com/office/powerpoint/2015/10/main}'
+OFFICE_DERIVED_PARTS = frozenset({
+    'docProps/core.xml', 'docProps/thumbnail.jpeg',
+    'ppt/changesInfos/changesInfo1.xml', 'ppt/revisionInfo.xml',
+})
 
 
 class ArtifactUnavailable(ValueError):
@@ -98,7 +108,39 @@ def erase_permitted_font_sizes(slide, shape_id):
     return result
 
 
-def freeze_contract(original, target_part, shape_id, target_size_pt):
+def office_derived_part_equal(name, left, right):
+    """Ignore only observed Office save bookkeeping, never slide content.
+
+    The thumbnail is a derived JPEG preview. Its bytes may change when the
+    target title changes; all media, slides, relationships, and layouts remain
+    strictly compared elsewhere in the package.
+    """
+    if name == 'docProps/thumbnail.jpeg':
+        return all(data.startswith(b'\xff\xd8') and data.endswith(b'\xff\xd9') for data in (left, right))
+    before, after = xml(left), xml(right)
+    if name == 'docProps/core.xml':
+        for root in (before, after):
+            for node in root.iter():
+                if node.tag in (CP + 'revision', DCTERMS + 'modified'):
+                    node.text = None
+    elif name == 'ppt/changesInfos/changesInfo1.xml':
+        for root in (before, after):
+            for node in root.iter():
+                if node.tag in (P13_COMMAND + 'chgData', D13_COMMAND + 'chgData'):
+                    for key in ('clId', 'dt', 'v'):
+                        node.attrib.pop(key, None)
+    elif name == 'ppt/revisionInfo.xml':
+        for root in (before, after):
+            for node in root.iter():
+                if node.tag == P15 + 'client':
+                    for key in ('dt', 'id', 'v'):
+                        node.attrib.pop(key, None)
+    else:
+        raise ArtifactUnavailable('unknown Office-derived part')
+    return canonical(before) == canonical(after)
+
+
+def freeze_contract(original, target_part, shape_id, target_size_pt, *, office_web_normalized=False):
     data, members = package(original)
     if target_part not in members or not target_part.startswith('ppt/slides/'):
         raise ArtifactUnavailable('target slide part is absent')
@@ -109,7 +151,10 @@ def freeze_contract(original, target_part, shape_id, target_size_pt):
             'original_member_sha256': {name: sha(content) for name, content in sorted(members.items())},
             'target_part': target_part, 'target_shape_id': str(shape_id), 'target_size_pt': target_size_pt,
             'permitted_mutation': 'only the sz attribute of nonempty target title a:r/a:rPr nodes',
-            'normalization_boundary': 'No application metadata normalization is assumed; freeze a separate normalized baseline when using Microsoft PowerPoint.'}
+            'office_web_normalized': bool(office_web_normalized),
+            'normalization_boundary': ('Trusted evaluator-generated Office-saved baseline; only four specified derived package parts have narrow allowances.'
+                                       if office_web_normalized else
+                                       'No application metadata normalization is assumed; freeze a separate normalized baseline when using Microsoft PowerPoint.')}
 
 
 def verify(original, modified, contract):
@@ -153,7 +198,10 @@ def verify(original, modified, contract):
             elif before[name] != after[name]:
                 # XML syntax/prefix differences are not semantic edits. Text,
                 # attributes, relationships, object ordering and content remain.
-                if name.endswith(('.xml', '.rels')):
+                if contract.get('office_web_normalized') is True and name in OFFICE_DERIVED_PARTS:
+                    if not office_derived_part_equal(name, before[name], after[name]):
+                        unexpected.add(name)
+                elif name.endswith(('.xml', '.rels')):
                     if canonical(xml(before[name])) != canonical(xml(after[name])):
                         unexpected.add(name)
                 else:
@@ -188,6 +236,8 @@ def main():
     freeze.add_argument('--target-part', default='ppt/slides/slide1.xml')
     freeze.add_argument('--shape-id', required=True)
     freeze.add_argument('--target-size-pt', type=float, required=True)
+    freeze.add_argument('--office-web-normalized', action='store_true',
+                        help='baseline was independently saved by Office before the actor ran')
     freeze.add_argument('--out', type=Path, required=True)
     check = modes.add_parser('verify')
     check.add_argument('--original', type=Path, required=True)
@@ -197,7 +247,8 @@ def main():
     if args.mode == 'freeze':
         if args.out.exists():
             raise ValueError('refuse to overwrite a frozen guard contract')
-        contract = freeze_contract(args.original, args.target_part, args.shape_id, args.target_size_pt)
+        contract = freeze_contract(args.original, args.target_part, args.shape_id, args.target_size_pt,
+                                   office_web_normalized=args.office_web_normalized)
         args.out.write_text(json.dumps(contract, indent=2) + '\n')
         print(json.dumps({'contract_written': True, 'original_sha256': contract['original_sha256']}))
     else:
