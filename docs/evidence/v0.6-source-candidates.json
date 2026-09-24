@@ -1,0 +1,149 @@
+{
+  "schema": "v0.6-source-candidates-v1",
+  "status": "candidate_inventory_only",
+  "live_qualified_cells": 0,
+  "full_matrix_executed": false,
+  "freeze_permitted": false,
+  "cells": [
+    {
+      "id": "powerpoint-online",
+      "repository": {
+        "url": "https://github.com/microsoft/ppteval",
+        "commit": "1b8b55a29e48fdc65d423689b6f2370ad91beeea"
+      },
+      "license": "MIT code; individual source decks retain attribution-specific Public Domain Mark/CC0/CC-BY terms",
+      "inventory_count": 120,
+      "cluster_definition": "canonical input deck path",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "verified in source; not executed here",
+        "account_login": "unknown; no account or OAuth check performed",
+        "software_entitlement": "unknown; README does not establish this user account entitlement",
+        "reset": "reported/source implementation; no smoke",
+        "verifier": "verified rubric files and saved-artifact design; no smoke"
+      },
+      "primary_references": [
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/README.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/SETUP.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/ATTRIBUTION.md",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/LICENSE",
+        "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/ppteval/verify/ppt/verifier.py"
+      ]
+    },
+    {
+      "id": "microsoft-excel",
+      "repository": {
+        "url": "https://github.com/RUCKBReasoning/SpreadsheetBench",
+        "commit": "49b73a94775fb489063f60ca1865e3a650079a79"
+      },
+      "license": "CC-BY-SA-4.0 declared in project README; Microsoft Excel entitlement separate",
+      "inventory_count": 400,
+      "cluster_definition": "original question ID before first hyphen; provisional source-family proxy",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "unknown/not implemented in current EnvLoop actor",
+        "account_license": "unknown; no entitlement inspection",
+        "reset": "proposed VM snapshot + fresh workbook; untested",
+        "verifier": "file-based reference exists; GUI-backed Excel readback/recalculation untested"
+      },
+      "primary_references": [
+        "https://github.com/RUCKBReasoning/SpreadsheetBench/blob/49b73a94775fb489063f60ca1865e3a650079a79/README.md#license-and-citation",
+        "https://github.com/RUCKBReasoning/SpreadsheetBench/blob/49b73a94775fb489063f60ca1865e3a650079a79/evaluation",
+        "https://huggingface.co/datasets/KAKA22/SpreadsheetBench/resolve/ab0b742b0fc95b946f212d80ac7771b5531272e4/spreadsheetbench_verified_400.tar.gz"
+      ]
+    },
+    {
+      "id": "native-desktop",
+      "repository": {
+        "url": "https://github.com/xlang-ai/OSWorld",
+        "commit": "b138d348256078fa634fc3b73567a7337c793e6b"
+      },
+      "license": "Apache-2.0 benchmark code; applications/assets retain own terms",
+      "inventory_count": 151,
+      "cluster_definition": "task config ID only; source-asset clustering pending",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "verified source supports screenshot/a11y desktop actions; no local execution",
+        "reset": "reported VM/task initialization; no smoke",
+        "verifier": "source execution-based functions; no smoke",
+        "qwen4b_screenshot_compatibility": "unknown at provider/model level; absent from current text-only EnvLoop adapter"
+      },
+      "primary_references": [
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/LICENSE",
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/desktop_env",
+        "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/evaluation_examples/test_all.json"
+      ]
+    },
+    {
+      "id": "servicenow-compositional",
+      "repository": {
+        "url": "https://github.com/ServiceNow/WorkArena",
+        "commit": "87a9e61c2bf9c1d8271effe0f7e290860f0b252d"
+      },
+      "license": "Apache-2.0 benchmark code; gated ServiceNow instance access terms separate",
+      "inventory_count": 175,
+      "cluster_definition": "L2taskclass; seeds are instances within a template",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "source implemented; not executed",
+        "instance_access": "unknown; no gated access check",
+        "reset": "source setup/teardown present; no smoke",
+        "verifier": "source validate uses ServiceNow record readback; no smoke"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/LICENSE",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/README.md",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/src/browsergym/workarena/tasks/base.py",
+        "https://github.com/ServiceNow/WorkArena/blob/87a9e61c2bf9c1d8271effe0f7e290860f0b252d/src/browsergym/workarena/tasks/form.py"
+      ]
+    },
+    {
+      "id": "gitlab-project-operations",
+      "repository": {
+        "url": "https://github.com/ServiceNow/webarena-verified",
+        "commit": "6473f72db5dcefc97b5725b59e734504edc28a21"
+      },
+      "license": "Apache-2.0 benchmark/evaluator; site software and bundled source data retain separate terms",
+      "inventory_count": 180,
+      "cluster_definition": "intent_template_id",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "browser source environment verified; not executed",
+        "reset": "upstream container environment-control present; no smoke",
+        "verifier": "deterministic evaluator/network-trace implementation verified in source; no smoke"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/README.md",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/assets/dataset/webarena-verified.json"
+      ]
+    },
+    {
+      "id": "magento-admin",
+      "repository": {
+        "url": "https://github.com/ServiceNow/webarena-verified",
+        "commit": "6473f72db5dcefc97b5725b59e734504edc28a21"
+      },
+      "license": "Apache-2.0 benchmark/evaluator; site software and bundled source data retain separate terms",
+      "inventory_count": 182,
+      "cluster_definition": "intent_template_id",
+      "split_status": "proposed; not frozen or runtime-qualified",
+      "readiness": {
+        "all_120_runtime_ready": false,
+        "gui_implementation": "browser source environment verified; not executed",
+        "reset": "upstream container environment-control present; no smoke",
+        "verifier": "deterministic evaluator/network-trace implementation verified in source; no smoke"
+      },
+      "primary_references": [
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/README.md",
+        "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/assets/dataset/webarena-verified.json"
+      ]
+    }
+  ]
+}
