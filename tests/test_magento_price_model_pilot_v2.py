@@ -1,5 +1,6 @@
 """Offline guards for the versioned Magento visual observer."""
 import asyncio
+from io import BytesIO
 import importlib.util
 import json
 from pathlib import Path
@@ -8,6 +9,8 @@ import time
 import unittest
 from unittest.mock import patch
 from types import SimpleNamespace
+
+from PIL import Image, ImageChops
 
 from cursibench.scale_vision_proxy import (
     Limits, MODEL, PROCESSOR, RENDERER, VisionSamplingAdapter,
@@ -61,6 +64,19 @@ class FakeBackend:
 
 
 class GuardTests(unittest.TestCase):
+    def test_dashboard_mask_route_is_segment_bound_and_excludes_product_grid(self):
+        def gated(path):
+            return pilot.should_mask_dashboard_tables(SimpleNamespace(
+                url='http://localhost:7792' + path))
+        for path in ('/admin', '/admin/',
+                     '/admin/admin/dashboard/',
+                     '/admin/admin/dashboard/index/key/synthetic'):
+            self.assertTrue(gated(path), path)
+        for path in ('/admin/catalog/product/index/key/synthetic',
+                     '/admin/admin/dashboard-extra/',
+                     '/admin/admin/customer/index/key/synthetic'):
+            self.assertFalse(gated(path), path)
+
     def test_visual_progress_reports_identical_no_effect_actions_without_claiming_state(self):
         feedback = pilot.VisualProgress()
         image = b'frame pixels'
@@ -218,6 +234,141 @@ class GuardTests(unittest.TestCase):
 
 
 class ActionContractTests(unittest.IsolatedAsyncioTestCase):
+    async def test_dashboard_table_pixels_and_controls_are_private_but_navigation_remains(self):
+        from playwright.async_api import async_playwright
+
+        html = '''<style>
+          body { margin: 0; font: 16px Arial; }
+          aside { position: absolute; left: 0; top: 0; width: 150px; }
+          main, section { margin-left: 180px; }
+          main table, section table { width: 360px; table-layout: fixed; }
+          td { padding: 8px; }
+        </style>
+        <aside><table><tr><td><button id="nav">Catalog</button></td></tr></table></aside>
+        <main><h1>Dashboard</h1><button id="refresh">Refresh</button>
+          <table class="admin__table-primary dashboard-data" id="lastOrdersGrid_table">
+          <tr><td class="col-customer" id="buyer">Demo Buyer Alpha</td>
+          <td><button id="order">View order</button></td></tr></table></main>
+        <section><table class="admin__table-primary dashboard-data"
+          id="productsOrderedGrid_table"><tr><td>Demo Product</td>
+          <td><button id="invoice">View invoice</button></td></tr></table>
+          <table class="admin__table-primary dashboard-data"
+          id="lastSearchGrid_table"><tr><td>Demo Search Alpha</td></tr></table>
+          <table class="admin__table-primary dashboard-data"
+          id="topSearchGrid_table"><tr><td>Demo Search Beta</td></tr></table></section>'''
+
+        async def serve(route):
+            await route.fulfill(status=200, content_type='text/html', body=html)
+
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            try:
+                page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                await page.route('**/*', serve)
+                await page.goto(
+                    'http://localhost:7792/admin/admin/dashboard/index/key/synthetic')
+                original = await page.screenshot(type='png', full_page=False,
+                    animations='disabled', mask=[page.locator('.admin-user')])
+                masked = await pilot.screenshot_for_observation(page)
+                nav_box = await page.locator('aside table').bounding_box()
+                data_boxes = [await page.locator('#' + table_id).bounding_box()
+                    for table_id in ('lastOrdersGrid_table',
+                                     'productsOrderedGrid_table',
+                                     'lastSearchGrid_table', 'topSearchGrid_table')]
+                nav_region = (0, 0, int(nav_box['width']),
+                              int(nav_box['height']))
+                original_image = Image.open(BytesIO(original)).convert('RGB')
+                masked_image = Image.open(BytesIO(masked)).convert('RGB')
+                self.assertIsNone(ImageChops.difference(
+                    original_image.crop(nav_region),
+                    masked_image.crop(nav_region)).getbbox())
+                for box in data_boxes:
+                    self.assertEqual(masked_image.getpixel((
+                        int(box['x'] + 10), int(box['y'] + 10))),
+                        (255, 0, 255))
+                controls, handles = await pilot.viewport_controls(page)
+                labels = [row['label'] for row in controls]
+                self.assertIn('Catalog', labels)
+                self.assertIn('Refresh', labels)
+                self.assertNotIn('View order', labels)
+                self.assertNotIn('View invoice', labels)
+                self.assertNotIn('Demo Buyer Alpha', json.dumps(controls))
+                self.assertNotIn('Demo Product', json.dumps(controls))
+                visible_ids = [await h.get_attribute('id') for h in handles.values()]
+                self.assertNotIn('order', visible_ids)
+                self.assertNotIn('invoice', visible_ids)
+
+                await page.locator('#buyer').evaluate(
+                    "element => element.textContent = 'Demo Buyer Omega'")
+                self.assertNotEqual(original, await page.screenshot(
+                    type='png', full_page=False, animations='disabled',
+                    mask=[page.locator('.admin-user')]))
+                self.assertEqual(masked, await pilot.screenshot_for_observation(page))
+
+                await page.goto(
+                    'http://localhost:7792/admin/catalog/product/index/key/synthetic')
+                unmasked_image = Image.open(BytesIO(
+                    await pilot.screenshot_for_observation(page))).convert('RGB')
+                self.assertNotEqual(unmasked_image.getpixel((
+                    int(data_boxes[0]['x'] + 10), int(data_boxes[0]['y'] + 10))),
+                    (255, 0, 255))
+                other_controls, _ = await pilot.viewport_controls(page)
+                other_labels = [row['label'] for row in other_controls]
+                self.assertIn('View order', other_labels)
+                self.assertIn('View invoice', other_labels)
+            finally:
+                await browser.close()
+
+    async def test_dashboard_capture_and_stale_frame_check_share_masked_hash(self):
+        from playwright.async_api import async_playwright
+
+        html = '''<aside><button id="nav">Catalog</button></aside>
+          <main><h1>Dashboard</h1><table style="width:360px;table-layout:fixed">
+          <tr><td id="buyer"><h2 style="white-space:nowrap;overflow:hidden;"
+          >Demo Buyer Alpha</h2></td>
+          <td><button>View order</button></td></tr></table></main>'''
+
+        async def serve(route):
+            await route.fulfill(status=200, content_type='text/html', body=html)
+
+        with TemporaryDirectory() as folder:
+            async with async_playwright() as playwright:
+                browser = await playwright.chromium.launch(headless=True)
+                try:
+                    page = await browser.new_page(viewport={'width': 640,
+                                                             'height': 480})
+                    await page.route('**/*', serve)
+                    await page.goto(
+                        'http://localhost:7792/admin/admin/dashboard/index/key/synthetic')
+                    with patch.object(pilot.v063.host, '_visible_controls',
+                                      pilot.viewport_controls):
+                        capture = pilot.make_capture(Path(folder),
+                                                     pilot.VisualProgress())
+                        observation, handles, frame_url = await capture(page,
+                            instruction='Use visible navigation',
+                            binding='f' * 64, step=0, memory='', previous=None)
+                    frame = next(Path(folder).glob('frame-*.png')).read_bytes()
+                    self.assertEqual(observation.screenshot['sha256'],
+                                     pilot.hashlib.sha256(frame).hexdigest())
+                    self.assertTrue((await pilot._same_pixels(
+                        page, observation, frame_url))[0])
+                    self.assertNotIn('View order',
+                        [row.label for row in observation.controls])
+                    self.assertNotIn('Demo Buyer Alpha', observation.a11y_text)
+                    self.assertIn('Dashboard', observation.a11y_text)
+                    self.assertEqual(len(handles), 1)
+
+                    await page.locator('#buyer h2').evaluate(
+                        "element => element.textContent = 'Demo Buyer Omega'")
+                    self.assertEqual(await pilot._same_pixels(
+                        page, observation, frame_url), (True, None))
+                    await page.locator('#nav').evaluate(
+                        "element => element.textContent = 'Products'")
+                    self.assertEqual(await pilot._same_pixels(
+                        page, observation, frame_url), (False, 'pixels_changed'))
+                finally:
+                    await browser.close()
+
     async def test_offscreen_control_is_absent_from_model_observation(self):
         from playwright.async_api import async_playwright
         async with async_playwright() as playwright:

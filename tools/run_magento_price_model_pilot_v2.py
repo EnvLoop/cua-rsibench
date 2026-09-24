@@ -46,6 +46,10 @@ MAX_OUTPUT_TOKENS = 512
 PREFILL_USD_PER_M = Decimal('1.86')
 SAMPLE_USD_PER_M = Decimal('5.595')
 PUBLISHED_RATE_CAP_USD = Decimal('10')
+DASHBOARD_TABLE_SELECTOR = (
+    'table:not(nav table):not(aside table):not(.admin__menu table)'
+    ':not(.admin__menu-wrapper table)'
+)
 
 
 def _load(path, name):
@@ -362,6 +366,41 @@ async def login(browser, source, blocked):
         await context.close()
 
 
+def should_mask_dashboard_tables(page):
+    """Limit table redaction to the Magento Dashboard route, not product grids."""
+    path = urlsplit(page.url).path
+    return (path.rstrip('/') == '/admin' or
+            re.fullmatch(r'/admin/admin/dashboard(?:/.*)?', path) is not None)
+
+
+def screenshot_masks(page):
+    masks = [page.locator('.admin-user')]
+    if should_mask_dashboard_tables(page):
+        masks.append(page.locator(DASHBOARD_TABLE_SELECTOR))
+    return masks
+
+
+async def screenshot_for_observation(page):
+    """Use the exact same privacy mask for model frames and stale checks."""
+    return await page.screenshot(type='png', full_page=False,
+                                 animations='disabled', mask=screenshot_masks(page))
+
+
+async def inside_masked_dashboard_table(page, element):
+    return should_mask_dashboard_tables(page) and await element.evaluate(
+        '(node, selector) => !!node.closest("table")?.matches(selector)',
+        DASHBOARD_TABLE_SELECTOR)
+
+
+async def _same_pixels(page, observation, frame_url):
+    if page.url != frame_url:
+        return False, 'unexpected_navigation_during_sampling'
+    image = await screenshot_for_observation(page)
+    if hashlib.sha256(image).hexdigest() != observation.screenshot['sha256']:
+        return False, 'pixels_changed'
+    return True, None
+
+
 async def viewport_controls(page):
     """Expose only controls whose click center occurs inside observed pixels."""
     viewport = page.viewport_size or {'width': 1440, 'height': 1000}
@@ -373,6 +412,8 @@ async def viewport_controls(page):
             if not await handle.is_visible() or not await handle.is_enabled():
                 continue
             if await handle.evaluate('(element) => !!element.closest(".admin-user")'):
+                continue
+            if await inside_masked_dashboard_table(page, handle):
                 continue
             box = await handle.bounding_box()
             if box is None:
@@ -426,8 +467,7 @@ def make_capture(frames, feedback):
         except Exception:
             pass  # Pixel/ref checks still fail closed if the page changes.
         await page.wait_for_timeout(350)
-        image = await page.screenshot(type='png', full_page=False,
-            animations='disabled', mask=[page.locator('.admin-user')])
+        image = await screenshot_for_observation(page)
         feedback.observed(image, page.url, previous)
         count += 1
         path = frames / f'frame-{count:03d}-step-{step:02d}.png'
@@ -437,7 +477,8 @@ def make_capture(frames, feedback):
         headings = []
         for heading in await page.locator('h1, h2').element_handles():
             try:
-                if await heading.is_visible():
+                if await heading.is_visible() and not await inside_masked_dashboard_table(
+                        page, heading):
                     headings.append(v063.host._short_text(await heading.inner_text(), 200))
             except Exception:
                 continue
@@ -515,7 +556,7 @@ async def execute_scored_policy(page, adapter, *, instruction, binding,
                            v063.host.sampling_failure_class(result.get('error_subtype')),
                            result.get('error_subtype') or 'sampling_failed')
 
-        same, reason = await v063._same_pixels(page, observation, frame_url)
+        same, reason = await _same_pixels(page, observation, frame_url)
         if not same:
             decision = await discard_stale(reason)
             if decision is not None:
@@ -533,7 +574,7 @@ async def execute_scored_policy(page, adapter, *, instruction, binding,
             if decision is not None:
                 return decision
             continue
-        same, reason = await v063._same_pixels(page, observation, frame_url)
+        same, reason = await _same_pixels(page, observation, frame_url)
         if not same:
             decision = await discard_stale(reason)
             if decision is not None:
