@@ -1,0 +1,33 @@
+{
+  "schema": "v0.6-vision-proxy-smoke-v1",
+  "date": "2026-09-24",
+  "status": "completed",
+  "model": "Qwen/Qwen3.8-27B",
+  "renderer": "qwen3_5_disable_thinking",
+  "adapter": "scale-vision-proxy-v1",
+  "binding_sha256": "7314317cef399cb1f5ee3220d65dca6bee40bf58fd76228c10938a102fec66cd",
+  "input": {
+    "kind": "generated_synthetic_image",
+    "image_width": 128,
+    "image_height": 128,
+    "image_sha256": "795e057e2a680cbbb09e4ff6a38c146a9162e6b487745e05e896684f37d50f52",
+    "rendered_input_tokens": 107,
+    "image_tokens": 64
+  },
+  "response": {
+    "single_new_dispatch": true,
+    "stop_reason": "stop",
+    "output_tokens": 2,
+    "text_sha256": "0f35eb765c034ba5e67942a42520c11373b48ffed40ef460dfd87a57a2b2751a",
+    "elapsed_seconds": 5.027
+  },
+  "tests": {
+    "proxy_offline_tests_passed": 20,
+    "proxy_offline_tests_skipped": 1,
+    "provider_billed_tokens_observed": false,
+    "cost_usd": null,
+    "benchmark_task_score": null
+  },
+  "private_journal_or_model_text_published": false,
+  "scope": "A paid model API compatibility smoke with a generated image. No browser action, dataset task, or capability gain is claimed."
+}
