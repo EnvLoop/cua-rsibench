@@ -1,0 +1,38 @@
+{
+  "schema": "envloop.magento.price777.qwen_attempt_usage_correction.v1",
+  "task_id": 777,
+  "model": "Qwen/Qwen3.8-27B",
+  "model_kind": "base",
+  "status": "unscored_environment_failure",
+  "failure_code": "gui_dispatch_error",
+  "provider_sample_attempts": 5,
+  "applied_gui_actions": 2,
+  "stale_samples_discarded": 2,
+  "task_state": {
+    "target_prices_persisted_at_47": 0,
+    "target_count": 5,
+    "wrong_color_unchanged": true,
+    "official_network_score_diagnostic": 0.0,
+    "raw_and_sanitized_evaluator_equal": true,
+    "monitored_sql_and_search_reset_verified": true
+  },
+  "usage_correction": {
+    "rendered_multimodal_input_tokens": 17833,
+    "sampled_output_tokens": 100,
+    "original_immutable_result_output_tokens": 0,
+    "uncached_prefill_usd_per_million": "1.86",
+    "sample_usd_per_million": "5.595",
+    "corrected_published_rate_subtotal_usd": "0.03372888",
+    "original_immutable_result_subtotal_usd": "0.03316938",
+    "maximum_published_rate_reservation_usd": "0.31906560",
+    "provider_billed_tokens_known": false,
+    "provider_invoice_usd_known": false,
+    "basis": "Five private per-sample usage receipts; rendered and returned token lengths are not the provider invoice."
+  },
+  "evidence": {
+    "private_immutable_result_sha256": "e1a1c90678f4f1dd1cadf064584557dc408ad80c98f5c46180215e415d3c7bae",
+    "private_usage_jsonl_sha256": "1529e44aeacff640633c6903a24d5460eb9cb0653f843ce0adaa565f8225cb68",
+    "raw_model_text_and_har_published": false
+  },
+  "interpretation": "The attempted pilot is not a scored model result. Its result.json is unchanged; this addendum corrects an output-token aggregation bug in the local reporting code."
+}

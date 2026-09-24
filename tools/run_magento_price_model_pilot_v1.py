@@ -1,0 +1,561 @@
+"""One bounded Qwen3.8-27B base-model GUI pilot on Magento task 777.
+
+This mutation runner is separate from the pinned read-only task-157 pilot. The
+model can choose only one validated visible GUI action per Tinker sample. The
+host owns login, local-only routing, the original evaluator, saved-state SQL
+and search-index readback, and clone-only reset. Raw frames/model text/HAR stay
+under ignored work/; the result is a field-limited private receipt.
+"""
+from __future__ import annotations
+
+import argparse
+import asyncio
+from decimal import Decimal
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+import time
+import traceback
+from urllib.parse import urlsplit
+
+from cursibench.scale_action_contract import ContractLimits, make_observation
+from cursibench.scale_vision_proxy import (
+    Limits as VisionLimits, QwenVisionRenderer, TinkerVisionBackend,
+    VisionSamplingAdapter, campaign_metadata,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / 'work/scale-v06/sources/webarena-verified'
+BASE = 'http://localhost:7792/admin'
+VERSION = 'magento-price777-model-pilot-v1'
+CAMPAIGN_ID = 'magento-price777-base-pilot-v1'
+MAX_SAMPLES = 40
+MAX_GUI_ACTIONS = 40
+MAX_STALE_SAMPLES = 4
+WALL_SECONDS = 1200
+REQUEST_TIMEOUT_SECONDS = 90
+MAX_INPUT_TOKENS = 32768
+MAX_OUTPUT_TOKENS = 512
+PREFILL_USD_PER_M = Decimal('1.86')
+SAMPLE_USD_PER_M = Decimal('5.595')
+PUBLISHED_RATE_CAP_USD = Decimal('10')
+
+
+def _load(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+price = _load(ROOT / 'tools/qualify_magento_variant_price_v1.py', 'magento_price_qualification')
+v063 = _load(ROOT / 'tools/run_magento_model_pilot_v063.py', 'pinned_magento_v063')
+
+
+class PilotError(RuntimeError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+def sample_reservation_usd():
+    return ((Decimal(MAX_INPUT_TOKENS) * PREFILL_USD_PER_M +
+             Decimal(MAX_OUTPUT_TOKENS) * SAMPLE_USD_PER_M) / Decimal(1_000_000))
+
+
+def published_rate_preflight():
+    worst = sample_reservation_usd() * MAX_SAMPLES
+    if worst > PUBLISHED_RATE_CAP_USD:
+        raise PilotError('published_rate_budget_exceeded')
+    return {'max_samples': MAX_SAMPLES, 'max_input_tokens_per_sample': MAX_INPUT_TOKENS,
+            'max_output_tokens_per_sample': MAX_OUTPUT_TOKENS,
+            'uncached_prefill_usd_per_million': str(PREFILL_USD_PER_M),
+            'sample_usd_per_million': str(SAMPLE_USD_PER_M),
+            'worst_case_published_rate_reservation_usd': str(worst),
+            'published_rate_cap_usd': str(PUBLISHED_RATE_CAP_USD),
+            'provider_invoice_known': False}
+
+
+def validate_clone_redirect(status, location):
+    try:
+        parsed = urlsplit(location)
+        if (status != 302 or parsed.scheme != 'http' or
+                parsed.hostname not in ('localhost', '127.0.0.1') or
+                parsed.port != 7792 or parsed.path != '/admin' or
+                parsed.username or parsed.password):
+            raise PilotError('clone_redirect_not_isolated')
+    except ValueError:
+        raise PilotError('clone_redirect_not_isolated') from None
+    return {'status': status, 'location_origin': 'http://localhost:7792'}
+
+
+def clone_route_preflight():
+    response = subprocess.run(['curl', '-sS', '-m', '30', '-D', '-', '-o',
+        '/dev/null', 'http://127.0.0.1:7792/admin'], check=True,
+        capture_output=True, text=True, timeout=35)
+    lines = response.stdout.splitlines()
+    statuses = [int(match.group(1)) for line in lines
+                if (match := re.match(r'^HTTP/\S+\s+(\d{3})', line))]
+    locations = [line.split(':', 1)[1].strip() for line in lines
+                 if line.lower().startswith('location:')]
+    if len(statuses) != 1 or len(locations) != 1:
+        raise PilotError('clone_redirect_not_isolated')
+    return validate_clone_redirect(statuses[0], locations[0])
+
+
+def permitted_request(url, method, *, setup=False):
+    try:
+        parsed = urlsplit(url)
+        if parsed.scheme in ('data', 'blob', 'about'):
+            return True
+        if not (parsed.scheme == 'http' and parsed.hostname in ('localhost', '127.0.0.1')
+                and parsed.port == 7792 and not parsed.username and not parsed.password):
+            return False
+        if setup or method in ('GET', 'HEAD', 'OPTIONS'):
+            return True
+        if method != 'POST':
+            return False
+        if parsed.path == '/admin/mui/bookmark/save/':
+            return True
+        ids = '|'.join(str(i) for i in price.TARGETS)
+        return bool(re.fullmatch(r'/admin/catalog/product/(?:validate|save)/id/(?:'
+                                 + ids + r')/(?:.*)?', parsed.path))
+    except ValueError:
+        return False
+
+
+async def install_guard(context, *, setup, blocked):
+    async def route_request(route):
+        request = route.request
+        if permitted_request(request.url, request.method, setup=setup):
+            await route.continue_()
+        else:
+            blocked.append({'method': request.method,
+                            'url_sha256': price.sha(request.url)})
+            await route.abort()
+    await context.route('**/*', route_request)
+    async def close_socket(socket):
+        await socket.close()
+    await context.route_web_socket('**/*', close_socket)
+
+
+def render_for_model(observation):
+    rendered = v063.render_for_model(observation)
+    payload = json.loads(rendered['instruction'])
+    contract = payload['contract']
+    if 'five applied GUI actions' not in contract or 'seven samples' not in contract:
+        raise PilotError('pinned_model_contract_changed')
+    payload['contract'] = (contract.replace('five applied GUI actions',
+                                            'forty applied GUI actions')
+                           .replace('seven samples', 'forty samples'))
+    rendered['instruction'] = json.dumps(payload, ensure_ascii=False,
+                                          sort_keys=True, separators=(',', ':'))
+    return rendered
+
+
+class BudgetedAdapter:
+    """Reserve maximum published-rate tokens before every possible dispatch."""
+    def __init__(self, adapter, *, deadline):
+        self.adapter = adapter
+        self.deadline = deadline
+        self.attempt_count = 0
+
+    def sample(self, *, request_id, **request):
+        if time.monotonic() + REQUEST_TIMEOUT_SECONDS >= self.deadline:
+            return self.adapter.failure(request_id, 'wall_clock_budget')
+        if self.attempt_count >= MAX_SAMPLES or (
+                sample_reservation_usd() * (self.attempt_count + 1) >
+                PUBLISHED_RATE_CAP_USD):
+            return self.adapter.failure(request_id, 'published_rate_budget')
+        self.attempt_count += 1
+        return self.adapter.sample(request_id=request_id, **request)
+
+    @property
+    def reserved_usd(self):
+        return str(sample_reservation_usd() * self.attempt_count)
+
+
+def summarize_usage(policy, budget_adapter):
+    samples = policy.get('samples', []) if isinstance(policy, dict) else []
+    rendered_in = 0
+    sampled_out = 0
+    missing_usage = 0
+    for row in samples:
+        usage = row.get('usage') or {}
+        if type(usage.get('input_tokens')) is int:
+            rendered_in += usage['input_tokens']
+        else:
+            missing_usage += 1
+        if type(usage.get('output_tokens')) is int:
+            sampled_out += usage['output_tokens']
+        else:
+            missing_usage += 1
+    if budget_adapter.attempt_count > len(samples):
+        missing_usage += budget_adapter.attempt_count - len(samples)
+    estimate = ((Decimal(rendered_in) * PREFILL_USD_PER_M +
+                 Decimal(sampled_out) * SAMPLE_USD_PER_M) / Decimal(1_000_000))
+    return {'rendered_multimodal_input_tokens': rendered_in,
+            'sampled_output_tokens': sampled_out,
+            'missing_usage_fields': missing_usage,
+            'published_rate_subtotal_usd': str(estimate) if not missing_usage else None,
+            'reserved_maximum_published_rate_usd': budget_adapter.reserved_usd,
+            'provider_billed_tokens_known': False, 'provider_invoice_usd_known': False,
+            'basis': 'rendered and returned token lengths, not provider billing'}
+
+
+def entity_rows(snapshot, entity_id):
+    return {table: [row for row in rows if int(row[
+        'product_id' if table == 'cataloginventory_stock_item' else 'entity_id']) == entity_id]
+            for table, rows in snapshot['selected'].items()}
+
+
+def state_summary(before, after):
+    old, new = price.prices(before), price.prices(after)
+    target_hits = [key for key in price.TARGETS
+                   if float(old[key]) == 52.0 and float(new[key]) == 47.0]
+    wrong_unchanged = (old[112] == new[112] and
+                       entity_rows(before, 112) == entity_rows(after, 112))
+    return {'target_47_count': len(target_hits),
+            'target_ids_at_47': target_hits,
+            'wrong_color_unchanged': wrong_unchanged,
+            'positive_state_pass': len(target_hits) == 5 and wrong_unchanged,
+            'target_prices': {str(key): new[key] for key in price.TARGETS},
+            'wrong_color_price': new[112]}
+
+
+async def login(browser, source, blocked):
+    credentials = json.loads((source / 'examples/configs/config.example.json').read_text())[
+        'environments']['__SHOPPING_ADMIN__']['credentials']
+    context = await browser.new_context(service_workers='block')
+    try:
+        await install_guard(context, setup=True, blocked=blocked)
+        if await context.cookies():
+            raise PilotError('nonempty_fresh_context')
+        page = await context.new_page()
+        await page.goto(BASE, wait_until='domcontentloaded', timeout=90000)
+        await page.get_by_label('Username', exact=True).fill(credentials['username'])
+        await page.get_by_label('Password', exact=True).fill(credentials['password'])
+        await page.get_by_role('button', name='Sign in', exact=True).click()
+        await page.get_by_role('heading', name='Dashboard', exact=True).wait_for(timeout=90000)
+        if blocked:
+            raise PilotError('setup_blocked_request')
+        return await context.storage_state()
+    finally:
+        await context.close()
+
+
+async def viewport_controls(page):
+    """Expose only controls whose click center occurs inside observed pixels."""
+    viewport = page.viewport_size or {'width': 1440, 'height': 1000}
+    controls, handles = [], {}
+    for handle in await page.locator(v063.host.CONTROL_SELECTOR).element_handles():
+        if len(controls) >= 120:
+            break
+        try:
+            if not await handle.is_visible() or not await handle.is_enabled():
+                continue
+            if await handle.evaluate('(element) => !!element.closest(".admin-user")'):
+                continue
+            box = await handle.bounding_box()
+            if box is None:
+                continue
+            center_x = box['x'] + box['width'] / 2
+            center_y = box['y'] + box['height'] / 2
+            if not (0 <= center_x < viewport['width'] and
+                    0 <= center_y < viewport['height']):
+                continue
+            tag = (await handle.evaluate('(element) => element.tagName')).lower()
+            role = await handle.get_attribute('role') or {
+                'a': 'link', 'button': 'button', 'input': 'textbox',
+                'select': 'combobox', 'textarea': 'textbox',
+            }.get(tag, 'control')
+            label = (await handle.get_attribute('aria-label')
+                     or await handle.inner_text()
+                     or await handle.get_attribute('title')
+                     or await handle.get_attribute('placeholder')
+                     or '')
+            label = v063.host._short_text(label, 200)
+            if not label:
+                continue
+            ref = f'c{len(controls) + 1:03d}'
+            controls.append({'ref': ref, 'role': v063.host._short_text(role, 80),
+                             'label': label, 'visible': True, 'enabled': True})
+            handles[ref] = handle
+        except Exception:
+            continue
+    return controls, handles
+
+
+def make_capture(frames):
+    count = 0
+    async def capture(page, *, instruction, binding, step, memory, previous):
+        nonlocal count
+        try:
+            await page.wait_for_load_state('networkidle', timeout=20000)
+        except Exception:
+            pass  # Pixel/ref checks still fail closed if the page changes.
+        await page.wait_for_timeout(350)
+        image = await page.screenshot(type='png', full_page=False,
+            animations='disabled', mask=[page.locator('.admin-user')])
+        count += 1
+        path = frames / f'frame-{count:03d}-step-{step:02d}.png'
+        path.write_bytes(image)
+        path.chmod(0o600)
+        controls, handles = await v063.host._visible_controls(page)
+        headings = []
+        for heading in await page.locator('h1, h2').element_handles():
+            try:
+                if await heading.is_visible():
+                    headings.append(v063.host._short_text(await heading.inner_text(), 200))
+            except Exception:
+                continue
+        observation = make_observation(
+            task_id='webarena.shopping_admin.777', task_binding_sha256=binding,
+            instruction=instruction, step=step, screenshot_bytes=image,
+            a11y_text='Visible headings: ' + '; '.join(headings[:12]),
+            dom_text='', controls=controls, previous_action_result=previous,
+            memory=memory, limits=ContractLimits(max_step=MAX_GUI_ACTIONS))
+        return observation, handles, page.url
+    return capture
+
+
+async def execute_policy(page, adapter, *, instruction, binding, prefix, frames,
+                         deadline):
+    saved = (v063.MAX_GUI_ACTIONS, v063.MAX_SAMPLES, v063.MAX_STALE_SAMPLES,
+             v063.host.MAX_ACTIONS, v063.host.capture_frame,
+             v063.host.render_for_proxy, v063.host._visible_controls,
+             v063.host.dispatch_action)
+    v063.MAX_GUI_ACTIONS, v063.MAX_SAMPLES = MAX_GUI_ACTIONS, MAX_SAMPLES
+    v063.MAX_STALE_SAMPLES = MAX_STALE_SAMPLES
+    v063.host.MAX_ACTIONS = MAX_GUI_ACTIONS
+    v063.host.capture_frame = make_capture(frames)
+    v063.host.render_for_proxy = render_for_model
+    v063.host._visible_controls = viewport_controls
+    original_dispatch = v063.host.dispatch_action
+    async def logged_dispatch(page, action, observation, handles):
+        try:
+            return await original_dispatch(page, action, observation, handles)
+        except Exception as exc:
+            path = frames.parent / 'private-dispatch-errors.jsonl'
+            with path.open('a') as stream:
+                stream.write(json.dumps({'type': type(exc).__name__,
+                    'step': observation.step, 'action_type': action.get('type'),
+                    'traceback': traceback.format_exc()}) + '\n')
+            path.chmod(0o600)
+            raise
+    v063.host.dispatch_action = logged_dispatch
+    try:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise PilotError('wall_clock_budget')
+        return await asyncio.wait_for(v063.execute_policy(
+            page, adapter, instruction=instruction, binding=binding,
+            request_prefix=prefix), timeout=remaining)
+    finally:
+        (v063.MAX_GUI_ACTIONS, v063.MAX_SAMPLES, v063.MAX_STALE_SAMPLES,
+         v063.host.MAX_ACTIONS, v063.host.capture_frame,
+         v063.host.render_for_proxy, v063.host._visible_controls,
+         v063.host.dispatch_action) = saved
+
+
+class LiveAdapterFactory:
+    def __init__(self):
+        self.service = None
+
+    def __call__(self, journal, *, deadline):
+        if not os.environ.get('TINKER_API_KEY'):
+            raise PilotError('tinker_key_missing')
+        import tinker
+        renderer = QwenVisionRenderer.load()
+        self.service = tinker.ServiceClient(
+            user_metadata=campaign_metadata(CAMPAIGN_ID))
+        backend = TinkerVisionBackend.from_service(self.service, renderer)
+        adapter = VisionSamplingAdapter(backend, journal, limits=VisionLimits(
+            max_actions=MAX_SAMPLES, input_tokens=MAX_INPUT_TOKENS,
+            output_tokens=MAX_OUTPUT_TOKENS,
+            request_timeout_seconds=REQUEST_TIMEOUT_SECONDS))
+        return BudgetedAdapter(adapter, deadline=deadline)
+
+    def close(self, status):
+        if self.service is not None:
+            try:
+                self.service.close(status).result(timeout=30)
+            except Exception:
+                pass
+
+
+async def run(source, out, adapter_factory):
+    from playwright.async_api import async_playwright
+    source, out = Path(source).resolve(), Path(out).resolve()
+    if not out.is_relative_to(ROOT / 'work/scale-v06') or out.exists():
+        raise PilotError('invalid_output_path')
+    out.mkdir(parents=True, mode=0o700)
+    out.chmod(0o700)
+    frames = out / 'private-frames'
+    frames.mkdir(mode=0o700)
+    started = time.monotonic()
+    deadline = started + WALL_SECONDS
+    report = {'version': VERSION, 'task_id': 777, 'model': 'Qwen/Qwen3.8-27B',
+              'model_kind': 'base', 'training_or_checkpoint_used': False,
+              'started_at': time.time(), 'max_samples': MAX_SAMPLES,
+              'max_gui_actions': MAX_GUI_ACTIONS, 'wall_limit_seconds': WALL_SECONDS,
+              'campaign_id': CAMPAIGN_ID, 'status': 'unscored', 'score': None,
+              'hundred_task_ready': False, 'official_final_task_count': 0,
+              'auth_state_retained': False, 'raw_har_retained': False,
+              'published_rate_budget': published_rate_preflight()}
+    before = None
+    search_before = None
+    budget_adapter = None
+    try:
+        if not os.environ.get('TINKER_API_KEY'):
+            raise PilotError('tinker_key_missing')
+        task, source_info = price.source_proof(source)
+        report['source'] = source_info
+        report['container'] = price.container_proof()
+        report['clone_route'] = clone_route_preflight()
+        report['search_health'] = price.search_health()
+        before = price.read_db()
+        search_before = price.read_search_index()
+        report['sql_before'] = price.public_db(before)
+        report['search_before'] = search_before
+        if not all(float(price.prices(before)[key]) == 52.0 for key in (*price.TARGETS, *price.WRONG)):
+            raise PilotError('baseline_price_changed')
+        if float(search_before['parent_price_0_1']) != 52.0:
+            raise PilotError('baseline_search_price_changed')
+        binding = price.digest({'version': VERSION, 'source': source_info,
+            'task_id': 777, 'intent': task['intent'], 'max_samples': MAX_SAMPLES,
+            'max_gui_actions': MAX_GUI_ACTIONS})
+        report['task_binding_sha256'] = binding
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            try:
+                setup_blocked = []
+                state = await login(browser, source, setup_blocked)
+                with tempfile.TemporaryDirectory(prefix='.private-har-', dir=out) as temp:
+                    raw_path = Path(temp) / 'network.har'
+                    context = await browser.new_context(storage_state=state,
+                        viewport={'width': 1440, 'height': 1000},
+                        service_workers='block', record_har_path=str(raw_path),
+                        record_har_content='embed')
+                    blocked = []
+                    try:
+                        await install_guard(context, setup=False, blocked=blocked)
+                        page = await context.new_page()
+                        page.set_default_timeout(30000)
+                        await page.goto(BASE, wait_until='domcontentloaded', timeout=90000)
+                        await page.get_by_role('heading', name='Dashboard', exact=True).wait_for(timeout=90000)
+                        budget_adapter = adapter_factory(out / 'private-journal',
+                                                         deadline=deadline)
+                        prefix = 'mag777-' + hashlib.sha256(str(out).encode()).hexdigest()[:16]
+                        try:
+                            report['policy'] = await execute_policy(page, budget_adapter,
+                                instruction=task['intent'], binding=binding,
+                                prefix=prefix, frames=frames, deadline=deadline)
+                        except asyncio.TimeoutError:
+                            report['policy'] = {'status': 'unscored',
+                                'failure_class': 'environment_failure',
+                                'failure_code': 'wall_clock_budget',
+                                'samples': [], 'actions': []}
+                        report['final_url_path'] = urlsplit(page.url).path
+                        report['blocked_requests'] = blocked
+                    finally:
+                        await context.close()
+                    report['raw_har_sha256'] = price.sha(raw_path.read_bytes())
+                    raw = json.loads(raw_path.read_text())
+                    sanitized = price.sanitize_har(raw)
+                    clean_path = out / 'private-sanitized-network.har'
+                    price.write_new(clean_path, sanitized)
+                    official = price.evaluator(source)
+                    raw_score = price.evaluate(official, raw_path)
+                    clean_score = price.evaluate(official, clean_path)
+                    report['published_evaluator_raw'] = raw_score
+                    report['published_evaluator_sanitized'] = clean_score
+                    report['raw_and_sanitized_evaluator_equal'] = raw_score == clean_score
+                    report['sanitized_har_sha256'] = price.sha(clean_path.read_bytes())
+            finally:
+                await browser.close()
+        after = price.read_db()
+        search_after = price.read_search_index()
+        report['sql_after'] = price.public_db(after)
+        report['search_after'] = search_after
+        state_result = state_summary(before, after)
+        report['independent_state'] = state_result
+        report['usage'] = summarize_usage(report.get('policy'), budget_adapter)
+        if state_result['positive_state_pass']:
+            price.validate_positive(before, after)
+        policy = report['policy']
+        official = report['published_evaluator_sanitized']
+        if blocked or not report['raw_and_sanitized_evaluator_equal']:
+            report.update(failure_class='environment_failure',
+                          failure_code='blocked_or_evaluator_disagreement')
+        elif policy['status'] != 'completed':
+            report.update(failure_class=policy['failure_class'],
+                          failure_code=policy['failure_code'])
+        elif official['status'] not in ('success', 'failure') or official['score'] not in (0.0, 1.0):
+            report.update(failure_class='verifier_failure',
+                          failure_code='invalid_official_result')
+        else:
+            report['status'] = 'completed'
+            report['score'] = 1.0 if (
+                official['score'] == 1.0 and state_result['positive_state_pass']) else 0.0
+            report['pilot_task_complete'] = report['score'] == 1.0
+            if report['score'] == 0.0:
+                report.update(failure_class='model_failure',
+                              failure_code='requested_prices_not_all_persisted')
+        report['official_network_score_diagnostic'] = official['score']
+    except Exception as exc:
+        report['failure_class'] = ('environment_failure' if isinstance(exc, PilotError)
+                                   else 'transport_or_environment_failure')
+        report['failure_code'] = exc.code if isinstance(exc, PilotError) else type(exc).__name__
+    finally:
+        if budget_adapter is not None and 'usage' not in report:
+            report['usage'] = summarize_usage(report.get('policy'), budget_adapter)
+        if before is not None:
+            try:
+                price.restore_rows(before)
+                if search_before is not None:
+                    price.reindex_search()
+                restored = price.read_db()
+                price.validate_reset(before, restored)
+                report['sql_restored'] = price.public_db(restored)
+                if search_before is not None:
+                    search_restored = price.read_search_index()
+                    price.validate_search_reset(search_before, search_restored)
+                    report['search_restored'] = search_restored
+                report['final_monitored_reset_verified'] = True
+            except Exception as exc:
+                report['final_monitored_reset_verified'] = False
+                report['reset_error_type'] = type(exc).__name__
+                report['status'] = 'unscored'
+                report['score'] = None
+        report['elapsed_seconds'] = time.monotonic() - started
+        report['finished_at'] = time.time()
+        price.write_new(out / 'result.json', report)
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source', type=Path, default=SOURCE)
+    parser.add_argument('--out', type=Path, required=True)
+    args = parser.parse_args()
+    factory = LiveAdapterFactory()
+    try:
+        result = asyncio.run(run(args.source, args.out, factory))
+        print(json.dumps({key: result.get(key) for key in
+            ('version', 'task_id', 'status', 'score', 'failure_class',
+             'failure_code', 'final_monitored_reset_verified', 'elapsed_seconds')},
+            sort_keys=True), flush=True)
+        raise SystemExit(0 if result['status'] == 'completed' else 2)
+    finally:
+        factory.close('success' if 'result' in locals() and result['status'] == 'completed' else 'errored')
+
+
+if __name__ == '__main__':
+    main()
