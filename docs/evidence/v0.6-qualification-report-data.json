@@ -1,0 +1,297 @@
+{
+  "schema": "cua-rsibench-v0.6-qualification-report-data-v1",
+  "language": "en",
+  "snapshot_date": "2026-09-24",
+  "snapshot_git_commit": "f75cf4f95f103931a528d6f6fccda463b3ad00f3",
+  "report_type": "interim qualification and methods report",
+  "result_status": "No full-scale researcher comparison or 100-task application-cell result is available in this merged evidence snapshot.",
+  "measurement_policy": {
+    "measured": "An observed local or provider execution with a retained public receipt; each claim remains limited to its stated task, software, and control.",
+    "offline_candidate": "A pinned source inventory or reproducible offline split; no task admission, GUI success, or model score follows from its count.",
+    "planned": "A declared future workload or budget ceiling, not an execution, invoice, or success denominator.",
+    "unverified": "A gate without qualifying evidence in this snapshot; do not convert it to a zero model score."
+  },
+  "declared_study": {
+    "evidence_class": "planned",
+    "researcher_configurations": ["gpt-6-astra", "gpt-5.6-sol", "gpt-6-sol", "gpt-6-luna"],
+    "student": "Qwen/Qwen3.8-27B",
+    "rollout_teacher": "gpt-5.6-sol",
+    "application_cells": 6,
+    "campaigns": 24,
+    "selection_tasks_per_cell": 20,
+    "official_task_identities_per_cell": 100,
+    "official_task_identities_across_cells": 600,
+    "projected_initial_selection_trials": 2520,
+    "projected_initial_official_trials_including_shared_base": 3000,
+    "per_campaign_wall_time_cap_hours": 16,
+    "per_campaign_tinker_cap_usd": 500,
+    "aggregate_nominal_tinker_cap_usd": 12000,
+    "known_rate_token_envelope_subtotal_usd_approx": 2950,
+    "token_envelope_excludes": ["unknown input-token use", "non-Tinker provider use", "E2B", "application services", "storage"],
+    "sources": ["full_scale_plan"]
+  },
+  "merged_snapshot_progress": {
+    "evidence_class": "measured_public_receipt_coverage",
+    "frozen_100_task_cells": 0,
+    "admitted_official_final_task_identities": 0,
+    "completed_researcher_campaigns": 0,
+    "completed_full_scale_official_trials": 0,
+    "full_scale_success_rate": null,
+    "trained_checkpoint_improvement": null,
+    "provider_invoice_usd": null,
+    "interpretation": "Counts describe receipts present at the specified merged commit, not a live job monitor or a model failure rate.",
+    "sources": ["source_inventory", "full_scale_plan"]
+  },
+  "post_merge_access_observation": {
+    "evidence_class": "user_authorized_browser_submission_after_merged_snapshot",
+    "workarena_request_state": "submitted_awaiting_repository_author_review",
+    "instance_access_verified": false,
+    "task_execution_verified": false,
+    "source": "workarena_access_request"
+  },
+  "post_merge_qualification_controls": {
+    "gitlab_milestone_590": {
+      "evidence_class": "measured_one_task_gui_mutation_on_synthetic_local_seed",
+      "official_positive_negative_positive": [1.0, 0.0, 1.0],
+      "independent_database_readback": true,
+      "per_case_reset_to_monitored_baseline": [true, true, true],
+      "model_calls": 0,
+      "original_populated_webarena_seed": false,
+      "hundred_task_cell_ready": false,
+      "source": "gitlab_milestone"
+    },
+    "magento_variant_price_777": {
+      "evidence_class": "measured_rejected_local_gui_task",
+      "official_raw_and_sanitized_har_score": 1.0,
+      "requested_price_saves": 5,
+      "persisted_target_price_changes": 0,
+      "visible_save_error": true,
+      "independent_database_state_unchanged": true,
+      "admission": "rejected_unscored",
+      "model_calls": 0,
+      "hundred_task_cell_ready": false,
+      "source": "magento_price_rejection"
+    }
+  },
+  "application_qualification": [
+    {
+      "cell": "PowerPoint for the web",
+      "candidate_inventory": 120,
+      "candidate_unit": "PPT-Eval task IDs across 12 source-deck families",
+      "offline_split": "20 selection and 100 provisional final candidates, deck-family disjoint",
+      "observed_scope": "One 32-slide source deck was edited and saved in the real web app. An Office-saved no-task-change control and requested 48-point title edit differ in five package parts; a narrowly normalized artifact guard conditionally accepts the edit.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "Automated pre-actor baseline freeze, task reset, and a reliable upstream official score remain unverified.",
+      "evidence_class": "measured_one_task_artifact_control_plus_offline_candidates",
+      "sources": ["source_inventory", "ppt_web_control"]
+    },
+    {
+      "cell": "Microsoft Excel for the web",
+      "candidate_inventory": 200,
+      "candidate_unit": "SpreadsheetBench 2 Financial_Model and Debugging task instances from 30 base-workbook families",
+      "offline_split": "20 selection candidates from three families and 100 provisional final candidates from 15 different families",
+      "observed_scope": "A complex source workbook opened and retained checked cell semantics on an untouched download, but lost two Note drawings. A separate six-sheet SEC-based development workbook has one human GUI full-positive and one partial negative control.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "No provisional final task has a complete web-GUI repair, full preservation proof, hidden isolation, and automated reset.",
+      "evidence_class": "measured_development_controls_plus_offline_candidates",
+      "sources": ["source_inventory", "excel_split", "excel_roundtrip", "excel_oracle", "sec_full_positive", "sec_partial_negative"]
+    },
+    {
+      "cell": "Native desktop applications",
+      "candidate_inventory": 369,
+      "candidate_unit": "OSWorld task IDs across ten application domains; Calc contributes 47 IDs",
+      "offline_split": null,
+      "observed_scope": "One E2B Desktop sandbox used LibreOffice Calc GUI to save a synthetic XLSX; independent OOXML readback matched both cells, and the sandbox was confirmed stopped.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "No OSWorld task, task-specific evaluator, or task reset ran; LibreOffice is not Microsoft Excel desktop.",
+      "evidence_class": "measured_synthetic_environment_smoke_plus_offline_candidates",
+      "sources": ["source_inventory", "e2b_desktop"]
+    },
+    {
+      "cell": "ServiceNow compositional work",
+      "candidate_inventory": 175,
+      "candidate_unit": "WorkArena L2 task classes; seeds are instances within a class",
+      "offline_split": null,
+      "observed_scope": "Pinned source inventory plus a post-merge gated-access request that was submitted and awaiting author review. No ServiceNow instance access or task execution is verified.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "Approved benchmark-instance access and live task, verifier, and reset checks.",
+      "evidence_class": "offline_candidate_plus_post_merge_access_request",
+      "sources": ["source_inventory", "workarena_access_request"]
+    },
+    {
+      "cell": "GitLab project operations",
+      "candidate_inventory": 180,
+      "candidate_unit": "WebArena-Verified GitLab task IDs from 41 intent templates",
+      "offline_split": null,
+      "observed_scope": "A read-only navigation task on an unseeded local GitLab CE instance scored 1/0/1. A separate published milestone mutation task 590 scored 1/0/1 for correct/wrong-date/correct GUI submissions on a minimal synthetic local project; PostgreSQL readback and three monitored resets passed. Neither case used a model.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "The original populated WebArena project state, realistic current-date tasks, broader mutation reset, and 100-task task-by-task admission.",
+      "evidence_class": "measured_two_local_tasks_with_one_synthetic_seeded_mutation_plus_offline_candidates",
+      "sources": ["source_inventory", "web_app_smokes", "gitlab_milestone"]
+    },
+    {
+      "cell": "Magento administration",
+      "candidate_inventory": 182,
+      "candidate_unit": "WebArena-Verified Magento-admin task IDs",
+      "offline_split": null,
+      "observed_scope": "Task 157 read-only navigation had positive/wrong-route controls; a Qwen3.8-27B base-model attempt scored 1 on that single task. Task 538 address mutation had official positive 1.0, wrong-order negative 0.0, independent database readback, and post-test restoration of five monitored business-table hashes. A separate five-variant price task 777 was rejected: the network-only official score was 1.0, but the GUI showed a save error and SQL confirmed zero persisted price changes.",
+      "full_cell_official_success_rate": null,
+      "qualified_final_tasks": 0,
+      "missing_gate": "Reliable persisted saves for other mutation families, general reset, and 100-task admission; the one base-model success is not a trained-checkpoint or full-cell result.",
+      "evidence_class": "measured_two_task_local_qualification_plus_one_rejected_task_and_offline_candidates",
+      "sources": ["source_inventory", "web_app_smokes", "magento_mutation", "magento_qwen_pilot", "magento_price_rejection"]
+    }
+  ],
+  "hard_excel_calibration": {
+    "evidence_class": "measured_development_controls_not_official_final",
+    "spreadsheetbench_2_structural_screen": {
+      "source_task_instances": 200,
+      "source_base_workbook_families": 30,
+      "families_passing_offline_structural_screen": 22,
+      "provisional_final_tasks": 100,
+      "provisional_final_families": 15,
+      "selection_tasks": 20,
+      "selection_families": 3,
+      "final_gui_qualified_tasks": 0,
+      "final_family_sheet_range": [7, 25],
+      "final_family_median_sheets": 12,
+      "final_family_formula_cell_range": [1014, 73063],
+      "final_family_median_formula_cells": 2009,
+      "interpretation": "The 100 candidates share 15 base models; neither the task count nor the structural thresholds establish GUI solvability or hidden-set novelty."
+    },
+    "single_financial_model_offline_oracle": {
+      "source_task": "Financial_Model:01_01",
+      "source_workbook_sheets_seen_in_web": 25,
+      "target_formula_cells_in_offline_gold": 82,
+      "gold_artifact_passed": true,
+      "wrong_formula_rejected": true,
+      "unrelated_numeric_edit_rejected": true,
+      "visible_gui_solution": false,
+      "untouched_web_roundtrip_note_drawings_removed": 2
+    },
+    "sec_blind_audit_development_fixture": {
+      "sheets": 6,
+      "authentic_sec_rows": 177,
+      "formula_targets": 114,
+      "injected_causal_faults": 9,
+      "human_gui_one_edit_repaired_faults": 1,
+      "human_gui_one_edit_full_pass": false,
+      "human_gui_full_repaired_faults": 9,
+      "human_gui_full_checked_targets": 114,
+      "human_gui_full_pass": true,
+      "evaluator_side_replay_profiles_passed": 2,
+      "model_calls_across_these_controls": 0,
+      "distinct_issuer_source_families": 1,
+      "interpretation": "The one-edit and full-repair controls discriminate incomplete repair on one public development fixture. They do not measure model difficulty or create sealed final tasks."
+    },
+    "sources": ["excel_split", "excel_roundtrip", "excel_oracle", "sec_full_positive", "sec_partial_negative"]
+  },
+  "student_interface_evidence": {
+    "evidence_class": "measured_compatibility_and_single_base_model_task",
+    "tinker_synthetic_image_optimizer_steps": 1,
+    "tinker_checkpoint_saved_and_sampled": true,
+    "paid_synthetic_image_proxy_requests": 1,
+    "real_magento_base_model_task_157_scored_attempts": 1,
+    "real_magento_base_model_task_157_score": 1.0,
+    "real_magento_base_model_applied_gui_actions": 5,
+    "earlier_protocol_development_attempts": ["0 before GUI dispatch", "0 before GUI dispatch", "unscored after a stale frame"],
+    "trained_benchmark_checkpoint_result": null,
+    "billed_provider_cost_usd": null,
+    "interpretation": "Synthetic-image LoRA compatibility and one base-model navigation success are separate checks; no before/after training effect is measured.",
+    "sources": ["vision_compatibility", "vision_proxy", "magento_qwen_pilot"]
+  },
+  "suggested_figures": [
+    {
+      "id": "qualification_matrix",
+      "title": "Six application cells: local evidence versus the 100-task gate",
+      "form": "categorical evidence matrix, not a success-rate chart",
+      "columns": ["Pinned source inventory", "Real application GUI observed", "One task or development positive", "Negative control", "Saved-state readback", "One task-specific rollback", "100 official tasks qualified"],
+      "rows": [
+        {"cell": "PowerPoint for the web", "states": ["yes", "yes", "artifact-only", "offline-only", "artifact-only", "no", "no"]},
+        {"cell": "Excel for the web", "states": ["yes", "yes", "human development fixture", "one-edit development fixture", "checked workbook semantics", "no", "no"]},
+        {"cell": "Native desktop", "states": ["yes", "synthetic Calc GUI", "synthetic only", "no", "two-cell XLSX", "sandbox teardown only", "no"]},
+        {"cell": "ServiceNow", "states": ["yes", "no", "no", "no", "no", "no", "no"]},
+        {"cell": "GitLab", "states": ["yes", "yes", "navigation and milestone mutation", "wrong-route and wrong-date", "database", "one synthetic-seed mutation", "no"]},
+        {"cell": "Magento", "states": ["yes", "yes", "navigation and mutation", "wrong-route and wrong-order", "database", "one mutation", "no"]}
+      ],
+      "caption": "A colored cell denotes the exact scope in its text; no row represents a completed 100-task benchmark.",
+      "sources": ["source_inventory", "ppt_web_control", "sec_full_positive", "sec_partial_negative", "e2b_desktop", "web_app_smokes", "gitlab_milestone", "magento_mutation"]
+    },
+    {
+      "id": "hard_excel_source_funnel",
+      "title": "Hard Excel source diversity narrows before GUI admission",
+      "form": "two aligned small-multiple bar charts with separate units",
+      "task_instance_series": [
+        {"stage": "Published Financial_Model + Debugging", "count": 200},
+        {"stage": "Provisional final", "count": 100},
+        {"stage": "GUI-qualified final", "count": 0}
+      ],
+      "base_workbook_family_series": [
+        {"stage": "Published base families", "count": 30},
+        {"stage": "Pass offline structural screen", "count": 22},
+        {"stage": "Provisional final families", "count": 15}
+      ],
+      "caption": "The two series have different denominators. Selection uses another three disjoint families and is omitted from the final-family funnel. Screening is structural, not a difficulty score.",
+      "sources": ["excel_split"]
+    },
+    {
+      "id": "sec_development_control",
+      "title": "A real Excel-web repair control separates partial from complete work",
+      "form": "two-bar repair-count comparison with an independent-oracle annotation",
+      "bars": [
+        {"attempt": "One-edit human GUI control", "repaired_faults": 1, "total_faults": 9, "full_pass": false},
+        {"attempt": "Full human GUI control", "repaired_faults": 9, "total_faults": 9, "full_pass": true}
+      ],
+      "annotation": "The full downloaded workbook passed 114/114 formula targets and two evaluator-side source/scenario replay profiles. Their vectors are public in this development fixture. Both controls are human-operated, with zero model calls.",
+      "sources": ["sec_full_positive", "sec_partial_negative"]
+    },
+    {
+      "id": "magento_network_state_disagreement",
+      "title": "A network success signal contradicted the persisted business state",
+      "form": "two evidence cards with distinct units, not a common-axis score chart",
+      "official_network_score": 1.0,
+      "requested_price_changes": 5,
+      "persisted_price_changes": 0,
+      "visible_save_error": true,
+      "admission": "rejected_unscored",
+      "caption": "In one isolated Magento clone, the unchanged official HAR evaluator returned 1.0, while the UI reported a save error and five target prices remained unchanged. This is an environment-specific rejection, not a general benchmark score.",
+      "sources": ["magento_price_rejection"]
+    }
+  ],
+  "publication_cautions": [
+    "Title the artifact as an interim qualification or methods report. Do not call it the completed four-by-six result paper.",
+    "Do not pool Magento protocol-development scores 0, 0, unscored, 1 as independent model trials; protocol versions and failure modes differ.",
+    "Do not count the SEC human positive as a Qwen result, a hidden final item, or automated cloud-reset evidence.",
+    "Do not equate 100 provisional Excel task instances with 100 independent workbooks; they derive from 15 final base families.",
+    "Do not treat E2B Calc as Microsoft Excel desktop or its synthetic XLSX smoke as an OSWorld task.",
+    "Do not treat the GitLab milestone task on a minimal synthetic local project with past 2023 dates as the original populated WebArena environment or a realistic final task.",
+    "Do not promote the Magento task 777 network-only score of 1.0 to an admitted task success; the GUI reported a save error and the target prices did not persist in that clone.",
+    "Do not treat a source's published task count as a runtime-ready denominator; inventory units differ across cells.",
+    "The ServiceNow access request is a separately registered post-merge browser observation; it is not instance approval or a task run.",
+    "Actual provider billing, complete 100-task scores, model improvement, and all-cell reset coverage are unavailable."
+  ],
+  "sources": {
+    "source_inventory": {"path": "docs/evidence/v0.6-source-candidates.json", "sha256": "4bfd9d3ca22dd011be54b988c463ffcf9aeffe833a810efadb69596ca352cb28"},
+    "full_scale_plan": {"path": "docs/plans/2026-09-24-full-scale-computer-use.md", "sha256": "6db3e66abdff0cb07178fd0b3c2ff2d4970e27576546e692bc9d4e05a6fc12a3"},
+    "ppt_web_control": {"path": "docs/evidence/v0.6-ppt-web-normalization-control-2026-09-24.md", "sha256": "3d415c543a29acb616fc2faf8dea4e6c34e5083504deba8daba61b3a979ade75"},
+    "excel_split": {"path": "docs/evidence/hard-excel-v2-offline-split-2026-09-24.md", "sha256": "276c4986b2aa7ee62be2a54859d2794dbf6b23d3f2d77e6a8456bc7e40466a8a"},
+    "excel_roundtrip": {"path": "docs/evidence/v0.6-excel-hard-web-roundtrip.json", "sha256": "236e5f30164c5e9a57a824479f990f6144ff05200927790e670df5a7303a12b9"},
+    "excel_oracle": {"path": "docs/evidence/hard-excel-v2-01-01-oracle-2026-09-24.json", "sha256": "63c981bc51ceef167b91a2af1368da864330aecdb873a07421589b1c0236a9b7"},
+    "sec_full_positive": {"path": "docs/evidence/sec-bridge-audit-excel-web-full-positive-2026-09-24.json", "sha256": "c78fd61c742026449dde1ae20c1ff4f0a08bf6d68484b869e019c59f909db751"},
+    "sec_partial_negative": {"path": "docs/evidence/sec-bridge-audit-excel-web-one-edit-2026-09-24.json", "sha256": "2396ac1941c81c3273c495d12d5890d63147e6ef8eb59249582392d4929abaa9"},
+    "e2b_desktop": {"path": "docs/evidence/e2b-desktop-smoke-2026-09-24/receipt.json", "sha256": "e75af34a8ff41994f744ecfb7c8383ca73cae2f8afcb39a9eba60889de7cda84"},
+    "web_app_smokes": {"path": "docs/evidence/v0.6-web-app-smokes.json", "sha256": "19095b6af382882cafb322e98caa0c3bc588ae0969fe23c0b2b893849b6760a2"},
+    "magento_mutation": {"path": "docs/evidence/magento-order-address-mutation-2026-09-24.json", "sha256": "f17ab11d18a94737fa5ad3622209b67ee13a1a45798fe17c2bbcf72a63bf9d4d"},
+    "magento_qwen_pilot": {"path": "docs/evidence/v0.6-magento-qwen38-pilot.json", "sha256": "6a19400894d255cb6daf922fb7a92f4f6a0933c51efa5e4e27b9dd61b2e1ae8d"},
+    "vision_compatibility": {"path": "docs/evidence/v0.6-vision-compatibility.json", "sha256": "133fbdee8c8578207e31df5dbf683a6f74f2c0dd3d8d1e23e2ac8f8ac38e4b9c"},
+    "vision_proxy": {"path": "docs/evidence/v0.6-vision-proxy-smoke.json", "sha256": "bc07591cd87347163f7d14ee779a957ce2ac7617078a695b371b4a7c2731b695"},
+    "workarena_access_request": {"path": "docs/evidence/workarena-access-request-2026-09-24.json", "sha256": "410134fff2fb82cfdf1c8b743e260dce3b8815556a5c9a00cd0a324f873f479d"},
+    "gitlab_milestone": {"path": "docs/evidence/gitlab-milestone-mutation-2026-09-24.json", "sha256": "20443cd5c2d854e37dbc72b51c569c3ca7a6c2290e74d46b77a95c258f5c3f33"},
+    "magento_price_rejection": {"path": "docs/evidence/magento-variant-price-rejection-2026-09-24.json", "sha256": "7d1c2cde069a2591e47517cb7ce2e966aaff931480e2c86d2f50954f92a2afd3"}
+  }
+}

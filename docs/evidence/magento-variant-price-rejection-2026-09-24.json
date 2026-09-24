@@ -1,0 +1,111 @@
+{
+  "admission": {
+    "hundred_task_ready": false,
+    "official_final_task_count": 0,
+    "qualified_task_count": 0,
+    "reason": "A network-only 1.0 contradicted visible error and independent unchanged persisted state."
+  },
+  "clone": {
+    "image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+    "localhost_only": true,
+    "mounts": 0
+  },
+  "independent_sql": {
+    "business_table_hashes_unchanged_after_save": true,
+    "final_hashes_match_baseline": true,
+    "final_reset_verified": true,
+    "monitored_table_count": 9,
+    "target_prices_after": {
+      "111": "52.000000",
+      "114": "52.000000",
+      "117": "52.000000",
+      "120": "52.000000",
+      "123": "52.000000"
+    },
+    "target_prices_before": {
+      "111": "52.000000",
+      "114": "52.000000",
+      "117": "52.000000",
+      "120": "52.000000",
+      "123": "52.000000"
+    },
+    "wrong_color_price_after": "52.000000",
+    "wrong_color_price_before": "52.000000"
+  },
+  "intent": "Reduce the price of green Hollister backyard sweatshirt in all sizes by $5",
+  "local_exception": {
+    "private_log_sha256": "712c210e1d64ec89314c9525be7c6f7fcaa8a6a6997fbcd4935d0213eee9cdfe",
+    "reported_previous_exception": "Could not ping search engine: No alive nodes found in your cluster",
+    "visible_save_failure": true
+  },
+  "negative_case": {
+    "attempted": false,
+    "reason": "The positive save did not persist; this task was rejected before wrong-object qualification."
+  },
+  "privacy": {
+    "authentication_state_retained": false,
+    "private_log_published": false,
+    "published_har": false,
+    "raw_har_retained": false
+  },
+  "provenance": {
+    "run_dir_label": "magento-variant-price-v1-run4",
+    "run_tool_sha256": "46028f46e7db34d282ebc9b68087fad1f7f8a8112199322577ed7a6aa54a4c5e",
+    "screenshot_file": "magento-variant-price-rejected-save-2026-09-24.png"
+  },
+  "published_evaluator": {
+    "checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+    "network_evaluators_passed": 5,
+    "raw_and_sanitized_equal": true,
+    "raw_score": 1.0,
+    "sanitized_score": 1.0
+  },
+  "schema": "envloop.magento.variant_price.rejection.v1",
+  "scripted_gui": {
+    "model_calls": 0,
+    "save_requests": [
+      {
+        "entity_id": 111,
+        "price_field": "47.00",
+        "status": 302
+      },
+      {
+        "entity_id": 114,
+        "price_field": "47.00",
+        "status": 302
+      },
+      {
+        "entity_id": 117,
+        "price_field": "47.00",
+        "status": 302
+      },
+      {
+        "entity_id": 120,
+        "price_field": "47.00",
+        "status": 302
+      },
+      {
+        "entity_id": 123,
+        "price_field": "47.00",
+        "status": 302
+      }
+    ],
+    "screenshot_sha256": "cbbbe54a0df069bf17a6859d6bf496a97a8b00e7e922269b5462df440f86b6a2",
+    "target_skus": {
+      "111": "MH05-XS-Green",
+      "114": "MH05-S-Green",
+      "117": "MH05-M-Green",
+      "120": "MH05-L-Green",
+      "123": "MH05-XL-Green"
+    },
+    "visible_error": "The stock item was unable to be saved. Please try again."
+  },
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "evaluator_source_sha256": "a2e6d2be96debd2bbaec36690d3e6c94b12be067a686998bbf58e2118f4605c5",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "task_sha256": "a39bdffcb64ffc8cbb5305858853c6c87664eac0060fedfd554b5bf6bfe9f177"
+  },
+  "status": "rejected_unscored",
+  "task_id": 777
+}

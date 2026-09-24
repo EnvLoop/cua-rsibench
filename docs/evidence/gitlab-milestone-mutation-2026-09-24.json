@@ -1,0 +1,293 @@
+{
+  "business_baseline": {
+    "business_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+    "events": 2,
+    "issues": 0,
+    "milestones": [],
+    "milestones_sequence": "1|false",
+    "project_id": 1
+  },
+  "case": "Published WebArena-Verified GitLab task 590 in disposable real GitLab CE 18.5",
+  "cases": [
+    {
+      "actual_sanitized_task_event": {
+        "request": {
+          "cookies": [],
+          "headers": [],
+          "method": "POST",
+          "postData": {
+            "mimeType": "application/x-www-form-urlencoded",
+            "text": "milestone%5Btitle%5D=product+launch&milestone%5Bstart_date%5D=2023-01-16&milestone%5Bdue_date%5D=2023-01-30"
+          },
+          "queryString": [],
+          "url": "http://localhost:8013/primer/design/-/milestones"
+        },
+        "response": {
+          "content": {},
+          "cookies": [],
+          "headers": [],
+          "redirectURL": "http://localhost:8013/primer/design/-/milestones/10",
+          "status": 302
+        },
+        "startedDateTime": "2026-09-24T10:49:38.204Z"
+      },
+      "blocked_external_requests": 7,
+      "final_gui": {
+        "due_date_visible": true,
+        "start_date_visible": true,
+        "title_visible": true,
+        "url": "http://localhost:8013/primer/design/-/milestones/10"
+      },
+      "form_values": [
+        "product launch",
+        "2023-01-16",
+        "2023-01-30"
+      ],
+      "full_sanitized_har_entries": 298,
+      "full_sanitized_har_sha256": "2ae19b382e4fbf7cabe1bdb79c0bf45a449dc7a6700016efea1191bfb9bf39cf",
+      "independent_database_readback": {
+        "business_sha256": "339c077611630a07e6d6216915ac5eb65512ee51a51b3a6d77c6deaccad67a15",
+        "events": 3,
+        "issues": 0,
+        "milestone": {
+          "due_date": "2023-01-30",
+          "group_id": null,
+          "id": 1,
+          "project_id": 1,
+          "start_date": "2023-01-16",
+          "state": "active",
+          "title": "product launch"
+        }
+      },
+      "name": "positive-1",
+      "published_evaluator": {
+        "error_present": false,
+        "evaluators": [
+          {
+            "name": "AgentResponseEvaluator",
+            "score": 1.0,
+            "status": "success"
+          },
+          {
+            "name": "NetworkEventEvaluator",
+            "score": 1.0,
+            "status": "success"
+          }
+        ],
+        "score": 1.0,
+        "status": "success"
+      },
+      "raw_and_sanitized_score_equal": true,
+      "reset": {
+        "baseline_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+        "business_state_restored": true,
+        "reset_rows": 1
+      },
+      "screenshots_sha256": {
+        "final.png": "a92ce2e5bf4864fdd6a2dd3f486def6111c724af98615e6c558cafd190b3fb04",
+        "form.png": "42868f55ad5f5b4120abec1646af6d97105f6476225fd8e9b2d153e49e54fadc",
+        "project.png": "13cf07890ac0e84225636a299aa097f0c6453274eb30e1c03f905a2e8880a2b5"
+      }
+    },
+    {
+      "actual_sanitized_task_event": {
+        "request": {
+          "cookies": [],
+          "headers": [],
+          "method": "POST",
+          "postData": {
+            "mimeType": "application/x-www-form-urlencoded",
+            "text": "milestone%5Btitle%5D=product+launch&milestone%5Bstart_date%5D=2023-01-16&milestone%5Bdue_date%5D=2023-02-01"
+          },
+          "queryString": [],
+          "url": "http://localhost:8013/primer/design/-/milestones"
+        },
+        "response": {
+          "content": {},
+          "cookies": [],
+          "headers": [],
+          "redirectURL": "http://localhost:8013/primer/design/-/milestones/11",
+          "status": 302
+        },
+        "startedDateTime": "2026-09-24T10:49:57.043Z"
+      },
+      "blocked_external_requests": 7,
+      "final_gui": {
+        "due_date_visible": true,
+        "start_date_visible": true,
+        "title_visible": true,
+        "url": "http://localhost:8013/primer/design/-/milestones/11"
+      },
+      "form_values": [
+        "product launch",
+        "2023-01-16",
+        "2023-02-01"
+      ],
+      "full_sanitized_har_entries": 300,
+      "full_sanitized_har_sha256": "b3d3412805901af747a402cc7f2ae9b7511fbc54b6d5f422ce9145c4198dd788",
+      "independent_database_readback": {
+        "business_sha256": "a7ba45d912e5cdb87f1ba303a343a4a6ab6423aaf17dc92f9472e01cf62831b4",
+        "events": 3,
+        "issues": 0,
+        "milestone": {
+          "due_date": "2023-02-01",
+          "group_id": null,
+          "id": 1,
+          "project_id": 1,
+          "start_date": "2023-01-16",
+          "state": "active",
+          "title": "product launch"
+        }
+      },
+      "name": "wrong-due-date",
+      "published_evaluator": {
+        "error_present": false,
+        "evaluators": [
+          {
+            "name": "AgentResponseEvaluator",
+            "score": 1.0,
+            "status": "success"
+          },
+          {
+            "name": "NetworkEventEvaluator",
+            "score": 0.0,
+            "status": "failure"
+          }
+        ],
+        "score": 0.0,
+        "status": "failure"
+      },
+      "raw_and_sanitized_score_equal": true,
+      "reset": {
+        "baseline_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+        "business_state_restored": true,
+        "reset_rows": 1
+      },
+      "screenshots_sha256": {
+        "final.png": "413808457b3329e7b13f7a6bb9c2027c47daedddf523ce88464f3220fcfddef5",
+        "form.png": "b95357e4492ef7f8a51bef60bb1913ba353f9acda3f0bcb4ba1b7d0623697fcf",
+        "project.png": "218428b044ae8b69305cadb2059bb6b8f7bbc489bf046406837bed3ac80d0dc3"
+      }
+    },
+    {
+      "actual_sanitized_task_event": {
+        "request": {
+          "cookies": [],
+          "headers": [],
+          "method": "POST",
+          "postData": {
+            "mimeType": "application/x-www-form-urlencoded",
+            "text": "milestone%5Btitle%5D=product+launch&milestone%5Bstart_date%5D=2023-01-16&milestone%5Bdue_date%5D=2023-01-30"
+          },
+          "queryString": [],
+          "url": "http://localhost:8013/primer/design/-/milestones"
+        },
+        "response": {
+          "content": {},
+          "cookies": [],
+          "headers": [],
+          "redirectURL": "http://localhost:8013/primer/design/-/milestones/12",
+          "status": 302
+        },
+        "startedDateTime": "2026-09-24T10:50:17.891Z"
+      },
+      "blocked_external_requests": 7,
+      "final_gui": {
+        "due_date_visible": true,
+        "start_date_visible": true,
+        "title_visible": true,
+        "url": "http://localhost:8013/primer/design/-/milestones/12"
+      },
+      "form_values": [
+        "product launch",
+        "2023-01-16",
+        "2023-01-30"
+      ],
+      "full_sanitized_har_entries": 300,
+      "full_sanitized_har_sha256": "489cf5cc7ab34f9cd2ee5345ecbfafed6e951861c1cdda09e329c9a5bd6a3d87",
+      "independent_database_readback": {
+        "business_sha256": "339c077611630a07e6d6216915ac5eb65512ee51a51b3a6d77c6deaccad67a15",
+        "events": 3,
+        "issues": 0,
+        "milestone": {
+          "due_date": "2023-01-30",
+          "group_id": null,
+          "id": 1,
+          "project_id": 1,
+          "start_date": "2023-01-16",
+          "state": "active",
+          "title": "product launch"
+        }
+      },
+      "name": "positive-2",
+      "published_evaluator": {
+        "error_present": false,
+        "evaluators": [
+          {
+            "name": "AgentResponseEvaluator",
+            "score": 1.0,
+            "status": "success"
+          },
+          {
+            "name": "NetworkEventEvaluator",
+            "score": 1.0,
+            "status": "success"
+          }
+        ],
+        "score": 1.0,
+        "status": "success"
+      },
+      "raw_and_sanitized_score_equal": true,
+      "reset": {
+        "baseline_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+        "business_state_restored": true,
+        "reset_rows": 1
+      },
+      "screenshots_sha256": {
+        "final.png": "a92ce2e5bf4864fdd6a2dd3f486def6111c724af98615e6c558cafd190b3fb04",
+        "form.png": "826797e5555b3822dfc7c2d5ed37a9dc4d5376302ee453c7e813729ad5d85bff",
+        "project.png": "773c08c1cc1b9aeb629bf16cdcd0d27b7a27402f4b11c773ac36bb420ca1ae5f"
+      }
+    }
+  ],
+  "container": {
+    "container_id_sha256": "07f7203e77ddcf665b4721af8e7c260e525c57fd77039a4169cbc31b89db8749",
+    "container_name": "cua-v06-gitlab-mutation",
+    "docker_context": "colima-cua-gitlab-mutation",
+    "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
+    "loopback_port": 8013
+  },
+  "final_business_state": {
+    "business_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+    "events": 2,
+    "issues": 0,
+    "milestones": [],
+    "milestones_sequence": "1|false",
+    "project_id": 1
+  },
+  "fixture": {
+    "origin": "minimal synthetic local project",
+    "original_webarena_database": false,
+    "project": "primer/design"
+  },
+  "fixture_sha256": "dda68e7174364efccd9be94bfe0a73c5e2f2d6db208a640f2770c82ed7666969",
+  "hundred_task_ready": false,
+  "limitations": "One published task on a synthetic local project; no model run or 100-task admission.",
+  "model_calls": 0,
+  "official_scores": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "qualified_task_count": 1,
+  "runner_sha256": "1df4d263b7c8228911d4431d8e7c15a9d5ced1bb301d362dae163f457662b56f",
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "evaluator_source_sha256": "a2e6d2be96debd2bbaec36690d3e6c94b12be067a686998bbf58e2118f4605c5",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "seeded_original_webarena_snapshot": false,
+    "task_intent": "Create a milestone in the current repo with title \"product launch\" for the upcoming event of product launch starting on January 16, 2023 and ending on January 30, 2023",
+    "task_sha256": "f2d2470d440643bb6d96ef2a71c0330eea3102c7678c9d907ba02a622d028ce0"
+  },
+  "task_id": 590
+}

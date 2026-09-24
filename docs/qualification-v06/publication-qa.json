@@ -1,0 +1,48 @@
+{
+  "all_pdf_pages_visually_reviewed": true,
+  "assets_sha256": {
+    "docs/evidence/v0.6-qualification-report-data.json": "5c06e9d6216f32df8d1373ce57d8c70193ba5ddfa63497bb8d495ed465349190",
+    "docs/evidence/workarena-access-request-2026-09-24.json": "410134fff2fb82cfdf1c8b743e260dce3b8815556a5c9a00cd0a324f873f479d",
+    "docs/qualification-v06/EnvLoop-Computer-Use-Qualification-Report.md": "3dba8d9e89a2dd2e8833230f7fa4960f784a586c7610881de0c624dedfb45299",
+    "docs/qualification-v06/EnvLoop-Computer-Use-Qualification-Report.pdf": "7e3e1543793cc7404f3b489e52b64598f3b5e4b1b654e72a78ae85c667d30ace",
+    "docs/qualification-v06/figures/excel-audit.png": "3b9d059298b6e1a2ac71feb03a9d07a475f1b273f572b573518e0b2e58b6868b",
+    "docs/qualification-v06/figures/excel-source-funnel.png": "6ddf9fadf1384ec0aecbde21af0f74151d2af30bc95cba77f1c70091f042bcc9",
+    "docs/qualification-v06/figures/magento-state-gap.png": "10feee2ecab0b3473e29eda8af71041f15519a22b27b744a7da45e8b279a4b06",
+    "docs/qualification-v06/figures/pipeline.png": "71be7b54efa3d5204cbe539aafffe654e2ae1a2aa28eb6a63bd210a223290314",
+    "docs/qualification-v06/figures/readiness.png": "3e5a07ed1241eb5d4dce223a5115afbcdf845e61679bf5e071b44349f7beb3b0",
+    "docs/qualification-v06/index.html": "677dc518de873bff2ce8de063d5490b37db2c77f94571ed45b92ecfb401fba72"
+  },
+  "candidate_cells": 6,
+  "evidence_registry_sources_verified": 17,
+  "figure_dimensions": {
+    "excel-audit.png": [
+      1600,
+      489
+    ],
+    "excel-source-funnel.png": [
+      1600,
+      567
+    ],
+    "magento-state-gap.png": [
+      1600,
+      521
+    ],
+    "pipeline.png": [
+      1600,
+      492
+    ],
+    "readiness.png": [
+      1600,
+      684
+    ]
+  },
+  "interactive_site_checked_in_browser": true,
+  "official_campaigns_completed": 0,
+  "official_final_instances_completed": 0,
+  "pdf_pages": 6,
+  "privacy_patterns_passed": true,
+  "release_assets_fetchback_verified": false,
+  "remote_pages_fetchback_verified": false,
+  "report_type": "qualification_note_not_full_scale_results",
+  "schema": "cua-v06-qualification-publication-qa-v1"
+}
