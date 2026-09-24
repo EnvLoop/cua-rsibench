@@ -14,7 +14,7 @@
       "license": "MIT code; individual source decks retain attribution-specific Public Domain Mark/CC0/CC-BY terms",
       "inventory_count": 120,
       "cluster_definition": "canonical input deck path",
-      "split_status": "proposed; not frozen or runtime-qualified",
+      "split_status": "offline family-disjoint 20-selection/100-provisional-final candidates prepared from 18 base workbook families; not frozen or GUI-qualified",
       "readiness": {
         "all_120_runtime_ready": false,
         "gui_implementation": "blank deck edited in real PowerPoint for the web and reopened after save; dataset tasks not executed",
@@ -45,12 +45,12 @@
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
         "all_200_runtime_ready": false,
-        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved",
+        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved; a separate six-sheet SEC blind-audit prototype had one formula visibly repaired, saved, reloaded, and downloaded",
         "account_license": "dedicated test account signed in; free web editing observed; bulk benchmark use and dataset feature coverage unverified",
         "reset": "save/reload readback passed on a disposable workbook and an easy predecessor task; one hard workbook had zero semantic cell changes after untouched web download but lost two VML note drawings; deterministic cloud rollback unverified",
-        "verifier": "independent OOXML oracle passed an easy predecessor task; published SpreadsheetBench 2 evaluator is insufficient alone for outside-range regression, and hard-task oracle calibration is pending",
+        "verifier": "independent OOXML oracle passed an easy predecessor task; offline hard SpreadsheetBench 2 task 01_01 gold and wrong-target/unrelated-edit controls passed but Excel-web qualification is pending; a separate SEC blind-audit verifier scored one GUI repair as 1/9 with full task failure",
         "source_family_diversity": "30 hard-source workbook files; a 100-independent-family final set requires new families or broader audited sources",
-        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked with zero non-target semantic cell changes; remaining 83 formulas and cloud reset unverified"
+        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked; a harder six-sheet blind audit uses 177 authentic rows, 114 formulas, nine faults, two-source-calendar Q4 bridges and hidden perturbations, with one GUI edit verified; neither complete task nor cloud reset is qualified"
       },
       "primary_references": [
         "https://arxiv.org/html/2606.29955",

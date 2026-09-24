@@ -1,0 +1,28 @@
+{
+  "schema": "hard-excel-v2-ooxml-artifact-v1",
+  "source_task_id": "Financial_Model:01_01",
+  "source_revision": "5a2215ed4121945ab09d8723df2995602090b042",
+  "source_archive_sha256": "17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c",
+  "source_workbook_sha256": "a01657c0cc7116569be1d649bb259d32073d3fa6261d7d9da22c461875e1080c",
+  "gold_workbook_sha256": "02538233e6cf415ca7b374ef4a2118c88b100cfb351ad9fc5043754b0bf68364",
+  "calibration": {
+    "gold_unrelated_cell_value_or_formula_changes": 0,
+    "target_formula_cells": 82,
+    "target_sheet_counts": {
+      "Consolidated BS": 10,
+      "Consolidated P&L": 1,
+      "Cost Drivers": 40,
+      "Fixed Assets Schedule": 5,
+      "Revenue Drivers": 20,
+      "Working Capital Schedule": 6
+    },
+    "gold_positive_artifact_pass": true,
+    "synthetic_wrong_target_formula_rejected": true,
+    "synthetic_unrelated_numeric_edit_rejected": true
+  },
+  "status": "offline_artifact_oracle_only_not_excel_web_qualified",
+  "gui_execution_verified": false,
+  "native_recalculation_verified": false,
+  "formatting_and_embedded_objects_verified": false,
+  "license_note": "No source workbook, task instruction, or answer is redistributed."
+}

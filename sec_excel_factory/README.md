@@ -33,4 +33,16 @@ The [SEC EDGAR API documentation](https://www.sec.gov/search-filings/edgar-appli
 
 The OOXML evaluator supports direct A1 references, arithmetic, and parentheses. It does not yet accept valid but more elaborate Excel formulas such as `SUMIFS` or `XLOOKUP`, or check chart/drawing fidelity. Its no-regression comparison normalizes Excel's equivalent shared-string encodings and numeric spellings that decode to the same IEEE-754 value; substantive source edits still fail.
 
+## Blind Q4 bridge audit prototype
+
+[`build_bridge_audit.py`](build_bridge_audit.py) creates a separate six-sheet development task from the same pinned source snapshots. It has 177 authentic filing records, 114 initially populated formulas, and nine undisclosed injected faults. The actor must diagnose causal mistakes across annual fact selection, nine-month-to-full-year Q4 reconciliation, forecast drivers, and a board view. The independent [`verify_bridge_audit.py`](verify_bridge_audit.py) scores the saved OOXML workbook against freshly recomputed SEC values, rejects edits outside the faulted formulas, and runs two private replays that perturb all 36 canonical filing facts plus two scenario inputs. It reports isolated partial credit in ninths while preserving a strict full-pass check. It is a harder task *shape*, but not a new issuer source family or a hidden final case because its generator is public.
+
+```bash
+python3 build_bridge_audit.py output/bridge_audit
+python3 verify_bridge_audit.py output/bridge_audit/private/reference.xlsx output/bridge_audit/actor/task.xlsx output/bridge_audit/private/reference.xlsx
+python3 -m unittest discover -s . -p 'test_bridge_audit.py' -v
+```
+
+The full evidence and admission limits are in [`docs/evidence/sec-bridge-audit-prototype-2026-09-24.md`](../docs/evidence/sec-bridge-audit-prototype-2026-09-24.md). Generated workbooks are intentionally ignored. The full task has not been solved or qualified in a visible Excel-web GUI.
+
 On 2026-09-24, a copy was uploaded into a dedicated test account in actual Microsoft Excel for the web. All five sheets opened in editing mode. One cross-sheet target formula was entered through the GUI, saved, reloaded, and downloaded. Independent OOXML readback found that target correct and no non-target semantic cell changes, and a private source perturbation changed its computed result. This qualifies the single edit and readback path only: **83 target formulas remain blank**, the full task is unscored, and per-attempt cloud reset is untested. The redacted receipt is [`docs/evidence/v0.6-sec-excel-web-smoke.json`](../docs/evidence/v0.6-sec-excel-web-smoke.json). No Office account, credentials, paid data provider, or tenant data are included here.
