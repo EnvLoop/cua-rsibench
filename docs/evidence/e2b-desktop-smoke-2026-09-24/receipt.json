@@ -1,0 +1,250 @@
+{
+  "date_utc": "2026-09-24T03:22:53.083119+00:00",
+  "scenario": "One E2B Desktop sandbox, GUI LibreOffice Calc, synthetic XLSX",
+  "sdk": {
+    "e2b_desktop": "2.6.0"
+  },
+  "sandbox_timeout_seconds": 540,
+  "expected_cells": {
+    "A1": "E2B Desktop smoke",
+    "B1": "1729"
+  },
+  "screenshots": {
+    "desktop-created": {
+      "file": "desktop-created.png",
+      "sha256": "35ac099b40fc2ccbec8a02f5ba6fa4f88e578242c77fa352fd87b530f64b5d11",
+      "bytes": 40364
+    },
+    "calc-open": {
+      "file": "calc-open.png",
+      "sha256": "53ff3b282b4a3d0224a32e4d98951d5fb11843c0735a40a0bde98ee5eb24ba44",
+      "bytes": 40360
+    },
+    "calc-after-wait": {
+      "file": "calc-after-wait.png",
+      "sha256": "d309cfdc28684e5d3f1a7d21c10516633b33fc55544997ffa0a5cec095779061",
+      "bytes": 144194
+    },
+    "calc-edited": {
+      "file": "calc-edited.png",
+      "sha256": "bab3285baf17f9e1c4f189117cfaf1703365d7778250b62ba88843cc55324691",
+      "bytes": 106920
+    },
+    "save-dialog": {
+      "file": "save-dialog.png",
+      "sha256": "b03f1fddf40ac1099c069ede2182f4e59249661b58607eac80c9306be9ca7b92",
+      "bytes": 83922
+    },
+    "save-after-path": {
+      "file": "save-after-path.png",
+      "sha256": "161b4ac99e923adb62870e5ccf19af77c81135fb62bb50bee542758328bc150f",
+      "bytes": 140479
+    },
+    "calc-saved": {
+      "file": "calc-saved.png",
+      "sha256": "6534265960111ea670a6c61dcfdfca7db28607591af01f8d308be19a4edf2e94",
+      "bytes": 107864
+    }
+  },
+  "stages": [
+    {
+      "name": "sandbox_created",
+      "seconds_since_start": 5.743,
+      "id_sha256": "0f743fe9f0c20348dbd47ac67ec8ef090d76b805f9810a03d137cddda48af933",
+      "is_running": true
+    },
+    {
+      "name": "app_probe",
+      "seconds_since_start": 8.053,
+      "exit_code": 0,
+      "output": "/usr/bin/libreoffice\nLibreOffice 7.3.7.2 30(Build:2)\n\n/usr/share/applications/libreoffice-calc.desktop"
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 8.919,
+      "label": "desktop-created",
+      "file": "desktop-created.png"
+    },
+    {
+      "name": "calc_launch_requested",
+      "seconds_since_start": 13.178
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 14.011,
+      "label": "calc-open",
+      "file": "calc-open.png"
+    },
+    {
+      "name": "command_error",
+      "seconds_since_start": 36.956,
+      "type": "CommandExitException"
+    },
+    {
+      "name": "wait",
+      "seconds_since_start": 41.962,
+      "seconds": 5.0
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 42.783,
+      "label": "calc-after-wait",
+      "file": "calc-after-wait.png"
+    },
+    {
+      "name": "mouse_click",
+      "seconds_since_start": 56.201,
+      "x": 881,
+      "y": 536
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 56.495,
+      "keys": [
+        "ctrl",
+        "home"
+      ]
+    },
+    {
+      "name": "gui_write",
+      "seconds_since_start": 57.648,
+      "length": 17
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 57.924,
+      "keys": [
+        "tab"
+      ]
+    },
+    {
+      "name": "gui_write",
+      "seconds_since_start": 58.349,
+      "length": 4
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 59.018,
+      "keys": [
+        "enter"
+      ]
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 59.834,
+      "label": "calc-edited",
+      "file": "calc-edited.png"
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 81.235,
+      "keys": [
+        "ctrl",
+        "s"
+      ]
+    },
+    {
+      "name": "wait",
+      "seconds_since_start": 83.236,
+      "seconds": 2.0
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 84.064,
+      "label": "save-dialog",
+      "file": "save-dialog.png"
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 110.601,
+      "keys": [
+        "ctrl",
+        "l"
+      ]
+    },
+    {
+      "name": "gui_write",
+      "seconds_since_start": 112.398,
+      "length": 33
+    },
+    {
+      "name": "key_press",
+      "seconds_since_start": 112.703,
+      "keys": [
+        "enter"
+      ]
+    },
+    {
+      "name": "wait",
+      "seconds_since_start": 114.714,
+      "seconds": 2.0
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 115.656,
+      "label": "save-after-path",
+      "file": "save-after-path.png"
+    },
+    {
+      "name": "mouse_click",
+      "seconds_since_start": 136.012,
+      "x": 790,
+      "y": 518
+    },
+    {
+      "name": "wait",
+      "seconds_since_start": 138.013,
+      "seconds": 2.0
+    },
+    {
+      "name": "screenshot",
+      "seconds_since_start": 139.25,
+      "label": "calc-saved",
+      "file": "calc-saved.png"
+    },
+    {
+      "name": "xlsx_readback",
+      "seconds_since_start": 139.515,
+      "bytes": 4787,
+      "parsed_cells": {
+        "A1": "E2B Desktop smoke",
+        "B1": "1729"
+      },
+      "matches_expected": {
+        "A1": true,
+        "B1": true
+      }
+    },
+    {
+      "name": "sandbox_killed",
+      "seconds_since_start": 158.951,
+      "kill_returned": true
+    },
+    {
+      "name": "termination_checked",
+      "seconds_since_start": 159.624,
+      "is_running": false
+    }
+  ],
+  "result": "readback_pass",
+  "sandbox_id_sha256": "0f743fe9f0c20348dbd47ac67ec8ef090d76b805f9810a03d137cddda48af933",
+  "xlsx": {
+    "file": "calc-smoke.xlsx",
+    "sha256": "155ebc1e2d8aa977def8e21c85f54842295d9a6d104d9d41af698aebe5d52cdb",
+    "bytes": 4787,
+    "parsed_cells": {
+      "A1": "E2B Desktop smoke",
+      "B1": "1729"
+    },
+    "matches_expected": {
+      "A1": true,
+      "B1": true
+    },
+    "independent_parser": "Python standard-library zipfile and ElementTree, outside sandbox"
+  },
+  "is_running_before_kill": true,
+  "kill_returned": true,
+  "is_running_after_kill": false,
+  "duration_seconds": 159.625,
+  "diagnostic_note": "The pre-save status probe returned CommandExitException because its final test required the not-yet-saved XLSX; the later GUI save, XLSX readback, and sandbox termination passed."
+}

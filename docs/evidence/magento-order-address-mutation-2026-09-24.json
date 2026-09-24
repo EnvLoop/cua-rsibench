@@ -1,0 +1,177 @@
+{
+  "after_positive": {
+    "selected_address_row_sha256": {
+      "598": "27097e69f86522fdba2cce25dcef5758c0f5a2437b9c188a20745c049734913b",
+      "600": "5e5c77fc3b11f7bc045ea3200894edfc7f791ae3fbc595b205dff8b7fa01de39"
+    },
+    "selected_order_grid_row_sha256": {
+      "299": "6fc8acaf8dc7bf82db9c7e9b7f8da9e6bf6b8ea0cf240137ce2bda9411739b03",
+      "300": "ec113ed590da6274a652b39900e6b46a123c50780f5f7473d1f3712135355944"
+    },
+    "table_sha256": {
+      "customer_address_entity": "1e56754a11924cfc25397c137f7a63a1a9c629b8244a205e0cc38d07f5d8f7f5",
+      "sales_order": "62cafb0841ac5ced329407dc80fbf3b730409bad3262c588b9ce454dac61ff71",
+      "sales_order_address": "600f4aaec14fbaffd0c25d2bb89117e2100dac7565eacefa13ec7c1c22d60e0f",
+      "sales_order_grid": "9b42cd53c537a2eaef135e2cc8426eea936ae5a3b02a9df2188d46fe6932a64c",
+      "sales_order_status_history": "4822a80851e49265c804672a051b4c4d4b897cf5f81999542f2168c3a2a029bd"
+    }
+  },
+  "after_wrong_object": {
+    "selected_address_row_sha256": {
+      "598": "27f749755305e2294555120b8d951cd7d156db0cc434b9dcd03ab7d83636d9b2",
+      "600": "674a1ea602cc926f8947bd387fff7a786ed17349c90fe2fee6123ad4e1b1c513"
+    },
+    "selected_order_grid_row_sha256": {
+      "299": "92a8200ed7bc4769a74369be4584d5de7b0541429e87526fec4573c3784d3205",
+      "300": "7878bc6949678d6d7adfc1bd4b84d3ea142216323edfe8e346677612575b8191"
+    },
+    "table_sha256": {
+      "customer_address_entity": "1e56754a11924cfc25397c137f7a63a1a9c629b8244a205e0cc38d07f5d8f7f5",
+      "sales_order": "62cafb0841ac5ced329407dc80fbf3b730409bad3262c588b9ce454dac61ff71",
+      "sales_order_address": "f105938251b4454e25a99c22b0e5e2416c343aa6a71b952bf4731476072662b8",
+      "sales_order_grid": "38593701a91af248d8ddd2783d2d9dcb06474574139d0374acdf7b2b1d3e69e7",
+      "sales_order_status_history": "4822a80851e49265c804672a051b4c4d4b897cf5f81999542f2168c3a2a029bd"
+    }
+  },
+  "baseline": {
+    "selected_address_row_sha256": {
+      "598": "27f749755305e2294555120b8d951cd7d156db0cc434b9dcd03ab7d83636d9b2",
+      "600": "5e5c77fc3b11f7bc045ea3200894edfc7f791ae3fbc595b205dff8b7fa01de39"
+    },
+    "selected_order_grid_row_sha256": {
+      "299": "92a8200ed7bc4769a74369be4584d5de7b0541429e87526fec4573c3784d3205",
+      "300": "ec113ed590da6274a652b39900e6b46a123c50780f5f7473d1f3712135355944"
+    },
+    "table_sha256": {
+      "customer_address_entity": "1e56754a11924cfc25397c137f7a63a1a9c629b8244a205e0cc38d07f5d8f7f5",
+      "sales_order": "62cafb0841ac5ced329407dc80fbf3b730409bad3262c588b9ce454dac61ff71",
+      "sales_order_address": "3866dea8a7a00f79c116e94b4e4dcaae80daf40b993e0c4f1db6bad8929ab50c",
+      "sales_order_grid": "c13e84d27634b7f3615c81148fa63dc5703fdbd130fabca39cfc161682f65132",
+      "sales_order_status_history": "4822a80851e49265c804672a051b4c4d4b897cf5f81999542f2168c3a2a029bd"
+    }
+  },
+  "environment": {
+    "container_id_sha256": "e81b56bc5ff7b33038296ed6638ccc5edcd6a2823a7dfe3097f8d0fde46f6c29",
+    "image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+    "loopback_ports": [
+      7790,
+      7791
+    ],
+    "mounts": 0
+  },
+  "evidence_type": "one-task scripted GUI qualification, not a model rollout",
+  "execution_tool_sha256": "5ebc630eb7c4be212769ae60e7f27cacc3543307509d42baffa6d3b8cc7853ae",
+  "final_reset_verified": true,
+  "hundred_task_ready": false,
+  "model_calls": 0,
+  "paid_provider_calls": 0,
+  "positive": {
+    "blocked_external_requests": 0,
+    "gui_visible_target_street": true,
+    "name": "order-299",
+    "network_entries": 1010,
+    "official_evaluators": [
+      {
+        "name": "AgentResponseEvaluator",
+        "score": 1.0,
+        "status": "success"
+      },
+      {
+        "name": "NetworkEventEvaluator",
+        "score": 1.0,
+        "status": "success"
+      }
+    ],
+    "official_score": 1.0,
+    "official_status": "success",
+    "raw_and_sanitized_evaluator_equal": true,
+    "raw_har_sha256": "96b8bd2002079508eef2446431c91b9e12deb7038dc7eb41f5e378f208f3de4d",
+    "sanitized_har_sha256": "7c0069c0c560251b506b8929067a94d7642389889e567e13a5cff66940aa0b4f",
+    "save_response_status": 302,
+    "screenshots_sha256": {
+      "form-before-save.png": "321d12b58b6b634103e7889528440553ac6d29f23ac21ec6411bce715e130782",
+      "order-after.png": "f5f81bdf2a6558226883c6c1df448a67bcfe42464b479e15ac27f01dc9e1ba6a",
+      "order-before.png": "0b088286fa2086f35f2d3c92138b512dba4838e1ca2ef005cbb969d0d3bcd432"
+    }
+  },
+  "post_run_review_note": "The published tool adds a fail-closed final rollback gate after this passing execution; the execution tool hash identifies the exact run version.",
+  "private_artifacts": "Raw HAR, authentication state, and full screenshots are excluded from the public repository.",
+  "qualified_task_count": 1,
+  "restored_after_positive": {
+    "selected_address_row_sha256": {
+      "598": "27f749755305e2294555120b8d951cd7d156db0cc434b9dcd03ab7d83636d9b2",
+      "600": "5e5c77fc3b11f7bc045ea3200894edfc7f791ae3fbc595b205dff8b7fa01de39"
+    },
+    "selected_order_grid_row_sha256": {
+      "299": "92a8200ed7bc4769a74369be4584d5de7b0541429e87526fec4573c3784d3205",
+      "300": "ec113ed590da6274a652b39900e6b46a123c50780f5f7473d1f3712135355944"
+    },
+    "table_sha256": {
+      "customer_address_entity": "1e56754a11924cfc25397c137f7a63a1a9c629b8244a205e0cc38d07f5d8f7f5",
+      "sales_order": "62cafb0841ac5ced329407dc80fbf3b730409bad3262c588b9ce454dac61ff71",
+      "sales_order_address": "3866dea8a7a00f79c116e94b4e4dcaae80daf40b993e0c4f1db6bad8929ab50c",
+      "sales_order_grid": "c13e84d27634b7f3615c81148fa63dc5703fdbd130fabca39cfc161682f65132",
+      "sales_order_status_history": "4822a80851e49265c804672a051b4c4d4b897cf5f81999542f2168c3a2a029bd"
+    }
+  },
+  "restored_after_wrong_object": {
+    "selected_address_row_sha256": {
+      "598": "27f749755305e2294555120b8d951cd7d156db0cc434b9dcd03ab7d83636d9b2",
+      "600": "5e5c77fc3b11f7bc045ea3200894edfc7f791ae3fbc595b205dff8b7fa01de39"
+    },
+    "selected_order_grid_row_sha256": {
+      "299": "92a8200ed7bc4769a74369be4584d5de7b0541429e87526fec4573c3784d3205",
+      "300": "ec113ed590da6274a652b39900e6b46a123c50780f5f7473d1f3712135355944"
+    },
+    "table_sha256": {
+      "customer_address_entity": "1e56754a11924cfc25397c137f7a63a1a9c629b8244a205e0cc38d07f5d8f7f5",
+      "sales_order": "62cafb0841ac5ced329407dc80fbf3b730409bad3262c588b9ce454dac61ff71",
+      "sales_order_address": "3866dea8a7a00f79c116e94b4e4dcaae80daf40b993e0c4f1db6bad8929ab50c",
+      "sales_order_grid": "c13e84d27634b7f3615c81148fa63dc5703fdbd130fabca39cfc161682f65132",
+      "sales_order_status_history": "4822a80851e49265c804672a051b4c4d4b897cf5f81999542f2168c3a2a029bd"
+    }
+  },
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "evaluator_source_file_count": 74,
+    "evaluator_source_sha256": "a2e6d2be96debd2bbaec36690d3e6c94b12be067a686998bbf58e2118f4605c5",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "task_sha256": "8449c83f3a06818eccd90ee45e86ffdae61ebc83f7b8ed3ebf98dbbb056f8ee7",
+    "versions": {
+      "playwright": "1.63.0",
+      "pydantic": "2.12.0",
+      "webarena-verified": "1.2.3"
+    }
+  },
+  "task_id": 538,
+  "user_account_accessed": false,
+  "wrong_object_negative": {
+    "blocked_external_requests": 0,
+    "gui_visible_target_street": true,
+    "name": "order-300",
+    "network_entries": 1008,
+    "official_evaluators": [
+      {
+        "name": "AgentResponseEvaluator",
+        "score": 1.0,
+        "status": "success"
+      },
+      {
+        "name": "NetworkEventEvaluator",
+        "score": 0.0,
+        "status": "failure"
+      }
+    ],
+    "official_score": 0.0,
+    "official_status": "failure",
+    "raw_and_sanitized_evaluator_equal": true,
+    "raw_har_sha256": "c8b88821dc8bc8b59f0f5a44057dcde61140799c468d00206ef4283e0a72615a",
+    "sanitized_har_sha256": "0531b4785c3236daf6c52416e0a0d94b58fb5badfb4014a866a52096af9f53e6",
+    "save_response_status": 302,
+    "screenshots_sha256": {
+      "form-before-save.png": "c9bd2188f33a565c53f14f8f8d0d584de9aead239352cc8ad77ae3a206f83a51",
+      "order-after.png": "89b206c58c5c888e9131ab4830248abb0067f1038e9f88708fb07fa964465e7c",
+      "order-before.png": "f948150bfd62fc1e39c65643cc7279fda65f86987ccc2286c676ae3165bfa723"
+    }
+  }
+}
