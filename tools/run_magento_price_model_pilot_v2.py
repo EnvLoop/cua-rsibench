@@ -38,6 +38,7 @@ CAMPAIGN_ID = 'magento-price777-base-pilot-v2'
 MAX_SAMPLES = 84
 MAX_GUI_ACTIONS = 80
 MAX_STALE_SAMPLES = 4
+NO_VISIBLE_PROGRESS_ACTIONS = 3
 WALL_SECONDS = 1800
 REQUEST_TIMEOUT_SECONDS = 90
 MAX_INPUT_TOKENS = 32768
@@ -182,9 +183,14 @@ class VisualProgress:
                         'url_before': url_before}
 
     def observed(self, image, url, previous):
-        self.current = None
-        if previous is None or self.pending is None:
+        if previous is None:
+            self.current = None
             return
+        if self.pending is None:
+            # A confirmation capture may be followed by the next model frame.
+            # Keep that observed feedback until another action is dispatched.
+            return
+        self.current = None
         pending, self.pending = self.pending, None
         same_view = (hashlib.sha256(image).hexdigest() ==
                      pending['screenshot_sha256'] and url == pending['url_before'])
@@ -204,6 +210,12 @@ class VisualProgress:
             'scope': 'Screenshot pixels and page URL only; no claim about saved state',
         }
 
+    def third_identical_action_pending(self):
+        """A final observation can now confirm or refute a third no-op."""
+        return (self.pending is not None and
+                self.same_action_streak == NO_VISIBLE_PROGRESS_ACTIONS - 1 and
+                self.pending['signature'] == self.last_signature)
+
 
 def render_for_model(observation, feedback=None):
     rendered = v063.render_for_model(observation)
@@ -221,7 +233,11 @@ def render_for_model(observation, feedback=None):
         ' The host may report whether the previous GUI action changed the '
         'screenshot or URL. Repeated identical actions with unchanged pixels '
         'should prompt reconsideration of the visible controls or allowed '
-        'keyboard actions; the host never chooses an action for you.')
+        'keyboard actions. A filled input may require an Enter key action or '
+        'a visible submit control; clicking the same input again only focuses '
+        'it. After three identical applied actions with no screenshot or URL '
+        'change, the host stops and scores the resulting state. The host never '
+        'chooses an action for you.')
     payload['visual_progress'] = feedback.current if feedback else None
     rendered['instruction'] = json.dumps(payload, ensure_ascii=False,
                                           sort_keys=True, separators=(',', ':'))
@@ -296,6 +312,33 @@ def state_summary(before, after):
             'positive_state_pass': len(target_hits) == 5 and wrong_unchanged,
             'target_prices': {str(key): new[key] for key in price.TARGETS},
             'wrong_color_price': new[112]}
+
+
+def admit_scored_result(policy, official, state_result, *, blocked,
+                        evaluator_equal):
+    """Keep infrastructure failures unscored and model terminals scorable."""
+    if blocked or not evaluator_equal:
+        return {'status': 'unscored', 'score': None,
+                'failure_class': 'environment_failure',
+                'failure_code': 'blocked_or_evaluator_disagreement'}
+    if policy['status'] != 'completed':
+        return {'status': 'unscored', 'score': None,
+                'failure_class': policy['failure_class'],
+                'failure_code': policy['failure_code']}
+    if official['status'] not in ('success', 'failure') or official['score'] not in (0.0, 1.0):
+        return {'status': 'unscored', 'score': None,
+                'failure_class': 'verifier_failure',
+                'failure_code': 'invalid_official_result'}
+    success = official['score'] == 1.0 and state_result['positive_state_pass']
+    if success:
+        return {'status': 'completed', 'score': 1.0,
+                'pilot_task_complete': True}
+    return {'status': 'completed', 'score': 0.0,
+            'pilot_task_complete': False,
+            'failure_class': 'model_failure',
+            'failure_code': (policy.get('failure_code')
+                             if policy.get('failure_class') == 'model_failure'
+                             else None) or 'requested_prices_not_all_persisted'}
 
 
 async def login(browser, source, blocked):
@@ -408,6 +451,129 @@ def make_capture(frames, feedback):
     return capture
 
 
+async def execute_scored_policy(page, adapter, *, instruction, binding,
+                                request_prefix, feedback):
+    """v063 action protocol with a v2-only, observed model-failure terminal.
+
+    Keep the pinned v063 runner unchanged. A third identical applied action is
+    checked with a fresh screenshot/URL before any further model sample. The
+    local loop owns the receipts, so stopping retains exact sample/action
+    counts instead of reconstructing them from a raised exception.
+    """
+    memory = ''
+    previous = None
+    actions = []
+    samples = []
+    stale_reasons = []
+    applied_count = 0
+
+    def outcome(status, failure_class=None, failure_code=None):
+        return {
+            'status': status, 'failure_class': failure_class,
+            'failure_code': failure_code, 'actions': actions, 'samples': samples,
+            'action_attempt_count': len(actions),
+            'applied_action_count': applied_count,
+            'sample_attempt_count': len(samples),
+            'stale_sample_count': len(stale_reasons),
+            'stale_reasons': list(stale_reasons),
+            'max_gui_actions': MAX_GUI_ACTIONS,
+            'max_samples': MAX_SAMPLES,
+            'max_stale_samples': MAX_STALE_SAMPLES,
+        }
+
+    async def discard_stale(reason):
+        stale_reasons.append(reason)
+        samples[-1]['discarded_as_stale'] = True
+        samples[-1]['stale_reason'] = reason
+        if reason == 'unexpected_navigation_during_sampling':
+            return outcome('unscored', 'environment_failure', reason)
+        if len(stale_reasons) > MAX_STALE_SAMPLES:
+            return outcome('unscored', 'environment_failure',
+                           'stale_sample_budget_exhausted')
+        return None
+
+    while len(actions) < MAX_GUI_ACTIONS and len(samples) < MAX_SAMPLES:
+        step = len(actions)
+        sample_index = len(samples)
+        observation, handles, frame_url = await v063.host.capture_frame(
+            page, instruction=instruction, binding=binding, step=step,
+            memory=memory, previous=previous)
+        request = v063.host.render_for_proxy(observation)
+        request_id = f'{request_prefix}-sample-{sample_index}-step-{step}'
+        try:
+            result = await asyncio.to_thread(adapter.sample,
+                                             request_id=request_id, **request)
+        except Exception:
+            return outcome('unscored', 'transport_or_provider_failure',
+                           'sampling_transport_uncertain')
+        if type(result) is not dict:
+            return outcome('unscored', 'transport_or_provider_failure',
+                           'sampling_result_invalid')
+        samples.append(v063.host.sample_receipt(result))
+        if result.get('status') != 'completed' or type(result.get('text')) is not str:
+            return outcome('unscored',
+                           v063.host.sampling_failure_class(result.get('error_subtype')),
+                           result.get('error_subtype') or 'sampling_failed')
+
+        same, reason = await v063._same_pixels(page, observation, frame_url)
+        if not same:
+            decision = await discard_stale(reason)
+            if decision is not None:
+                return decision
+            continue
+        try:
+            action = v063.host.validate_action(result['text'], observation,
+                current_frame_id=observation.frame_id)
+        except v063.host.ContractError as exc:
+            actions.append(v063.host.action_receipt(observation, error=exc))
+            return outcome('completed', 'model_failure', exc.code)
+
+        if not await v063._same_visible_refs(page, action, observation, handles):
+            decision = await discard_stale('ref_identity_changed')
+            if decision is not None:
+                return decision
+            continue
+        same, reason = await v063._same_pixels(page, observation, frame_url)
+        if not same:
+            decision = await discard_stale(reason)
+            if decision is not None:
+                return decision
+            continue
+        try:
+            v063.host.validate_action(action, observation,
+                                     current_frame_id=observation.frame_id)
+            previous = await v063.host.dispatch_action(page, action,
+                                                       observation, handles)
+        except v063.host.ContractError as exc:
+            actions.append(v063.host.action_receipt(observation, error=exc))
+            return outcome('completed', 'model_failure', exc.code)
+        except v063.host.PilotError as exc:
+            if exc.code == 'target_not_found':
+                previous = {'status': 'rejected', 'code': 'target_not_found'}
+            else:
+                return outcome('unscored', 'environment_failure', exc.code)
+        except Exception:
+            return outcome('unscored', 'environment_failure', 'gui_dispatch_error')
+        actions.append(v063.host.action_receipt(observation, action=action))
+        if previous['status'] == 'applied':
+            applied_count += 1
+        memory = action['memory']
+        if action['type'] == 'finish':
+            return outcome('completed')
+
+        # A post-action observation is needed even when this was action 80.
+        # It consumes neither another model sample nor another GUI action.
+        if feedback.third_identical_action_pending():
+            await v063.host.capture_frame(
+                page, instruction=instruction, binding=binding,
+                step=len(actions), memory=memory, previous=previous)
+            if feedback.same_action_streak >= NO_VISIBLE_PROGRESS_ACTIONS:
+                return outcome('completed', 'model_failure', 'no_visible_progress')
+    if len(actions) >= MAX_GUI_ACTIONS:
+        return outcome('completed', 'model_failure', 'action_budget_exhausted')
+    return outcome('unscored', 'environment_failure', 'sample_budget_exhausted')
+
+
 async def execute_policy(page, adapter, *, instruction, binding, prefix, frames,
                          deadline):
     feedback = VisualProgress()
@@ -442,9 +608,9 @@ async def execute_policy(page, adapter, *, instruction, binding, prefix, frames,
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise PilotError('wall_clock_budget')
-        return await asyncio.wait_for(v063.execute_policy(
+        return await asyncio.wait_for(execute_scored_policy(
             page, adapter, instruction=instruction, binding=binding,
-            request_prefix=prefix), timeout=remaining)
+            request_prefix=prefix, feedback=feedback), timeout=remaining)
     finally:
         (v063.MAX_GUI_ACTIONS, v063.MAX_SAMPLES, v063.MAX_STALE_SAMPLES,
          v063.host.MAX_ACTIONS, v063.host.capture_frame,
@@ -493,6 +659,11 @@ async def run(source, out, adapter_factory):
               'model_kind': 'base', 'training_or_checkpoint_used': False,
               'started_at': time.time(), 'max_samples': MAX_SAMPLES,
               'max_gui_actions': MAX_GUI_ACTIONS, 'wall_limit_seconds': WALL_SECONDS,
+              'scored_model_terminal_rule': {
+                  'code': 'no_visible_progress',
+                  'identical_applied_action_threshold': NO_VISIBLE_PROGRESS_ACTIONS,
+                  'observation': 'unchanged screenshot pixels and page URL',
+                  'verifier_and_reset_required': True},
               'campaign_id': CAMPAIGN_ID, 'status': 'unscored', 'score': None,
               'hundred_task_ready': False, 'official_final_task_count': 0,
               'auth_state_retained': False, 'raw_har_retained': False,
@@ -518,7 +689,8 @@ async def run(source, out, adapter_factory):
             raise PilotError('baseline_search_price_changed')
         binding = price.digest({'version': VERSION, 'source': source_info,
             'task_id': 777, 'intent': task['intent'], 'max_samples': MAX_SAMPLES,
-            'max_gui_actions': MAX_GUI_ACTIONS})
+            'max_gui_actions': MAX_GUI_ACTIONS,
+            'no_visible_progress_actions': NO_VISIBLE_PROGRESS_ACTIONS})
         report['task_binding_sha256'] = binding
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
@@ -579,23 +751,9 @@ async def run(source, out, adapter_factory):
             price.validate_positive(before, after)
         policy = report['policy']
         official = report['published_evaluator_sanitized']
-        if blocked or not report['raw_and_sanitized_evaluator_equal']:
-            report.update(failure_class='environment_failure',
-                          failure_code='blocked_or_evaluator_disagreement')
-        elif policy['status'] != 'completed':
-            report.update(failure_class=policy['failure_class'],
-                          failure_code=policy['failure_code'])
-        elif official['status'] not in ('success', 'failure') or official['score'] not in (0.0, 1.0):
-            report.update(failure_class='verifier_failure',
-                          failure_code='invalid_official_result')
-        else:
-            report['status'] = 'completed'
-            report['score'] = 1.0 if (
-                official['score'] == 1.0 and state_result['positive_state_pass']) else 0.0
-            report['pilot_task_complete'] = report['score'] == 1.0
-            if report['score'] == 0.0:
-                report.update(failure_class='model_failure',
-                              failure_code='requested_prices_not_all_persisted')
+        report.update(admit_scored_result(policy, official, state_result,
+            blocked=blocked,
+            evaluator_equal=report['raw_and_sanitized_evaluator_equal']))
         report['official_network_score_diagnostic'] = official['score']
     except Exception as exc:
         report['failure_class'] = ('environment_failure' if isinstance(exc, PilotError)

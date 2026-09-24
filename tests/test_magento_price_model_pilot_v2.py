@@ -40,6 +40,8 @@ class FakeBackend:
         self.visual_feedback.append(payload['visual_progress'])
         visible = json.loads(visible_text)
         assert f'{pilot.MAX_GUI_ACTIONS} applied GUI actions' in payload['contract']
+        assert 'Enter key action or a visible submit control' in payload['contract']
+        assert 'After three identical applied actions' in payload['contract']
         assert payload['task_instruction'] == 'Update the five green prices'
         if 'Ready' in visible['a11y_text']:
             action = {'type': 'finish'}
@@ -76,6 +78,13 @@ class GuardTests(unittest.TestCase):
         feedback.dispatched(click, observation, 'http://localhost:7792/admin',
                             {'status': 'applied', 'code': 'ok'})
         feedback.observed(b'new pixels', 'http://localhost:7792/admin',
+                          {'status': 'applied', 'code': 'ok'})
+        self.assertFalse(feedback.current['screenshot_and_url_unchanged'])
+        self.assertEqual(feedback.current[
+            'consecutive_identical_actions_without_visible_change'], 0)
+        feedback.dispatched(click, observation, 'http://localhost:7792/admin',
+                            {'status': 'applied', 'code': 'ok'})
+        feedback.observed(image, 'http://localhost:7792/admin/catalog/',
                           {'status': 'applied', 'code': 'ok'})
         self.assertFalse(feedback.current['screenshot_and_url_unchanged'])
         self.assertEqual(feedback.current[
@@ -156,6 +165,56 @@ class GuardTests(unittest.TestCase):
             if row['entity_id'] == 112:
                 row['value'] = '47.000000'
         self.assertFalse(pilot.state_summary(before, after)['positive_state_pass'])
+
+    def test_model_terminal_is_scored_only_after_valid_verification(self):
+        self.assertEqual(pilot.NO_VISIBLE_PROGRESS_ACTIONS, 3)
+        official = {'status': 'failure', 'score': 0.0}
+        state = {'positive_state_pass': False}
+        for code in ('no_visible_progress', 'action_budget_exhausted'):
+            policy = {'status': 'completed', 'failure_class': 'model_failure',
+                      'failure_code': code}
+            outcome = pilot.admit_scored_result(policy, official, state,
+                blocked=[], evaluator_equal=True)
+            self.assertEqual((outcome['status'], outcome['score'],
+                              outcome['failure_class'], outcome['failure_code']),
+                             ('completed', 0.0, 'model_failure', code))
+        no_progress = {'status': 'completed', 'failure_class': 'model_failure',
+                       'failure_code': 'no_visible_progress'}
+        positive = pilot.admit_scored_result(no_progress,
+            {'status': 'success', 'score': 1.0},
+            {'positive_state_pass': True}, blocked=[], evaluator_equal=True)
+        self.assertEqual((positive['status'], positive['score']), ('completed', 1.0))
+
+    def test_provider_gui_stale_and_verifier_failures_remain_unscored(self):
+        state = {'positive_state_pass': False}
+        official = {'status': 'failure', 'score': 0.0}
+        for failure_class, code in (
+                ('transport_or_provider_failure', 'sampling_transport_uncertain'),
+                ('environment_failure', 'gui_dispatch_error'),
+                ('environment_failure', 'stale_sample_budget_exhausted'),
+                ('environment_failure', 'wall_clock_budget')):
+            policy = {'status': 'unscored', 'failure_class': failure_class,
+                      'failure_code': code}
+            result = pilot.admit_scored_result(policy, official, state,
+                blocked=[], evaluator_equal=True)
+            self.assertEqual((result['status'], result['score'],
+                              result['failure_class'], result['failure_code']),
+                             ('unscored', None, failure_class, code))
+        policy = {'status': 'completed', 'failure_class': None,
+                  'failure_code': None}
+        for blocked, equal, expected in (
+                ([{'method': 'POST'}], True, 'blocked_or_evaluator_disagreement'),
+                ([], False, 'blocked_or_evaluator_disagreement')):
+            result = pilot.admit_scored_result(policy, official, state,
+                blocked=blocked, evaluator_equal=equal)
+            self.assertEqual((result['status'], result['score'],
+                              result['failure_code']), ('unscored', None, expected))
+        invalid = pilot.admit_scored_result(policy,
+            {'status': 'error', 'score': None}, state,
+            blocked=[], evaluator_equal=True)
+        self.assertEqual((invalid['status'], invalid['score'],
+                          invalid['failure_class']),
+                         ('unscored', None, 'verifier_failure'))
 
 
 class ActionContractTests(unittest.IsolatedAsyncioTestCase):
@@ -297,6 +356,161 @@ class ActionContractTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(backend.visual_feedback[2][
                         'consecutive_identical_actions_without_visible_change'], 2)
                     await context.close()
+                finally:
+                    await browser.close()
+
+    async def test_three_identical_applied_no_effect_actions_stop_before_fourth_sample(self):
+        from playwright.async_api import async_playwright
+
+        class StuckBackend(FakeBackend):
+            def render(self, image, instruction, visible_text):
+                payload = json.loads(instruction)
+                self.visual_feedback.append(payload['visual_progress'])
+                control = next(row for row in json.loads(visible_text)['controls']
+                               if row['label'] == 'Idle')
+                self.output = json.dumps({'type': 'click',
+                                          'target': {'ref': control['ref']}})
+                return object(), {'input_tokens': 100, 'image_tokens': 50,
+                                  'chunk_types': ['EncodedTextChunk', 'ImageChunk']}
+
+        with TemporaryDirectory() as folder:
+            async with async_playwright() as playwright:
+                browser = await playwright.chromium.launch(headless=True)
+                try:
+                    page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                    await page.set_content('<style>button,button:hover,'
+                                           'button:active,button:focus{'
+                                           'background:#eee;color:#000;'
+                                           'border:1px solid #000;'
+                                           'outline:none;box-shadow:none}'
+                                           '</style><h1>Dashboard</h1><button>Idle</button>')
+                    backend = StuckBackend()
+                    adapter = VisionSamplingAdapter(backend, Path(folder) / 'journal',
+                        limits=Limits(max_actions=84, output_tokens=512))
+                    budget = pilot.BudgetedAdapter(adapter,
+                        deadline=time.monotonic() + 300)
+                    frames = Path(folder) / 'frames'
+                    frames.mkdir()
+                    policy = await pilot.execute_policy(page, budget,
+                        instruction='Use the visible controls', binding='c' * 64,
+                        prefix='mag777-stuck-fake', frames=frames,
+                        deadline=time.monotonic() + 300)
+                    self.assertEqual((policy['status'], policy['failure_class'],
+                                      policy['failure_code']),
+                                     ('completed', 'model_failure', 'no_visible_progress'))
+                    self.assertEqual((policy['sample_attempt_count'],
+                                      policy['action_attempt_count'],
+                                      policy['applied_action_count'],
+                                      budget.attempt_count), (3, 3, 3, 3))
+                    self.assertEqual([row['action_type'] for row in policy['actions']],
+                                     ['click', 'click', 'click'])
+                    self.assertEqual(len(list(frames.glob('*.png'))), 4)
+                    self.assertEqual([row and row[
+                        'consecutive_identical_actions_without_visible_change']
+                        for row in backend.visual_feedback], [None, 1, 2])
+                finally:
+                    await browser.close()
+
+    async def test_third_identical_action_with_visible_change_can_continue(self):
+        from playwright.async_api import async_playwright
+
+        class DelayedProgressBackend(FakeBackend):
+            def render(self, image, instruction, visible_text):
+                payload = json.loads(instruction)
+                self.visual_feedback.append(payload['visual_progress'])
+                visible = json.loads(visible_text)
+                if 'Ready' in visible['a11y_text']:
+                    action = {'type': 'finish'}
+                else:
+                    control = next(row for row in visible['controls']
+                                   if row['label'] == 'Idle')
+                    action = {'type': 'click', 'target': {'ref': control['ref']}}
+                self.output = json.dumps(action)
+                return object(), {'input_tokens': 100, 'image_tokens': 50,
+                                  'chunk_types': ['EncodedTextChunk', 'ImageChunk']}
+
+        with TemporaryDirectory() as folder:
+            async with async_playwright() as playwright:
+                browser = await playwright.chromium.launch(headless=True)
+                try:
+                    page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                    await page.set_content('<style>button,button:hover,'
+                                           'button:active,button:focus{'
+                                           'background:#eee;color:#000;'
+                                           'border:1px solid #000;'
+                                           'outline:none;box-shadow:none}'
+                                           '</style><h1>Dashboard</h1>'
+                                           '<button onclick="window.n=(window.n||0)+1;'
+                                           "if(window.n===3)document.querySelector("
+                                           "'h1').textContent='Ready'\">Idle</button>")
+                    backend = DelayedProgressBackend()
+                    adapter = VisionSamplingAdapter(backend, Path(folder) / 'journal',
+                        limits=Limits(max_actions=84, output_tokens=512))
+                    budget = pilot.BudgetedAdapter(adapter,
+                        deadline=time.monotonic() + 300)
+                    frames = Path(folder) / 'frames'
+                    frames.mkdir()
+                    policy = await pilot.execute_policy(page, budget,
+                        instruction='Use the visible controls', binding='d' * 64,
+                        prefix='mag777-delayed-progress-fake', frames=frames,
+                        deadline=time.monotonic() + 300)
+                    self.assertEqual((policy['status'], policy['failure_code']),
+                                     ('completed', None))
+                    self.assertEqual((policy['sample_attempt_count'],
+                                      policy['applied_action_count']), (4, 4))
+                    self.assertEqual([row['action_type'] for row in policy['actions']],
+                                     ['click', 'click', 'click', 'finish'])
+                    self.assertFalse(backend.visual_feedback[3][
+                        'screenshot_and_url_unchanged'])
+                finally:
+                    await browser.close()
+
+    async def test_normal_action_ceiling_is_scored_model_failure(self):
+        from playwright.async_api import async_playwright
+
+        class AlternatingBackend(FakeBackend):
+            def render(self, image, instruction, visible_text):
+                controls = json.loads(visible_text)['controls']
+                label = 'A' if len(self.visual_feedback) % 2 == 0 else 'B'
+                control = next(row for row in controls if row['label'] == label)
+                self.visual_feedback.append(json.loads(instruction)['visual_progress'])
+                self.output = json.dumps({'type': 'click',
+                                          'target': {'ref': control['ref']}})
+                return object(), {'input_tokens': 100, 'image_tokens': 50,
+                                  'chunk_types': ['EncodedTextChunk', 'ImageChunk']}
+
+        self.assertEqual(pilot.MAX_GUI_ACTIONS, 80)
+        with TemporaryDirectory() as folder:
+            async with async_playwright() as playwright:
+                browser = await playwright.chromium.launch(headless=True)
+                try:
+                    page = await browser.new_page(viewport={'width': 640, 'height': 480})
+                    await page.set_content('<button>A</button><button>B</button>')
+                    backend = AlternatingBackend()
+                    adapter = VisionSamplingAdapter(backend, Path(folder) / 'journal',
+                        limits=Limits(max_actions=3, output_tokens=512))
+                    budget = pilot.BudgetedAdapter(adapter,
+                        deadline=time.monotonic() + 300)
+                    frames = Path(folder) / 'frames'
+                    frames.mkdir()
+                    with patch.object(pilot, 'MAX_GUI_ACTIONS', 3), \
+                         patch.object(pilot, 'MAX_SAMPLES', 3), \
+                         patch.object(pilot, 'MAX_STALE_SAMPLES', 0):
+                        policy = await pilot.execute_policy(page, budget,
+                            instruction='Use the visible controls', binding='e' * 64,
+                            prefix='mag777-ceiling-fake', frames=frames,
+                            deadline=time.monotonic() + 300)
+                    self.assertEqual((policy['status'], policy['failure_class'],
+                                      policy['failure_code']),
+                                     ('completed', 'model_failure', 'action_budget_exhausted'))
+                    self.assertEqual((policy['sample_attempt_count'],
+                                      policy['applied_action_count']), (3, 3))
+                    admitted = pilot.admit_scored_result(policy,
+                        {'status': 'failure', 'score': 0.0},
+                        {'positive_state_pass': False}, blocked=[],
+                        evaluator_equal=True)
+                    self.assertEqual((admitted['status'], admitted['score']),
+                                     ('completed', 0.0))
                 finally:
                     await browser.close()
 
