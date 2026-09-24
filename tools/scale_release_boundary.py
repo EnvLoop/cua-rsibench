@@ -12,7 +12,8 @@ from pathlib import Path
 import re
 
 
-TEXT_SUFFIXES = frozenset({'.json', '.jsonl', '.md', '.txt', '.csv', '.tsv', '.html', '.css', '.js', '.py', '.svg', '.sha256'})
+TEXT_SUFFIXES = frozenset({'.json', '.jsonl', '.md', '.txt', '.csv', '.tsv', '.html', '.css', '.js', '.mjs', '.py', '.svg', '.sha256'})
+TEXT_NAMES = frozenset({'.gitignore'})
 PRIVATE_NAMES = frozenset({'.env', 'storage_state.json', 'auth_state.json', 'cookies.json', 'secrets.json', 'credentials.json'})
 PRIVATE_SUFFIXES = frozenset({'.har', '.sqlite', '.sqlite3', '.db', '.key', '.pem', '.p12', '.pfx'})
 SECRET_PATTERNS = (
@@ -52,7 +53,8 @@ def scan_public_tree(root, *, markers=(), approved_binary_hashes=None):
             raise ValueError('public inventory contains an authentication or raw-state file')
         data = path.read_bytes()
         digest = sha256(data)
-        if path.suffix.lower() in TEXT_SUFFIXES:
+        is_text = path.suffix.lower() in TEXT_SUFFIXES or path.name.lower() in TEXT_NAMES
+        if is_text:
             try:
                 content = data.decode('utf-8')
             except UnicodeDecodeError:
@@ -65,7 +67,7 @@ def scan_public_tree(root, *, markers=(), approved_binary_hashes=None):
         elif digest not in approved:
             raise ValueError('unreviewed binary file in public inventory')
         files[relative] = {'sha256': digest, 'bytes': len(data),
-                           'reviewed_binary': path.suffix.lower() not in TEXT_SUFFIXES}
+                           'reviewed_binary': not is_text}
     if not files:
         raise ValueError('empty public inventory')
     return {'schema': 'scale-publication-boundary-v1', 'status': 'text-and-inventory-pass',

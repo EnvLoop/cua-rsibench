@@ -1,0 +1,41 @@
+{
+  "schema": "v0.6-web-app-smokes-v1",
+  "date": "2026-09-24",
+  "status": "two_read_only_task_smokes_only",
+  "source": {
+    "repository": "https://github.com/ServiceNow/webarena-verified",
+    "commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+  },
+  "magento_admin": {
+    "published_task_id": 157,
+    "task_kind": "read_only_navigation",
+    "actual_application": "Magento 2.4.6 local disposable container",
+    "published_evaluator_scores_positive_negative_positive": [1, 0, 1],
+    "positive_visible_customer_rows": [70, 70],
+    "negative_visible_order_rows": 200,
+    "customer_business_tables_unchanged": 13,
+    "sanitized_trace_scored_like_raw": true,
+    "model_calls": 0,
+    "mutation_rollback_qualified": false,
+    "one_hundred_tasks_qualified": false,
+    "private_result_sha256": "1cb9e10ad2a83209d0fde3ac4368f557a7367da28e76f847a0815a6739bb3ed8"
+  },
+  "gitlab": {
+    "published_task_id": 44,
+    "task_kind": "read_only_navigation",
+    "actual_application": "GitLab CE 18.5 local disposable container",
+    "published_evaluator_scores_positive_negative_positive": [1, 0, 1],
+    "business_tables_unchanged": true,
+    "seeded_webarena_snapshot": false,
+    "gitlab_only_task_ids": 180,
+    "distinct_intent_templates": 41,
+    "model_calls": 0,
+    "mutation_rollback_qualified": false,
+    "one_hundred_tasks_qualified": false
+  },
+  "privacy": {
+    "raw_har_or_auth_state_published": false,
+    "personal_or_office_account_accessed": false
+  }
+}

@@ -15,12 +15,12 @@ class ScaleReleaseBoundaryTests(unittest.TestCase):
             self.assertFalse(result['screenshot_content_reviewed'])
 
     def test_rejects_account_and_provider_values_without_echoing_them(self):
-        for value in ('bench-account@example.test', 'e2b_' + 'x' * 30,
-                      'https://1drv.ms/u/s!sensitive-link'):
+        for value in ('bench-account' + '@example.test', 'e2b_' + 'x' * 30,
+                      'https://' + '1drv.ms' + '/u/s!sensitive-link'):
             with self.subTest(value=value), tempfile.TemporaryDirectory() as temporary:
                 (Path(temporary) / 'summary.json').write_text('{"value":' + repr(value).replace("'", '"') + '}')
                 with self.assertRaises(ValueError) as caught:
-                    scan_public_tree(temporary, markers=('bench-account@example.test',))
+                    scan_public_tree(temporary, markers=('bench-account' + '@example.test',))
                 self.assertNotIn(value, str(caught.exception))
 
     def test_requires_reviewed_binary_and_rejects_raw_auth_paths(self):
@@ -41,6 +41,18 @@ class ScaleReleaseBoundaryTests(unittest.TestCase):
             (root / 'safe.txt').write_text('safe')
             (root / 'link.txt').symlink_to(root / 'safe.txt')
             with self.assertRaisesRegex(ValueError, 'symlink'):
+                scan_public_tree(root)
+
+    def test_javascript_modules_and_gitignore_are_scanned_as_text(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'builder.mjs').write_text('export const rows = 2;\n')
+            (root / '.gitignore').write_text('output/\n')
+            result = scan_public_tree(root)
+            self.assertEqual(set(result['files']), {'builder.mjs', '.gitignore'})
+            self.assertFalse(any(row['reviewed_binary'] for row in result['files'].values()))
+            (root / 'builder.mjs').write_text('export const key = "e2b_' + 'x' * 30 + '";\n')
+            with self.assertRaisesRegex(ValueError, 'provider credential'):
                 scan_public_tree(root)
 
 

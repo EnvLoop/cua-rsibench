@@ -17,11 +17,11 @@
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
         "all_120_runtime_ready": false,
-        "gui_implementation": "verified in source; not executed here",
-        "account_login": "unknown; no account or OAuth check performed",
-        "software_entitlement": "unknown; README does not establish this user account entitlement",
-        "reset": "reported/source implementation; no smoke",
-        "verifier": "verified rubric files and saved-artifact design; no smoke"
+        "gui_implementation": "blank deck edited in real PowerPoint for the web and reopened after save; dataset tasks not executed",
+        "account_login": "dedicated test account signed in and used for a disposable deck on 2026-09-24; identity and file URLs private",
+        "software_entitlement": "free web editing observed; bulk benchmark entitlement and dataset feature coverage unverified",
+        "reset": "save/reload readback passed on one disposable deck; fresh task hydration and rollback unverified",
+        "verifier": "published rubric inspected; independent whole-deck no-regression and screenshot-failure handling still needed"
       },
       "primary_references": [
         "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/README.md",
@@ -34,24 +34,29 @@
     {
       "id": "microsoft-excel",
       "repository": {
-        "url": "https://github.com/RUCKBReasoning/SpreadsheetBench",
-        "commit": "49b73a94775fb489063f60ca1865e3a650079a79"
+        "url": "https://github.com/RUCKBReasoning/SpreadsheetBench-2",
+        "commit": null
       },
-      "license": "CC-BY-SA-4.0 declared in project README; Microsoft Excel entitlement separate",
-      "inventory_count": 400,
-      "cluster_definition": "original question ID before first hyphen; provisional source-family proxy",
+      "dataset_revision": "5a2215ed4121945ab09d8723df2995602090b042",
+      "dataset_archive_sha256": "17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c",
+      "license": "SpreadsheetBench 2 paper says CC-BY-SA-4.0 dataset; Hugging Face metadata says MIT; conflict unresolved, no public redistribution",
+      "inventory_count": 200,
+      "cluster_definition": "Financial_Model and Debugging base golden workbook; 200 task instances from 30 distinct workbook files",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
-        "all_120_runtime_ready": false,
-        "gui_implementation": "unknown/not implemented in current EnvLoop actor",
-        "account_license": "unknown; no entitlement inspection",
-        "reset": "proposed VM snapshot + fresh workbook; untested",
-        "verifier": "file-based reference exists; GUI-backed Excel readback/recalculation untested"
+        "all_200_runtime_ready": false,
+        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved",
+        "account_license": "dedicated test account signed in; free web editing observed; bulk benchmark use and dataset feature coverage unverified",
+        "reset": "save/reload readback passed on a disposable workbook and an easy predecessor task; one hard workbook had zero semantic cell changes after untouched web download but lost two VML note drawings; deterministic cloud rollback unverified",
+        "verifier": "independent OOXML oracle passed an easy predecessor task; published SpreadsheetBench 2 evaluator is insufficient alone for outside-range regression, and hard-task oracle calibration is pending",
+        "source_family_diversity": "30 hard-source workbook files; a 100-independent-family final set requires new families or broader audited sources",
+        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked with zero non-target semantic cell changes; remaining 83 formulas and cloud reset unverified"
       },
       "primary_references": [
-        "https://github.com/RUCKBReasoning/SpreadsheetBench/blob/49b73a94775fb489063f60ca1865e3a650079a79/README.md#license-and-citation",
-        "https://github.com/RUCKBReasoning/SpreadsheetBench/blob/49b73a94775fb489063f60ca1865e3a650079a79/evaluation",
-        "https://huggingface.co/datasets/KAKA22/SpreadsheetBench/resolve/ab0b742b0fc95b946f212d80ac7771b5531272e4/spreadsheetbench_verified_400.tar.gz"
+        "https://arxiv.org/html/2606.29955",
+        "https://github.com/RUCKBReasoning/SpreadsheetBench-2",
+        "https://huggingface.co/datasets/KAKA22/SpreadsheetBench-v2/tree/5a2215ed4121945ab09d8723df2995602090b042",
+        "https://support.microsoft.com/en-us/excel/edit-a-workbook-that-contains-features-unsupported-by-excel-for-the-web"
       ]
     },
     {
@@ -69,7 +74,7 @@
         "gui_implementation": "verified source supports screenshot/a11y desktop actions; no local execution",
         "reset": "reported VM/task initialization; no smoke",
         "verifier": "source execution-based functions; no smoke",
-        "qwen4b_screenshot_compatibility": "unknown at provider/model level; absent from current text-only EnvLoop adapter"
+        "qwen38_27b_screenshot_compatibility": "one synthetic-image Tinker LoRA update and checkpoint sampling passed; desktop task integration untested"
       },
       "primary_references": [
         "https://github.com/xlang-ai/OSWorld/blob/b138d348256078fa634fc3b73567a7337c793e6b/LICENSE",
@@ -109,13 +114,14 @@
       },
       "license": "Apache-2.0 benchmark/evaluator; site software and bundled source data retain separate terms",
       "inventory_count": 180,
-      "cluster_definition": "intent_template_id",
+      "cluster_definition": "intent_template_id; 180 GitLab-only task IDs collapse to 41 templates",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
         "all_120_runtime_ready": false,
-        "gui_implementation": "browser source environment verified; not executed",
-        "reset": "upstream container environment-control present; no smoke",
-        "verifier": "deterministic evaluator/network-trace implementation verified in source; no smoke"
+        "gui_implementation": "one real GitLab CE task 44 read-only navigation smoke passed in an unseeded local demo; full seeded dataset not executed",
+        "reset": "fresh browser login and unchanged business-table fingerprints passed for one read-only task; mutation rollback unverified",
+        "verifier": "pinned evaluator scored two positives 1 and one wrong-route negative 0; 100-task coverage unverified",
+        "seeded_environment": "unverified; official optimized image does not fit the isolated 24-GB demo profile"
       },
       "primary_references": [
         "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
@@ -136,8 +142,8 @@
       "readiness": {
         "all_120_runtime_ready": false,
         "gui_implementation": "browser source environment verified; not executed",
-        "reset": "upstream container environment-control present; no smoke",
-        "verifier": "deterministic evaluator/network-trace implementation verified in source; no smoke"
+        "reset": "fresh browser sessions and unchanged customer business tables verified for one read-only navigation task; mutation rollback unverified",
+        "verifier": "pinned evaluator scored task 157 on two customer-navigation positives and one wrong-route negative; 100-task coverage unverified"
       },
       "primary_references": [
         "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
