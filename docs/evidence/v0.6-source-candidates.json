@@ -45,12 +45,12 @@
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
         "all_200_runtime_ready": false,
-        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved; a separate six-sheet SEC blind-audit prototype had one formula visibly repaired, saved, reloaded, and downloaded",
+        "gui_implementation": "easy predecessor task 50250 completed; one 25-sheet SpreadsheetBench 2 financial model opened in Excel web editing mode but was not solved; a separate six-sheet SEC blind-audit development prototype had all nine defects repaired by a human through visible Excel web, saved, reloaded, downloaded, and independently checked",
         "account_license": "dedicated test account signed in; free web editing observed; bulk benchmark use and dataset feature coverage unverified",
         "reset": "save/reload readback passed on a disposable workbook and an easy predecessor task; one hard workbook had zero semantic cell changes after untouched web download but lost two VML note drawings; deterministic cloud rollback unverified",
-        "verifier": "independent OOXML oracle passed an easy predecessor task; offline hard SpreadsheetBench 2 task 01_01 gold and wrong-target/unrelated-edit controls passed but Excel-web qualification is pending; a separate SEC blind-audit verifier scored one GUI repair as 1/9 with full task failure",
+        "verifier": "independent OOXML oracle passed an easy predecessor task; offline hard SpreadsheetBench 2 task 01_01 gold and wrong-target/unrelated-edit controls passed but Excel-web qualification is pending; a separate SEC blind-audit verifier scored a one-repair GUI negative 1/9 and a nine-repair human GUI positive 9/9 across 114 targets and two private replay profiles",
         "source_family_diversity": "30 hard-source workbook files; a 100-independent-family final set requires new families or broader audited sources",
-        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked; a harder six-sheet blind audit uses 177 authentic rows, 114 formulas, nine faults, two-source-calendar Q4 bridges and hidden perturbations, with one GUI edit verified; neither complete task nor cloud reset is qualified"
+        "supplemental_original_task": "one five-sheet, 84-formula prototype from frozen public SEC facts opened in Excel web; one cross-sheet formula saved, reloaded, downloaded and independently checked; a harder six-sheet blind audit uses 177 authentic rows, 114 formulas, nine faults, two-source-calendar Q4 bridges and hidden perturbations, with one human GUI-positive full repair and one partial negative; it is a public development task, not a hidden final case, and automated cloud reset is unqualified"
       },
       "primary_references": [
         "https://arxiv.org/html/2606.29955",
