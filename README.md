@@ -15,6 +15,8 @@ The [English qualification PDF](docs/qualification-v06/EnvLoop-Computer-Use-Qual
 
 The [v0.6.1 English addendum](docs/qualification-v061/EnvLoop-Real-Software-Qualification-Addendum.pdf) and [vector control diagram](docs/qualification-v061/figures/control-transitions.svg) report three additional saved-state development controls in real Excel web, PowerPoint web, and Magento admin. Their task-specific scores are not pooled or promoted into the planned 24-campaign study. The [Magento 100-candidate backlog](docs/evidence/magento-100-candidate-admission-2026-09-24.md) is an audited preparation queue with zero officially admitted final identities.
 
+A separate [Qwen3.8-27B base-model Magento price-task pilot](docs/evidence/magento-price777-qwen-base-pilot-2026-09-24.md) records one runner failure and one 40-sample budget-censored retry. Neither completed a product save or entered an official final-task denominator; both attempts' monitored SQL and search state were restored. This protocol-development evidence is not a checkpoint or training-gain result.
+
 ## Executable data-research studies
 
 Researchers write Python data factories in isolated E2B workspaces, generate native task states, request verified GUI demonstrations, and revise their training mixtures from selection feedback. Each accepted dataset trains a fresh Qwen3.5-4B LoRA adapter. The fixed teacher is **gpt-5.6-sol**; the researcher model and the evaluated student are different roles.

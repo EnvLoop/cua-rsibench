@@ -1,0 +1,95 @@
+{
+  "schema": "envloop.magento.price777.qwen_base_pilot.v1",
+  "task_id": 777,
+  "application": "Magento 2.4.6 admin in separate disposable local clones",
+  "source_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "model": "Qwen/Qwen3.8-27B",
+  "model_kind": "base",
+  "training_or_checkpoint_selection_performed": false,
+  "action_surface": "DOM-assisted visual GUI: one model action per current masked screenshot, with viewport-bound visible control references or screenshot coordinates",
+  "official_evaluator_unchanged": true,
+  "limits_per_attempt": {
+    "max_samples": 40,
+    "max_gui_actions": 40,
+    "wall_seconds": 1200,
+    "published_rate_cap_usd": "10",
+    "worst_case_published_rate_reservation_usd": "2.55252480"
+  },
+  "attempts": [
+    {
+      "label": "original-observer",
+      "status": "unscored",
+      "failure_class": "environment_failure",
+      "failure_code": "gui_dispatch_error",
+      "elapsed_seconds": 90.32380174999707,
+      "provider_sample_attempts": 5,
+      "applied_gui_actions": 2,
+      "discarded_stale_samples": 2,
+      "terminal_page": "/admin/catalog/product/",
+      "observed_boundary_issue": "A listed control reference named an offscreen product edit link at y≈7816 outside the 1000-pixel screenshot. The original dispatch exception class was not retained; a read-only replay could click that link.",
+      "target_prices_persisted_at_47": 0,
+      "wrong_color_unchanged": true,
+      "official_network_score_diagnostic": 0.0,
+      "raw_and_sanitized_evaluator_equal": true,
+      "monitored_sql_and_search_reset_verified": true,
+      "rendered_multimodal_input_tokens": 17833,
+      "sampled_output_tokens_corrected": 100,
+      "published_rate_subtotal_usd_corrected": "0.03372888",
+      "usage_correction_receipt": "magento-price777-qwen-attempt1-usage-correction-2026-09-24.json",
+      "private_result_sha256": "e1a1c90678f4f1dd1cadf064584557dc408ad80c98f5c46180215e415d3c7bae",
+      "private_usage_jsonl_sha256": "1529e44aeacff640633c6903a24d5460eb9cb0653f843ce0adaa565f8225cb68"
+    },
+    {
+      "label": "viewport-bound-observer-retry",
+      "status": "unscored",
+      "private_runner_failure_class": "environment_failure",
+      "failure_code": "sample_budget_exhausted",
+      "analysis_class": "budget_censored_no_infrastructure_outage",
+      "interpretation": "A bounded model-control attempt reached the 40-sample ceiling without completing the task; no provider or GUI infrastructure error occurred in this retry.",
+      "elapsed_seconds": 291.8894085419888,
+      "provider_sample_attempts": 40,
+      "applied_gui_actions": 39,
+      "discarded_stale_samples": 1,
+      "blocked_external_requests": 0,
+      "terminal_page": "/admin/catalog/product/",
+      "observed_behavior": "After reaching the Products grid and filling the keyword field, the model repeatedly clicked the same search input without submitting the search.",
+      "target_prices_persisted_at_47": 0,
+      "target_count": 5,
+      "wrong_color_unchanged": true,
+      "official_network_score_diagnostic": 0.0,
+      "raw_and_sanitized_evaluator_equal": true,
+      "monitored_sql_and_search_reset_verified": true,
+      "rendered_multimodal_input_tokens": 101811,
+      "sampled_output_tokens": 826,
+      "published_rate_subtotal_usd": "0.19398993",
+      "maximum_published_rate_reservation_usd": "2.55252480",
+      "private_result_sha256": "99fc5e86b5e3760841f1f6b482b02eac75ef0947f79590d5649aeb058af79307",
+      "private_usage_jsonl_sha256": "a99be4ec206d0ba99cf02f82c44b04928a9e01527448d91efb4821f1dfb16ae8",
+      "masked_terminal_frame": {
+        "file": "magento-price777-qwen-base-budget-limit-2026-09-24.png",
+        "sha256": "d1dbd78d4a5222f82753cb9c9587280f5da44dabda894a73ab7bf1013935f72f"
+      }
+    }
+  ],
+  "usage": {
+    "published_rate_uncached_prefill_usd_per_million": "1.86",
+    "published_rate_sample_usd_per_million": "5.595",
+    "two_attempt_rendered_token_subtotal_usd": "0.22771881",
+    "provider_billed_tokens_known": false,
+    "provider_invoice_usd_known": false,
+    "basis": "Rendered multimodal prompt tokens and returned sample tokens; not provider billing."
+  },
+  "admission": {
+    "scored_model_attempts": 0,
+    "official_final_tasks": 0,
+    "hundred_task_ready_from_these_attempts": false,
+    "qualifier_scripted_oracle_is_separate": true,
+    "no_model_success_rate_inferred": true
+  },
+  "privacy": {
+    "raw_model_text_published": false,
+    "raw_har_published": false,
+    "authentication_state_published": false,
+    "provider_key_published": false
+  }
+}
