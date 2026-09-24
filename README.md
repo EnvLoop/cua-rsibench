@@ -17,6 +17,8 @@ The [v0.6.1 English addendum](docs/qualification-v061/EnvLoop-Real-Software-Qual
 
 A separate [Qwen3.8-27B base-model Magento price-task pilot](docs/evidence/magento-price777-qwen-base-pilot-2026-09-24.md) records one runner failure and one 40-sample budget-censored retry. Neither completed a product save or entered an official final-task denominator; both attempts' monitored SQL and search state were restored. This protocol-development evidence is not a checkpoint or training-gain result.
 
+The later [v3 scored development diagnostic](docs/evidence/magento-price777-qwen-scored-v3-2026-09-25.md) completed one valid model-driven GUI attempt on the same public task. Qwen saved one of five target prices, then chose `finish`; the unchanged evaluator and independent saved-state check scored the full task **0.0**. Two intervening v2 attempts remain unscored infrastructure/protocol failures. Monitored SQL and all 181 search documents were restored after every attempt. This public task adds no hidden final identity or researcher campaign.
+
 ## Executable data-research studies
 
 Researchers write Python data factories in isolated E2B workspaces, generate native task states, request verified GUI demonstrations, and revise their training mixtures from selection feedback. Each accepted dataset trains a fresh Qwen3.5-4B LoRA adapter. The fixed teacher is **gpt-5.6-sol**; the researcher model and the evaluated student are different roles.
