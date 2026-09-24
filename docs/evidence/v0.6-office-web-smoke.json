@@ -9,7 +9,14 @@
     "disposable_deck_created_and_edited_in_gui": true,
     "title_and_subtitle_persisted_after_reload": true,
     "native_pptx_download_offered": true,
-    "independent_ooxml_verifier_passed": false,
+    "native_pptx_downloaded_from_onedrive": true,
+    "download_sha256": "007643bec526b0688efc3fbe208a3d110aefb2c43fce3fa582e6bd8348ffaf11",
+    "independent_ooxml_readback": {
+      "slide_count": 1,
+      "expected_title_and_subtitle_text_present": true,
+      "unexpected_slide_present": false
+    },
+    "independent_ooxml_verifier_passed": true,
     "published_dataset_task_qualified": false,
     "deterministic_reset_qualified": false
   },
@@ -40,7 +47,7 @@
     "deterministic_cloud_reset_qualified": false
   },
   "limitations": [
-    "The PowerPoint file has not passed an independent whole-deck comparison.",
+    "The PowerPoint disposable deck passed basic slide-count/text readback; it has not passed a published PPT-Eval task or whole-deck no-regression comparison.",
     "The Excel OOXML checker cannot infer GUI provenance or recalculation from file bytes alone; the GUI probe is separately observed.",
     "Task 50250 is an easy infrastructure check and is not representative of the planned difficult Excel cell.",
     "No 100-task Office cell is frozen or scored."

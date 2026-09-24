@@ -1,0 +1,27 @@
+{
+  "schema": "sec-excel-candidate-issuers-v1",
+  "selected_on": "2026-09-24",
+  "identity_source": "https://www.sec.gov/files/company_tickers.json",
+  "identity_note": "Ticker, CIK and SEC name were checked against the SEC ticker list on selected_on. A ticker association may change; the fetched companyfacts CIK must still match. Industry and task-shape labels are research hypotheses, not SEC fields or verified workbook families.",
+  "target_fiscal_years": [2023, 2024],
+  "candidates": [
+    {"ticker": "AAPL", "cik": 320193, "sec_name": "Apple Inc.", "industry_hypothesis": "technology products", "task_shape_hypothesis": "product mix and supply chain", "snapshot": "apple-companyfacts.json.gz"},
+    {"ticker": "MSFT", "cik": 789019, "sec_name": "MICROSOFT CORP", "industry_hypothesis": "software and cloud", "task_shape_hypothesis": "recurring revenue and capex", "snapshot": "microsoft-companyfacts.json.gz"},
+    {"ticker": "NVDA", "cik": 1045810, "sec_name": "NVIDIA CORP", "industry_hypothesis": "semiconductors", "task_shape_hypothesis": "cyclical growth and inventory"},
+    {"ticker": "WMT", "cik": 104169, "sec_name": "Walmart Inc.", "industry_hypothesis": "retail", "task_shape_hypothesis": "inventory and thin margins"},
+    {"ticker": "COST", "cik": 909832, "sec_name": "COSTCO WHOLESALE CORP /NEW", "industry_hypothesis": "membership retail", "task_shape_hypothesis": "membership fees and fiscal calendar"},
+    {"ticker": "HD", "cik": 354950, "sec_name": "HOME DEPOT, INC.", "industry_hypothesis": "home improvement retail", "task_shape_hypothesis": "store productivity and working capital"},
+    {"ticker": "AMZN", "cik": 1018724, "sec_name": "AMAZON COM INC", "industry_hypothesis": "retail and cloud", "task_shape_hypothesis": "segment and fulfillment capex"},
+    {"ticker": "GOOGL", "cik": 1652044, "sec_name": "Alphabet Inc.", "industry_hypothesis": "advertising and cloud", "task_shape_hypothesis": "segment growth and capex"},
+    {"ticker": "META", "cik": 1326801, "sec_name": "Meta Platforms, Inc.", "industry_hypothesis": "digital advertising", "task_shape_hypothesis": "revenue concentration and infrastructure capex"},
+    {"ticker": "NFLX", "cik": 1065280, "sec_name": "NETFLIX INC", "industry_hypothesis": "streaming media", "task_shape_hypothesis": "content economics"},
+    {"ticker": "DIS", "cik": 1744489, "sec_name": "Walt Disney Co", "industry_hypothesis": "media and parks", "task_shape_hypothesis": "multi-segment seasonality"},
+    {"ticker": "PFE", "cik": 78003, "sec_name": "PFIZER INC", "industry_hypothesis": "pharmaceuticals", "task_shape_hypothesis": "product cycle and acquisitions"},
+    {"ticker": "BA", "cik": 12927, "sec_name": "BOEING CO", "industry_hypothesis": "aerospace manufacturing", "task_shape_hypothesis": "long-cycle losses and cash flow"},
+    {"ticker": "CAT", "cik": 18230, "sec_name": "CATERPILLAR INC", "industry_hypothesis": "industrial machinery", "task_shape_hypothesis": "cyclicality and finance arm"},
+    {"ticker": "CVX", "cik": 93410, "sec_name": "CHEVRON CORP", "industry_hypothesis": "energy", "task_shape_hypothesis": "commodity cycle and capex"},
+    {"ticker": "KO", "cik": 21344, "sec_name": "COCA COLA CO", "industry_hypothesis": "consumer staples", "task_shape_hypothesis": "bottling and geographic mix"},
+    {"ticker": "ORCL", "cik": 1341439, "sec_name": "ORACLE CORP", "industry_hypothesis": "enterprise software", "task_shape_hypothesis": "fiscal calendar and cloud transition"},
+    {"ticker": "CRM", "cik": 1108524, "sec_name": "Salesforce, Inc.", "industry_hypothesis": "enterprise software", "task_shape_hypothesis": "subscription growth and acquisitions"}
+  ]
+}

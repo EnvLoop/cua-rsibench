@@ -46,7 +46,7 @@ def default_config():
             ('astra', 'gpt-6-astra'), ('sol', 'gpt-5.6-sol'),
             ('sol6', 'gpt-6-sol'), ('luna6', 'gpt-6-luna'))],
         'cells': [{'id': f'cell-{number:02}', 'application': None, 'interface': None,
-                   'selection_tasks': 100, 'final_tasks': 100, 'split_manifest': None,
+                   'selection_tasks': 20, 'final_tasks': 100, 'split_manifest': None,
                    'runtime_sha256': None, 'verifier_sha256': None}
                   for number in range(1, 7)],
         'research_seeds': [23],

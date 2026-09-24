@@ -21,7 +21,7 @@
         "account_login": "dedicated test account signed in and used for a disposable deck on 2026-09-24; identity and file URLs private",
         "software_entitlement": "free web editing observed; bulk benchmark entitlement and dataset feature coverage unverified",
         "reset": "save/reload readback passed on one disposable deck; fresh task hydration and rollback unverified",
-        "verifier": "published rubric inspected; independent whole-deck no-regression and screenshot-failure handling still needed"
+        "verifier": "disposable web deck independently downloaded and checked for one slide plus title/subtitle; published PPT-Eval task not run in GUI; an artifact-only guard catches upstream unrelated-subtitle false acceptance and unscored screenshot failure"
       },
       "primary_references": [
         "https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/README.md",
@@ -95,7 +95,7 @@
       "readiness": {
         "all_120_runtime_ready": false,
         "gui_implementation": "source implemented; not executed",
-        "instance_access": "unknown; no gated access check",
+        "instance_access": "official WorkArena setup requires approval for gated ServiceNow benchmark instances; no access or personal developer instance has been obtained in this study",
         "reset": "source setup/teardown present; no smoke",
         "verifier": "source validate uses ServiceNow record readback; no smoke"
       },

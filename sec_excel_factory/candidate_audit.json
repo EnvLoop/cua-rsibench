@@ -1,0 +1,548 @@
+{
+  "schema": "sec-excel-candidate-audit-v1",
+  "candidate_manifest_sha256": "6fe7bd4c582414d8006306d18e5113cc9f7b0138d4950c3e404421b523c41383",
+  "identity_source": "https://www.sec.gov/files/company_tickers.json",
+  "target_fiscal_years": [
+    2023,
+    2024
+  ],
+  "required_us_gaap_concepts": {
+    "Revenue": "RevenueFromContractWithCustomerExcludingAssessedTax",
+    "Operating income": "OperatingIncomeLoss",
+    "Operating cash flow": "NetCashProvidedByUsedInOperatingActivities",
+    "Capital expenditures": "PaymentsToAcquirePropertyPlantAndEquipment",
+    "Assets": "Assets",
+    "Liabilities": "Liabilities",
+    "Equity": "StockholdersEquity"
+  },
+  "selection_policy": "An exact USD fact for each of seven tags and each year, from one original FY2024 10-K accession; FY2023/FY2024 issuer-specific end dates, 330-380 day flows, instant stocks, common start date/filed date, and assets=liabilities+equity within USD 1.5m.",
+  "counts": {
+    "candidates": 18,
+    "snapshots_audited": 2,
+    "eligible_sources": 2,
+    "rejected_sources": 0,
+    "pending_snapshots": 16,
+    "fetch_errors": 0
+  },
+  "results": [
+    {
+      "ticker": "AAPL",
+      "cik": 320193,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "sha256_raw_json": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+      "industry_hypothesis": "technology products",
+      "task_shape_hypothesis": "product mix and supply chain",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0000320193-24-000123",
+      "filed": "2024-11-01",
+      "year_ends": {
+        "2023": "2023-09-30",
+        "2024": "2024-09-28"
+      },
+      "selected_facts": {
+        "2023:Revenue": {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "unit": "USD",
+          "value": 383285000000,
+          "start": "2022-09-25",
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Revenue": {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "unit": "USD",
+          "value": 391035000000,
+          "start": "2023-10-01",
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Operating income": {
+          "concept": "OperatingIncomeLoss",
+          "unit": "USD",
+          "value": 114301000000,
+          "start": "2022-09-25",
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Operating income": {
+          "concept": "OperatingIncomeLoss",
+          "unit": "USD",
+          "value": 123216000000,
+          "start": "2023-10-01",
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Operating cash flow": {
+          "concept": "NetCashProvidedByUsedInOperatingActivities",
+          "unit": "USD",
+          "value": 110543000000,
+          "start": "2022-09-25",
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Operating cash flow": {
+          "concept": "NetCashProvidedByUsedInOperatingActivities",
+          "unit": "USD",
+          "value": 118254000000,
+          "start": "2023-10-01",
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Capital expenditures": {
+          "concept": "PaymentsToAcquirePropertyPlantAndEquipment",
+          "unit": "USD",
+          "value": 10959000000,
+          "start": "2022-09-25",
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Capital expenditures": {
+          "concept": "PaymentsToAcquirePropertyPlantAndEquipment",
+          "unit": "USD",
+          "value": 9447000000,
+          "start": "2023-10-01",
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Assets": {
+          "concept": "Assets",
+          "unit": "USD",
+          "value": 352583000000,
+          "start": null,
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Assets": {
+          "concept": "Assets",
+          "unit": "USD",
+          "value": 364980000000,
+          "start": null,
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Liabilities": {
+          "concept": "Liabilities",
+          "unit": "USD",
+          "value": 290437000000,
+          "start": null,
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Liabilities": {
+          "concept": "Liabilities",
+          "unit": "USD",
+          "value": 308030000000,
+          "start": null,
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Equity": {
+          "concept": "StockholdersEquity",
+          "unit": "USD",
+          "value": 62146000000,
+          "start": null,
+          "end": "2023-09-30",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Equity": {
+          "concept": "StockholdersEquity",
+          "unit": "USD",
+          "value": 56950000000,
+          "start": null,
+          "end": "2024-09-28",
+          "form": "10-K",
+          "accession": "0000320193-24-000123",
+          "filed": "2024-11-01",
+          "fy": 2024,
+          "fp": "FY"
+        }
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "entity_name": "Apple Inc.",
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "09"
+        ],
+        "same_end_other_accession_fact_count": 43,
+        "nearby_quarterly_fact_count": 120,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1144,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      },
+      "snapshot_path": "sources/raw/apple-companyfacts.json.gz",
+      "sha256_snapshot_file": "ea6b4b8210c789174b7c455033c48be601daa3ced92e960d6e371a09349a7674"
+    },
+    {
+      "ticker": "MSFT",
+      "cik": 789019,
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+      "sha256_raw_json": "f8aae2965b20ad0df44bdf7ccbedf797d275b6b8dc030154a7a311361bb7246f",
+      "industry_hypothesis": "software and cloud",
+      "task_shape_hypothesis": "recurring revenue and capex",
+      "status": "eligible_source",
+      "reason_codes": [],
+      "accession": "0000950170-24-087843",
+      "filed": "2024-07-30",
+      "year_ends": {
+        "2023": "2023-06-30",
+        "2024": "2024-06-30"
+      },
+      "selected_facts": {
+        "2023:Revenue": {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "unit": "USD",
+          "value": 211915000000,
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Revenue": {
+          "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "unit": "USD",
+          "value": 245122000000,
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Operating income": {
+          "concept": "OperatingIncomeLoss",
+          "unit": "USD",
+          "value": 88523000000,
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Operating income": {
+          "concept": "OperatingIncomeLoss",
+          "unit": "USD",
+          "value": 109433000000,
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Operating cash flow": {
+          "concept": "NetCashProvidedByUsedInOperatingActivities",
+          "unit": "USD",
+          "value": 87582000000,
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Operating cash flow": {
+          "concept": "NetCashProvidedByUsedInOperatingActivities",
+          "unit": "USD",
+          "value": 118548000000,
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Capital expenditures": {
+          "concept": "PaymentsToAcquirePropertyPlantAndEquipment",
+          "unit": "USD",
+          "value": 28107000000,
+          "start": "2022-07-01",
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Capital expenditures": {
+          "concept": "PaymentsToAcquirePropertyPlantAndEquipment",
+          "unit": "USD",
+          "value": 44477000000,
+          "start": "2023-07-01",
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Assets": {
+          "concept": "Assets",
+          "unit": "USD",
+          "value": 411976000000,
+          "start": null,
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Assets": {
+          "concept": "Assets",
+          "unit": "USD",
+          "value": 512163000000,
+          "start": null,
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Liabilities": {
+          "concept": "Liabilities",
+          "unit": "USD",
+          "value": 205753000000,
+          "start": null,
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Liabilities": {
+          "concept": "Liabilities",
+          "unit": "USD",
+          "value": 243686000000,
+          "start": null,
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2023:Equity": {
+          "concept": "StockholdersEquity",
+          "unit": "USD",
+          "value": 206223000000,
+          "start": null,
+          "end": "2023-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        },
+        "2024:Equity": {
+          "concept": "StockholdersEquity",
+          "unit": "USD",
+          "value": 268477000000,
+          "start": null,
+          "end": "2024-06-30",
+          "form": "10-K",
+          "accession": "0000950170-24-087843",
+          "filed": "2024-07-30",
+          "fy": 2024,
+          "fp": "FY"
+        }
+      },
+      "balance_gaps_usd": {
+        "2023": 0,
+        "2024": 0
+      },
+      "entity_name": "MICROSOFT CORPORATION",
+      "complexity_profile": {
+        "fiscal_year_end_months": [
+          "06"
+        ],
+        "same_end_other_accession_fact_count": 56,
+        "nearby_quarterly_fact_count": 122,
+        "required_concepts_with_multiple_units": 0,
+        "required_concept_usd_fact_count": 1301,
+        "note": "Source-data complexity indicators only; no workbook-family or GUI difficulty claim."
+      },
+      "snapshot_path": "sources/raw/microsoft-companyfacts.json.gz",
+      "sha256_snapshot_file": "eae0c57c5afa1775febf2b6e3b2db2ab6506f145f56f0da05bb3cb9109d7507b"
+    },
+    {
+      "ticker": "NVDA",
+      "cik": 1045810,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json"
+    },
+    {
+      "ticker": "WMT",
+      "cik": 104169,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000104169.json"
+    },
+    {
+      "ticker": "COST",
+      "cik": 909832,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000909832.json"
+    },
+    {
+      "ticker": "HD",
+      "cik": 354950,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000354950.json"
+    },
+    {
+      "ticker": "AMZN",
+      "cik": 1018724,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json"
+    },
+    {
+      "ticker": "GOOGL",
+      "cik": 1652044,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json"
+    },
+    {
+      "ticker": "META",
+      "cik": 1326801,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json"
+    },
+    {
+      "ticker": "NFLX",
+      "cik": 1065280,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001065280.json"
+    },
+    {
+      "ticker": "DIS",
+      "cik": 1744489,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001744489.json"
+    },
+    {
+      "ticker": "PFE",
+      "cik": 78003,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000078003.json"
+    },
+    {
+      "ticker": "BA",
+      "cik": 12927,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000012927.json"
+    },
+    {
+      "ticker": "CAT",
+      "cik": 18230,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000018230.json"
+    },
+    {
+      "ticker": "CVX",
+      "cik": 93410,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000093410.json"
+    },
+    {
+      "ticker": "KO",
+      "cik": 21344,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000021344.json"
+    },
+    {
+      "ticker": "ORCL",
+      "cik": 1341439,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001341439.json"
+    },
+    {
+      "ticker": "CRM",
+      "cik": 1108524,
+      "status": "pending_snapshot",
+      "reason_codes": [],
+      "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json"
+    }
+  ],
+  "scope_note": "Eligible means source facts qualify. No additional workbook, independent workbook family, Excel-web round trip, or benchmark score was created by this audit."
+}
