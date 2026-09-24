@@ -20,7 +20,7 @@ from PIL import Image
 from cursibench.scale_vision_proxy import (
     Limits, MODEL, PROCESSOR, RENDERER, ProxyError, QwenVisionRenderer,
     TinkerVisionBackend, VisionSamplingAdapter, error_subtype, image_from_bytes,
-    make_http_server, public_receipt,
+    make_http_server, public_receipt, campaign_metadata,
 )
 
 
@@ -66,6 +66,13 @@ class FakeBackend:
 
 
 class AdapterTests(unittest.TestCase):
+    def test_campaign_metadata_is_bounded_for_billing_attribution(self):
+        self.assertEqual(campaign_metadata('excel-sol6-seed23'),
+                         {'purpose': 'scale-vision-proxy-v1', 'campaign_id': 'excel-sol6-seed23'})
+        for value in ('', '../other', 'Excel-Sol6', 'a' * 65):
+            with self.subTest(value=value), self.assertRaisesRegex(ProxyError, 'invalid_campaign_id'):
+                campaign_metadata(value)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

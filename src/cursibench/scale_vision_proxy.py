@@ -35,11 +35,19 @@ MODEL = 'Qwen/Qwen3.8-27B'
 RENDERER = 'qwen3_5_disable_thinking'
 PROCESSOR = 'Qwen2VLImageProcessorPil'
 REQUEST_ID = re.compile(r'[A-Za-z0-9_-]{8,100}')
+CAMPAIGN_ID = re.compile(r'[a-z][a-z0-9-]{0,63}')
 
 
 def digest(value):
     encoded = value if isinstance(value, bytes) else json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def campaign_metadata(campaign_id):
+    """Attribute provider billing events to one declared study campaign."""
+    if not isinstance(campaign_id, str) or not CAMPAIGN_ID.fullmatch(campaign_id):
+        raise ProxyError('invalid_campaign_id')
+    return {'purpose': VERSION, 'campaign_id': campaign_id}
 
 
 class ProxyError(ValueError):
@@ -405,6 +413,7 @@ def make_http_server(adapter, bearer_token, host='127.0.0.1', port=8089):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--journal', type=Path, required=True)
+    parser.add_argument('--campaign-id', required=True)
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8089)
     parser.add_argument('--max-actions', type=int, default=90)
@@ -420,7 +429,7 @@ def main():
             raise ProxyError('required_credentials_missing')
         renderer = QwenVisionRenderer.load()
         import tinker
-        service = tinker.ServiceClient(user_metadata={'purpose': VERSION})
+        service = tinker.ServiceClient(user_metadata=campaign_metadata(args.campaign_id))
         backend = TinkerVisionBackend.from_service(service, renderer, checkpoint=os.environ.get('TINKER_SAMPLER_PATH'))
         adapter = VisionSamplingAdapter(backend, args.journal, limits=limits)
         server = make_http_server(adapter, token, args.host, args.port)
