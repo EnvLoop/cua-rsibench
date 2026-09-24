@@ -66,8 +66,9 @@
         "commit": "b138d348256078fa634fc3b73567a7337c793e6b"
       },
       "license": "Apache-2.0 benchmark code; applications/assets retain own terms",
-      "inventory_count": 151,
-      "cluster_definition": "task config ID only; source-asset clustering pending",
+      "inventory_count": 369,
+      "inventory_note": "Exact official test_all.json count at pinned commit: 369 IDs across ten domains; LibreOffice Calc alone has 47, so a 100-task cell must mix applications and qualify every setup/evaluator",
+      "cluster_definition": "task config ID only; source-asset and application clustering pending",
       "split_status": "proposed; not frozen or runtime-qualified",
       "readiness": {
         "all_120_runtime_ready": false,
@@ -143,7 +144,7 @@
         "all_120_runtime_ready": false,
         "gui_implementation": "browser source environment verified; not executed",
         "reset": "fresh browser sessions and unchanged customer business tables verified for one read-only navigation task; mutation rollback unverified",
-        "verifier": "pinned evaluator scored task 157 on two customer-navigation positives and one wrong-route negative; 100-task coverage unverified"
+        "verifier": "pinned evaluator scored task 157 on two customer-navigation positives and one wrong-route negative; one Qwen3.8-27B base-model GUI pilot reached official score 1 under versioned bounded protocol; 100-task coverage unverified"
       },
       "primary_references": [
         "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
