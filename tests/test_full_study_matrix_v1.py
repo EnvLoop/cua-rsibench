@@ -192,10 +192,13 @@ class FullStudyMatrixTests(unittest.TestCase):
                        'tinker_usd_per_campaign': '500',
                        'researcher_inference_usd_per_campaign': '100',
                        'researcher_calls_per_campaign': 1000,
+                       'teacher_rollout_usd_per_campaign': '25',
                        'teacher_rollout_tokens_per_campaign': 1000000,
                        'teacher_rollout_calls_per_campaign': 1000,
                        'e2b_sandbox_hours_per_campaign': '20',
+                       'e2b_usd_per_campaign': '20',
                        'e2b_peak_concurrency': 3,
+                       'storage_application_usd_per_campaign': '5',
                        'candidate_submissions_per_campaign': 25,
                        'selection_evaluations_per_campaign': 25,
                        'per_campaign_all_in_ceiling_usd': '750',
@@ -265,7 +268,7 @@ class FullStudyMatrixTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'pre-campaign all-in upper bound exceeds'):
             pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-budget-shortfall')
         bad = self.pre_campaign_manifest()
-        bad['budget']['per_campaign_all_in_ceiling_usd'] = '600'
+        bad['budget']['per_campaign_all_in_ceiling_usd'] = '650'
         with self.assertRaisesRegex(ValueError, 'omits selected final-evaluation'):
             pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-final-omitted')
 
@@ -361,16 +364,24 @@ class FullStudyMatrixTests(unittest.TestCase):
             matrix.prepare(self.write_matrix(bad), self.root / 'missing-external-cap')
         bad = copy.deepcopy(self.matrix)
         bad['budget']['per_campaign_all_in_ceiling_usd'] = '99'
-        with self.assertRaisesRegex(ValueError, 'cannot cover known Tinker'):
+        with self.assertRaisesRegex(ValueError, 'cannot cover declared service caps'):
             matrix.prepare(self.write_matrix(bad), self.root / 'weak-campaign-cap')
         bad = copy.deepcopy(self.matrix)
-        bad['budget']['per_campaign_all_in_ceiling_usd'] = '600'
+        bad['budget']['per_campaign_all_in_ceiling_usd'] = '650'
         with self.assertRaisesRegex(ValueError, 'campaign all-in cap exceeded'):
             matrix.prepare(self.write_matrix(bad), self.root / 'missing-final-in-cap')
         bad = copy.deepcopy(self.matrix)
         bad['budget']['global_all_in_ceiling_usd'] = '3000'
         with self.assertRaisesRegex(ValueError, 'matrix all-in upper bound exceeds'):
             matrix.prepare(self.write_matrix(bad), self.root / 'training-omitted-global')
+        bad = copy.deepcopy(self.matrix)
+        bad['budget']['teacher_rollout_usd_per_campaign'] = '26'
+        with self.assertRaisesRegex(ValueError, 'campaign all-in cap exceeded'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'teacher-dollars-omitted')
+        bad = copy.deepcopy(self.matrix)
+        del bad['budget']['e2b_usd_per_campaign']
+        with self.assertRaisesRegex(ValueError, 'matrix budget: wrong fields'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'e2b-dollars-missing')
 
     def test_unqualified_slot_and_cross_researcher_drift_fail_closed(self):
         bad = copy.deepcopy(self.matrix)

@@ -84,6 +84,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                            f'{cell_id}: analysis family is missing or not a source group')
         cell_final.require(
             matrix.TINKER_USD_PER_CAMPAIGN + limits['researcher_inference'] +
+            limits['teacher_usd'] + limits['e2b_usd'] +
+            limits['storage_application_usd'] +
             base['cost_maximum'] <= limits['campaign_all_in'],
             f'{cell_id}: campaign cap omits selected final-evaluation reservation')
         shared_base_upper += base['cost_maximum']
@@ -129,6 +131,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                 'campaign_hours_cap': matrix.CAMPAIGN_HOURS,
                 'tinker_usd_cap': str(matrix.TINKER_USD_PER_CAMPAIGN),
                 'researcher_inference_usd_cap': str(limits['researcher_inference']),
+                'teacher_rollout_usd_cap': str(limits['teacher_usd']),
+                'e2b_usd_cap': str(limits['e2b_usd']),
+                'storage_application_usd_cap': str(limits['storage_application_usd']),
                 'e2b_sandbox_hours_cap': str(limits['e2b_hours']),
                 'all_in_ceiling_usd': str(limits['campaign_all_in']),
                 'matched_count_caps': {key: limits['raw'][key]

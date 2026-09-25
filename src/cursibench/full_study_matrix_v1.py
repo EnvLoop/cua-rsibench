@@ -119,8 +119,11 @@ def _budget(raw_budget: object) -> dict:
     budget = cell_final.exact(raw_budget, {
         'campaign_hours', 'tinker_usd_per_campaign',
         'researcher_inference_usd_per_campaign', 'researcher_calls_per_campaign',
+        'teacher_rollout_usd_per_campaign',
         'teacher_rollout_tokens_per_campaign', 'teacher_rollout_calls_per_campaign',
-        'e2b_sandbox_hours_per_campaign', 'e2b_peak_concurrency',
+        'e2b_sandbox_hours_per_campaign', 'e2b_usd_per_campaign',
+        'e2b_peak_concurrency',
+        'storage_application_usd_per_campaign',
         'candidate_submissions_per_campaign', 'selection_evaluations_per_campaign',
         'per_campaign_all_in_ceiling_usd',
         'global_all_in_ceiling_usd', 'available_all_in_usd',
@@ -140,8 +143,15 @@ def _budget(raw_budget: object) -> dict:
     researcher_inference = cell_final.amount(
         budget['researcher_inference_usd_per_campaign'],
         'researcher_inference_usd_per_campaign', positive=True)
+    teacher_usd = cell_final.amount(budget['teacher_rollout_usd_per_campaign'],
+                                    'teacher_rollout_usd_per_campaign', positive=True)
     e2b_hours = cell_final.amount(budget['e2b_sandbox_hours_per_campaign'],
                                   'e2b_sandbox_hours_per_campaign', positive=True)
+    e2b_usd = cell_final.amount(budget['e2b_usd_per_campaign'],
+                                'e2b_usd_per_campaign', positive=True)
+    storage_application_usd = cell_final.amount(
+        budget['storage_application_usd_per_campaign'],
+        'storage_application_usd_per_campaign')
     bounded_counts = (
         'researcher_calls_per_campaign', 'teacher_rollout_tokens_per_campaign',
         'teacher_rollout_calls_per_campaign', 'e2b_peak_concurrency',
@@ -149,11 +159,15 @@ def _budget(raw_budget: object) -> dict:
     )
     for key in bounded_counts:
         cell_final.positive_integer(budget[key], key)
-    cell_final.require(campaign_all_in >= TINKER_USD_PER_CAMPAIGN + researcher_inference,
-                       'campaign all-in cap cannot cover known Tinker and researcher caps')
+    cell_final.require(campaign_all_in >= TINKER_USD_PER_CAMPAIGN +
+                       researcher_inference + teacher_usd + e2b_usd +
+                       storage_application_usd,
+                       'campaign all-in cap cannot cover declared service caps')
     return {'raw': budget, 'global_ceiling': global_ceiling, 'available': available,
             'campaign_all_in': campaign_all_in,
             'researcher_inference': researcher_inference,
+            'teacher_usd': teacher_usd, 'e2b_usd': e2b_usd,
+            'storage_application_usd': storage_application_usd,
             'e2b_hours': e2b_hours, 'bounded_counts': bounded_counts}
 
 
@@ -188,6 +202,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     available = limits['available']
     campaign_all_in = limits['campaign_all_in']
     researcher_inference = limits['researcher_inference']
+    teacher_usd = limits['teacher_usd']
+    e2b_usd = limits['e2b_usd']
+    storage_application_usd = limits['storage_application_usd']
     e2b_hours = limits['e2b_hours']
     bounded_counts = limits['bounded_counts']
     cells = manifest['cells']
@@ -248,6 +265,7 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             if researcher_id != 'shared-base':
                 cell_final.require(slot['cost_maximum'] == base['cost_maximum'] and
                                    TINKER_USD_PER_CAMPAIGN + researcher_inference +
+                                   teacher_usd + e2b_usd + storage_application_usd +
                                    slot['cost_maximum'] <= campaign_all_in,
                                    f'{cell_id}/{researcher_id}: campaign all-in cap exceeded')
             else:
@@ -330,6 +348,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'campaign_hours_cap': CAMPAIGN_HOURS,
         'tinker_usd_cap_per_campaign': str(TINKER_USD_PER_CAMPAIGN),
         'researcher_inference_usd_cap_per_campaign': str(researcher_inference),
+        'teacher_rollout_usd_cap_per_campaign': str(teacher_usd),
+        'e2b_usd_cap_per_campaign': str(e2b_usd),
+        'storage_application_usd_cap_per_campaign': str(storage_application_usd),
         'e2b_sandbox_hours_cap_per_campaign': str(e2b_hours),
         'per_campaign_all_in_ceiling_usd': str(campaign_all_in),
         'matched_non_tinker_campaign_caps': {key: budget[key] for key in bounded_counts},
