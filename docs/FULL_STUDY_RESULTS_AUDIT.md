@@ -17,4 +17,4 @@ PYTHONPATH=src python tools/audit_full_study_results_v1.py \
   --out work/full-study/audited-results.json
 ```
 
-The command revalidates every qualification and checkpoint reference from the source matrix before reading final receipts. It writes its private summary once and refuses an incomplete index. The eventual public PDF/figures must be derived from a separately privacy-reviewed projection of that summary, and the released assets must be downloaded back and visually inspected. **Current real status:** zero official final tasks, zero completed 24-campaign records, and no full-study result index or result paper.
+The command revalidates every qualification and checkpoint reference from the source matrix before reading final receipts. It writes its private summary once, binds the canonical execution-index SHA-256, and refuses an incomplete index. The eventual public PDF/figures must be derived from a separately privacy-reviewed projection of that summary, and the released assets must be downloaded back and visually inspected. **Current real status:** zero official final tasks, zero completed 24-campaign records, and no full-study result index or result paper.

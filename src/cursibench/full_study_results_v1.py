@@ -356,6 +356,7 @@ def audit(plan: object, index: object, root: Path, *,
     return {
         'schema': SUMMARY_SCHEMA, 'study_id': plan['study_id'],
         'matrix_plan_sha256': plan_sha256,
+        'execution_index_sha256': cell_final.digest(cell_final.json_bytes(index)),
         'campaign_count': 24, 'distinct_final_task_identities': 600,
         'slot_task_result_count': 3000,
         'unique_checkpoint_task_executions': len(executions) * 100,
