@@ -49,10 +49,11 @@ class SaaSMatrixTests(unittest.TestCase):
 
     def test_train_only_magento_template_cannot_reenter_candidate_matrix(self):
         manifest = magento.manifest(fake_magento_rows(), set())
-        modified = copy.deepcopy(manifest)
-        modified["task_sets"]["provisional_final"][0]["template_group"] = "shopping_admin:240"
-        with self.assertRaisesRegex(ValueError, "train-only or quarantined"):
-            matrix.make_cell("shopping_admin", modified)
+        for template in (240, 275):
+            modified = copy.deepcopy(manifest)
+            modified["task_sets"]["provisional_final"][0]["template_group"] = f"shopping_admin:{template}"
+            with self.assertRaisesRegex(ValueError, "train-reserved or quarantined"):
+                matrix.make_cell("shopping_admin", modified)
 
 
 if __name__ == "__main__":
