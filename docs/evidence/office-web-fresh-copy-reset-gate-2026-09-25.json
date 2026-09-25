@@ -1,0 +1,44 @@
+{
+  "schema": "office-web-fresh-copy-public-gate-v1",
+  "date": "2026-09-25",
+  "cell_id": "powerpoint-web",
+  "development_selection_task_id": "4._Pre-Colonial_Filipino_Culture-001",
+  "source": {
+    "kind": "previously Office-normalized evaluator baseline",
+    "sha256": "71a06838dfe24595aa39ab6c0c7bdaeed127ea78079a94323de99c28b30029cd",
+    "source_document_redistributed": false
+  },
+  "local_fresh_copy_stage": {
+    "independent_copy_count": 5,
+    "slots": ["untouched", "positive", "partial_negative", "collateral_negative", "fresh_reset"],
+    "all_copy_hashes_match_frozen_baseline": true,
+    "distinct_file_inodes_checked": true,
+    "private_controller_receipt_sha256": "6af1c98c635b2ceca18bc70fb4c72cd65624d60be191a2c49a4fd25380eeddf1",
+    "tamper_and_reuse_tests_passed": true
+  },
+  "browser_gate": {
+    "available_browser": "Chrome extension session",
+    "dedicated_test_account_session_available": false,
+    "observed_blocker": "OneDrive navigation reached a Microsoft updated-terms screen for a different personal account. The prior in-app browser session was unavailable.",
+    "terms_accepted": false,
+    "account_switched": false,
+    "source_uploaded": false,
+    "gui_positive_executed": false,
+    "gui_negative_executed": false,
+    "cloud_saved_file_readback": false,
+    "fresh_cloud_reset_verified": false,
+    "download_binding_count": 0
+  },
+  "separation": {
+    "earlier_human_same_cloud_file_positive_negative_reset": true,
+    "earlier_controls_reused_as_new_fresh_copy_evidence": false,
+    "private_source_and_candidate_files_published": false,
+    "account_identity_or_cloud_item_url_published": false
+  },
+  "result": {
+    "status": "local_setup_only_browser_gate_blocked",
+    "new_gui_admissions": 0,
+    "official_final_task_credit": 0,
+    "model_calls": 0
+  }
+}
