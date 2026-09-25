@@ -1,0 +1,87 @@
+{
+  "admission": {
+    "model_runs": 0,
+    "office_web_gui_admitted": 0,
+    "official_final_tasks": 0
+  },
+  "authored_content": "simulated analyst briefs, mistakes, and committee rules",
+  "build_receipt_sha256": "a65d77d74da6dffc551fa5243583aedc1e45ffebf74035a3c9f74c956bc724eb",
+  "builder_sha256": "91860ced5db9c208795631a4042bda524ad79f25091b6d51e2d291474594a17e",
+  "calibration_run_sha256": "e7fe3309ac934ba3a96dfeb33a0465b1ac269e87427d579e8054745ae769e6ab",
+  "candidate_manifest_sha256": "68ccf12ad989d42da3a00facb1af760af18bceecc4647c310a33a4653866bad8",
+  "country_partition_alignment": "shared_wdi_desktop_private_partition",
+  "country_partition_alignment_verified": true,
+  "counts": {
+    "final_candidate": {
+      "candidate_tasks": 100,
+      "source_country_families": 25,
+      "workflow_counts": {
+        "dual_threshold_review": 12,
+        "inflation_acceleration": 13,
+        "labor_rate_change": 12,
+        "nominal_output_growth": 13,
+        "output_per_person_divergence": 12,
+        "per_capita_growth": 12,
+        "population_growth": 13,
+        "price_labor_spread": 13
+      }
+    },
+    "selection": {
+      "candidate_tasks": 20,
+      "source_country_families": 5,
+      "workflow_counts": {
+        "dual_threshold_review": 1,
+        "inflation_acceleration": 3,
+        "labor_rate_change": 4,
+        "nominal_output_growth": 1,
+        "output_per_person_divergence": 3,
+        "per_capita_growth": 2,
+        "population_growth": 4,
+        "price_labor_spread": 2
+      }
+    },
+    "train": {
+      "candidate_tasks": 20,
+      "source_country_families": 5,
+      "workflow_counts": {
+        "inflation_acceleration": 5,
+        "labor_rate_change": 5,
+        "nominal_output_growth": 5,
+        "per_capita_growth": 5
+      }
+    }
+  },
+  "dependent_target_edits_per_task": {
+    "final_candidate": 4,
+    "selection": 3,
+    "train": 1
+  },
+  "finalizer_sha256": "7402e83b4761908a2773af7ea4050c4f550e478455aa302b67b1037a483cdac2",
+  "limitations": [
+    "No task-specific visible-GUI save/download/reset controls yet",
+    "No PowerPoint-web chart/table edit compatibility established",
+    "Country-level source clustering required in final analysis"
+  ],
+  "offline_controls": {
+    "candidate_decks_built": 140,
+    "embedded_chart_workbooks_finalized": 140,
+    "evidence_class": "direct OOXML fixtures, not visible GUI or PowerPoint-web save/readback",
+    "positive_partial_collateral_chart_cases_passed": {
+      "final_candidate": 100,
+      "selection": 20,
+      "train": 20
+    },
+    "seven_slide_native_table_chart_sources": 140
+  },
+  "offline_package_qa": {
+    "candidate_decks": 140,
+    "chart_workbook_contract_pass": 140,
+    "layout_geometry_pass": 140,
+    "package_integrity_pass": 140
+  },
+  "runtime_bundle_version": "26.905.11957",
+  "schema": "ppt-wdi-original-offline-inventory-v1",
+  "source_license": "World Development Indicators CC BY 4.0",
+  "source_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+  "verifier_sha256": "5ccc0dc51387e542f5dd5af9cbd77befec24ce290d52a8e9738f8e954ea4bd4a"
+}
