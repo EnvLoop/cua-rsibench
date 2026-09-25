@@ -16,6 +16,8 @@ A fifth [operating-lease maturity development workflow](../docs/evidence/sec-lea
 
 A sixth [tax-provision and cash-tax development workflow](../docs/evidence/sec-tax-workflow-2026-09-25.md) uses current and prior-year SEC tax disclosures from three original filings. It reconciles current/deferred provision, cash payments, and deferred-tax assets without conflating their accounting bases. Three nine-sheet references pass a 46-target independent OOXML/counterfactual oracle; the rate/income scenario is synthetic and **no Excel-web or hidden-final admission exists**.
 
+A seventh [goodwill and intangible-asset development workflow](../docs/evidence/sec-goodwill-workflow-2026-09-25.md) audits acquired goodwill against total carrying movement, intangible amortization and asset mix, and a clearly synthetic write-down. Three original-filing references pass a 45-target independent OOXML/counterfactual oracle. The residual movements are not assumed to identify acquisitions or impairment uniquely; **Excel-web and hidden-final admissions remain zero**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
