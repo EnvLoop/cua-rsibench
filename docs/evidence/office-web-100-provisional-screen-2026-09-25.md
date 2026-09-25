@@ -1,0 +1,32 @@
+# Microsoft web Office: 20/100 source-candidate admission screen
+
+The companion [machine-readable public receipt](office-web-100-provisional-screen-2026-09-25.json) pins two **offline candidate inventories**, not two qualified benchmark cells. Each proposed final set has 100 published source task instances. Neither has an individually admitted final task, a sealed hidden exam, a model score, or a complete campaign. The evaluator-only identity manifest is generated under ignored `work/` and is not part of this repository.
+
+| Original application | Source pin | Selection candidates | Provisional final candidates | Individually GUI-admitted final |
+| --- | --- | ---: | ---: | ---: |
+| PowerPoint for the web | `microsoft/ppteval@1b8b55a29e48fdc65d423689b6f2370ad91beeea`; registry SHA-256 `aef4fdba6c70ff30946c8391e82e673cf17efc81f078d3ec825bed279de4fa51` | 20 from 2 source decks | 100 from 10 source decks | 0 |
+| Excel for the web | SpreadsheetBench 2 revision `5a2215ed4121945ab09d8723df2995602090b042`; archive SHA-256 `17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c` | 20 from 3 base workbook families | 100 from 15 base workbook families | 0 |
+
+The [PPT-Eval pinned registry](https://github.com/microsoft/ppteval/blob/1b8b55a29e48fdc65d423689b6f2370ad91beeea/task_registry/tasks.json) has exactly 120 task identities, ten per deck. The deterministic whole-deck split reproduces the earlier evaluator-only proposal exactly. Its 100 provisional final tasks comprise 44 Easy, 32 Medium, and 24 Hard instances. Static rubric inspection finds 48 programmatic, 51 VLM-dependent, and one LLM-dependent final task. There is no spare official deck for source-disjoint training. The [real PowerPoint web control](ppt-eval-office-web-gate-2026-09-24.md) admitted **one selection task only**, using a frozen Office-normalized baseline, a full-title positive, a mixed-size negative, saved-file readback, and a manual same-file reset. The unchanged upstream rubric accepted the mixed-size negative at 1.0; the independent guard rejected it. That observed failure prevents treating upstream perfect scores as sufficient for the 100 final tasks.
+
+The pinned [SpreadsheetBench 2 archive](https://huggingface.co/datasets/KAKA22/SpreadsheetBench-v2/tree/5a2215ed4121945ab09d8723df2995602090b042) contains 200 Financial_Model and Debugging instances on 30 base workbook families; 22 families pass the existing structural triage, and the source-family split yields 20 selection and 100 provisional final instances. The 100 are only 15 source families. The structural rule requires at least seven sheets and 1,000 existing formula cells in the first input, excludes external links, connections, and VBA, and caps instantiated cells provisionally at 400,000. These metrics do not establish task solvability, GUI speed, formula semantics, or business-entity uniqueness. The [real Excel web control](sec-retail-working-capital-excel-web-controls-2026-09-24.json) used a **separate authored SEC workbook**, not a SpreadsheetBench 2 item: one human operator saved/read back a 1/9 partial repair, a 9/9 full repair with 92 checked formula targets, and a 0/9 manual same-file reset. It supplies no V2 task admission or automated fresh-copy reset.
+
+`tools/plan_office_web_admission.py` independently rechecks the pinned source bytes and regenerates the split. Its evaluator-only records bind task identities, source record or instruction hashes, rubric or input hashes, and source/template/instance groups. The template group is conservatively the source deck or golden workbook; cross-family template similarity still needs review. Entity labels are explicitly unresolved placeholders, so no claim of entity-disjointness follows. Selection and final source/template/instance groups do not overlap within these provisional plans. The generator emits only aggregate counts, source pins, a candidate-identity commitment, prior public control-receipt hashes, and the admission contract publicly. A commitment is an integrity marker, **not secrecy** for a small publicly enumerable task set.
+
+The evaluator-owned contract requires, **for each task**, a pinned source and license review; a fresh isolated document; untouched web-app save/reload/download; a frozen Office-normalized baseline and task-specific oracle before actor action; a visible-GUI known-positive sequence; independent target and no-regression readback; partial/wrong-object and collateral-edit negatives; same-file plus fresh-copy reset; hidden data perturbations for causal Excel formulas; and leakage review across training, selection, final, and public releases. The executable preflight checks ten evaluator-only artifact file hashes and eleven required declarations, including negative and reset controls; it deliberately returns `gui_admitted: false` even for a complete receipt. An independent auditor must examine the GUI provenance and run the task-specific oracle before admission. Judge-dependent PowerPoint cases also need frozen VLM/LLM settings, calibration examples, and error-to-unscored handling. Infrastructure failures must remain unscored.
+
+The public upstream goals and gold artifacts are discoverable. These exact source tasks cannot be advertised as a sealed hidden final exam, even if identities are kept out of this repository. A publishable hidden transfer result requires new evaluator-held variants or independently authored source families, documented non-exposure, and individual GUI admission. SpreadsheetBench 2's paper/dataset-card license conflict also remains unresolved; the source workbooks, gold workbooks, task instructions, and reference edits are not redistributed here. Microsoft account identities, cloud document links, and saved artifacts remain outside the public bundle.
+
+Run the reproducible screen with pinned local sources:
+
+```bash
+PYTHONPYCACHEPREFIX=/private/tmp/office100-pycache python3 tools/plan_office_web_admission.py \
+  --ppt-root /path/to/pinned/ppteval \
+  --excel-archive /path/to/pinned/spreadsheetbench-v2.zip \
+  --private-out work/office-web-100-evaluator-manifest.json \
+  --public-out docs/evidence/office-web-100-provisional-screen-2026-09-25.json
+PYTHONPYCACHEPREFIX=/private/tmp/office100-pycache python3 -m unittest discover \
+  -s tests -p test_plan_office_web_admission.py -v
+```
+
+The generator never opens either Microsoft application, dispatches a model, or turns the candidate counts into a result.
