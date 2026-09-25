@@ -119,6 +119,13 @@ class FullStudyMatrixTests(unittest.TestCase):
                     'negative_rejected': True, 'no_regression_checked': True,
                     'evidence': independent},
             })
+        cls.local_ref(directory, 'analysis-families.json', {
+            'schema': 'cua-cell-analysis-families-v1',
+            'cell_id': cell_id,
+            'family_by_task': {row['task_id']: row['source_groups'][0]
+                               for row in official},
+        })
+        analysis_families = cls.matrix_ref(directory / 'analysis-families.json')
         qualification = cls.local_ref(directory, 'qualification.json', {
             'schema': cell_final.EVIDENCE_SCHEMA,
             'cell_id': cell_id, 'status': 'qualified',
@@ -162,7 +169,8 @@ class FullStudyMatrixTests(unittest.TestCase):
             path = directory / f'{researcher_id}.json'
             path.write_bytes(cell_final.json_bytes(slot))
             manifests[researcher_id] = cls.matrix_ref(path)
-        return {'cell_id': cell_id, 'base_manifest': manifests.pop('shared-base'),
+        return {'cell_id': cell_id, 'analysis_families': analysis_families,
+                'base_manifest': manifests.pop('shared-base'),
                 'selected_manifests': manifests}
 
     @classmethod
@@ -220,6 +228,8 @@ class FullStudyMatrixTests(unittest.TestCase):
         self.assertFalse(plan['scores_present'])
         self.assertEqual(result['provider_calls'], 0)
         self.assertEqual(len(plan['cells']), 6)
+        self.assertTrue(all(cell['analysis_family_count'] == 100
+                            for cell in plan['cells']))
         self.assertTrue(all(cell['base']['chunk_count'] == 34 for cell in plan['cells']))
         self.assertEqual(matrix.prepare(self.manifest_path, out), result)
 
@@ -319,6 +329,22 @@ class FullStudyMatrixTests(unittest.TestCase):
         finally:
             selected_path.write_bytes(selected_original)
             freeze_path.write_bytes(freeze_original)
+
+    def test_analysis_family_must_be_prebound_to_a_real_source_group(self):
+        changed = copy.deepcopy(self.matrix)
+        ref = changed['cells'][0]['analysis_families']
+        path = self.root / ref['path']
+        original = path.read_bytes()
+        try:
+            value = json.loads(original)
+            task = next(iter(value['family_by_task']))
+            value['family_by_task'][task] = 'invented-family'
+            path.write_bytes(cell_final.json_bytes(value))
+            ref['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError, 'not a frozen source group'):
+                matrix.prepare(self.write_matrix(changed), self.root / 'bad-family')
+        finally:
+            path.write_bytes(original)
 
     def test_tampered_intent_or_plan_and_missing_proof_fail_closed(self):
         out = self.root / 'prepared'

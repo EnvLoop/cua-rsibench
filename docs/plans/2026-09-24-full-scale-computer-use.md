@@ -1,5 +1,7 @@
 # Full-scale computer-use Data study implementation plan
 
+**2026-09-25 protocol amendment:** the primary enterprise cell is provisionally original Odoo Community rather than the ServiceNow WorkArena proposal below. [The dated amendment](../FULL_STUDY_ENTERPRISE_AMENDMENT_2026-09-25.md) records the access/usage reason, source distinction, and additional Odoo admission gates before any official final outcome. The original ServiceNow text remains here as the historical proposal; WorkArena may only be reported as a separate gated supplemental evaluation if approved.
+
 **Goal:** Run a new matched four-researcher by six-application study with 100 scored final instances per application, then publish an English report derived only from admitted results.
 
 **Architecture:** Each application supplies an immutable task inventory, reset operation, visible observation/action adapter, and an evaluator-owned saved-state verifier. A shared controller owns four researcher campaigns per application, fixed teacher and student identities, Tinker training, budget accounting, checkpoint selection, remote execution, artifact hashing, and the final report. The completed v0.5 study stays immutable and outside this matrix.

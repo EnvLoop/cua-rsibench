@@ -31,6 +31,7 @@ The matrix manifest has these top-level fields:
   "cells": [
     {
       "cell_id": "powerpoint-web",
+      "analysis_families": {"path": "cell/analysis-families.json", "sha256": "..."},
       "base_manifest": {"path": "cell/base.json", "sha256": "..."},
       "selected_manifests": {
         "astra": {"path": "cell/astra.json", "sha256": "..."},
@@ -59,7 +60,7 @@ The matrix manifest has these top-level fields:
 }
 ```
 
-The example shows only the first cell; a real manifest must include `excel-web`, `desktop-native`, `servicenow`, `gitlab`, and `magento-admin` as well. Ellipses and zero call limits are placeholders and **fail validation**. Every reference must point to a local file under the manifest directory and bind its exact SHA-256. Each `cua-model-configuration-v1` file binds the role, provider-reported model and snapshot when available, reasoning/renderer settings, and the exact bytes of its prompt, harness, tool grammar, decoding, provider route, and student training configuration. A null snapshot is explicitly reported rather than silently called a weight attestation. No provider key belongs in those files. The per-campaign Tinker ceiling is $500 and the nominal 24-campaign Tinker ceiling is $12,000. Equal researcher inference, teacher rollout, E2B, candidate, and selection caps are required for all 24 campaigns. The per-campaign and global *all-in* ceilings and available balance are separate fields; they include other inference, compute, storage, and application services. Declared upper bounds are not invoices or account-entitlement proof.
+The example shows only the first cell; a real manifest must include `excel-web`, `desktop-native`, `odoo-community`, `gitlab`, and `magento-admin` as well. [The dated enterprise-cell amendment](FULL_STUDY_ENTERPRISE_AMENDMENT_2026-09-25.md) selects original Odoo Community as a provisional sixth cell before any official outcomes; ServiceNow WorkArena remains a separately gated supplemental track. Ellipses and zero call limits are placeholders and **fail validation**. Every reference must point to a local file under the manifest directory and bind its exact SHA-256. Each cell's `cua-cell-analysis-families-v1` file assigns one pre-result primary source family to each official task, and that family must be among the task's declared source groups; this prevents choosing convenient bootstrap clusters after viewing scores. Each `cua-model-configuration-v1` file binds the role, provider-reported model and snapshot when available, reasoning/renderer settings, and the exact bytes of its prompt, harness, tool grammar, decoding, provider route, and student training configuration. A null snapshot is explicitly reported rather than silently called a weight attestation. No provider key belongs in those files. The per-campaign Tinker ceiling is $500 and the nominal 24-campaign Tinker ceiling is $12,000. Equal researcher inference, teacher rollout, E2B, candidate, and selection caps are required for all 24 campaigns. The per-campaign and global *all-in* ceilings and available balance are separate fields; they include other inference, compute, storage, and application services. Declared upper bounds are not invoices or account-entitlement proof.
 
 After all 30 qualified slot manifests exist, prepare offline with:
 

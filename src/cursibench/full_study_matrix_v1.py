@@ -23,7 +23,7 @@ STUDENT = 'Qwen/Qwen3.8-27B'
 TEACHER = 'gpt-5.6-sol'
 CELLS = (
     'powerpoint-web', 'excel-web', 'desktop-native',
-    'servicenow', 'gitlab', 'magento-admin',
+    'odoo-community', 'gitlab', 'magento-admin',
 )
 RESEARCHERS = {
     'astra': 'gpt-6-astra',
@@ -180,7 +180,7 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     all_in = Decimal(0)
     unique_final_executions = 0
     for raw in cells:
-        cell = cell_final.exact(raw, {'cell_id', 'base_manifest',
+        cell = cell_final.exact(raw, {'cell_id', 'analysis_families', 'base_manifest',
                                      'selected_manifests'}, 'matrix cell')
         cell_id = cell['cell_id']
         cell_final.require(cell_id in CELLS and cell_id not in seen,
@@ -190,6 +190,20 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                     f'{cell_id} researcher manifests')
         base = _slot(root, cell['base_manifest'], cell_id=cell_id,
                      researcher_id='shared-base', role='base')
+        family_binding, family_sha256, _ = _json_reference(
+            root, cell['analysis_families'], f'{cell_id} analysis families')
+        family_binding = cell_final.exact(family_binding,
+                                          {'schema', 'cell_id', 'family_by_task'},
+                                          f'{cell_id} analysis families')
+        family_by_task = family_binding['family_by_task']
+        expected_ids = {row['task_id'] for row in base['official']}
+        cell_final.require(family_binding['schema'] == 'cua-cell-analysis-families-v1' and
+                           family_binding['cell_id'] == cell_id and
+                           isinstance(family_by_task, dict) and
+                           set(family_by_task) == expected_ids and
+                           all(family_by_task[row['task_id']] in row['source_groups']
+                               for row in base['official']),
+                           f'{cell_id}: analysis family is missing or not a frozen source group')
         slots = {'shared-base': base}
         for researcher_id in RESEARCHERS:
             slots[researcher_id] = _slot(root, selected[researcher_id],
@@ -223,6 +237,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             'selection_task_count': SELECTION_PER_CELL,
             'train_task_count': len(base['train']),
             'official_identities_sha256': cell_final.digest(cell_final.json_bytes(base['official'])),
+            'analysis_family_sha256': family_sha256,
+            'analysis_family_by_task': family_by_task,
+            'analysis_family_count': len(set(family_by_task.values())),
             'qualification_sha256': base['qualification_sha256'],
             'matched_bindings': base['matched_bindings'],
             'unique_checkpoint_count': len(execution_owners),
