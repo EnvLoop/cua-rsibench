@@ -12,6 +12,8 @@ A third [debt-maturity and cash-capacity development workflow](../docs/evidence/
 
 A fourth [mixed-unit EPS and shareholder-return development workflow](../docs/evidence/sec-eps-workflow-2026-09-25.md) uses four other filing contexts and 84 pinned facts in USD, shares, and USD/share units. Its eight-sheet workbooks cover two fiscal years, diluted-share and EPS analysis, cash returns, and a synthetic repurchase case. Four references pass a 50-target independent OOXML/counterfactual oracle, with **zero Excel-web or hidden-final admissions**. Reported EPS need not equal a simple net-income/share quotient.
 
+A fifth [operating-lease maturity development workflow](../docs/evidence/sec-lease-workflow-2026-09-25.md) pins six contractual payment buckets and a reported discount rate across four original filings. Its nine-sheet workbooks reconcile the maturity ladder and liabilities and distinguish a synthetic payment stress from contractual obligations. Four references pass a 52-target independent OOXML/counterfactual oracle, again with **zero Excel-web or hidden-final admissions**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
