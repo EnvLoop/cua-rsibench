@@ -1,0 +1,36 @@
+{
+  "schema": "envloop-servicenow-original-software-admission-v1",
+  "observed_at_utc": "2026-09-25T01:27:17Z",
+  "workarena": {
+    "code_repository": "https://github.com/ServiceNow/WorkArena",
+    "pinned_code_commit": "87a9e61c2bf9c1d8271effe0f7e290860f0b252d",
+    "pinned_source_archive_sha256": "e1405077071ee3c104f1e9399bb05ff6148ca280d113c31eb5695d809e79ebde",
+    "code_license": "Apache-2.0",
+    "live_gated_dataset_page": "https://huggingface.co/datasets/ServiceNow/WorkArena-Instances",
+    "live_access_state": "request_submitted_awaiting_repository_author_review",
+    "live_access_observation": "Signed-in Hugging Face page visibly showed the pending-review banner; no dataset file or instance credential was opened.",
+    "instance_access_verified": false,
+    "task_execution_verified": false,
+    "runtime_admitted_tasks": 0,
+    "published_source_inventory": {
+      "workarena_l1_instances": 19912,
+      "workarena_l1_atomic_tasks": 33,
+      "workarena_plus_plus_tasks": 682,
+      "inventory_units_note": "These are upstream README counts with different units, not locally admitted identities."
+    },
+    "instance_terms": "Evaluation, benchmarking, and research only; no training, production workloads, or sensitive/proprietary/personally identifiable data; monitored use, fair-use limits, and no persistence guarantee.",
+    "training_boundary": "Do not generate Tinker training trajectories from gated WorkArena instances. Any student training corpus must come from a separately permitted source.",
+    "reset_and_verifier_source_audit": "Pinned code includes per-task setup, validate and teardown methods plus ServiceNow table-API readback; source form validator explicitly checks expected fields only and teardown is task-local, so full-world no-regression and episode reset remain unverified.",
+    "next_gate": "After repository-author approval: trusted controller fetches the pool without exposing credentials; execute one actual L2 task through the original GUI, independently read the saved ServiceNow records, calibrate wrong-object negative and oracle positive, invoke teardown, and verify pre/post state before any task is admitted."
+  },
+  "pdi_fallback": {
+    "software_identity": "Original ServiceNow Personal Developer Instance, separate from WorkArena benchmark instances and task provenance",
+    "account_or_instance_provisioned_for_this_study": false,
+    "live_entitlement_checked": false,
+    "published_entitlement": "One free PDI per Developer Program member for learning, exploration, and experimentation; actual release availability can require a waitlist.",
+    "usage_boundary": "ServiceNow states that PDIs are not for business or production purposes. Permission for this study's high-volume automated publication workload has not been established.",
+    "reset_limit": "Official reset-and-wipe discards configuration and can take a couple of hours; it is not a per-task rollback primitive.",
+    "next_gate": "If a PDI is used for a separate development prototype, first establish account entitlement and acceptable research workload; then create evaluator-owned task records, prove record-level reset and no-regression on one GUI task, and keep all results distinct from WorkArena. A dedicated authorized research/non-production instance is required if PDI terms or throughput do not cover the planned study."
+  },
+  "public_receipt_contains_account_identifiers_or_credentials": false
+}
