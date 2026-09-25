@@ -2,6 +2,10 @@
 
 **Status:** methodological specification, not a completed study or a result. Freeze its exact revision before the first official final-task outcome. Any change to cells, task identities, evaluator, budgets, or analysis after that point must be an explicit amendment that preserves the prior revision and outcomes.
 
+![Frozen six-application computer-use data-research design](full-study/figures/experiment-design.svg)
+
+*Figure 1. The planned data-only research loop and independent final evaluation. Counts describe the preregistered design, not completed results.*
+
 ## Relation to RSIBench-Data
 
 This is an **adaptation, not a replication**, of [RSIBench-Data](https://arxiv.org/pdf/2607.25886). Both designs have four researcher configurations across six benchmark settings, but the task pools, student, teacher, researcher systems, applications, and primary estimand differ. RSIBench-Data used benchmark-native final sizes of 100, 100, 100, 89, 100, and 30, with four decodes per AIME problem; this study proposes 100 final computer-use identities per application. RSIBench-Data's primary result is the selected checkpoint's native benchmark score, whereas this study preregisters a paired base-to-selected gain. RSIBench-Data also acknowledges selecting checkpoints and rerunning official evaluations on the same task subset; this study deliberately separates 20 selection tasks from 100 final tasks. The two studies' scores cannot be compared directly. Their common lesson is to control the researcher's data-only lever while holding training and evaluation infrastructure fixed within a setting.
