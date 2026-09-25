@@ -103,6 +103,13 @@ def purchase_case(page, case: dict, *, positive: bool = True) -> None:
                 'td[name="price_unit"]').inner_text().strip()
             if round(float(actual_price), 2) != line["expected"]["price"]:
                 raise RuntimeError("Purchase unit price edit did not persist")
+    if "vendor_reference" in case:
+        page.locator('[name="partner_ref"] input').fill(case["vendor_reference"])
+        page.locator('[name="partner_ref"] input').press("Tab")
+        save_purchase_if_pending(page)
+        page.reload()
+        if page.locator('[name="partner_ref"] input').input_value() != case["vendor_reference"]:
+            raise RuntimeError("Purchase vendor reference edit did not persist")
 
 
 def open_inventory_note(page, port: int, case: dict) -> bool:
@@ -177,6 +184,11 @@ def sales_case(page, case: dict, *, positive: bool) -> None:
     page.get_by_text("Other Info", exact=True).click()
     reference = case["customer_reference"] if positive else "WRONG-OBJECT-CONTROL"
     page.locator('[name="client_order_ref"] input').fill(reference)
+    if positive and "expiration_date" in case:
+        expected_date = case["expiration_date"]
+        page.locator('[name="validity_date"] input').fill(
+            f"{expected_date[5:7]}/{expected_date[8:10]}/{expected_date[:4]}")
+        page.locator('[name="validity_date"] input').press("Tab")
     if not positive:
         page.get_by_role("button", name="Save").click()
         page.get_by_role("button", name="Save").wait_for(state="hidden")
@@ -239,6 +251,10 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
         if initial["priority"] != expected["priority"]:
             priority = {"1": "Medium", "2": "High", "3": "Very High"}[expected["priority"]]
             page.locator(f'[name="priority"] [aria-label="{priority}"]').click()
+        if "email_from" in expected:
+            page.locator('[name="email_from"] input').fill(expected["email_from"])
+            page.locator('[name="phone"] input').fill(expected["phone"])
+            page.locator('[name="phone"] input').press("Tab")
     else:
         current = case["initial"]["priority"]
         wrong = {"0": "Medium", "1": "High", "2": "Very High", "3": "Medium"}[current]
@@ -260,6 +276,11 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
         selected = page.locator('[name="user_id"] input').input_value()
         if selected != names[case["expected"]["salesperson_index"]]:
             raise RuntimeError("CRM salesperson edit did not persist")
+    if positive and "email_from" in case["expected"]:
+        if page.locator('[name="email_from"] input').input_value() != case["expected"]["email_from"]:
+            raise RuntimeError("CRM verified email edit did not persist")
+        if page.locator('[name="phone"] input').input_value() != case["expected"]["phone"]:
+            raise RuntimeError("CRM verified phone edit did not persist")
 
 
 def run() -> dict:

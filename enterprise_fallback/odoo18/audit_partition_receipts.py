@@ -16,7 +16,8 @@ from datetime import datetime
 from pathlib import Path
 
 from factory import CODE_DIR, HERE, PRIVATE, OdooRPC, local_config
-from partition_factory import FAMILIES, ROLE_GROUP_XMLIDS, SPLIT_COUNTS, validate_scale_splits
+from partition_factory import (ALL_SPLIT_COUNTS, FAMILIES, ROLE_GROUP_XMLIDS,
+                               validate_scale_splits)
 from reset import file_hash, restore
 from sweep_partition import NEGATIVE_CODES
 from worker_lease import exclusive_worker_operation
@@ -50,10 +51,10 @@ def audit(run_id: str, output: Path) -> dict:
 def _audit_unlocked(run_id: str, output: Path) -> dict:
     config = local_config()
     partition = config.get("ODOO_PARTITION")
-    if partition not in SPLIT_COUNTS:
+    if partition not in ALL_SPLIT_COUNTS:
         raise RuntimeError("Audit requires an isolated candidate world")
-    expected_count = SPLIT_COUNTS[partition] * len(FAMILIES)
-    expected_source_files = 3 * SPLIT_COUNTS[partition] + 1
+    expected_count = ALL_SPLIT_COUNTS[partition] * len(FAMILIES)
+    expected_source_files = 3 * ALL_SPLIT_COUNTS[partition] + 1
     receipt = json.loads((PRIVATE / "partition_receipt.json").read_text())
     checkpoint = json.loads((PRIVATE / "checkpoint_receipt.json").read_text())
     world = json.loads((PRIVATE / "partition_cases.json").read_text())
@@ -191,7 +192,7 @@ def _audit_unlocked(run_id: str, output: Path) -> dict:
         "exclusive_worker_lease_interval_verified": exclusive_interval,
         "final_database_and_physical_filestore_reset_exact": bool(final_reset_exact),
         "protected_attachment_files_per_attempt": expected_source_files,
-        "product_planning_notes_in_database_snapshot": SPLIT_COUNTS[partition],
+        "product_planning_notes_in_database_snapshot": ALL_SPLIT_COUNTS[partition],
         "world_case_manifest_sha256": receipt["case_manifest_sha256"],
         "world_source_hash_manifest_sha256": receipt["source_hash_manifest_sha256"],
         "task_set_manifest_sha256": receipt["task_set_manifest_sha256"],

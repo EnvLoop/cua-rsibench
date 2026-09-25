@@ -18,13 +18,15 @@ import sys
 from pathlib import Path
 
 from factory import CODE_DIR
-from partition_factory import SPLIT_COUNTS
+from partition_factory import ALL_SPLIT_COUNTS, SPLIT_COUNTS
 
 WORKERS = CODE_DIR / "partition_workers"
-PORTS = {"train": 8092, "selection": 8093, "evaluation_candidate": 8094}
+PORTS = {"train": 8092, "selection": 8093, "evaluation_candidate": 8094,
+         "official_hidden": 8095}
 PROJECTS = {"train": "envloop-odoo-train-v1",
             "selection": "envloop-odoo-selection-v1",
-            "evaluation_candidate": "envloop-odoo-evaluation-v1"}
+            "evaluation_candidate": "envloop-odoo-evaluation-v1",
+            "official_hidden": "envloop-odoo-hidden-v1"}
 
 
 def _master_seed() -> str:
@@ -39,7 +41,19 @@ def _master_seed() -> str:
     return value
 
 
-def bootstrap_one(split: str, master_seed: str) -> dict:
+def _hidden_seed() -> str:
+    WORKERS.mkdir(parents=True, exist_ok=True)
+    path = WORKERS / "hidden-master-seed.txt"
+    if not path.exists():
+        path.write_text(secrets.token_hex(32) + "\n")
+        path.chmod(0o600)
+    value = path.read_text().strip()
+    if len(value) < 32:
+        raise RuntimeError("Private hidden seed is too short")
+    return value
+
+
+def bootstrap_one(split: str, master_seed: str, hidden_seed: str | None = None) -> dict:
     worker = WORKERS / split
     worker.mkdir(parents=True, exist_ok=True)
     compose = worker / "compose.yaml"
@@ -53,8 +67,12 @@ def bootstrap_one(split: str, master_seed: str) -> dict:
         raise RuntimeError(f"World {split} already has a checkpoint; refusing to reseed")
     env = os.environ.copy()
     env.update({"ENVLOOP_ODOO_WORKER_DIR": str(worker),
-                "ODOO_PARTITION": split, "ODOO_WORLD_SEED": master_seed,
+                "ODOO_PARTITION": split,
+                "ODOO_WORLD_SEED": hidden_seed if split == "official_hidden" else master_seed,
                 "ODOO_PORT": str(PORTS[split]), "ODOO_PROJECT": PROJECTS[split]})
+    if hidden_seed:
+        env["ODOO_TRAIN_SEED"] = master_seed
+        env["ODOO_HIDDEN_SEED"] = hidden_seed
     try:
         completed = subprocess.run([sys.executable, str(CODE_DIR / "bootstrap.py")],
                                    cwd=CODE_DIR, env=env, check=True,
@@ -83,18 +101,27 @@ def bootstrap_one(split: str, master_seed: str) -> dict:
             "official_final_tasks_admitted": 0}
 
 
-def run(splits: list[str]) -> dict:
+def run(splits: list[str], *, hidden_study: bool = False) -> dict:
     seed = _master_seed()
-    if any(part not in SPLIT_COUNTS for part in splits):
+    hidden_seed = _hidden_seed() if hidden_study else None
+    if hidden_study and splits != ["train", "selection", "official_hidden"]:
+        raise ValueError("Hidden study must freeze train, selection and official_hidden together")
+    if "official_hidden" in splits and not hidden_study:
+        raise ValueError("official_hidden requires --hidden-study")
+    if any(part not in ALL_SPLIT_COUNTS for part in splits):
         raise ValueError("Unknown partition")
     report = {"schema": "envloop-odoo-isolated-partition-worlds-v1",
-              "status": "candidate_bootstrap_not_gui_admission",
+              "status": ("evaluator_private_hidden_bootstrap_not_gui_admission"
+                         if hidden_study else "candidate_bootstrap_not_gui_admission"),
               "master_seed_sha256": hashlib.sha256(seed.encode()).hexdigest(),
               "worlds": []}
+    if hidden_seed:
+        report["hidden_seed_sha256"] = hashlib.sha256(hidden_seed.encode()).hexdigest()
     for split in splits:
-        row = bootstrap_one(split, seed)
+        row = bootstrap_one(split, seed, hidden_seed)
         report["worlds"].append(row)
-        public = WORKERS / "partition-worlds-receipt.json"
+        public = WORKERS / ("hidden-study-worlds-receipt.json" if hidden_study
+                            else "partition-worlds-receipt.json")
         public.write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps({"split": split, "status": row["status"],
                           "candidate_cases": row["candidate_cases"],
@@ -104,6 +131,8 @@ def run(splits: list[str]) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--split", choices=list(SPLIT_COUNTS), action="append")
+    parser.add_argument("--split", choices=list(ALL_SPLIT_COUNTS), action="append")
+    parser.add_argument("--hidden-study", action="store_true")
     arguments = parser.parse_args()
-    run(arguments.split or list(SPLIT_COUNTS))
+    default = ["train", "selection", "official_hidden"] if arguments.hidden_study else list(SPLIT_COUNTS)
+    run(arguments.split or default, hidden_study=arguments.hidden_study)

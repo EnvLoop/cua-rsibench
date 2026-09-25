@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import os
 import random
 import secrets
 from datetime import date, timedelta
@@ -21,8 +22,10 @@ from factory import (CATALOG, CODE_DIR, PRIVATE, SOURCE, OdooRPC,
 from multifamily import attach, crm_pdf, sales_pdf
 
 SPLIT_COUNTS = {"train": 5, "selection": 5, "evaluation_candidate": 25}
+ALL_SPLIT_COUNTS = {**SPLIT_COUNTS, "official_hidden": 25}
 FAMILIES = ("purchase", "inventory", "sales", "crm")
-PREFIX = {"train": "TRN", "selection": "SEL", "evaluation_candidate": "EVC"}
+PREFIX = {"train": "TRN", "selection": "SEL", "evaluation_candidate": "EVC",
+          "official_hidden": "HID"}
 ROLE_GROUP_XMLIDS = ("base.group_user", "purchase.group_purchase_user",
                      "stock.group_stock_manager",
                      "sales_team.group_sale_salesman_all_leads")
@@ -291,6 +294,9 @@ def split_audit(master_seed: str) -> dict:
 
 
 def source_asset(case: dict, world: dict) -> bytes:
+    if case.get("hidden_variant") == "causal_v2":
+        from hidden_factory import hidden_source_asset
+        return hidden_source_asset(case, world)
     if case["family"] == "purchase":
         return confirmation(case)
     if case["family"] == "inventory":
@@ -348,11 +354,28 @@ def _xml_group(rpc: OdooRPC, module: str, name: str) -> int:
 
 def seed_partition(split: str, master_seed: str) -> dict:
     """Seed one fresh Compose project; save complete oracle only under private/."""
-    world = candidate_world(master_seed, split)
-    count = SPLIT_COUNTS[split]
-    audit = split_audit(master_seed)
-    if not audit["entity_disjoint"]:
-        raise RuntimeError("Partition entity overlap")
+    hidden_seed = os.environ.get("ODOO_HIDDEN_SEED")
+    train_seed = os.environ.get("ODOO_TRAIN_SEED", master_seed)
+    if split == "official_hidden":
+        if not hidden_seed or hidden_seed != master_seed:
+            raise RuntimeError("Official hidden worker requires its distinct private hidden seed")
+        from hidden_factory import hidden_candidate_world
+        world = hidden_candidate_world(hidden_seed)
+    else:
+        world = candidate_world(master_seed, split)
+    count = ALL_SPLIT_COUNTS[split]
+    if hidden_seed:
+        from hidden_factory import hidden_split_audit, hidden_task_sets
+        audit = hidden_split_audit(train_seed, hidden_seed)
+        task_set_manifest = hidden_task_sets(train_seed, hidden_seed)
+        if not audit["strict_identity_source_template_disjoint"]:
+            raise RuntimeError("Hidden world leaked a development source, entity or template")
+    else:
+        audit = split_audit(master_seed)
+        task_set_manifest = scale_final_task_sets(master_seed)
+        if not audit["entity_disjoint"]:
+            raise RuntimeError("Partition entity overlap")
+    validate_scale_splits(task_set_manifest)
     rpc = OdooRPC()
     company_id = rpc.call("res.company", "search_read", [], fields=["id"], limit=1)[0]["id"]
     rpc.call("res.company", "write", [company_id], {"name": "Crestview Operations (Synthetic)"})
@@ -416,12 +439,15 @@ def seed_partition(split: str, master_seed: str) -> dict:
                 "product_id": products[line["sku"]], "product_uom": uoms[line["sku"]],
                 "product_qty": initial["qty"], "price_unit": initial["price"],
                 "date_planned": initial["date"] + " 12:00:00"}))
-        order_id = rpc.call("purchase.order", "create", {
+        values = {
             "name": case["id"], "origin": "ENVLOOP-DEV",
             "partner_id": vendors[case["vendor"]],
             "date_order": case["order_date"] + " 09:00:00",
-            "currency_id": usd, "order_line": commands})
-        pdf = confirmation(case)
+            "currency_id": usd, "order_line": commands}
+        if "initial_vendor_reference" in case:
+            values["partner_ref"] = case["initial_vendor_reference"]
+        order_id = rpc.call("purchase.order", "create", values)
+        pdf = source_asset(case, world)
         attach(rpc, "purchase.order", order_id, f"{case['id']}-source.pdf", pdf)
         source_hashes[case["id"]] = sha256_bytes(pdf)
         rows = rpc.call("purchase.order.line", "search_read", [["order_id", "=", order_id]],
@@ -433,6 +459,8 @@ def seed_partition(split: str, master_seed: str) -> dict:
             "lines": [{"line_id": row["id"], "product_id": products[line["sku"]],
                        "expected": line["expected"], "initial": line["initial"]}
                       for row, line in zip(rows, case["lines"])]}
+        if "vendor_reference" in case:
+            purchase_gold[case["id"]]["vendor_reference"] = case["vendor_reference"]
 
     for case in world["cases"]["inventory"]:
         product_id = products[case["sku"]]
@@ -447,7 +475,7 @@ def seed_partition(split: str, master_seed: str) -> dict:
         inventory_gold[case["id"]] = {"rule_id": rule_id, "product_id": product_id,
             "location_id": location_id, "expected": case["expected"],
             "initial": case["initial"]}
-        source_hashes[case["id"]] = sha256_bytes(case["source_note"].encode())
+        source_hashes[case["id"]] = sha256_bytes(source_asset(case, world))
 
     for case in world["cases"]["sales"]:
         commands = [(0, 0, {
@@ -455,12 +483,15 @@ def seed_partition(split: str, master_seed: str) -> dict:
             "product_uom_qty": line["initial"]["qty"],
             "price_unit": line["initial"]["price"],
             "discount": line["initial"]["discount"]}) for line in case["lines"]]
-        order_id = rpc.call("sale.order", "create", {
+        values = {
             "name": case["id"], "origin": "ENVLOOP-SALES-DEV",
             "partner_id": customers[case["customer"]],
             "client_order_ref": case["initial_customer_reference"],
-            "order_line": commands})
-        pdf = sales_pdf(case)
+            "order_line": commands}
+        if "initial_expiration_date" in case:
+            values["validity_date"] = case["initial_expiration_date"]
+        order_id = rpc.call("sale.order", "create", values)
+        pdf = source_asset(case, world)
         attach(rpc, "sale.order", order_id, f"{case['id']}-source.pdf", pdf)
         source_hashes[case["id"]] = sha256_bytes(pdf)
         rows = rpc.call("sale.order.line", "search_read", [["order_id", "=", order_id]],
@@ -473,18 +504,23 @@ def seed_partition(split: str, master_seed: str) -> dict:
             "lines": [{"line_id": row["id"], "product_id": products[line["sku"]],
                        "expected": line["expected"]}
                       for row, line in zip(rows, case["lines"])]}
+        if "expiration_date" in case:
+            sales_gold[case["id"]]["expiration_date"] = case["expiration_date"]
 
     for case in world["cases"]["crm"]:
         initial = case["initial"]
-        lead_id = rpc.call("crm.lead", "create", {
+        values = {
             "name": case["id"], "type": "opportunity",
             "partner_id": customers[case["customer"]],
             "description": "Synthetic intake: preserve this original opportunity note.",
             "stage_id": stage_ids[initial["stage_name"]],
             "user_id": salespeople[initial["salesperson_index"]],
             "expected_revenue": initial["revenue"],
-            "date_deadline": initial["deadline"], "priority": initial["priority"]})
-        pdf = crm_pdf(case, world["salespeople"])
+            "date_deadline": initial["deadline"], "priority": initial["priority"]}
+        if "email_from" in initial:
+            values.update({"email_from": initial["email_from"], "phone": initial["phone"]})
+        lead_id = rpc.call("crm.lead", "create", values)
+        pdf = source_asset(case, world)
         attach(rpc, "crm.lead", lead_id, f"{case['id']}-source.pdf", pdf)
         source_hashes[case["id"]] = sha256_bytes(pdf)
         expected = case["expected"]
@@ -495,13 +531,14 @@ def seed_partition(split: str, master_seed: str) -> dict:
                          "revenue": expected["revenue"],
                          "deadline": expected["deadline"],
                          "priority": expected["priority"]}}
+        if "email_from" in expected:
+            crm_gold[case["id"]]["expected"].update(
+                {"email_from": expected["email_from"], "phone": expected["phone"]})
 
     sec = SOURCE.read_bytes()
     attach(rpc, "res.company", company_id,
            "Public-SEC-retailer-companyfacts-excerpt.json", sec)
     PRIVATE.mkdir(parents=True, exist_ok=True)
-    task_set_manifest = scale_final_task_sets(master_seed)
-    validate_scale_splits(task_set_manifest)
     for filename, payload in (("development_gold.json", purchase_gold),
                               ("replenishment_gold.json", inventory_gold),
                               ("sales_gold.json", sales_gold),
@@ -533,9 +570,11 @@ def seed_partition(split: str, master_seed: str) -> dict:
                                  "gui_controls.py", "sweep_partition.py",
                                  "worker_lease.py", "audit_partition_receipts.py",
                                  "record_train_trace.py",
+                                 "hidden_factory.py",
                                  "compose.yaml")}
     receipt = {"schema": "envloop-odoo-partition-candidate-v1",
-        "status": "seeded_unsealed_candidate_not_gui_admitted",
+        "status": ("seeded_evaluator_private_hidden_candidate_not_gui_admitted"
+                   if split == "official_hidden" else "seeded_unsealed_candidate_not_gui_admitted"),
         "partition": split, "source_type": "synthetic_operational_plus_public_sec_reference",
         "master_seed_sha256": sha256_bytes(master_seed.encode()),
         "case_manifest_sha256": sha256_bytes(json.dumps(world, sort_keys=True).encode()),

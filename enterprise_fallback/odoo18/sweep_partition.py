@@ -21,7 +21,7 @@ from gui_controls import (
     open_purchase, open_replenishment, open_sales, purchase_case, sales_case,
     view_attachment,
 )
-from partition_factory import FAMILIES, SPLIT_COUNTS
+from partition_factory import ALL_SPLIT_COUNTS, FAMILIES
 from reset import file_hash, restore
 from verify import score
 from worker_lease import exclusive_worker_operation, require_worker_lease
@@ -166,7 +166,7 @@ def run(family: str | None = None, limit: int | None = None,
 def _run_unlocked(family: str | None = None, limit: int | None = None,
                   case_id: str | None = None) -> dict:
     world, cases = _case_index()
-    if world["split"] not in SPLIT_COUNTS:
+    if world["split"] not in ALL_SPLIT_COUNTS:
         raise RuntimeError("Unknown candidate partition")
     if family:
         cases = [row for row in cases if row[0] == family]

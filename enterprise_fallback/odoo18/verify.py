@@ -45,7 +45,7 @@ SELECT json_build_object(
   'orders', (
     SELECT COALESCE(json_agg(to_jsonb(x) ORDER BY x.id), '[]'::json)
     FROM (
-      SELECT id, name, origin, partner_id, state, currency_id,
+      SELECT id, name, origin, partner_id, partner_ref, state, currency_id,
              to_char(date_order, 'YYYY-MM-DD HH24:MI:SS') AS date_order
       FROM purchase_order WHERE origin = 'ENVLOOP-DEV'
     ) x
@@ -108,7 +108,8 @@ SELECT json_build_object(
   'sales_orders', (
     SELECT COALESCE(json_agg(to_jsonb(x) ORDER BY x.id), '[]'::json)
     FROM (
-      SELECT id, name, origin, partner_id, state, client_order_ref, note
+      SELECT id, name, origin, partner_id, state, client_order_ref, note,
+             to_char(validity_date, 'YYYY-MM-DD') AS validity_date
       FROM sale_order WHERE origin = 'ENVLOOP-SALES-DEV'
     ) x
   ),
@@ -129,7 +130,7 @@ SELECT json_build_object(
       SELECT id, name, type, partner_id, user_id, team_id, stage_id,
              expected_revenue::text AS revenue,
              to_char(date_deadline, 'YYYY-MM-DD') AS deadline,
-             priority, description, active
+             priority, email_from, phone, description, active
       FROM crm_lead WHERE name LIKE 'ELCRM-%'
     ) x
   ),
@@ -221,11 +222,28 @@ def freeze() -> dict:
 
 def evaluate(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
     differences = global_identity_differences(baseline, observed)
-    for group in ("orders", "attachments", "vendors", "products", "orderpoints",
+    for group in ("attachments", "vendors", "products", "orderpoints",
                   "sales_orders", "sales_lines", "crm_leads", "customers",
                   "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):
             differences.append(f"{group}_changed_or_missing")
+    original_orders = keyed(baseline["orders"])
+    actual_orders = keyed(observed["orders"])
+    if original_orders.keys() != actual_orders.keys():
+        differences.append("purchase_order_identity_set_changed")
+    for order_id, original in original_orders.items():
+        current = actual_orders.get(order_id)
+        if current is None:
+            continue
+        if order_id != target.get("order_id") or "vendor_reference" not in target:
+            if current != original:
+                differences.append("unrelated_or_target_order_changed")
+            continue
+        for key in original:
+            if key != "partner_ref" and current.get(key) != original[key]:
+                differences.append("target_purchase_order_identity_or_state_changed")
+        if current.get("partner_ref") != target["vendor_reference"]:
+            differences.append("target_vendor_reference_mismatch")
     baseline_lines = keyed(baseline["lines"])
     observed_lines = keyed(observed["lines"])
     if baseline_lines.keys() != observed_lines.keys():
@@ -318,6 +336,11 @@ def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -
                     differences.append("target_sales_order_identity_or_state_changed")
             if current["client_order_ref"] != target["customer_reference"]:
                 differences.append("target_customer_reference_mismatch")
+            if "expiration_date" in target:
+                if current.get("validity_date") != target["expiration_date"]:
+                    differences.append("target_quotation_expiration_mismatch")
+            elif current.get("validity_date") != original.get("validity_date"):
+                differences.append("target_quotation_expiration_changed")
     base_lines = keyed(baseline["sales_lines"])
     actual_lines = keyed(observed["sales_lines"])
     if base_lines.keys() != actual_lines.keys():
@@ -374,6 +397,11 @@ def evaluate_crm(case_id: str, target: dict, baseline: dict, observed: dict) -> 
                 differences.append(code)
         if round(float(current["revenue"]), 2) != expected["revenue"]:
             differences.append("target_crm_revenue_mismatch")
+        for key, code in (("email_from", "target_crm_verified_email_mismatch"),
+                          ("phone", "target_crm_verified_phone_mismatch")):
+            expected_value = expected[key] if key in expected else original.get(key)
+            if current.get(key) != expected_value:
+                differences.append(code)
     return _result(case_id, differences)
 
 

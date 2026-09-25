@@ -25,6 +25,8 @@ from factory import (  # noqa: E402
 from multifamily import crm_candidates, crm_pdf, sales_candidates, sales_pdf  # noqa: E402
 from partition_factory import (candidate_world, scale_final_task_sets,
                                split_audit as partition_split_audit)  # noqa: E402
+from hidden_factory import (hidden_candidate_world, hidden_split_audit,
+                            hidden_source_asset, hidden_task_sets)  # noqa: E402
 from worker_lease import WorkerBusyError, exclusive_worker_operation  # noqa: E402
 from gui_controls import browser_login  # noqa: E402
 SPLIT_VALIDATOR = Path(__file__).resolve().parents[1] / "src/cursibench/scale_final_v06.py"
@@ -157,6 +159,63 @@ class OdooFixtureTests(unittest.TestCase):
                 self.assertEqual(case["expected"], {
                     "minimum": minimum,
                     "maximum": minimum + 2 * params["case_pack"]})
+
+    def test_hidden_final_changes_business_rules_and_isolates_exposed_development(self):
+        train_seed = "train-hidden-audit-seed-0123456789abcdef"
+        hidden_seed = "new-hidden-only-seed-9876543210zyxwvutsr"
+        world = hidden_candidate_world(hidden_seed)
+        self.assertEqual(world["split"], "official_hidden")
+        self.assertEqual({key: len(rows) for key, rows in world["cases"].items()},
+                         {"purchase": 25, "inventory": 25, "sales": 25, "crm": 25})
+        audit = hidden_split_audit(train_seed, hidden_seed)
+        self.assertTrue(audit["strict_identity_source_template_disjoint"])
+        self.assertTrue(all(value == 0 for group in audit["overlap_with_hidden"].values()
+                            for value in group.values()))
+        task_sets = hidden_task_sets(train_seed, hidden_seed)
+        self.assertEqual({key: len(rows) for key, rows in task_sets.items()},
+                         {"train": 20, "selection": 20, "official": 100})
+        self.assertEqual(len(validate_splits(task_sets)), 100)
+        self.assertTrue(all(row["task_id"].split("-")[1] == "HID"
+                            for row in task_sets["official"]))
+        other_hidden = hidden_candidate_world("another-hidden-seed-abcdef0123456789")
+        self.assertFalse({case["id"] for rows in world["cases"].values() for case in rows}
+                         & {case["id"] for rows in other_hidden["cases"].values() for case in rows})
+        for case in world["cases"]["purchase"]:
+            self.assertNotEqual(case["vendor_reference"], case["initial_vendor_reference"])
+            self.assertEqual(case["revision_rule"]["authoritative"], "B")
+        for case in world["cases"]["inventory"]:
+            p = case["formula_inputs"]
+            weeks = p["weeks"]
+            lead = p["lead_days"] / 7
+            target = math.ceil(sum(weeks) / 4 * lead
+                               + p["service_factor"] * (max(weeks) - min(weeks))
+                               * math.sqrt(lead)) + p["safety_stock"]
+            self.assertEqual(case["expected"], {
+                "minimum": target, "maximum": target + 3 * p["case_pack"]})
+            self.assertIn("service factor", case["source_note"])
+        for case in world["cases"]["sales"]:
+            self.assertNotEqual(case["expiration_date"], case["initial_expiration_date"])
+        for case in world["cases"]["crm"]:
+            self.assertNotEqual(case["expected"]["email_from"], case["initial"]["email_from"])
+            self.assertNotEqual(case["expected"]["phone"], case["initial"]["phone"])
+
+    @unittest.skipUnless(importlib.util.find_spec("reportlab") and importlib.util.find_spec("pypdf"),
+                         "PDF report dependencies not installed")
+    def test_hidden_source_pdfs_expose_revision_deadline_and_verified_contact(self):
+        from io import BytesIO
+        from pypdf import PdfReader
+
+        world = hidden_candidate_world("hidden-pdf-test-seed-0123456789abcdef")
+        for family, required in (("purchase", ("Revision A", "Revision B", "Vendor reference")),
+                                 ("sales", ("Quotation must expire", "Customer PO reference")),
+                                 ("crm", ("Verified contact channels", "Phone:", "Email:"))):
+            case = world["cases"][family][0]
+            document = PdfReader(BytesIO(hidden_source_asset(case, world)))
+            self.assertEqual(len(document.pages), 1)
+            text = document.pages[0].extract_text()
+            self.assertIn(case["id"], text)
+            for phrase in required:
+                self.assertIn(phrase, text)
 
     def test_bootstrap_rejects_occupied_loopback_port_before_credentials(self):
         with socket.socket() as occupied, tempfile.TemporaryDirectory() as scratch:
@@ -338,6 +397,19 @@ class IndependentEvaluatorTests(unittest.TestCase):
         self.assertIn("attachments_changed_or_missing",
                       evaluate("ELPO-0001", target, self.baseline, observed)["difference_codes"])
 
+    def test_hidden_purchase_vendor_reference_is_required_and_other_fields_preserved(self):
+        self.baseline["orders"][0]["partner_ref"] = "old-revision"
+        target = {"order_id": 1, "vendor_reference": "VR-CURRENT",
+                  "lines": [{"line_id": 1, "product_id": 10,
+                             "expected": {"qty": 2, "price": 10.0, "date": "2025-01-01"}}]}
+        observed = copy.deepcopy(self.baseline)
+        observed["lines"][0]["price"] = "10.00"
+        observed["orders"][0]["partner_ref"] = "VR-CURRENT"
+        self.assertEqual(evaluate("ELPO-HID-0001", target, self.baseline, observed)["reward"], 1.0)
+        observed["orders"][0]["partner_ref"] = "old-revision"
+        self.assertIn("target_vendor_reference_mismatch",
+                      evaluate("ELPO-HID-0001", target, self.baseline, observed)["difference_codes"])
+
     def test_global_business_identity_guard_rejects_new_unscoped_document(self):
         self.baseline["global_business_identity"] = {
             "purchase_order": [1], "stock_move": [3], "account_move": []}
@@ -374,6 +446,21 @@ class IndependentEvaluatorTests(unittest.TestCase):
         self.assertIn("unrelated_sales_order_changed",
                       evaluate_sales("ELSQ-0001", target, self.baseline, observed)["difference_codes"])
 
+    def test_hidden_sales_expiration_is_required(self):
+        self.baseline["sales_orders"][0]["validity_date"] = "2027-03-01"
+        target = {"order_id": 10, "customer_reference": "CPO-391",
+                  "expiration_date": "2027-02-15",
+                  "lines": [{"line_id": 10, "product_id": 10,
+                             "expected": {"qty": 5, "price": 18.0, "discount": 5}}]}
+        observed = copy.deepcopy(self.baseline)
+        observed["sales_orders"][0].update({"client_order_ref": "CPO-391",
+                                             "validity_date": "2027-02-15"})
+        observed["sales_lines"][0]["price"] = "18.0"
+        self.assertEqual(evaluate_sales("ELSQ-HID-0001", target, self.baseline, observed)["reward"], 1.0)
+        observed["sales_orders"][0]["validity_date"] = "2027-03-01"
+        self.assertIn("target_quotation_expiration_mismatch",
+                      evaluate_sales("ELSQ-HID-0001", target, self.baseline, observed)["difference_codes"])
+
     def test_crm_positive_and_wrong_opportunity_negative(self):
         target = {"lead_id": 20, "expected": {"stage_id": 3, "user_id": 2,
                   "revenue": 7000, "deadline": "2025-10-15", "priority": "2"}}
@@ -384,6 +471,21 @@ class IndependentEvaluatorTests(unittest.TestCase):
         observed["crm_leads"][1]["stage_id"] = 3
         self.assertIn("unrelated_crm_opportunity_changed",
                       evaluate_crm("ELCRM-0001", target, self.baseline, observed)["difference_codes"])
+
+    def test_hidden_crm_verified_contact_channels_are_required(self):
+        self.baseline["crm_leads"][0].update({"email_from": "intake@example.invalid",
+                                               "phone": "+1 555 0901"})
+        target = {"lead_id": 20, "expected": {"stage_id": 3, "user_id": 2,
+                  "revenue": 7000, "deadline": "2025-10-15", "priority": "2",
+                  "email_from": "verified@example.invalid", "phone": "+1 555 0101"}}
+        observed = copy.deepcopy(self.baseline)
+        observed["crm_leads"][0].update({"stage_id": 3, "user_id": 2,
+            "revenue": "7000", "deadline": "2025-10-15", "priority": "2",
+            "email_from": "verified@example.invalid", "phone": "+1 555 0101"})
+        self.assertEqual(evaluate_crm("ELCRM-HID-0001", target, self.baseline, observed)["reward"], 1.0)
+        observed["crm_leads"][0]["phone"] = "+1 555 0901"
+        self.assertIn("target_crm_verified_phone_mismatch",
+                      evaluate_crm("ELCRM-HID-0001", target, self.baseline, observed)["difference_codes"])
 
     def test_physical_source_oracle_ignores_cache_but_rejects_tampering(self):
         checksum = "a" * 40

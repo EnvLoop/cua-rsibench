@@ -1,0 +1,36 @@
+{
+  "schema": "envloop-odoo-hidden-causal-qa-v1",
+  "date": "2026-09-25",
+  "status": "evaluator_private_qa_passed_not_official_hidden_admission",
+  "software": "original_odoo_community_18",
+  "qa_seed_distinct_from_future_hidden_final_seed": true,
+  "future_hidden_final_seed_generated_at_this_snapshot": false,
+  "causal_rule_changes": {
+    "purchase": "authoritative supplier revision and vendor-reference repair",
+    "inventory": "service-level stock with demand variability",
+    "sales": "customer-controlled quotation expiration",
+    "crm": "verified email and phone replacing intake contact channels"
+  },
+  "qa_candidates": 100,
+  "per_family_gui_qualified": {
+    "purchase": 25,
+    "inventory": 25,
+    "sales": 25,
+    "crm": 25
+  },
+  "per_case_controls": [
+    "native GUI source readback",
+    "independent persisted-state positive",
+    "plausible wrong-object negative",
+    "scoped no-regression and global business-record guard",
+    "exact cold database and physical-filestore reset before and after"
+  ],
+  "separate_read_only_evaluator": true,
+  "role_scoped_non_admin_actor": true,
+  "exclusive_worker_lease_audited": true,
+  "private_run_summary_sha256": "9c8c8ea495850cb3cc702d30c70f0f992012b9e3c2ee1580f79161c9e21098be",
+  "private_independent_audit_sha256": "4198176854d0e28b9624bfb440ffdc827f04fada25429c4d371d711fb29e3b15",
+  "official_final_tasks_admitted": 0,
+  "researcher_campaigns": 0,
+  "model_attempts": 0
+}

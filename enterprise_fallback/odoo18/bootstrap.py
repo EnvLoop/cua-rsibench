@@ -63,7 +63,8 @@ def _bootstrap_unlocked() -> dict:
     if not project.startswith("envloop-odoo-") or not project.replace("-", "").isalnum():
         raise ValueError("ODOO_PROJECT must be an isolated envloop-odoo-* name")
     partition = os.environ.get("ODOO_PARTITION", "")
-    if partition and partition not in {"train", "selection", "evaluation_candidate"}:
+    if partition and partition not in {"train", "selection", "evaluation_candidate",
+                                     "official_hidden"}:
         raise ValueError("Unknown ODOO_PARTITION")
     env.write_text(
         "ODOO_DB_PASSWORD=" + local_password() + "\n"

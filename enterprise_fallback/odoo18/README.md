@@ -35,6 +35,18 @@ ENVLOOP_ODOO_WORKER_DIR=enterprise_fallback/odoo18/partition_workers/evaluation_
 
 The private seed and generated task package must never be committed. The quoted command runs a candidate check, not a published evaluation.
 
+## Evaluator-private hidden causal rules
+
+The exposed 100-case evaluation-candidate world above is permanently **development calibration** and must never be promoted into the hidden denominator. [`hidden_factory.py`](hidden_factory.py) defines a separate final-candidate protocol with four genuinely different decisions or required actions: choose the authoritative Revision B supplier acknowledgement and repair its vendor reference; compute service-level stock from demand variability rather than seasonal weighting; set Sales quotation expiration from the customer deadline; and replace CRM's unverified intake email/phone with verified handoff channels. Each rule changes the generated initial and expected database state, the synthetic source document or planning note, and the independent persisted-state verifier. Tests inspect those transformations and feed the combined 20 train / 20 selection / 100 hidden identity rows through `scale_final_v06.validate_splits`.
+
+A distinct evaluator-private QA seed was used to test this implementation before any official hidden seed existed. Its 100/100 native-GUI known-answer positive, wrong-object negative and cold-reset controls passed a separate private receipt audit. The QA pool is **not** a final task set and its source values, gold, screenshots and credentials stay in ignored evaluator storage. A later `--hidden-study` bootstrap generates a new secret final seed, creates fresh train and selection worlds plus an `official_hidden` Odoo worker, and binds the complete task-package manifest, source assets, role policy, evaluator, GUI controls, lock and runtime hashes before any per-ID final admission. A final task remains unadmitted until its *own* new-seed GUI and hidden-contract gates pass.
+
+```bash
+python3 enterprise_fallback/odoo18/create_partition_worlds.py --hidden-study
+```
+
+The hidden seed is created locally only when this command runs. The developer-owned QA seed is never reused as a final seed. No task prompt, gold, account detail or source document from either private pool should enter researcher contexts or public artifacts.
+
 ## Reproduce locally
 
 Use Python 3.10 or newer, Docker Compose, and the repository's `report` extra.
