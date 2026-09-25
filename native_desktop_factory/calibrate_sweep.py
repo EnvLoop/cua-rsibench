@@ -56,13 +56,14 @@ def actor_script(package_dir: Path, oracle: dict, attempt: str) -> str:
         targets = list(oracle["targets"].items())
         if len(targets) != 3 or any(not addr.startswith("Decision ledger!") for addr, _ in targets):
             raise ValueError("Calc v2 must have three decision-ledger targets")
-        lines += ["click 325,767"]  # Visible second sheet tab at 1280x800.
+        lines += ["click 325,767", "wait 1"]  # Let the visible second sheet become active.
         for i, (address, rule) in enumerate(targets):
             cell = address.split("!", 1)[1]
             formula = rule["formula"]
             if attempt == "near-miss" and i == len(targets) - 1:
                 formula = "=" + before["Decision ledger"][cell]["formula"].lstrip("=")
             lines += ["click 51,171", "press ctrl,a", f"write {cell}", "press enter",
+                      "wait 1",  # Name Box must return focus to the grid before a formula.
                       f"write {_formula_for_calc(formula)}", "press enter"]
     elif workflow.startswith("impress-"):
         raw = next(package_dir.glob("*.pptx")).read_bytes()

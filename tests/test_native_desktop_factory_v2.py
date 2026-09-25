@@ -8,7 +8,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from native_desktop_factory import admit, factory, factory_v2, formula_semantics, source, verify
+from native_desktop_factory import (admit, factory, factory_v2,
+                                    formula_semantics, source,
+                                    target_text_semantics, verify)
 
 
 DEPENDENCIES = all(importlib.util.find_spec(name) is not None for name in
@@ -76,6 +78,8 @@ class DistinctDesktopTemplateTests(unittest.TestCase):
                 for wrong, expected in oracle["targets"].items():
                     if isinstance(expected, str):
                         self.assertNotEqual(wrong, expected)
+                        self.assertTrue(target_text_semantics.semantically_correct(expected, expected))
+                        self.assertFalse(target_text_semantics.semantically_correct(wrong, expected))
                 if row["workflow"].startswith("calc-"):
                     directory = one / row["split"] / row["task_id"]
                     cells = verify.xlsx_cells(next(directory.glob("*.xlsx")).read_bytes())
