@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -30,6 +31,13 @@ $db->beginTransaction();
 try {
   $existing=$db->query("SELECT COUNT(*) FROM cms_page WHERE identifier LIKE 'envloop-quote-%'")->fetchColumn();
   if ((int)$existing !== 0) throw new Exception('clone already contains an EnvLoop quote page');
+  $parentQuery=$db->prepare('SELECT sku,type_id FROM catalog_product_entity WHERE entity_id=?');
+  $parentQuery->execute([$case['parent_id']]);
+  $parentRow=$parentQuery->fetch(PDO::FETCH_ASSOC);
+  if ($parentRow===false || $parentRow['sku']!==$case['parent_sku'] ||
+      $parentRow['type_id']!=='configurable') {
+    throw new Exception('source configurable parent identity drifted');
+  }
   $query=$db->prepare('SELECT e.sku,sl.parent_id,d.value FROM catalog_product_entity e '
       .'JOIN catalog_product_super_link sl ON sl.product_id=e.entity_id '
       .'JOIN catalog_product_entity_decimal d ON d.entity_id=e.entity_id '
@@ -43,9 +51,11 @@ try {
       throw new Exception('source variant identity or starting price drifted');
     }
   }
-  $insert=$db->prepare('INSERT INTO cms_page (title,identifier,content_heading,content,is_active) '
-      .'VALUES (?,?,?,?,1)');
-  $insert->execute([$case['title'],$case['identifier'],$case['title'],$case['content']]);
+  $insert=$db->prepare('INSERT INTO cms_page '
+      .'(title,identifier,content_heading,content,is_active,creation_time,update_time) '
+      .'VALUES (?,?,?,?,1,?,?)');
+  $insert->execute([$case['title'],$case['identifier'],$case['title'],$case['content'],
+      '2026-09-25 00:00:00','2026-09-25 00:00:00']);
   $page=(int)$db->lastInsertId();
   $store=$db->prepare('INSERT INTO cms_page_store (page_id,store_id) VALUES (?,0)');
   $store->execute([$page]);
@@ -123,6 +133,7 @@ def seed(case: dict, container: str, http_port: int,
         'identifier': 'envloop-quote-' + opaque,
         'content': case['quote_page_body'],
         'parent_id': case['parent_id'],
+        'parent_sku': case['parent_sku'],
         'variants': ([{key: row[key] for key in ('entity_id', 'sku', 'initial_price')}
                       for row in case['target_variants']] +
                      [{'entity_id': row['entity_id'], 'sku': row['sku'],
@@ -154,10 +165,21 @@ def main() -> None:
     parser.add_argument('--container', required=True)
     parser.add_argument('--http-port', type=int, required=True)
     parser.add_argument('--control-port', type=int, required=True)
+    parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
+    out = args.out.resolve()
+    require(out.is_relative_to((ROOT / 'work').resolve()) and not out.exists(),
+            'new ignored evaluator seed receipt under work/ required')
     case = load_case(args.plan, args.plan_sha256, args.task_id)
     receipt = seed(case, args.container, args.http_port, args.control_port)
-    print(json.dumps(receipt, sort_keys=True))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    raw = (json.dumps(receipt, sort_keys=True, indent=2) + '\n').encode()
+    descriptor = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, 'wb') as stream:
+        stream.write(raw)
+    print(json.dumps({'status': receipt['status'],
+                      'receipt_sha256': _sha(raw),
+                      'official_final_tasks_admitted': 0}, sort_keys=True))
 
 
 if __name__ == '__main__':

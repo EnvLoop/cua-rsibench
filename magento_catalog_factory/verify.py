@@ -140,6 +140,9 @@ def _cents(value: str) -> int:
 
 def check_baseline(case: dict, state: dict) -> None:
     require(state['task_id'] == case['task_id'] and
+            state['database']['quote']['title'] == case['quote_page_title'] and
+            state['database']['quote']['identifier'] ==
+            'envloop-quote-' + case['task_id'].removeprefix('magento-catalog-') and
             state['database']['quote']['content_sha256'] ==
             case['quote_page_body_sha256'] and
             int(state['database']['quote']['is_active']) == 1 and

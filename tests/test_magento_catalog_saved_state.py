@@ -10,12 +10,14 @@ from unittest.mock import patch
 import unittest
 
 from magento_catalog_factory import seed, verify
+from tools import audit_magento_original_fresh_reset_v1 as reset_audit
 
 
 CASE = {
     'task_id': 'magento-catalog-0123456789abcdef',
     'package_sha256': 'f' * 64,
     'parent_id': 126,
+    'parent_sku': 'PARENT-126',
     'quote_page_title': 'Supplier cost review 0123456789abcdef',
     'quote_page_body': '<p>Private source</p>',
     'quote_page_body_sha256': hashlib.sha256(b'<p>Private source</p>').hexdigest(),
@@ -109,6 +111,25 @@ class MagentoCatalogSavedStateTests(unittest.TestCase):
         self.assertIn(CASE['quote_page_body'], kwargs['input'])
         self.assertNotIn(CASE['quote_page_body'], ' '.join(args[0]))
         self.assertEqual(kwargs['timeout'], 120)
+
+    def test_fresh_reset_requires_distinct_clone_and_identical_state(self):
+        first = baseline()
+        second = copy.deepcopy(first)
+        seed_one = {'status': 'trusted_fixture_seeded_not_gui_admitted',
+                    'task_id': CASE['task_id'],
+                    'package_sha256': CASE['package_sha256'],
+                    'quote_page_body_sha256': CASE['quote_page_body_sha256'],
+                    'page_id': 8,
+                    'clone': {'image_sha256': seed.IMAGE, 'mount_count': 0,
+                              'container_id_sha256': '1' * 64,
+                              'loopback_ports': [7794, 7795]}}
+        seed_two = copy.deepcopy(seed_one)
+        seed_two['clone']['container_id_sha256'] = '2' * 64
+        self.assertTrue(reset_audit.audit(CASE, first, second,
+                                          seed_one, seed_two)['fresh_clone_reset_passed'])
+        seed_two['clone']['container_id_sha256'] = '1' * 64
+        with self.assertRaisesRegex(ValueError, 'same container'):
+            reset_audit.audit(CASE, first, second, seed_one, seed_two)
 
 
 if __name__ == '__main__':
