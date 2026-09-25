@@ -246,6 +246,50 @@ class FullStudyResultAuditTests(unittest.TestCase):
         finally:
             path.write_bytes(original)
 
+    def test_selected_base_checkpoint_reuses_one_execution_without_losing_slot_result(self):
+        plan = copy.deepcopy(self.plan)
+        index = copy.deepcopy(self.index)
+        cell_id = matrix.CELLS[0]
+        cell = plan['cells'][0]
+        base_checkpoint = cell['base']['bindings']['checkpoint']
+        cell['researcher_plans']['luna6']['bindings']['checkpoint'] = base_checkpoint
+        cell['execution_evidence_owner_by_slot']['luna6'] = 'shared-base'
+        index['final_executions'] = [row for row in index['final_executions']
+                                     if (row['cell_id'], row['owner_slot']) !=
+                                     (cell_id, 'luna6')]
+        campaign = next(row for row in index['campaigns']
+                        if (row['cell_id'], row['researcher_id']) ==
+                        (cell_id, 'luna6'))
+        freeze_ref, usage_ref = campaign['selection_freeze'], campaign['usage']
+        freeze_path = self.root / freeze_ref['path']
+        usage_path = self.root / usage_ref['path']
+        old_freeze, old_usage = freeze_path.read_bytes(), usage_path.read_bytes()
+        try:
+            freeze = json.loads(old_freeze)
+            freeze['selected_checkpoint_sha256'] = base_checkpoint
+            freeze_path.write_bytes(cell_final.json_bytes(freeze))
+            freeze_ref['sha256'] = cell_final.digest(freeze_path.read_bytes())
+            usage = json.loads(old_usage)
+            usage['selected_final_usd'] = '0'
+            usage['all_in_usd'] = '14'
+            usage_path.write_bytes(cell_final.json_bytes(usage))
+            usage_ref['sha256'] = cell_final.digest(usage_path.read_bytes())
+            plan_sha = cell_final.digest(cell_final.json_bytes(plan))
+            index['matrix_plan_sha256'] = plan_sha
+            report = results.audit(plan, index, self.root,
+                                   plan_sha256=plan_sha,
+                                   bootstrap_replicates=100)
+            self.assertEqual(report['slot_task_result_count'], 3000)
+            self.assertEqual(report['unique_checkpoint_task_executions'], 2900)
+            self.assertEqual(report['reported_all_in_cost_subtotal_usd'], '417')
+            reused = next(row for row in report['comparisons']
+                          if (row['cell_id'], row['researcher_id']) ==
+                          (cell_id, 'luna6'))
+            self.assertEqual(reused['summary']['paired_delta_pp'], 0)
+        finally:
+            freeze_path.write_bytes(old_freeze)
+            usage_path.write_bytes(old_usage)
+
 
 if __name__ == '__main__':
     unittest.main()
