@@ -1,4 +1,4 @@
-"""Publish compact authentic filing excerpts from hash-checked SEC snapshots.
+"""Publish original 10-K excerpts with calendar-2024 period ends.
 
 The compact public excerpts are development sources, not hidden final data.
 Every input JSON must match its independently recorded direct-SEC SHA-256 from
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from datetime import date
 import gzip
 from hashlib import sha256
 import json
@@ -42,23 +43,23 @@ def source_map() -> list[dict]:
             if candidate["ticker"] not in {"AAPL", "MSFT"}]
 
 
-def annual_anchor(sec: dict) -> tuple[str, str, str]:
+def annual_anchor(sec: dict) -> tuple[str, str, str, int]:
     us = sec["facts"]["us-gaap"]
     rows = us.get("Assets", {}).get("units", {}).get("USD", [])
-    anchors = {(r["accn"], r["filed"], r["end"]) for r in rows
+    anchors = {(r["accn"], r["filed"], r["end"], r["fy"]) for r in rows
                if r.get("form") == "10-K" and r.get("fp") == "FY"
-               and r.get("fy") == 2024 and r.get("end", "").startswith("2024-")
-               and r.get("filed", "") <= "2025-06-30" and not r.get("start")}
+               and r.get("end", "").startswith("2024-") and not r.get("start")
+               and 0 <= (date.fromisoformat(r["filed"]) - date.fromisoformat(r["end"])).days <= 120}
     if not anchors:
-        raise ValueError("missing_original_fy2024_annual_anchor")
+        raise ValueError("missing_original_annual_anchor_with_2024_period_end")
     first = sorted(anchors, key=lambda row: (row[1], row[0], row[2]))[0]
-    if len({end for acc, _, end in anchors if acc == first[0]}) != 1:
+    if len({end for acc, _, end, _ in anchors if acc == first[0]}) != 1:
         raise ValueError("ambiguous_annual_end_in_original_filing")
     return first
 
 
 def filing_excerpt(sec: dict, ticker: str, source_sha: str) -> dict:
-    accession, filed, end = annual_anchor(sec)
+    accession, filed, end, fiscal_year = annual_anchor(sec)
     records = []
     for concept in sorted(CONCEPTS):
         item = sec["facts"]["us-gaap"].get(concept)
@@ -86,7 +87,7 @@ def filing_excerpt(sec: dict, ticker: str, source_sha: str) -> dict:
             "source_transport": "read-only text proxy; payload bytes checked against prior direct SEC SHA-256",
             "filing_index_url": index_url, "filing_index_url_status": "constructed_from_accession; only GOOGL and ORCL index pages manually opened",
             "filing_accession": accession, "filing_filed": filed, "filing_form": "10-K",
-            "filing_fiscal_year": 2024, "filing_period_end": end,
+            "filing_fiscal_year": fiscal_year, "filing_period_end": end,
             "records": records}
 
 
@@ -108,13 +109,14 @@ def freeze(raw_dir: Path, out_dir: Path) -> dict:
         if excerpt["filing_accession"] in all_accessions:
             raise ValueError("duplicate_annual_accession")
         all_accessions.add(excerpt["filing_accession"])
-        target = out_dir / f"{ticker.lower()}-fy2024-10k.json"
+        target = out_dir / f"{ticker.lower()}-end2024-10k.json"
         target.write_text(json.dumps(excerpt, indent=2) + "\n")
         results.append({"ticker": ticker, "cik": cik,
                         "prior_seven_tag_source_status": candidate["prior"]["status"],
                         "filing_accession": excerpt["filing_accession"],
                         "filing_filed": excerpt["filing_filed"],
                         "filing_period_end": excerpt["filing_period_end"],
+                        "filing_fiscal_year": excerpt["filing_fiscal_year"],
                         "filing_index_url": excerpt["filing_index_url"],
                         "raw_sec_json_sha256": digest(raw),
                         "excerpt_sha256": digest(target.read_bytes()),
@@ -122,11 +124,12 @@ def freeze(raw_dir: Path, out_dir: Path) -> dict:
                         "concepts": len({r["concept"] for r in excerpt["records"]})})
     report = {"schema": "sec-public-filing-expansion-v1", "date": "2026-09-25",
               "status": "verified public source excerpts; no hidden or Excel-web task admission",
-              "new_issuer_families": len(results), "distinct_original_fy2024_10k_accessions": len(all_accessions),
+              "new_issuer_families": len(results),
+              "distinct_original_10k_accessions_with_2024_period_end": len(all_accessions),
               "total_pinned_fact_rows": sum(r["fact_rows"] for r in results),
               "prior_direct_sec_sha256_checks_passed": len(results),
               "prior_seven_tag_source_statuses": dict(Counter(r["prior_seven_tag_source_status"] for r in results)),
-              "official_filing_pages_manually_opened": ["GOOGL", "ORCL"],
+              "official_filing_pages_manually_opened": ["GOOGL", "ORCL", "HD"],
               "sources": results,
               "no_official_final_credit": True}
     return report
@@ -142,7 +145,7 @@ def main() -> None:
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({k: report[k] for k in
-                      ("new_issuer_families", "distinct_original_fy2024_10k_accessions",
+                      ("new_issuer_families", "distinct_original_10k_accessions_with_2024_period_end",
                        "total_pinned_fact_rows", "prior_direct_sec_sha256_checks_passed")}, sort_keys=True))
 
 

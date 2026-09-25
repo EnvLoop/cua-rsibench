@@ -24,12 +24,12 @@ class SourceExpansionTest(unittest.TestCase):
     def test_all_sixteen_excerpts_are_pinned_and_filing_distinct(self) -> None:
         report = json.loads(REPORT.read_text())
         self.assertEqual(report["new_issuer_families"], 16)
-        self.assertEqual(report["distinct_original_fy2024_10k_accessions"], 16)
+        self.assertEqual(report["distinct_original_10k_accessions_with_2024_period_end"], 16)
         self.assertEqual(report["total_pinned_fact_rows"], 589)
         self.assertEqual(report["prior_direct_sec_sha256_checks_passed"], 16)
         seen = set()
         for row in report["sources"]:
-            source = HERE / "sources/expansion" / f"{row['ticker'].lower()}-fy2024-10k.json"
+            source = HERE / "sources/expansion" / f"{row['ticker'].lower()}-end2024-10k.json"
             self.assertEqual(sha256(source.read_bytes()).hexdigest(), row["excerpt_sha256"])
             parsed = json.loads(source.read_text())
             self.assertEqual(parsed["source_raw_json_sha256"], row["raw_sec_json_sha256"])
@@ -39,6 +39,10 @@ class SourceExpansionTest(unittest.TestCase):
                              {row["filing_accession"]})
             seen.add(row["filing_accession"])
         self.assertEqual(len(seen), 16)
+        hd = next(r for r in report["sources"] if r["ticker"] == "HD")
+        self.assertEqual(hd["filing_accession"], "0000354950-24-000062")
+        self.assertEqual(hd["filing_fiscal_year"], 2023)
+        self.assertEqual(hd["filing_filed"], "2024-03-13")
 
     def test_four_rpo_cases_have_distinct_source_lineage_and_missing_tag_paths(self) -> None:
         report = json.loads(REPORT.read_text())

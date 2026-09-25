@@ -42,7 +42,7 @@ def exact(records: list[dict], concept: str, end: str, *, start: str | None = No
 
 
 def make_case(ticker: str, source_report: dict) -> dict:
-    path = HERE / "sources/expansion" / f"{ticker.lower()}-fy2024-10k.json"
+    path = HERE / "sources/expansion" / f"{ticker.lower()}-end2024-10k.json"
     summary = next(r for r in source_report["sources"] if r["ticker"] == ticker)
     if digest(path.read_bytes()) != summary["excerpt_sha256"]:
         raise ValueError(f"source_excerpt_hash_changed:{ticker}")
@@ -87,7 +87,7 @@ def make_case(ticker: str, source_report: dict) -> dict:
             raise ValueError(f"current_liability_missing:{ticker}:{prefix}")
     return {"schema": "sec-rpo-audit-case-v1", "case_id": f"rpo-{ticker.lower()}-fy2024",
             "status": "public_development_case_only", "ticker": ticker,
-            "source_excerpt_path": f"sec_excel_factory/sources/expansion/{ticker.lower()}-fy2024-10k.json",
+            "source_excerpt_path": f"sec_excel_factory/sources/expansion/{ticker.lower()}-end2024-10k.json",
             "source_excerpt_sha256": summary["excerpt_sha256"],
             "source_raw_json_sha256": source["source_raw_json_sha256"],
             "cik": source["cik"], "filing_accession": source["filing_accession"],
