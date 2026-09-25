@@ -62,7 +62,7 @@ class TraceSession:
                key: str | None = None, dy: int | None = None,
                memory: str | None = None) -> None:
         from cursibench.scale_action_contract import (
-            make_observation, public_receipt, validate_action,
+            make_observation, public_receipt, render_for_proxy, validate_action,
         )
 
         if memory is not None:
@@ -127,12 +127,15 @@ class TraceSession:
                                       "y": int(bounds["height"] * 0.75)}})
         validated = validate_action(action, observation,
                                     current_frame_id=observation.frame_id)
+        rendered = render_for_proxy(observation)
         screenshot_name = f"{self.step:02d}.png"
         (self.directory / screenshot_name).write_bytes(screenshot)
         self.rows.append({
             "step": self.step, "screenshot": screenshot_name,
             "screenshot_sha256": _digest(screenshot),
             "visible_text": visible_text, "controls": controls,
+            "proxy_instruction": rendered["instruction"],
+            "proxy_visible_text": rendered["visible_text"],
             "action": validated, "public_contract_receipt": public_receipt(
                 observation, action=validated),
         })
@@ -181,9 +184,17 @@ def record() -> dict:
         case = world["cases"]["purchase"][0]
         if case["template_signature"]["target"] != "single_line_unit_price":
             raise RuntimeError("Unexpected train-only causal template")
-        binding_rows = json.loads((PRIVATE / "task_set_manifest.json").read_text())["train"]
+        task_sets = json.loads((PRIVATE / "task_set_manifest.json").read_text())
+        binding_rows = task_sets["train"]
         binding = next(row["package_sha256"] for row in binding_rows
                        if row["task_id"] == case["id"])
+        train_sources = next(row["source_groups"] for row in binding_rows
+                             if row["task_id"] == case["id"])
+        final_sources = {source for row in task_sets["official"]
+                         for source in row["source_groups"]}
+        source_disjoint = not set(train_sources) & final_sources
+        if not source_disjoint:
+            raise RuntimeError("Train source leaked into official task identities")
         target_line = next(line for line in case["lines"]
                            if line["initial"]["price"] != line["expected"]["price"])
         credentials = json.loads((PRIVATE / "actor_credentials.json").read_text())
@@ -241,6 +252,7 @@ def record() -> dict:
             after = restore()
         accepted = (failure is None and result["reward"] == 1.0
                     and not result["difference_codes"]
+                    and source_disjoint
                     and after["business_snapshot_equal"]
                     and after["physical_filestore_equal_before_web_restart"])
         qa = {"schema": "envloop-odoo-train-trace-host-qa-v1",
@@ -248,6 +260,9 @@ def record() -> dict:
               "run_id": run_id,
               "task_id": case["id"], "train_only_source_group": next(
                   row["source_groups"][0] for row in binding_rows if row["task_id"] == case["id"]),
+              "source_disjoint_from_official": source_disjoint,
+              "contract_sha256": file_hash(
+                  CODE_DIR.parents[1] / "src/cursibench/scale_action_contract.py"),
               "source_document_sha256": json.loads((PRIVATE / "source_hashes.json").read_text())[case["id"]],
               "trace_sha256": trace_metadata["trace_sha256"],
               "steps": trace_metadata["steps"],
