@@ -1,0 +1,53 @@
+{
+  "schema": "sec-ppe-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "five public original-filing source excerpts; zero hidden or GUI admission",
+  "issuers": 5,
+  "original_accessions": 5,
+  "total_fact_rows": 72,
+  "source_units": [
+    "USD"
+  ],
+  "sources": [
+    {
+      "ticker": "COST",
+      "cik": 909832,
+      "accession": "0000909832-24-000049",
+      "records": 16,
+      "raw_json_sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f",
+      "excerpt_sha256": "3ba257ea4b76cb8e04ad54293f3a00bfb624a7d1ba8db206e047c048cefc4fb8"
+    },
+    {
+      "ticker": "NFLX",
+      "cik": 1065280,
+      "accession": "0001065280-25-000044",
+      "records": 14,
+      "raw_json_sha256": "00f3449073d90dfa3aec4e384de24b70d92d897f90c67d6bca61f23e33d38634",
+      "excerpt_sha256": "ecaecc30ad0203dd5c7836d67844dd446dab8146b12207b030bea726ff3a2e77"
+    },
+    {
+      "ticker": "PFE",
+      "cik": 78003,
+      "accession": "0000078003-25-000054",
+      "records": 14,
+      "raw_json_sha256": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
+      "excerpt_sha256": "e602062e5a1cf617cc8f3609fa2a1c684bf579f4b076a6a0f2a0dde4fb4624bf"
+    },
+    {
+      "ticker": "BA",
+      "cik": 12927,
+      "accession": "0000012927-25-000015",
+      "records": 14,
+      "raw_json_sha256": "0c63f1ae7cc10b3c27e0c94f2add0c461e6293036dd4e52e52ae6dbb6f206e15",
+      "excerpt_sha256": "696e27d51ed5616c6936978f75d33beb1aad5313eeb7a8a470a788972ff48c5e"
+    },
+    {
+      "ticker": "CAT",
+      "cik": 18230,
+      "accession": "0000018230-25-000008",
+      "records": 14,
+      "raw_json_sha256": "01ddc6ffa741f0a7da440e2949b2ed19cec14fab35435a398e3f3d0100019715",
+      "excerpt_sha256": "d309130c36a99b302b9e33c8c7463c34b9a4f50d36ec8a0ae40488c473dc484a"
+    }
+  ]
+}

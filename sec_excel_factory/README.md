@@ -22,6 +22,8 @@ An eighth [receivables and doubtful-account allowance development workflow](../d
 
 A ninth [cash-flow quality and reinvestment development workflow](../docs/evidence/sec-cashquality-workflow-2026-09-25.md) uses five original filings to bridge net income to operating cash flow with separately reported depreciation/amortization and share-based compensation, preserving an unexplained residual. It computes reinvestment and repurchase coverage and applies a clearly synthetic cash stress. Five nine-sheet references pass a 48-target independent OOXML/counterfactual oracle; **Excel-web and hidden-final admissions remain zero**.
 
+A tenth [property, plant and equipment carrying-value development workflow](../docs/evidence/sec-ppe-workflow-2026-09-25.md) uses five original filings to reconcile gross, accumulated and net PPE, compare year-over-year carrying values with capex and D&A, and model a separate synthetic write-down/capex sensitivity. Five nine-sheet references pass a 55-target independent OOXML/counterfactual oracle. Reported D&A may include non-PPE assets; the movement residual has no asserted cause. **Excel-web and hidden-final admissions remain zero**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
