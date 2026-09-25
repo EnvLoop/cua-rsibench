@@ -13,6 +13,7 @@ import json
 import subprocess
 import time
 import urllib.request
+import xmlrpc.client
 from pathlib import Path
 
 from factory import HERE, PRIVATE, local_config
@@ -59,7 +60,12 @@ def wait_web(timeout_s: int = 90) -> None:
         try:
             with urllib.request.urlopen(url, timeout=3) as response:
                 if response.status == 200:
-                    return
+                    common = xmlrpc.client.ServerProxy(
+                        f"http://127.0.0.1:{port}/xmlrpc/2/common", allow_none=True
+                    )
+                    version = common.version()
+                    if str(version.get("server_version", "")).startswith("18.0"):
+                        return
         except Exception:
             pass
         time.sleep(2)

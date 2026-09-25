@@ -322,8 +322,10 @@ def local_config() -> dict[str, str]:
 
 
 class OdooRPC:
-    def __init__(self, base_url: str = BASE_URL):
+    def __init__(self, base_url: str | None = None):
         cfg = local_config()
+        if base_url is None:
+            base_url = f"http://127.0.0.1:{cfg.get('ODOO_PORT', '8078')}"
         self.password = cfg["ODOO_ADMIN_PASSWORD"]
         common = xmlrpc.client.ServerProxy(base_url + "/xmlrpc/2/common", allow_none=True)
         self.uid = common.authenticate("bench", "admin", self.password, {})
@@ -357,7 +359,7 @@ def seed() -> dict:
         product_id = rpc.call("product.product", "create", {
             "name": item["name"], "default_code": item["sku"],
             "type": "consu", "is_storable": True, "purchase_ok": True,
-            "sale_ok": False, "standard_price": 12.0, "list_price": 30.0,
+            "sale_ok": True, "standard_price": 12.0, "list_price": 30.0,
         })
         product_ids[item["sku"]] = product_id
         uom_ids[item["sku"]] = rpc.call("product.product", "read", [product_id], fields=["uom_po_id"])[0]["uom_po_id"][0]
@@ -416,6 +418,8 @@ def seed() -> dict:
     PRIVATE.mkdir(exist_ok=True)
     (PRIVATE / "development_gold.json").write_text(json.dumps(gold, indent=2) + "\n")
     repl_gold = seed_replenishment(rpc, product_ids, company_id)
+    from multifamily import seed_sales_and_crm
+    extra = seed_sales_and_crm(rpc, product_ids, company_id)
     public = {
         "status": "unsealed_development_candidates_not_gui_admitted",
         "application": "Odoo Community 18.0-20260908",
@@ -424,6 +428,7 @@ def seed() -> dict:
         "synthetic_rfqs": len(gold),
         "synthetic_confirmations": len(gold),
         "replenishment_candidates": len(repl_gold),
+        **extra,
         "selection_candidates": 20,
         "unsealed_scale_candidates": 100,
         "train_only_generator_candidates_not_deployed": 40,

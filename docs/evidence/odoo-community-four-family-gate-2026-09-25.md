@@ -1,0 +1,18 @@
+# Odoo Community four-family development gate
+
+**Status: development controls, not a final benchmark result.** The primary enterprise cell is original, pinned Odoo Community 18.0. The new local worker implements Sales quotation reconciliation and CRM opportunity handoff in addition to the earlier Purchase RFQ and Inventory replenishment workflows. The actor changed records through Odoo's browser GUI. Fixture setup used environment-owned XML-RPC before freezing the checkpoint; scoring used a separate PostgreSQL `SELECT` role and physical source-file hashes.
+
+| Workflow | Local development cases | Causal source and target |
+| --- | ---: | --- |
+| Purchase RFQ reconciliation | 120 | Supplier confirmation PDF; repair three purchase lines while preserving the RFQ and unrelated records |
+| Inventory replenishment | 20 | Four-week demand note; calculate a SKU/location minimum and maximum while preserving other rules |
+| Sales quotation reconciliation | 20 | Customer PO PDF opened in Odoo's attachment viewer; repair customer reference and one to three line quantity/price faults |
+| CRM opportunity handoff | 20 | Sales handoff PDF opened in Odoo's attachment viewer; repair pipeline stage, salesperson, forecast, closing date and priority |
+
+All operational entities and 160 business PDFs are original synthetic fixture material. The separate 112-observation Costco/Walmart SEC excerpt is an authentic historical reference on the synthetic company record, not operational ground truth. No real customer or supplier record is represented by these fixtures. The development world has 24 synthetic suppliers, 48 products, 20 synthetic customers and three synthetic salespeople.
+
+For the new families, the repeatable GUI control opened each source PDF in the native viewer, corrected `ELSQ-0001` and `ELCRM-0001` to independently verified reward 1.0, then changed another quotation/opportunity through the GUI and observed reward 0.0 with `unrelated_sales_order_changed` / `unrelated_crm_opportunity_changed`. The original task returned to reward 0.0 after each cold restore. A three-line Sales fault (`ELSQ-0010`) and another CRM target stage, owner and priority (`ELCRM-0003`) also scored 1.0 through the GUI. These are known-answer environment checks; no model result is inferred.
+
+The evaluator snapshots purchase and sales orders and lines, replenishment rules, CRM opportunities, customers, salespeople, stages, products, vendors and attachment metadata. It also hashes the physical bytes of all **161 protected source attachments** against the frozen filestore manifest. Odoo creates runtime cache files during browsing, so those cache files are excluded from task scoring. Cold restore still verifies the **entire** physical filestore against its baseline manifest before restarting the web service, plus equality of the scoped business snapshot. The new worker's baseline contains 1,176 filestore files. The checkpoint digests and machine-readable outcomes are in the [JSON receipt](odoo-community-four-family-gate-2026-09-25.json); private dumps, gold and credentials are excluded.
+
+The new Sales and CRM cases are public development candidates. The RFQ 20/100 proposal still overlaps on vendors, SKUs and fault patterns; Sales and CRM customers and products also overlap within this development world. There are **zero official final tasks admitted**, no frozen all-family entity-disjoint train/selection/final worlds, and no researcher campaigns. A future 100-task final Odoo cell still requires individually verified fresh GUI positives and plausible negatives, preserved-state/filestore scoring, reset receipts, a hidden source-family boundary, and a fixed screenshot/action interface before any paid comparison.

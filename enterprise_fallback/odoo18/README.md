@@ -2,14 +2,16 @@
 
 This is a self-hosted **original Odoo Community 18.0** software track for an enterprise computer-use benchmark. The actor uses Odoo's browser GUI. Environment-owned XML-RPC seeds disposable records; a separate PostgreSQL role with `SELECT` but no `UPDATE` reads persisted state for scoring. Neither an imitation application nor an API-only actor result qualifies as a computer-use success.
 
-The deployed local development world has **two causal workflows**:
+The isolated local development world now has **four causal workflows** in the original Odoo Community interface:
 
 | Workflow | Public development candidates | Source visible to actor | Target state |
 | --- | ---: | --- | --- |
 | Purchase RFQ reconciliation | 120 three-line RFQs across eight fault patterns | A supplier confirmation PDF attached to each Odoo RFQ | Line quantities, prices, and promised dates; preserve all other RFQs, attachment bytes, supplier, and draft state |
 | Inventory replenishment | 20 SKU/location rules | A four-week demand and lead-time planning note on each Odoo product's Purchase tab | Compute and set minimum/maximum at WH/Stock; preserve other rules and product notes |
+| Sales quotation reconciliation | 20 three-line quotations, with one to three quantity/price faults and a wrong customer PO reference | Synthetic customer PO PDF in the quotation's native attachment viewer | Repair customer reference and line values; preserve customer, order state, discounts, unrelated quotations and every attachment |
+| CRM opportunity handoff | 20 opportunities across three target stages, three salespeople, varying revenue, closing dates and priority | Synthetic handoff PDF in the opportunity's native attachment viewer | Repair stage, assignee, forecast, close date and priority; preserve customer, original notes, unrelated opportunities and attachments |
 
-The 120 RFQs contain 20 selection candidates and 100 **unsealed scale candidates**. They reuse the same eight fault patterns, 24 synthetic vendors, and 48 synthetic SKUs. The exact selection/scale overlap is **0 IDs, 20 vendors, 36 SKUs, and all 8 fault patterns**. They are *not* 100 independent hidden tasks, a leak-safe split, or an official final denominator. The Inventory cases use 20 different SKUs but one planning formula family. The separate `train_world_candidates(world_seed)` function reproducibly generates 40 **undeployed** train-only candidate identities with zero overlap in RFQ IDs, vendor names, and SKUs against both selection and scale candidates. A future official study must instantiate them in an isolated worker, freeze a private evaluation seed and source-family split, and run fresh GUI admission on every task before any model campaign.
+The 120 RFQs contain 20 selection candidates and 100 **unsealed scale candidates**. They reuse the same eight fault patterns, 24 synthetic vendors, and 48 synthetic SKUs. The exact selection/scale overlap is **0 IDs, 20 vendors, 36 SKUs, and all 8 fault patterns**. They are *not* 100 independent hidden tasks, a leak-safe split, or an official final denominator. The Inventory cases use 20 different SKUs but one planning formula family. Sales and CRM are separate 20-case development pools, not extra admitted final tasks. Their customer entities overlap across families and are not hidden. The separate `train_world_candidates(world_seed)` function reproducibly generates 40 **undeployed** train-only RFQ candidate identities with zero overlap in RFQ IDs, vendor names, and SKUs against both selection and scale candidates. A future official study must instantiate entity-disjoint train/selection/final worlds for all four families, freeze a private evaluation seed and source-family split, and run fresh GUI admission on every task before any model campaign.
 
 `proposed_clustered_split(world_seed)` is a separate **undeployed repair blueprint**: 40 train, 20 selection, and 100 evaluation-candidate RFQs; each split has its own vendor and SKU namespace, with five cases per vendor and zero ID/vendor/SKU overlap. All eight fault patterns still appear in every split. If used, the endpoint must be preregistered as **within-template generalization**; novel-template transfer requires additional independently designed task families and a different split. The generator is public and example seeds are not hidden; no output from it is a sealed final task.
 
@@ -19,18 +21,21 @@ The only authentic historical values in this development world are the **112 unm
 
 Use Python 3.10 or newer, Docker Compose, and the repository's `report` extra.
 
-The [`compose.yaml`](compose.yaml) pins Odoo and PostgreSQL by OCI digest. Docker Compose publishes the Odoo GUI to `127.0.0.1:8078` only; PostgreSQL has no host port. Odoo's database manager is disabled with `--no-database-list`, confirmed by the page's disabled banner. `bootstrap.py` creates a private mode-0600 `.env`, rotates Odoo's temporary default admin password, installs Community modules, seeds both workflows, creates a read-only SQL role, freezes a scoped baseline, and checkpoints **both** PostgreSQL and Odoo's physical filestore. It does not use a cloud account or paid service.
+The [`compose.yaml`](compose.yaml) pins Odoo and PostgreSQL by OCI digest. Docker Compose publishes the Odoo GUI on loopback only (`8078` by default); PostgreSQL has no host port. Odoo's database manager is disabled with `--no-database-list`, confirmed by the page's disabled banner. `bootstrap.py` creates a private mode-0600 `.env`, rotates Odoo's temporary default admin password, installs Community modules, seeds all four workflows, creates a read-only SQL role, freezes a scoped baseline, and checkpoints **both** PostgreSQL and Odoo's physical filestore. `ODOO_PROJECT` and `ODOO_PORT` may select an isolated worker at first bootstrap. It does not use a cloud account or paid service.
 
 ```bash
-python3 -m pip install -e '.[report]'
+python3 -m pip install -e '.[report,browser]'
 python3 enterprise_fallback/odoo18/bootstrap.py
 python3 enterprise_fallback/odoo18/verify.py score ELPO-0005
 python3 enterprise_fallback/odoo18/verify.py score ELRP-0001
+python3 enterprise_fallback/odoo18/verify.py score ELSQ-0001
+python3 enterprise_fallback/odoo18/verify.py score ELCRM-0001
 python3 enterprise_fallback/odoo18/reset.py restore
+python3 enterprise_fallback/odoo18/gui_controls.py
 python3 -m unittest tests/test_odoo_fallback_factory.py -v
 ```
 
-Fresh cases should start from `reset.py restore`. `verify.py score <case>` must run only after actor GUI work and must use the evaluator's private gold and frozen snapshot in ignored `private/`. The four GUI-positive cases and two wrong-object controls in the [evidence note](../../docs/evidence/odoo-community-fallback-2026-09-25.md) are development checks; none has an official final identity. The baseline checkpoint should never be published because it contains local credentials and evaluator material. A production worker must receive a distinct `ODOO_PROJECT`, port, private checkpoint, and sealed gold. The current bootstrap is deliberately one-shot for one local worker.
+Fresh cases should start from `reset.py restore`. `gui_controls.py` itself cold-restores the local worker before and after its Sales and CRM controls, so run it only against a disposable benchmark worker. `verify.py score <case>` must run only after actor GUI work and must use the evaluator's private gold and frozen snapshot in ignored `private/`. The original four GUI-positive cases and two wrong-object controls in the [earlier evidence note](../../docs/evidence/odoo-community-fallback-2026-09-25.md), plus the new controls in the four-family evidence note, remain development checks; none has an official final identity. The baseline checkpoint should never be published because it contains local credentials and evaluator material. A production worker must receive a distinct `ODOO_PROJECT`, port, private checkpoint, and sealed gold. The current bootstrap is deliberately one-shot for one local worker.
 
 ## Next workflow contracts
 
