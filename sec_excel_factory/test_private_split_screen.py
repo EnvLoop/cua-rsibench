@@ -70,6 +70,12 @@ class PrivateSplitScreenTest(unittest.TestCase):
         self.assertIn("actor_sha256_reused_across_tasks", errors)
         self.assertIn("semantic_template_hash_reused_under_alias", errors)
 
+    def test_reject_same_filing_and_template_repetition(self) -> None:
+        cases = deepcopy(synthetic_plan())
+        cases[1]["template_family"] = cases[0]["template_family"]
+        cases[1]["template_semantic_sha256"] = cases[0]["template_semantic_sha256"]
+        self.assertIn("same_issuer_template_filing_repeated", screen(cases)["errors"])
+
     def test_current_empty_inventory_fails_closed(self) -> None:
         result = screen([])
         self.assertEqual(result["status"], "blocked")

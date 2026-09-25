@@ -56,7 +56,7 @@ def screen(tasks: list[dict], public_ciks: set[int] | None = None,
     template_hashes: dict[str, set[str]] = defaultdict(set)
     semantic_hash_splits: dict[str, set[str]] = defaultdict(set)
     semantic_hash_families: dict[str, set[str]] = defaultdict(set)
-    issuer_template_pairs = Counter()
+    issuer_template_accessions = Counter()
     final_issuers: set[int] = set()
     final_templates: set[str] = set()
     for t in tasks:
@@ -83,7 +83,7 @@ def screen(tasks: list[dict], public_ciks: set[int] | None = None,
             errors.append("template_family_missing")
         else:
             template_splits[template].add(split)
-            issuer_template_pairs[(cik, template)] += 1
+            issuer_template_accessions[(cik, template, accession)] += 1
             if template in public_workflows:
                 errors.append("public_development_template_reused")
             if isinstance(semantic_hash, str):
@@ -116,8 +116,8 @@ def screen(tasks: list[dict], public_ciks: set[int] | None = None,
         errors.append("semantic_template_hash_crosses_splits")
     if any(len(families) > 1 for families in semantic_hash_families.values()):
         errors.append("semantic_template_hash_reused_under_alias")
-    if any(n > 1 for n in issuer_template_pairs.values()):
-        errors.append("issuer_template_pair_repeated")
+    if any(n > 1 for n in issuer_template_accessions.values()):
+        errors.append("same_issuer_template_filing_repeated")
     for key in ("actor_sha256", "reference_sha256"):
         digests = [t.get(key) for t in tasks]
         if len(set(digests)) != len(digests):
