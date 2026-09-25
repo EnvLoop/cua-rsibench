@@ -532,6 +532,7 @@ def seed_partition(split: str, master_seed: str) -> dict:
                                  "partition_factory.py", "verify.py", "reset.py",
                                  "gui_controls.py", "sweep_partition.py",
                                  "worker_lease.py", "audit_partition_receipts.py",
+                                 "record_train_trace.py",
                                  "compose.yaml")}
     receipt = {"schema": "envloop-odoo-partition-candidate-v1",
         "status": "seeded_unsealed_candidate_not_gui_admitted",
