@@ -8,6 +8,8 @@ A separate [source expansion and contract-obligations workflow](../docs/evidence
 
 Ten more issuer identities have [two source facts each cross-checked directly in SEC-hosted filing views](../docs/evidence/sec-ten-official-crosschecked-anchors-2026-09-25.md). This raises the development identity inventory to 28, but only the previous 18 full companyfacts payloads are bound to earlier direct-SEC SHA-256 values. The ten new full proxy responses stay quarantined in ignored `work/`; only 20 officially cross-checked asset/revenue anchors are committed. None is a qualified hidden or Excel-web final item.
 
+A third [debt-maturity and cash-capacity development workflow](../docs/evidence/sec-debt-workflow-2026-09-25.md) uses five of the fully hash-pinned issuer excerpts. It tracks current/noncurrent long-term-debt disclosures, historical cash flow, and separately modeled refinancing stress. Five eight-sheet reference workbooks pass an independent 33-target OOXML/counterfactual oracle; none has an Excel-web GUI or hidden-final admission. The tracked two-tag debt subtotal must not be represented as an issuer's total corporate debt.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
