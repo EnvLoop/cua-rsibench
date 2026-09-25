@@ -1,0 +1,14 @@
+{
+  "actor_task_sha256": "3b6b0b718b6ef877f111917caee58f003b75abde650f9551f4cff1f32eebd216",
+  "input_sha256": "d109286764e413c32d06668c74aeaf16fe2c75a11666e5ba75eb795fce113d7c",
+  "instance_group": "wdi-native-mex-impress-deck",
+  "oracle_sha256": "3abb13d543ba7781492be52508f7d0a40e4a0f4eb13185b860c1587fd628d1b7",
+  "package_sha256": "1799856d64f6f8ecba2daf4d2d051f6574a22b84db11f22e0e930796d3c0d062",
+  "source_groups": [
+    "wdi-country:MEX"
+  ],
+  "split": "train",
+  "task_id": "wdi-native-mex-impress-deck",
+  "template_group": "train:impress-deck",
+  "workflow": "impress-deck"
+}

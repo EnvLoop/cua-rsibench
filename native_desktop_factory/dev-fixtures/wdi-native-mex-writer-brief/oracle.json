@@ -1,0 +1,14 @@
+{
+  "country_iso3": "MEX",
+  "edits": 1,
+  "input_sha256": "e7a7ee4ef664b1326b8755141ecbd00c017eca03b0e5fde0b5a4972294766fdd",
+  "schema": "cua-native-wdi-oracle-v1",
+  "source_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+  "split": "train",
+  "targets": {
+    "FINDING_1_REVIEW_3": "FINDING 1: Nominal GDP grew 2.01% from 2023 to 2024."
+  },
+  "task_id": "wdi-native-mex-writer-brief",
+  "variant": 3,
+  "workflow": "writer-brief"
+}
