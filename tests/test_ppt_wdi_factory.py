@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -11,7 +12,24 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from ppt_wdi_factory import plan, qa, verify
-from ppt_wdi_factory.build import DEFAULT_MODULES, DEFAULT_NODE, prepare_builder, run
+from ppt_wdi_factory.build import DEFAULT_MODULES, DEFAULT_NODE, DEFAULT_PYTHON, DEFAULT_SKILL, prepare_builder, run
+
+
+def finalized_package(private: Path, row: dict) -> Path:
+    package = private / "packages" / "final_candidate" / row["task_id"]
+    package.mkdir(parents=True)
+    spec = package / "task.private.json"
+    spec.write_bytes(plan.canonical(row))
+    builder = prepare_builder(private, DEFAULT_MODULES)
+    environment = {**os.environ, "PRESENTATIONS_SKILL_DIR": str(DEFAULT_SKILL),
+                   "RUNTIME_PYTHON": str(DEFAULT_PYTHON), "RUNTIME_NODE": str(DEFAULT_NODE),
+                   "RUNTIME_NODE_MODULES": str(DEFAULT_MODULES)}
+    subprocess.run([str(DEFAULT_NODE), str(builder), str(spec), str(package / "draft.pptx")],
+                   check=True, capture_output=True, env=environment)
+    subprocess.run([str(DEFAULT_NODE), str(Path("ppt_wdi_factory/finalize_deck.mjs").resolve()),
+                    str(package / "draft.pptx"), str(package / "source.pptx")],
+                   check=True, capture_output=True, env=environment)
+    return package
 
 
 class PptWdiFactoryTest(unittest.TestCase):
@@ -32,8 +50,11 @@ class PptWdiFactoryTest(unittest.TestCase):
         self.assertTrue(all(r["target_keys"] == ["summary", "ledger", "interpretation"]
                             for r in sets["selection"]))
         self.assertEqual({r["workflow"] for r in final}, set(plan.WORKFLOWS))
+        self.assertEqual({workflow: sum(r["workflow"] == workflow for r in final)
+                          for workflow in plan.WORKFLOWS}, {workflow: 10 for workflow in plan.WORKFLOWS})
         self.assertEqual(len({r["task_id"] for r in final}), 100)
-        self.assertTrue(all(r["target_keys"] == list(verify.LOCATIONS) for r in final))
+        self.assertTrue(all(r["target_keys"] == verify.FINAL_TARGETS.get(
+            r["workflow"], verify.DEFAULT_FINAL_TARGETS) for r in final))
         self.assertTrue(all(r["calculation"]["value"] != r["calculation"]["wrong_value"]
                             for r in final))
         self.assertTrue(all(r["calculation"]["formula"] != r["calculation"]["wrong_formula"]
@@ -85,13 +106,7 @@ class PptWdiFactoryTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             private = Path(temporary)
             row = self.candidates["sets"]["final_candidate"][0]
-            package = private / "packages" / "final_candidate" / row["task_id"]
-            package.mkdir(parents=True)
-            spec = package / "task.private.json"
-            spec.write_bytes(plan.canonical(row))
-            builder = prepare_builder(private, DEFAULT_MODULES)
-            subprocess.run([str(DEFAULT_NODE), str(builder), str(spec), str(package / "source.pptx")],
-                           check=True, capture_output=True)
+            package = finalized_package(private, row)
             self.assertTrue(verify.calibrate(package)["offline_controls_pass"])
             receipt = json.loads((package / "calibration.private.json").read_text())
             self.assertEqual(len(receipt["checks"]["positive"]["per_target"]), 4)
@@ -116,6 +131,24 @@ class PptWdiFactoryTest(unittest.TestCase):
             self.assertEqual(result["status"], "scored")
             self.assertEqual(result["score"], 0)
             self.assertFalse(result["preservation_pass"])
+
+    @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
+                         "bundled presentation runtime is unavailable")
+    def test_provenance_and_chart_legend_workflows(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            private = Path(temporary)
+            for workflow in ("source_year_reconciliation", "chart_series_relabel"):
+                row = next(r for r in self.candidates["sets"]["final_candidate"]
+                           if r["workflow"] == workflow)
+                package = finalized_package(private, row)
+                self.assertTrue(verify.calibrate(package)["offline_controls_pass"])
+                receipt = json.loads((package / "calibration.private.json").read_text())
+                self.assertEqual(len(receipt["checks"]["positive"]["per_target"]), 4)
+                if workflow == "source_year_reconciliation":
+                    self.assertIn("attribution", row["target_keys"])
+                else:
+                    self.assertEqual(receipt["checks"]["legend_desync"]["score"], 0)
+                    self.assertTrue(receipt["checks"]["legend_desync"]["preservation_pass"])
 
 
 if __name__ == "__main__":

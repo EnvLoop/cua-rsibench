@@ -5,10 +5,10 @@
     "official_final_tasks": 0
   },
   "authored_content": "simulated analyst briefs, mistakes, and committee rules",
-  "build_receipt_sha256": "a65d77d74da6dffc551fa5243583aedc1e45ffebf74035a3c9f74c956bc724eb",
-  "builder_sha256": "91860ced5db9c208795631a4042bda524ad79f25091b6d51e2d291474594a17e",
-  "calibration_run_sha256": "e7fe3309ac934ba3a96dfeb33a0465b1ac269e87427d579e8054745ae769e6ab",
-  "candidate_manifest_sha256": "68ccf12ad989d42da3a00facb1af760af18bceecc4647c310a33a4653866bad8",
+  "build_receipt_sha256": "3b324f0dbb154f3933e741453bc1d5c85df4ff62efc2f5db20cf4633cb44d667",
+  "builder_sha256": "a4bb926c0cfab29b79b127ff33611ce4607265862a699e57f54f2718803c0566",
+  "calibration_run_sha256": "3045b7d9b668b26e7af4ff6784b255e2abe5d7a8c91b61d5c0b74a300db50e2b",
+  "candidate_manifest_sha256": "8dc8b4c40db26873a2a37d6114a0c283d3ace9e02ad9bc2ba4c00dfff121dab0",
   "country_partition_alignment": "shared_wdi_desktop_private_partition",
   "country_partition_alignment_verified": true,
   "counts": {
@@ -16,14 +16,16 @@
       "candidate_tasks": 100,
       "source_country_families": 25,
       "workflow_counts": {
-        "dual_threshold_review": 12,
-        "inflation_acceleration": 13,
-        "labor_rate_change": 12,
-        "nominal_output_growth": 13,
-        "output_per_person_divergence": 12,
-        "per_capita_growth": 12,
-        "population_growth": 13,
-        "price_labor_spread": 13
+        "chart_series_relabel": 10,
+        "dual_threshold_review": 10,
+        "inflation_acceleration": 10,
+        "labor_rate_change": 10,
+        "nominal_output_growth": 10,
+        "output_per_person_divergence": 10,
+        "per_capita_growth": 10,
+        "population_growth": 10,
+        "price_labor_spread": 10,
+        "source_year_reconciliation": 10
       }
     },
     "selection": {
@@ -83,5 +85,5 @@
   "schema": "ppt-wdi-original-offline-inventory-v1",
   "source_license": "World Development Indicators CC BY 4.0",
   "source_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
-  "verifier_sha256": "5ccc0dc51387e542f5dd5af9cbd77befec24ce290d52a8e9738f8e954ea4bd4a"
+  "verifier_sha256": "5bfd2f911a0feb3f3d73b55754260042e9d05e01632bf3ac371aff631acaf4aa"
 }

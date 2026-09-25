@@ -37,7 +37,9 @@ const sourceNote = "Source: World Bank, World Development Indicators, pinned API
 const s1 = slideBase(`${task.country_name} | economic monitoring`, 1, sourceNote);
 text(s1, "brief_heading", task.heading, 72, 159, 1134, 75, 25, false, colors.muted);
 text(s1, "target__summary", task.draft.summary, 76, 276, 1110, 92, 32, true, colors.amber);
-const targetLabels = { summary: "summary", ledger: "calculation", interpretation: "interpretation", decision: "committee decision" };
+const targetLabels = { summary: "summary", ledger: "calculation", interpretation: "interpretation",
+  decision: "committee decision", attribution: "source footnote",
+  legend_cpi: "blue chart legend", legend_unemployment: "teal chart legend" };
 text(s1, "brief_method", `Reconcile the flagged ${task.target_keys.map(key => targetLabels[key]).join(", ")} with the pinned evidence. Preserve all other content.`, 76, 422, 1080, 105, 23, false, colors.ink);
 
 const s2 = slideBase("WDI source observations", 2, sourceNote);
@@ -84,7 +86,8 @@ const s4 = slideBase("Calculation review", 4, sourceNote);
 text(s4, "calculation_rule", `Review rule: ${task.calculation.rule}`, 72, 140, 1105, 72, 23, false, colors.ink);
 const review = s4.tables.add({ rows: 3, columns: 3, left: 72, top: 253, width: 1128, height: 236,
   values: [["Field", "Analyst draft", "Use"],
-           ["Derived measure", task.draft.ledger, task.calculation.window],
+           [task.workflow === "source_year_reconciliation" ? "Source observation" : "Derived measure",
+            task.draft.ledger, task.calculation.window],
            ["Unit and rule", task.calculation.unit, `Simulated threshold: ${task.calculation.simulated_threshold.toFixed(1)}`]] });
 review.styleOptions = { headerRow: true };
 review.borders.assign({ style: "solid", fill: "#D6E2E6", width: 1 });
@@ -116,7 +119,8 @@ const s7 = slideBase("Method and attribution", 7, sourceNote);
 text(s7, "method_1", "Observed values: World Development Indicators, 2019–2024 API snapshot. The table contains the five pinned series for this country.", 75, 150, 1090, 90, 23, false, colors.ink);
 text(s7, "method_2", "Calculations: derive from the displayed, rounded WDI values; round results to two decimals for the committee memo.", 75, 283, 1090, 86, 23, false, colors.ink);
 text(s7, "method_3", "Scenario: the committee threshold and the intentional draft errors are EnvLoop-authored benchmark fiction.", 75, 417, 1090, 86, 23, false, colors.ink);
-text(s7, "method_source", "World Bank, World Development Indicators. CC BY 4.0. https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators", 75, 552, 1090, 62, 16, false, colors.muted);
+text(s7, "target__attribution", task.draft.attribution, 75, 552, 1090, 62, 16, false,
+     task.target_keys.includes("attribution") ? colors.amber : colors.muted);
 
 await fs.mkdir(path.dirname(outputPath), { recursive: true });
 await (await PresentationFile.exportPptx(pres)).save(outputPath);

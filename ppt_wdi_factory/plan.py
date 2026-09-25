@@ -28,6 +28,8 @@ WORKFLOWS = (
     "output_per_person_divergence",
     "price_labor_spread",
     "dual_threshold_review",
+    "source_year_reconciliation",
+    "chart_series_relabel",
 )
 INDICATORS = {
     "gdp": "NY.GDP.MKTP.CD", "gdp_pc": "NY.GDP.PCAP.CD",
@@ -68,7 +70,9 @@ def workflow_for(split: str, country_index: int, slot: int) -> str:
         return WORKFLOWS[slot]
     if split == "selection":
         return WORKFLOWS[(country_index + slot) % 8]
-    return WORKFLOWS[(country_index * 3 + slot * 2) % 8]
+    # Twenty-five country families x four tasks yield ten of each final
+    # workflow, without sharing a country across train/selection/final.
+    return WORKFLOWS[(country_index * 4 + slot) % 10]
 
 
 def compute(facts: dict, workflow: str) -> dict:
@@ -130,10 +134,23 @@ def compute(facts: dict, workflow: str) -> dict:
             "min(2024 CPI inflation - 5%, 2024 unemployment - 6%)",
             "CPI inflation and unemployment (%)", "2024", "threshold", 0.0,
             "Escalate when either simulated watch threshold is exceeded; use the larger excess."),
+        "source_year_reconciliation": (
+            y24[INDICATORS["inflation"]], y23[INDICATORS["inflation"]], "%",
+            "use the 2024 CPI inflation observation",
+            "carry forward the 2023 CPI observation into the 2024 review",
+            "CPI inflation (annual %)", "2024", "provenance", 5.0,
+            "The cited indicator, observation year, table row and source footnote must all describe 2024."),
+        "chart_series_relabel": (
+            spread, -spread, "percentage points",
+            "2024 CPI inflation - 2024 unemployment",
+            "2024 unemployment - 2024 CPI inflation after swapping chart labels",
+            "CPI inflation and unemployment (%)", "2024", "legend", 2.0,
+            "Match each chart line to the WDI source values and preserve both value series and year labels."),
     }
     if workflow not in reference:
         raise ValueError("Unknown workflow")
     value, wrong_value, unit, formula, wrong_formula, series, window, kind, threshold, rule = reference[workflow]
+    wrong_source_year = "2023" if workflow == "source_year_reconciliation" else None
     if abs(round(value, 2) - round(wrong_value, 2)) < 0.1:
         stale_labor_year = max(("2019", "2020", "2021", "2022"),
                                key=lambda year: abs(y24[INDICATORS["unemployment"]]
@@ -158,8 +175,22 @@ def compute(facts: dict, workflow: str) -> dict:
             "dual_threshold_review": (max(y23[INDICATORS["inflation"]] - 5.0,
                                           y23[INDICATORS["unemployment"]] - 6.0),
                                       "max(2023 CPI inflation - 5%, 2023 unemployment - 6%)"),
+            "source_year_reconciliation": (v["2022"][INDICATORS["inflation"]],
+                                           "carry forward the 2022 CPI observation into the 2024 review"),
+            "chart_series_relabel": (y23[INDICATORS["unemployment"]]
+                                      - y24[INDICATORS["inflation"]],
+                                      "2023 unemployment - 2024 CPI inflation after swapping chart labels"),
         }
         wrong_value, wrong_formula = fallbacks[workflow]
+        if workflow == "source_year_reconciliation":
+            wrong_source_year = "2022"
+    if workflow == "source_year_reconciliation" and abs(round(value, 2) - round(wrong_value, 2)) < 0.1:
+        wrong_source_year = max(("2019", "2020", "2021", "2022", "2023"),
+                                key=lambda year: abs(value - v[year][INDICATORS["inflation"]]))
+        wrong_value = v[wrong_source_year][INDICATORS["inflation"]]
+        wrong_formula = f"carry forward the {wrong_source_year} CPI observation into the 2024 review"
+        if abs(round(value, 2) - round(wrong_value, 2)) < 0.1:
+            raise ValueError("No discriminating stale CPI year for provenance task")
     if abs(round(value, 2) - round(wrong_value, 2)) < 0.1:
         wrong_value = value + 0.5
         wrong_formula += " (plus a 0.5-point transcription error)"
@@ -175,6 +206,7 @@ def compute(facts: dict, workflow: str) -> dict:
         "series": series,
         "window": window, "decision": decision, "incorrect_decision": incorrect,
         "simulated_threshold": threshold, "workflow_kind": kind,
+        "wrong_source_year": wrong_source_year,
     }
 
 
@@ -188,7 +220,7 @@ def chart_series(facts: dict, workflow: str) -> dict:
     elif workflow == "population_growth":
         chosen = ("population",)
         divisor, precision, unit = 1e6, 2, "millions of people"
-    elif workflow in ("price_labor_spread", "dual_threshold_review"):
+    elif workflow in ("price_labor_spread", "dual_threshold_review", "chart_series_relabel"):
         chosen = ("inflation", "unemployment")
         divisor, precision, unit = 1, 2, "%"
     elif workflow == "labor_rate_change":
@@ -199,9 +231,11 @@ def chart_series(facts: dict, workflow: str) -> dict:
         divisor, precision, unit = 1, 2, "%"
     names = {"gdp": "GDP", "gdp_pc": "GDP per capita", "population": "Population",
              "inflation": "CPI inflation", "unemployment": "Unemployment"}
-    return {"categories": list(YEARS), "unit": unit,
-            "series": [{"name": names[key], "values": [round(facts["years"][year][INDICATORS[key]] / divisor, precision)
-                                                        for year in YEARS]} for key in chosen]}
+    series = [{"name": names[key], "values": [round(facts["years"][year][INDICATORS[key]] / divisor, precision)
+                                                for year in YEARS]} for key in chosen]
+    if workflow == "chart_series_relabel":
+        series[0]["name"], series[1]["name"] = series[1]["name"], series[0]["name"]
+    return {"categories": list(YEARS), "unit": unit, "series": series}
 
 
 def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
@@ -217,24 +251,62 @@ def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
         "ledger": display,
         "interpretation": f"Use {calc['formula']} for the {calc['window']} review; result {display}.",
         "decision": f"Simulated committee rule: {calc['decision']} ({calc['workflow_kind']} threshold {calc['simulated_threshold']:.1f}).",
+        "attribution": (f"Source: World Bank WDI, FP.CPI.TOTL.ZG; 2024 observation for the 2024 review, "
+                        f"{calc['value']:+.2f}%; CC BY 4.0. https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators"
+                        if workflow == "source_year_reconciliation" else
+                        "World Bank, World Development Indicators. CC BY 4.0. https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators"),
+        "legend_cpi": "CPI inflation",
+        "legend_unemployment": "Unemployment",
     }
     draft = {
         "summary": f"Verified change: {wrong_display}",
         "ledger": wrong_display,
         "interpretation": f"Use {calc['wrong_formula']} for the {calc['window']} review; result {wrong_display}.",
         "decision": f"Simulated committee rule: {calc['incorrect_decision']} ({calc['workflow_kind']} threshold {calc['simulated_threshold']:.1f}).",
+        "attribution": (f"Source: World Bank WDI, FP.CPI.TOTL.ZG; {calc['wrong_source_year']} observation for the 2024 review, "
+                        f"{calc['wrong_value']:+.2f}%; CC BY 4.0. https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators"
+                        if workflow == "source_year_reconciliation" else
+                        correct["attribution"]),
+        "legend_cpi": "Unemployment" if workflow == "chart_series_relabel" else "CPI inflation",
+        "legend_unemployment": "CPI inflation" if workflow == "chart_series_relabel" else "Unemployment",
     }
+    if workflow == "source_year_reconciliation":
+        correct["summary"] = f"2024 CPI inflation observation: {display}"
+        draft["summary"] = f"2024 CPI inflation observation: {wrong_display}"
+        correct["interpretation"] = (f"The 2024 CPI inflation observation in the WDI extract is {display}; "
+                                     "use that annual value for the review.")
+        draft["interpretation"] = (f"The 2024 CPI inflation observation is {wrong_display}, "
+                                   f"carried forward from the {calc['wrong_source_year']} WDI row.")
     target_keys = (["summary"] if split == "train" else
                    ["summary", "ledger", "interpretation"] if split == "selection" else
+                   ["summary", "ledger", "interpretation", "attribution"]
+                   if workflow == "source_year_reconciliation" else
+                   ["summary", "legend_cpi", "legend_unemployment", "interpretation"]
+                   if workflow == "chart_series_relabel" else
                    ["summary", "ledger", "interpretation", "decision"])
     for key in correct:
         if key not in target_keys:
             draft[key] = correct[key]
-    actor = (f"In the {facts['name']} monitoring brief, reconcile the flagged {workflow.replace('_', ' ')} "
-             f"statements with the WDI evidence table and chart. Correct the marked "
-             f"{', '.join(target_keys)} field{'s' if len(target_keys)>1 else ''}; "
-             "use the displayed simulated committee rule where applicable. Preserve the other slides, "
-             "data, chart, source note, and layout. Save the same deck.")
+    if workflow == "chart_series_relabel" and split == "final_candidate":
+        # Do not expose the signed gold spread in an untargeted table cell.
+        draft["ledger"] = "Pending chart-legend reconciliation with the WDI source table"
+    if workflow == "source_year_reconciliation" and split == "final_candidate":
+        actor = (f"In the {facts['name']} monitoring brief, trace the annual CPI observation back to the "
+                 "WDI source table. Correct the flagged summary, source value, interpretation, and "
+                 "source-year footnote so they refer to the same 2024 indicator row. Preserve the chart, "
+                 "committee decision, remaining source values, and layout. Save the same deck.")
+    elif workflow == "chart_series_relabel" and split == "final_candidate":
+        actor = (f"In the {facts['name']} monitoring brief, the two chart legend labels on slide 3 are "
+                 "assigned to the wrong value series. Restore the CPI-inflation and unemployment labels "
+                 "in the chart and its data workbook, then correct the flagged summary and interpretation "
+                 "to match the WDI evidence table. Preserve the chart values, year categories, committee "
+                 "decision, source note, and layout. Save the same deck.")
+    else:
+        actor = (f"In the {facts['name']} monitoring brief, reconcile the flagged {workflow.replace('_', ' ')} "
+                 f"statements with the WDI evidence table and chart. Correct the marked "
+                 f"{', '.join(target_keys)} field{'s' if len(target_keys)>1 else ''}; "
+                 "use the displayed simulated committee rule where applicable. Preserve the other slides, "
+                 "data, chart, source note, and layout. Save the same deck.")
     return {
         "schema": SCHEMA, "task_id": task_id, "split": split, "source_group": iso,
         "template_group": f"{split}-{workflow}-v1", "entity_group": iso,
