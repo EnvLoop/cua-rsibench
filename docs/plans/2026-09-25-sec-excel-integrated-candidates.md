@@ -40,8 +40,11 @@ receipts must be recorded before a candidate is admitted. Public counts must
 remain candidate counts until those controls and a sealed, non-exposed source
 corpus exist. Source snapshot refresh is a separate, rate-limited operation.
 
-The initial pool is limited by only two local full companyfacts snapshots.
-Attempts to refresh the other audited issuers were unsuccessful because the
-SEC host could not complete TLS from this environment. Thus this pool must
-not be described as 100 independent filing families or a publishable hidden
-exam, even if 100 candidate workbook variants are generated.
+The initial integrated pool is limited by only two local full companyfacts
+snapshots. Direct attempts to refresh the other audited issuers were
+unsuccessful because the SEC host could not complete TLS from this environment.
+A subsequent [source expansion](../evidence/sec-source-expansion-rpo-2026-09-25.md)
+froze 16 hash-verified public filing excerpts and a different RPO workflow, but
+it did not retrofit source diversity or GUI admission into these 100 integrated
+variants. This pool must not be described as 100 independent filing families or
+a publishable hidden exam.
