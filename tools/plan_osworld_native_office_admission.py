@@ -10,8 +10,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
+import subprocess
 from collections import Counter
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 
 SOURCE_COMMIT = "b138d348256078fa634fc3b73567a7337c793e6b"
@@ -30,6 +33,34 @@ def stable_key(task_id: str) -> str:
     return sha256(f"{SPLIT_SALT}:{task_id}".encode("ascii"))
 
 
+def assign_input_asset_families(rows: list[dict]) -> None:
+    """Conservatively cluster task identities linked by any input basename."""
+    parent = {row["id"]: row["id"] for row in rows}
+    if len(parent) != len(rows):
+        raise ValueError("Duplicate task identity in asset-family assignment")
+
+    def root(task_id: str) -> str:
+        while parent[task_id] != task_id:
+            parent[task_id] = parent[parent[task_id]]
+            task_id = parent[task_id]
+        return task_id
+
+    first: dict[str, str] = {}
+    for row in sorted(rows, key=lambda item: item["id"]):
+        for name_hash in row["input_asset_name_sha256s"]:
+            previous = first.setdefault(name_hash, row["id"])
+            parent[root(row["id"])] = root(previous)
+
+    groups: dict[str, list[str]] = {}
+    for row in rows:
+        groups.setdefault(root(row["id"]), []).append(row["id"])
+    for row in rows:
+        members = sorted(groups[root(row["id"])])
+        row["input_asset_basename_family_sha256"] = sha256(
+            "\n".join(members).encode("ascii"))
+        row["input_asset_basename_family_size"] = len(members)
+
+
 def result_types(result: object) -> set[str]:
     """Return evaluator result channels without exposing evaluator gold."""
     if isinstance(result, dict):
@@ -38,6 +69,24 @@ def result_types(result: object) -> set[str]:
     if isinstance(result, list):
         return set().union(*(result_types(item) for item in result))
     return set()
+
+
+def expected_types(expected: object) -> set[str]:
+    if isinstance(expected, dict):
+        value = expected.get("type")
+        return {value} if isinstance(value, str) else set()
+    if isinstance(expected, list):
+        return set().union(*(expected_types(item) for item in expected))
+    return set()
+
+
+def postconfig_saves(evaluator: dict) -> bool:
+    """Detect an evaluator-side GUI save that could mask an actor's missing save."""
+    pattern = r"hotkey\s*\(\s*['\"]ctrl['\"]\s*,\s*['\"]s['\"]"
+    return any(step.get("type") == "execute" and re.search(
+        pattern, " ".join(map(str, step.get("parameters", {}).get("command", []))),
+        flags=re.IGNORECASE)
+        for step in evaluator.get("postconfig", []))
 
 
 def read_task(root: Path, domain: str, task_id: str) -> dict:
@@ -53,6 +102,13 @@ def read_task(root: Path, domain: str, task_id: str) -> dict:
         for step in task.get("config", [])
         if step.get("type") == "download"
     )
+    asset_names = sorted({
+        unquote(Path(urlsplit(item["url"]).path).name).casefold()
+        for step in task.get("config", []) if step.get("type") == "download"
+        for item in step.get("parameters", {}).get("files", [])
+    })
+    if downloads and (not asset_names or any(not name for name in asset_names)):
+        raise ValueError(f"Missing source asset name: {domain}/{task_id}")
     source_text = task.get("source") or ""
     return {
         "id": task_id,
@@ -62,10 +118,28 @@ def read_task(root: Path, domain: str, task_id: str) -> dict:
         "task_config_sha256": sha256(raw),
         "setup_step_types": [step.get("type") for step in task.get("config", [])],
         "download_asset_references": downloads,
+        "input_asset_name_sha256s": [sha256(name.encode("utf-8")) for name in asset_names],
         "evaluator_function": evaluator.get("func"),
         "evaluator_result_types": sorted(result_types(evaluator.get("result"))),
+        "evaluator_expected_types": sorted(expected_types(evaluator.get("expected"))),
+        "evaluator_postconfig_saves": postconfig_saves(evaluator),
+        "setup_uses_command_or_execute": any(step.get("type") in {"command", "execute"}
+                                             for step in task.get("config", [])),
         "source_group_sha256": sha256(source_text.encode("utf-8")),
     }
+
+
+def verify_source_revision(source_root: Path) -> None:
+    """Reject a checkout whose tracked bytes differ from the recorded commit."""
+    commit = subprocess.check_output(
+        ["git", "-C", str(source_root), "rev-parse", "HEAD"], text=True).strip()
+    if commit != SOURCE_COMMIT:
+        raise ValueError(f"OSWorld source commit changed: {commit}")
+    tracked_changes = subprocess.check_output(
+        ["git", "-C", str(source_root), "status", "--porcelain", "--untracked-files=no"],
+        text=True).strip()
+    if tracked_changes:
+        raise ValueError("Pinned OSWorld source has modified tracked files")
 
 
 def eligible_rows(source_root: Path) -> tuple[list[dict], dict[str, int]]:
@@ -78,6 +152,7 @@ def eligible_rows(source_root: Path) -> tuple[list[dict], dict[str, int]]:
     counts = {domain: len(ids) for domain, ids in index.items()}
     if len(index) != 10 or sum(counts.values()) != 369:
         raise ValueError(f"Unexpected OSWorld index shape: {counts}")
+    verify_source_revision(source_root)
     seen_ids: set[str] = set()
     rows = []
     for domain in (*SINGLE_APPS, "multi_apps"):
@@ -97,13 +172,23 @@ def eligible_rows(source_root: Path) -> tuple[list[dict], dict[str, int]]:
 
 
 def split_rows(rows: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    assign_input_asset_families(rows)
     source_sizes = Counter(row["source_group_sha256"] for row in rows)
+    asset_name_sizes = Counter(
+        asset_hash for row in rows for asset_hash in set(row["input_asset_name_sha256s"])
+    )
     for row in rows:
         row["source_group_size_in_candidate_pool"] = source_sizes[row["source_group_sha256"]]
+        row["input_asset_names_unique_in_candidate_pool"] = bool(
+            row["input_asset_name_sha256s"]
+            and all(asset_name_sizes[key] == 1 for key in row["input_asset_name_sha256s"])
+        )
     selected = []
     for domain, quota in SELECTION_QUOTAS.items():
         choices = sorted(
-            (row for row in rows if row["domain"] == domain and row["source_group_size_in_candidate_pool"] == 1),
+            (row for row in rows if row["domain"] == domain
+             and row["source_group_size_in_candidate_pool"] == 1
+             and row["input_asset_names_unique_in_candidate_pool"]),
             key=lambda row: stable_key(row["id"]),
         )
         if len(choices) < quota:
@@ -128,6 +213,9 @@ def split_rows(rows: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
     selected_sources = {row["source_group_sha256"] for row in selected}
     if selected_sources & {row["source_group_sha256"] for row in final}:
         raise AssertionError("Exact source-string overlap between selection and provisional final")
+    selected_assets = {key for row in selected for key in row["input_asset_name_sha256s"]}
+    if selected_assets & {key for row in final for key in row["input_asset_name_sha256s"]}:
+        raise AssertionError("Input asset filename overlap between selection and provisional final")
     ids = [row["id"] for row in selected + final + reserve]
     if len(ids) != len(set(ids)) or len(ids) != len(rows):
         raise AssertionError("Split lost or duplicated task identities")
@@ -151,7 +239,8 @@ def build_manifest(source_root: Path) -> dict:
             "salt": SPLIT_SALT,
             "single_app_quotas": SELECTION_QUOTAS,
             "selection_exact_source_string_disjoint_from_final": True,
-            "warning": "Source strings and public task IDs do not establish asset-family or answer isolation; all evaluator configs are upstream-public.",
+            "selection_input_asset_basename_hash_disjoint_from_final": True,
+            "warning": "Source strings and asset basenames do not establish byte-level asset-family or answer isolation; all evaluator configs are upstream-public.",
         },
         "counts": {
             "source_ids": sum(source_counts.values()),
@@ -161,6 +250,16 @@ def build_manifest(source_root: Path) -> dict:
             "reserve_candidates": len(reserve),
             "runtime_admitted_final_tasks": 0,
             "official_scored_final_tasks": 0,
+        },
+        "provisional_final_risks": {
+            "cloud_file_gold_tasks": sum("cloud_file" in row["evaluator_expected_types"] for row in final),
+            "evaluator_postconfig_save_tasks": sum(row["evaluator_postconfig_saves"] for row in final),
+            "trusted_setup_shell_tasks": sum(row["setup_uses_command_or_execute"] for row in final),
+            "input_asset_basename_families": len({row["input_asset_basename_family_sha256"] for row in final}),
+            "tasks_in_shared_input_asset_basename_families": sum(
+                row["input_asset_basename_family_size"] > 1 for row in final),
+            "input_asset_content_hashes_verified": 0,
+            "embedded_asset_rights_cleared": 0,
         },
         "required_runtime_gates": [
             "pinned_native_image_and_application_versions",

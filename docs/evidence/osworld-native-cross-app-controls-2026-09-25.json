@@ -1,0 +1,146 @@
+{
+  "schema": "envloop-osworld-native-cross-app-development-controls-v1",
+  "checked_date": "2026-09-25",
+  "status": "development_controls_not_final_task_admissions_or_model_results",
+  "source_commit": "b138d348256078fa634fc3b73567a7337c793e6b",
+  "asset_dataset_revision": "1e112283c4ecb08d6fed8069bca7de74fa2f12aa",
+  "runtime": {
+    "desktop": "E2B Desktop Linux",
+    "e2b_desktop_version": "2.2.0",
+    "libreoffice_version": "7.3.7.2",
+    "libreoffice_launcher_sha256": "eb926ee03b6ba1b18e89b4a94cbb7a060ceac31f171b4bf9db5677e848451f86",
+    "guest_osworld_controller_integrated": false
+  },
+  "source_inventory": {
+    "offline_candidate_tasks": 128,
+    "selection_tasks": 20,
+    "provisional_final_tasks": 100,
+    "provisional_final_cloud_file_gold_tasks": 90,
+    "provisional_final_evaluator_postconfig_save_tasks": 90,
+    "provisional_final_input_asset_basename_families": 93,
+    "selection_final_input_asset_basename_overlap": 0,
+    "input_asset_content_hashes_verified_for_full_set": 0,
+    "embedded_asset_rights_cleared_for_full_set": 0
+  },
+  "positive_negative_pairs": [
+    {
+      "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+      "split": "selection",
+      "domain": "libreoffice_calc",
+      "task_config_sha256": "4339f8f3beeddc6763983b6cc5b4122692aa2b9f312ee56420e00a27ff7b4817",
+      "input_asset_sha256": "cfe3f5f1f6b91636b9b816cf447418bbb183767f42045206c011b47f4dbac4e0",
+      "gold_asset_sha256": "b7ecc16b48e56b4763c54017b1f1e7c9b5824700996a51f752ab34b335b993d6",
+      "unchanged_upstream_metric": "compare_table",
+      "upstream_metric_source_sha256": "f41cf46df90a764705bb85727b3a0a612e9ff7bfa2629cdf40d6feab76d6e5fe",
+      "positive": {
+        "gui_action": "sort all 18 records by Amount ascending in the native Sort dialog",
+        "official_score": 1.0,
+        "independent_amount_sorted": true,
+        "independent_all_rows_preserved": true,
+        "saved_file_sha256": "f79aae12e98624ca990e3c4a0195e6e2f8d0785f057556643d7a731ce5ad293f",
+        "private_receipt_sha256": "d0b8ba696317a19367e02109bc8ef1be312ef64fd2690bdc4590d60ca3c87d95"
+      },
+      "negative": {
+        "gui_action": "sort the same records by Customer rather than Amount",
+        "official_score": 0.0,
+        "independent_amount_sorted": false,
+        "independent_all_rows_preserved": true,
+        "saved_file_sha256": "5a2bc8a1c184b0c5908a7ee43649ecba505b22e29ac69b54706f0fc4144d5824",
+        "private_receipt_sha256": "c2c0402221bbac8a94d11cfc66627425a52b8ffb28ebe24d9ca6ce58fdb82a3a"
+      },
+      "fresh_reset": "distinct sandbox IDs, equal input bytes and native probe, both sandboxes killed and confirmed stopped",
+      "task_semantics_passed": true,
+      "rights_status": "embedded workbook rights unresolved; bytes and screenshots private"
+    },
+    {
+      "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+      "split": "selection",
+      "domain": "libreoffice_writer",
+      "task_config_sha256": "1e16f271cdec21560263cdb42eff7ac1712a4497482aacdd4a6313c8253ac563",
+      "input_asset_sha256": "82f131afdd70eff51751bdb433846f9fcd62728c5293bec7c962836eab7ec2db",
+      "unchanged_upstream_metric_function": "contains_page_break",
+      "upstream_metric_source_sha256": "3e414ebae04231c6c83f5d264198e058f7c5b120f81f34a3bf30134f60ee8c3c",
+      "metric_loading": "exact function AST compiled from pinned source because unrelated module imports are unavailable",
+      "baseline_page_breaks": 4,
+      "positive": {
+        "gui_action": "find the final sentence on page one, insert a page break after that sentence, and save",
+        "saved_page_breaks": 5,
+        "official_function_score": 1.0,
+        "independent_nonempty_text_and_table_count_preserved": true,
+        "saved_file_sha256": "d7f8f2008ee64846507ef9d3fc60b8d6445cd23af81fe0847519f875ad1d85af",
+        "private_receipt_sha256": "f2c819978e91a5bb50b6f8c6d33c8343f1b5effba72237ca4461981db896a71e"
+      },
+      "negative": {
+        "gui_action": "insert an ordinary paragraph rather than a page break and save",
+        "saved_page_breaks": 4,
+        "official_function_score": 0.0,
+        "independent_nonempty_text_and_table_count_preserved": true,
+        "saved_file_sha256": "132da8d76d82304611a4533d8dcdf28ff46d57ef9dacf9a0101accd33d0e8aac",
+        "private_receipt_sha256": "ce20bb72be5c37c397646f379268f389fd0f225f991659cf2c8e746a96962de8"
+      },
+      "fresh_reset": "distinct sandbox IDs, equal input bytes and native probe, both sandboxes killed and confirmed stopped",
+      "task_semantics_passed": true,
+      "independent_blank_page_after_current_page": true,
+      "baseline_first_explicit_break_paragraph_index": 5,
+      "positive_new_explicit_break_paragraph_index": 4,
+      "rights_status": "source document visibly limits reproduction or modification; retained as private development control only"
+    }
+  ],
+  "incompatible_or_incomplete_controls": [
+    {
+      "task_id": "9ec204e4-f0a3-42f8-8458-b772a6797cab",
+      "split": "selection",
+      "domain": "libreoffice_impress",
+      "task_config_sha256": "65ba74a923f24a8e7bd4c774d6506a2be0af2331e68b7854e59c44eed3058903",
+      "input_asset_sha256": "15c5875d7731c3459a2b54e0934a53770e8c84fd206917ad280001bd821ff008",
+      "upstream_metric_source_sha256": "c8f56352659b23985d01b7b301207caa429a628dc32f6f2693d4a5ed3378628d",
+      "gui_saved_slide_count": 26,
+      "baseline_slide_count": 24,
+      "tail_slide_order_matches_requested": true,
+      "original_slide_shape_geometry_changes": 83,
+      "original_slide_text_shape_changes": 5,
+      "official_score_against_both_gold_variants": 0.0,
+      "saved_file_sha256": "4b9db081bd37e0cfdd4f37e80131c76863674f7c3c75f63199b8a3224400392f",
+      "private_receipt_sha256": "38063c40a1e54d3fbea88e889ba209e95afc9a001d74c00c92ee6abc51bdddd5",
+      "status": "quarantined_native_serializer_collateral_changes"
+    },
+    {
+      "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+      "split": "selection",
+      "domain": "libreoffice_impress",
+      "task_config_sha256": "edd35392abce270634a2221dc86d7e067c802b582f910224691bb23c51ce7696",
+      "input_asset_sha256": "97439c9e711e67ad20a4223916c7f47e4ff8000b30d442035c9fe0eae4f14f76",
+      "upstream_metric_source_sha256": "c8f56352659b23985d01b7b301207caa429a628dc32f6f2693d4a5ed3378628d",
+      "blue_slides_after_gui_save": 1,
+      "total_slides": 19,
+      "official_continuous_score": 0.052631578947368474,
+      "saved_file_sha256": "f94878f988f1d1e48e0ed948aa148b2ea39f5f74b9e00913276f289cf19932ec",
+      "private_receipt_sha256": "4c0de10625375e1ad7b2ac344fb28806729f5c37974e9b6f4ac6bf4d1f6f5bb7",
+      "status": "incomplete_gui_positive_not_admitted"
+    },
+    {
+      "task_id": "8df7e444-8e06-4f93-8a1a-c5c974269d82",
+      "split": "reserve",
+      "domain": "multi_apps",
+      "task_config_sha256": "947232c27d3c8ed3068826932e9a51d957d97304a4470dc9d61c05c993a94019",
+      "input_article_sha256": "e7b8c0538a0c9038a7339a186a9d941e49e95cec610d064ad5d3c21272acfaba",
+      "input_reminder_sha256": "82ecb111c2b6046171f43a2738abdaeaff661c034f1b7723e25019371cef79c1",
+      "gold_zip_sha256": "69b9deb94f48de827cb7ae29d17728a88b34add9fb726407a2cf843bdab3d2bf",
+      "upstream_metric_source_sha256": "4e6f7a086c8d3533defc3687e7f6e6b34ca1ac1cfdfe86eabdf757ddf84dbf2f",
+      "gui_pdf_export_sha256": "a996fefc4d70d947ad681a066063a1ad70b13d078a10c57ad6198fbfc20a4d20",
+      "pdf_pages_gui_export": 17,
+      "pdf_pages_gold": 20,
+      "pdf_text_similarity_against_gold": 0.8203002853952103,
+      "required_pdf_similarity": 0.95,
+      "full_zip_archive_gui_run": false,
+      "official_full_task_score": null,
+      "private_receipt_sha256": "47844f1df357cc9dd88771d3f58574cacb89b5a080ba69447822974dfdf0d7c2",
+      "status": "quarantined_pdf_render_compatibility_unproven"
+    }
+  ],
+  "metric_discrimination_pairs": 2,
+  "task_semantic_control_pairs_passed": 2,
+  "runtime_admitted_final_tasks": 0,
+  "official_model_scored_final_tasks": 0,
+  "private_document_or_screenshot_bytes_redistributed": false
+}

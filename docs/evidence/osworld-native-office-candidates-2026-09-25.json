@@ -27,7 +27,8 @@
       "libreoffice_writer": 4
     },
     "selection_exact_source_string_disjoint_from_final": true,
-    "warning": "Source strings and public task IDs do not establish asset-family or answer isolation; all evaluator configs are upstream-public."
+    "selection_input_asset_basename_hash_disjoint_from_final": true,
+    "warning": "Source strings and asset basenames do not establish byte-level asset-family or answer isolation; all evaluator configs are upstream-public."
   },
   "counts": {
     "source_ids": 369,
@@ -37,6 +38,15 @@
     "reserve_candidates": 8,
     "runtime_admitted_final_tasks": 0,
     "official_scored_final_tasks": 0
+  },
+  "provisional_final_risks": {
+    "cloud_file_gold_tasks": 90,
+    "evaluator_postconfig_save_tasks": 90,
+    "trusted_setup_shell_tasks": 5,
+    "input_asset_basename_families": 93,
+    "tasks_in_shared_input_asset_basename_families": 13,
+    "input_asset_content_hashes_verified": 0,
+    "embedded_asset_rights_cleared": 0
   },
   "required_runtime_gates": [
     "pinned_native_image_and_application_versions",
@@ -62,32 +72,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "3fd7cca123f5c8ec555aea011713c3d09ca40aa78fb865d6dcf55c6eb81149e7"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "cb85ff9b6bff9eb5a27fcca07e01917f6e5992189e90a5fd2ab8e676d0735d62",
-      "source_group_size_in_candidate_pool": 1
-    },
-    {
-      "id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
-      "domain": "libreoffice_calc",
-      "snapshot": "libreoffice_calc",
-      "related_apps": [
-        "libreoffice_calc"
-      ],
-      "task_config_sha256": "a6b5a82c80ba00540edf5081dff6ea1edc7cd1abcda984fe72d021b1a7ee737b",
-      "setup_step_types": [
-        "download",
-        "open"
-      ],
-      "download_asset_references": 1,
-      "evaluator_function": "compare_table",
-      "evaluator_result_types": [
-        "vm_file"
-      ],
-      "source_group_sha256": "109eb8dcc6fef56d470c8a56cb23161a2032e27946f19fac83c4c3da1bc426e5",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "83b930ac4623edffbc7f7d09efcbfc39e5274e0fd9ea600882d880070c1551ae",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "21df9241-f8d7-4509-b7f1-37e501a823f7",
@@ -102,12 +103,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c9c629a8a113de7004e39280b2be2583604c1169c3448f1f3f6a41ddc48336f8"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "65ad017cbb798b2b7beea37a6a4e774eb63a9f32e0e86e449caff937250d6ef8",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "a2b6dadf72cd948bdd8fd55e6d195641deff3d1e1811939ac411c0d516e82c5f",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "51b11269-2ca8-4b2a-9163-f21758420e78",
@@ -122,32 +134,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "cb5eba3acf0bca2af6cafc3fe55055da6b0de213318aa9968adec61ddd797b56"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "51c9da599b46e20627e443a9d331242af55d89d30d726aa251c51d5cc68555e8",
-      "source_group_size_in_candidate_pool": 1
-    },
-    {
-      "id": "1273e544-688f-496b-8d89-3e0f40aa0606",
-      "domain": "libreoffice_calc",
-      "snapshot": "libreoffice_calc",
-      "related_apps": [
-        "libreoffice_calc"
-      ],
-      "task_config_sha256": "f029bd9147dcc1ae1cffaced681af87351e0eeb67ce7f9346f500d17ac242556",
-      "setup_step_types": [
-        "download",
-        "open"
-      ],
-      "download_asset_references": 1,
-      "evaluator_function": "compare_table",
-      "evaluator_result_types": [
-        "vm_file"
-      ],
-      "source_group_sha256": "f5195ce43dbab1b4e91739327b1c04ec7ca9859b41d3ec739461c3a0b2331eac",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "6b630edeab59e8a6a0e9e39be7ffef396fef2d8325a345f72b1c55c2a77eb891",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "035f41ba-6653-43ab-aa63-c86d449d62e5",
@@ -162,12 +165,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "0c2a777fb47e15d10ce34c60560ff8ead558d8c829e847d5e7044973fd5085f8"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "75328f5c76262508d5801a34abbae176be138efdc4ace87889b4da7f209b21ba",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "3e9624010dc61bf94a149228a533f0e61243f33f8001809e84179eb7e37196c9",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0cecd4f3-74de-457b-ba94-29ad6b5dafb6",
@@ -182,12 +196,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6ab6a5d0be268f99ceba2e363737cc94ed7018c34e28e3a809f60ea9f717487b"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "da6c254ee19f02e523b96a59aec6301dcf9853cb16f9dc61f57f134e388e2d1e",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "034350c5d4b16f7a95c7bb75cc28bd92a873d9983d338e2366e5544faf335996",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "04d9aeaf-7bed-4024-bedb-e10e6f00eb7f",
@@ -202,12 +227,85 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "149789233df8aefbaff697aaad175187e10c64ef64a3f85f78b1e4cefe31359c"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "28ab31a341db99dade55858b34d932ac7f8f25a9625154bb6b1563a50212dce6",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "a9ddc4669ec1fd88ad282707c95f1007af52464c25ff9073ece423a4460f4276",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
+    },
+    {
+      "id": "1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+      "domain": "libreoffice_calc",
+      "snapshot": "libreoffice_calc",
+      "related_apps": [
+        "libreoffice_calc"
+      ],
+      "task_config_sha256": "446b8dd35f32962f137351bc556cbd6c3f04ab6c54d826f124fe0c5327a1e2ee",
+      "setup_step_types": [
+        "download",
+        "open"
+      ],
+      "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "a4a16017d18e96c8078f6ddd765c39018a0fd338e633e10ee26d9a14a4577bdc"
+      ],
+      "evaluator_function": "compare_table",
+      "evaluator_result_types": [
+        "vm_file"
+      ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
+      "source_group_sha256": "66b59a057ce474fb76afc7334c3218b265d63978161788a205f9e1ad56de5fbc",
+      "input_asset_basename_family_sha256": "1c2ffed35fd85653125e1bee169bb1d82a6ee971aef210ec862c03bba9e31245",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
+    },
+    {
+      "id": "6e99a1ad-07d2-4b66-a1ce-ece6d99c20a5",
+      "domain": "libreoffice_calc",
+      "snapshot": "libreoffice_calc",
+      "related_apps": [
+        "libreoffice calc"
+      ],
+      "task_config_sha256": "610adfe4461f26cd2c0dd95053d010be0b1ed1eac294a780a82c67df6b8f46f7",
+      "setup_step_types": [
+        "download",
+        "open"
+      ],
+      "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "80c812d21f540d92b017c2f516b7a5188c392406eb92fbccd904c37c1e38e886"
+      ],
+      "evaluator_function": "compare_table",
+      "evaluator_result_types": [
+        "vm_file"
+      ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
+      "source_group_sha256": "30c5b8724fc15ad13cfa394d7e8397b3be92d505ad77520c350358aa93f49640",
+      "input_asset_basename_family_sha256": "c35a362ea24b16ae63bedcd0ad3709ab24cd3b4cc57a3a8fd1c0431b0fe90626",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0f84bef9-9790-432e-92b7-eece357603fb",
@@ -222,12 +320,21 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "78f1d38b456b09f9b590f580ed216747a58c4ea61c60983312be82d0c28a1d76"
+      ],
       "evaluator_function": "check_presenter_console_disable",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "a03185a82d8ff7d87e809bf33d89bcb47287b37ddedf40662be9ed23f43fea72",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "b2278e1703b8dabc92b7edfe46025006ee8529d8b5e44be4b86336d470ff9747",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "9ec204e4-f0a3-42f8-8458-b772a6797cab",
@@ -242,6 +349,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d9f8fa694bff59569019ee33321a4193691c718fd9a7e6618baa8ed159795fa3"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -249,8 +359,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "ff8f0fde29bf5411ec68a6ddb6f538fa7e3c9b2b508709f1cd5cbd69df11e6ee",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "8991a9babb54dfde67fbb10fbb7c3fa3ce25e4d3cf23c5f330f726342a99b58f",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
@@ -265,12 +383,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "0e688abc6d089d361b39f2f08c8115699ca68841a677117be376114a29ed7c6f"
+      ],
       "evaluator_function": "evaluate_presentation_fill_to_rgb_distance",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "10eb6e702d1d77713300934f6810c1ff7c7970dcb8297c55b3b90f24de8f6ea2",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "2f50568e9e28dc6ccd1a0d0c16fd4aa0ca2cf30e45aafeebb0f02ba6c0df3354",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
@@ -285,12 +414,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "fd45aeef330f3550016b9ae916694f44594685bda264c66510b7d197a6cf65f3"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "5587934935dfd584f1ee565f30d18caa4cf725d71e100217e7b4ccd520c49d9d",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e32520226bf396d90433475167579f89dde92e33848dc483005bc325f0b5cdd1",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "550ce7e7-747b-495f-b122-acdc4d0b8e54",
@@ -307,6 +447,9 @@
         "execute"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d055786b5269d932a568d2941ea5fd9890903af8d9bed9815ec4de7a79049818"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -314,8 +457,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8d8c6d832a5de30b74fbb1c26592ae4dcf642fc20ce9ddd350fc4169d68c5914",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "5db022af6b55b97081264790fbe87ede95a28f6923ae4740b59071a764eafbe5",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "bf4e9888-f10f-47af-8dba-76413038b73c",
@@ -336,12 +487,29 @@
         "download"
       ],
       "download_asset_references": 7,
+      "input_asset_name_sha256s": [
+        "5ef88210a5cf76bbb35a9c4e0652438e1ff81c8b0b0f97b864ab771915987fcf",
+        "f5ddeec1a1b4c3828c9bcf2f7c6786cb76ebb771584cbbfb704623e276848519",
+        "0c09b63abfcb28264e77e67fea822c5d19fcf25f9b73ff5bd5c7550d3bee8593",
+        "4b585a06af93c1d161473d0d64e7660cfee3016afc6ad563edf2f0be6ded549f",
+        "691a0b4d67f96ebbb00d9fe83d09d03f63fd9ea1ff21826c9f472341e9265985",
+        "dc7564aa0d832bbcc68e5682c81f02571814f2d6a895bd9c44b9d6aaf37df742",
+        "5e62e4a4e128305ebba27b59eee2118deb37bc8519ebda9b3354698c2a9d6e03"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "e03f70f64aaa6b4388d17f50ae70887846b379f3eeae96021d170779862b19e3",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "55c80132665213e84678d445a3564a4729372063bff28ce69f6b72a299c4e204",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "358aa0a7-6677-453f-ae35-e440f004c31e",
@@ -356,12 +524,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "421434fd60bb731b581822f36125ad2b2719645a8cbee584bb9c7d4e60270cb0"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "1483629e966e66eb60de165ee5230a2241193e625b0d032d7355922e7b05725b",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "28389400f83aa33d48f3e72f06308d1ee50e9f6372f39950453effca527ff250",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a669ef01-ded5-4099-9ea9-25e99b569840",
@@ -377,12 +556,21 @@
         "execute"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "82e3f8b5205b6afe657efca2ea58a95af8c2b732829944948dd1525cce11685b"
+      ],
       "evaluator_function": "check_continuation_line_indent_no_bullet",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "a69c28fb312a6bcf436f19479a3bb9614ff533f8a2a1d33f767e9621d9bc1d79",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "c886bfb792a274eef6e89d84833e8edfff15103f5bd578feb631639e491b5c49",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
@@ -397,12 +585,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b7ac49da11f4a406f64b1a6c2a1d496bc7bd363db4c0a46ea35046cf866ebf3d"
+      ],
       "evaluator_function": "evaluate_strike_through_last_paragraph",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "6336da97c59138f7f9696605e2b7414e14019295d38ba51bcc3cc71a775ed3de",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "fc64b128789699307489d6247b6301505723ebfae3f9b83381b12be054bc949d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
@@ -417,12 +616,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c3cca46bdc6637040ddf0729f8cb6fdf98fcdfe3ba5f571d9d9e69823b295f55"
+      ],
       "evaluator_function": "contains_page_break",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "6a77651ebe5a97699a6d77bde4dffeb0f0c5d08fc996b14f8f3bba14d356f609",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "f2866aa8c612ef1b5d6a897c6461d0eda63a3859b5c847f560a9746d82fd4bce",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "88fe4b2d-3040-4c70-9a70-546a47764b48",
@@ -437,6 +647,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "87f31d8e639304a8921c0bd7c8b6cded0729b45c9d4f2b1bc0ae8c1ca3f34adc"
+      ],
       "evaluator_function": [
         "compare_docx_files",
         "compare_docx_files",
@@ -446,8 +659,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "ce0d4c84bd156927f53369d73d7306a15dd0fab86c66c74b2e18a0d8e12dcc99",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "3d053a59d8bca0fc57d5933252d95e68bb128fd36350216b01ebdf7e498dbf88",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "6f81754e-285d-4ce0-b59e-af7edb02d108",
@@ -462,54 +683,87 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b93b922ba2abb6d2c97145d8418d84124247d4d755909a9eb17c8a25484f7b96"
+      ],
       "evaluator_function": "compare_unique_train_records",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "3514a27a5a9ef15796a084bb696db95f4ce37da15dbea4f106d8b9eb865d2501",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "5fd34c8d4e6d6a57b470963589ff20a49a6a922a124318604de3d807436872db",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     }
   ],
   "provisional_final": [
     {
-      "id": "1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+      "id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
       "domain": "libreoffice_calc",
       "snapshot": "libreoffice_calc",
       "related_apps": [
         "libreoffice_calc"
       ],
-      "task_config_sha256": "446b8dd35f32962f137351bc556cbd6c3f04ab6c54d826f124fe0c5327a1e2ee",
+      "task_config_sha256": "a6b5a82c80ba00540edf5081dff6ea1edc7cd1abcda984fe72d021b1a7ee737b",
       "setup_step_types": [
         "download",
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b402e5f1995f4b973c690d2e23d5981bd57b1a19413b70b3d26b622883fbf28c"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
-      "source_group_sha256": "66b59a057ce474fb76afc7334c3218b265d63978161788a205f9e1ad56de5fbc",
-      "source_group_size_in_candidate_pool": 1
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
+      "source_group_sha256": "109eb8dcc6fef56d470c8a56cb23161a2032e27946f19fac83c4c3da1bc426e5",
+      "input_asset_basename_family_sha256": "150298aa5cedd34d423b3cdde911aa3ca7b11dbbc49a5f99dcc8e855fbe40cf9",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
-      "id": "6e99a1ad-07d2-4b66-a1ce-ece6d99c20a5",
+      "id": "1273e544-688f-496b-8d89-3e0f40aa0606",
       "domain": "libreoffice_calc",
       "snapshot": "libreoffice_calc",
       "related_apps": [
-        "libreoffice calc"
+        "libreoffice_calc"
       ],
-      "task_config_sha256": "610adfe4461f26cd2c0dd95053d010be0b1ed1eac294a780a82c67df6b8f46f7",
+      "task_config_sha256": "f029bd9147dcc1ae1cffaced681af87351e0eeb67ce7f9346f500d17ac242556",
       "setup_step_types": [
         "download",
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d4eeff89e04a06d3d4146a56bcf72379e87ded00261f7cddecc3aa006117928d"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
-      "source_group_sha256": "30c5b8724fc15ad13cfa394d7e8397b3be92d505ad77520c350358aa93f49640",
-      "source_group_size_in_candidate_pool": 1
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
+      "source_group_sha256": "f5195ce43dbab1b4e91739327b1c04ec7ca9859b41d3ec739461c3a0b2331eac",
+      "input_asset_basename_family_sha256": "fcc7c2b095deed65deea4ea85eb1289ecc1660517bba89314139d04777dfd2b7",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
@@ -524,12 +778,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b402e5f1995f4b973c690d2e23d5981bd57b1a19413b70b3d26b622883fbf28c"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "b82f2ee7951b119914c05cea1c72d52085cc1363954324073c05ddd5c4363230",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "150298aa5cedd34d423b3cdde911aa3ca7b11dbbc49a5f99dcc8e855fbe40cf9",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "42e0a640-4f19-4b28-973d-729602b5a4a7",
@@ -544,12 +809,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d4eeff89e04a06d3d4146a56bcf72379e87ded00261f7cddecc3aa006117928d"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "2782ae7d5cf1e5c5e931dd4507339f28b878cb6c7d48a7d18d1c62a8fbf20688",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "fcc7c2b095deed65deea4ea85eb1289ecc1660517bba89314139d04777dfd2b7",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
@@ -564,12 +840,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "5c81cc7165c60672f96e30bf74cff85203ce0b36cd6f93f87e647bf6c9c39d12"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "f45d45417e2384496b4a78dcf502a0bb79881cf234a4a65610429fd7927778b2",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "9bf973b0e2df07c59a271056e766242bd10d91ab688080ddc46d18081e053de5",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a01fbce3-2793-461f-ab86-43680ccbae25",
@@ -584,12 +871,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "0158d9b5333cefab219517a6360b399efb1d0e2e79b2e13b1db5a266b0e73e6f"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "9f7dc24ef6f8127aff93234f58b93a59b64b0e40e0162f8565fed441887d4c92",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "0fa8faa377f51270b8c1b59964724b3558dbd61babe8356de7bffdf6f1bab7de",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4e6fcf72-daf3-439f-a232-c434ce416af6",
@@ -604,12 +902,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ca79da2b52585e548cf12f5b84d7bc920b944d5af9bf8c2b220ca54739e1b0d3"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "vm_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "4793c722052f05faa7e7d72c67cb3aa0b49d3342f1ee49651dd4f274cc65bcb9",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e1c5d83c917f7b27f6768e0892e06f79fa7a4346f77829cd13d9c00ab5e7365d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4f07fbe9-70de-4927-a4d5-bb28bc12c52c",
@@ -624,12 +933,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "f5e104c575837f8ea618af49f109529c3598246f3eb9e098aa5375af1ca57ad2"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "268fb7d0f13da060d9bed08b6369a5be5eb4c01eb114c3cc4e20acdcbf809e1b",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "58303f20c8712663fc8f08eb06ccb2a7dc9d10e95890a4e3d6ab45c5dac524eb",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
@@ -644,12 +964,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ab300a8addc7c0d5e081f43917b434491c18bba70282bc9b2c456f87302280b3"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "e6af4e73310e099c68fae2ad7715627c7d2fcaa91edcb85927a7458d735983e1",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "75f7d48e36ae75e633a5c5045686943859af28f8ed6ac95359e22a418b42217f",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
@@ -664,12 +995,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "927bbb137c8a388bf2f1666feaa4a8f172f0e1537fac208128824d422c0174f6"
+      ],
       "evaluator_function": "compare_csv",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "6aaab1a023d23ed8dfd8aec51e3921352ce1d83b23cd929f1d2ef89f400f9d27",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "5586f50ef236fe9938fcdcac1fffd694b5d394be8ba33e5ae918c1f6c2dd9f74",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "eb03d19a-b88d-4de4-8a64-ca0ac66f426b",
@@ -684,12 +1026,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "046efc0a61aa3ec87781ce02f19e0b80eb2f835d2591bccd7faeacb0b06b7ecb"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "dcbbf22dbcc7fed5872d2a160177f502647a8aee497bd634735c96438dc040c7",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e262d1c70b4b0b29fc0f2711419ddba6d5c7610aac9ee77d31f5dbc2a3d991b4",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0bf05a7d-b28b-44d2-955a-50b41e24012a",
@@ -704,12 +1057,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c6bf66ca3348de08b1b0d5d9202cffcf81b27f8054a47751224fb335c8ebe21f"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "9091986c1175b72f32d7d8bb4ad22e6d8c07b41830984cc80757c734f7e6b3e4",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "96d93df13c94d230c2662dc2fd1129629ad0204f81d55cf2c8bf83350c685a4b",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
@@ -724,12 +1088,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b2ae5cdcefb2243d72f657b1bf30805f2b6c4977ab327646de7c0deaa0956edd"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "d75e41526b378c534fb6de7586219dbf18d83608dcf2f394ba908cd503adf7df",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "6c7846c53638969d3720da47444957d37e758b31826cb6d1b40db98c5cf34f8c",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "347ef137-7eeb-4c80-a3bb-0951f26a8aff",
@@ -744,12 +1119,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "3d517f9fcd5f92ab8f24420a23e6b5208242caaa83ef4e58fbb5dd7e3806da63"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "36f8003a349c14c7685e45e6303e14a93ee3f34e8175e67a5f59f7e39c0ff104",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "3c80b1527d684825a76271fce2b25fe22302f642372d241a92e413efa750c61f",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3a7c8185-25c1-4941-bd7b-96e823c9f21f",
@@ -764,12 +1150,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "68cd9ba08b0be83550cc1dba28f2ee2f2f08e3aca03263cef16ab558f0dc990e"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "322d4eca0c6a50f2e015ed4f7a62a339f9a02482887e4106c2f044ecaafee558",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "20a0b0a571b30e7add8f7b3285bb94aa4f5c8911741a99fe416df7c94830567f",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "26a8440e-c166-4c50-aef4-bfb77314b46b",
@@ -784,12 +1181,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4360acdd31a9f60b0179169ef3f93074015a616dc01ec002fb16bcd868bd4b98"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "150ebdce88867e468f4301b97f6bf8cf70cea686c22dee09af1ad27664222c31",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "d2e49604c20c81ba821477ae194a82e1aab2abc4e27be3ee8df7e21ce8315232",
+      "input_asset_basename_family_size": 3,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "d681960f-7bc3-4286-9913-a8812ba3261a",
@@ -804,12 +1212,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "97cedf11d151b7bb1ad82775d1b34f456504d3856c8431dc9df5972b0d6703f2"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "7167e7d064381a0f619cefc576cb42a186e48f76a34e6b36e65277370282efe1",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "b1b6382c8ac60b479485583ddc9e86ddb45aed7a42d4935598aa5c17108a3daf",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "51719eea-10bc-4246-a428-ac7c433dd4b3",
@@ -824,12 +1243,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "68cd9ba08b0be83550cc1dba28f2ee2f2f08e3aca03263cef16ab558f0dc990e"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "bb3458b8af178e9cffa9536f7423ea500851a083b6c24c237296c615fe333115",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "20a0b0a571b30e7add8f7b3285bb94aa4f5c8911741a99fe416df7c94830567f",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "21ab7b40-77c2-4ae6-8321-e00d3a086c73",
@@ -844,12 +1274,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "7facd010d1898575d883919a406ed0309a1419d266203e1ed4b1df4edbc112d7"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "d7d4ff9f4b2620c9b3bd490d2ecfb394d2ac3cd800b2ddc7772411857b1bb6c2",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "ff7c86028e7726f5e57e26a43b165ec8d27ae048fde6d304ac1da4d5d299d5f0",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "357ef137-7eeb-4c80-a3bb-0951f26a8aff",
@@ -864,12 +1305,21 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "03a5184ac7ca7b240e5f51173db2effbe1df488b33dfe38b3e42bc190cb3ede1"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "d1483884361d48acf80fd4f4131565fcd1920b121b049707be4a1154ec7dd163",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "f1c15f758557afa49a13b6ae457378e040e00ffa4e27bdec45d2b215e4b88188",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
@@ -884,12 +1334,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "14a32de445970d4de7ba841e5d393b73acb0b7fe6722de297775146fcd670fc7"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "592f0befcb6e30b6d1c76b7b1fe403a6c7be49e0d784d4cf2631ba2fe1ff616b",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "eba0bfcd7315704a19c14b87a71c4fa019e91fb89b7612957b4d250ee3c3dad6",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "1954cced-e748-45c4-9c26-9855b97fbc5e",
@@ -904,12 +1365,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "3e71bec2741139f993be635ddca156d908aea33043bedb7365c625b26c37ccc2"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "16e2e06f87f90d63321e344e9e66eeac6ca3acff519763c8debda27fbc695aa9",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "b1ed86436b908424e24023ed54e04fd7fe097a76352e0eb0683fb7669cc73a34",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a9f325aa-8c05-4e4f-8341-9e4358565f4f",
@@ -924,12 +1396,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ced81e454332b121424fe9cb9e785db30729a3f3203566e83a8dd324c76caaf6"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "80880ce6925867d3787897e57f2c59f17f656414f207ea756f7a78039fcff2d3",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e08a08713f40446c77a0e6ab476489b496431192f7f82880356212ea73a47e5b",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "30e3e107-1cfb-46ee-a755-2cd080d7ba6a",
@@ -944,12 +1427,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "246f86e5c4640e03524de7f06af40a4c54597bc5c85130cd87bb29b9c06246f9"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "ad3eb2e2f7129162c85b52c3f3fc2687c9a9d2b8be6295294380d5b52610f464",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "47538b38d8bda0f164a2d8928b1eab5ec5600213ef042b22934dfc807b5084c0",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "01b269ae-2111-4a07-81fd-3fcd711993b0",
@@ -964,12 +1458,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "9a7dfd873ef4cba7a6c04494b717216238c6a6881471032541a456b44a825246"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8805cf4ed9302d48459e6aa773911e98ad65e605949e95c1b735ad04af09d8d2",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "0417bf0b909960bd86460efcc061f5f01a1ad5ca441a4d12a84c39329b02bce9",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
@@ -984,12 +1489,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "f2282bb5ecf5306683b0abc7f9cd9d4cf42b3d260ae0f86fc815e5bdcb7224d8"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "b62abaef90c05e71c2f974531b24de1d81e149a01902467213c0ec797e0af584",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "72ccc82e01239facc5681c0bad440cd4ffd48607df8d9485154934efbe49557d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
@@ -1004,12 +1520,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "063c956aeb844818a07713386779f3dda32407fca9d6697987d23c71e54aabc0"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "0c6547753dddc424449de0fd14bdb5bd17cac380ae149fe4ea07b3ebf59e2eba",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "90c4054f38a6b7a236e61a8c4a2714f3da05449c57c43c79812e6bc078344744",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4de54231-e4b5-49e3-b2ba-61a0bec721c0",
@@ -1024,12 +1551,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "229811e1d6a5fbc1325bee01151e7e4bc19013b153691bc1926dbdd29cca024c"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "d3bf9cfa1a92928147f92a2f2761c0afca63e42b031b5133de69c6b77f793a18",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "59238d01a6487ba43d621c3469a4e7f7c6c47f048a6d45a1c702a0202e225b9d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "7efeb4b1-3d19-4762-b163-63328d66303b",
@@ -1044,12 +1582,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d2bdb7f4c40d1018b981bb4e3d53d3763001a68a2aa5cc00a050d585b8948e23"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "71b80baa78a99c5e1e19dfea49f30ea0cecb2fa6d08b9f38f780ac77c8590c8d",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "f5067a340601b40373936b1fd9fff16fa163d6c1aa04c87da4930e44151b6c04",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "535364ea-05bd-46ea-9937-9f55c68507e8",
@@ -1064,12 +1613,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "1060157f285b14ff8bac6d37c8779b7160794bd5442a59ce8eed555463bf8a0e"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "2a2b30a2f85b7c707e64c2dea269e22c17e1dad97972927366028882f1014107",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "657edf50213d14eb8dfd8b0caa3f594bce8128ac03990b04bc06d5eed7e3a891",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "7a4e4bc8-922c-4c84-865c-25ba34136be1",
@@ -1084,12 +1644,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "92a1870e7d25701c96e9adc0bbb993ac0f4116a853833146d5a22637418dc321"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "5e6de8a2e86e9b72157b2716bccf16ae20c03cfe2092fb3e7e0487dd55e85f77",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "d88379509d83e820d2f91927f924c80bade5f0384f24646ec960dad3fa7bf358",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
@@ -1104,6 +1675,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "47ae9bb0660c5ba79a976f7c8c0de6aa087a227c5463c0539f86a37704791c3a"
+      ],
       "evaluator_function": [
         "check_pdf_pages",
         "compare_pdfs"
@@ -1111,8 +1685,17 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file",
+        "rule"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "bcc23e6255d50ebfe1761e16cef2e45d1fce14e3a62487600e3a50bf986f8637",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "1d33152cf8317423c267a8d49b1721d157e60e866f584db0aef6d30f24906d95",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "8b1ce5f2-59d2-4dcc-b0b0-666a714b9a14",
@@ -1127,12 +1710,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4e3ac493307ef18e971be7e6c79e004056f693e35c7901c2ddee4a65dea8bccf"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "0dbd23801f4c16cc11ae8c192e48979733d7381cc6bfd289edbe33097b99df82",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "b2d6f9e2f72a73de658ba51564e0be26d9e212671e6420fba2f191673097fd81",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0326d92d-d218-48a8-9ca1-981cd6d064c7",
@@ -1147,12 +1741,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4360acdd31a9f60b0179169ef3f93074015a616dc01ec002fb16bcd868bd4b98"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "64d87da6873384ead151b142e237c28c7936b600d49472c691d27fae75066510",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "d2e49604c20c81ba821477ae194a82e1aab2abc4e27be3ee8df7e21ce8315232",
+      "input_asset_basename_family_size": 3,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "f9584479-3d0d-4c79-affa-9ad7afdd8850",
@@ -1167,12 +1772,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "95f4b34d5cfb4e868db3c062cc2a7a52d7eb517afb94ee68efd212a4a1e907b6"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "5cef9a23def72055b9053bcc128e7e689697297974de9d9bf6315009e4331d00",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "9c08d21691f7389e0085c1f25d51fe45f393bf2f9fd6369fdca21a516d9fbeaa",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "37608790-6147-45d0-9f20-1137bb35703d",
@@ -1187,12 +1803,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "1335469b1766c7ce56f06e0f2887d16471a887f4fe8d5e5aa3e4881d046f9cdf"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "b16e262f3c9aff305d166788120b35965eb916370dd3c2e8df185b5e480c20e7",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "1b07c52924cd5ec5961e9c507d3da25064ca69689640fae01bf4b93f7c26e3dd",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0a2e43bf-b26c-4631-a966-af9dfa12c9e5",
@@ -1207,12 +1834,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4360acdd31a9f60b0179169ef3f93074015a616dc01ec002fb16bcd868bd4b98"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "bde8c589151e88eb21dcaf87c42d12be98471763575b3758afd38f8f6d7e5249",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "d2e49604c20c81ba821477ae194a82e1aab2abc4e27be3ee8df7e21ce8315232",
+      "input_asset_basename_family_size": 3,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "ecb0df7a-4e8d-4a03-b162-053391d3afaf",
@@ -1227,12 +1865,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ea158771e78628747186101ea379a74d672161965976fcb12d5cd04b3d4b73f3"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "f133be081b9fa46acaa480cb5650fb0dff22f29b855b661545862bd65b49c861",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "f7d51fea5a85f26224a8e4028b8cbbed837127eb37dc1a5f8bf4402ff091bdf0",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "841b50aa-df53-47bd-a73a-22d3a9f73160",
@@ -1247,12 +1896,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "af14226919c34c7beeacb3d6085958d07e200a44ef904f8b104a49ebf0ad31c4"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "4fe7988bd1cbec2ed4473b0c593a32b54ccf91744a453e5bdecdf74f66b2ce80",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "7dbc52a6-11e0-4c9a-a2cb-1e36cfda80d8",
@@ -1267,12 +1927,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "7e47608fb989db91c182026081080ec4441f9af926b02a0615b86674c2187693"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "f2cf73e47d488a2a81e6404b7ab5843fdff1943749bd6cd33fb5d6f957f0cbf8",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "57667013-ea97-417c-9dce-2713091e6e2a",
@@ -1287,6 +1958,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "22e366df8a2c170c1395ec108ca92487ad4bf8105972c7d8724399ccbb3e872f"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1294,8 +1968,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "66f46fa041d985f554bf7a141b947edf83707284db21f5f2316cc4b173241c86",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "af2d657a-e6b3-4c6a-9f67-9e3ed015974c",
@@ -1310,12 +1992,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ea7aa9b70b908af2169f6e23371206c96732ee8efd50b01fbca323f20dcacb1e"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "f45730172f4905c2b9a3e5913336901302531ee283af509dab74f8333cfc2350",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0a211154-fda0-48d0-9274-eaac4ce5486d",
@@ -1330,12 +2023,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b0f404e59624a51d3ed92f757461633fb9774c6678ab0f5ac64fbed2d86279f5"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "e753becd89992498d10ecdf08ef6600b87c8f2b794ba75f3296e3f890fdbf0b0",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
@@ -1350,6 +2054,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6fdb1ab12c64520e57652e081c7950f8f57712f4a0f4fff0ab9aec4ca687503f"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1357,8 +2064,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "e87a2488f5abce6c90fd3d0541dc4ee4c2b8456432acb24c15c2ee75d9449569",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "04578141-1d42-4146-b9cf-6fab4ce5fd74",
@@ -1374,6 +2089,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c2bf9052afa5b7063946d0f8ae690def1ae94c25ef093cd98b0d637b653b38a6"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1381,8 +2099,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "3afa52481c9b8ce0890262aac2219df427a1c3b2e6b5cfaf997ada6dbbe22894",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "f23acfd2-c485-4b7c-a1e7-d4303ddfe864",
@@ -1397,6 +2123,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "69a496bcca3558b43fd6da773f3ad60a72791ebd277865955ea8ea93092398a4"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files",
@@ -1406,8 +2135,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "87f1c2621e553734d2b5ef9b2b3feca28799a8e0a4acf1ce1329c5068154e04a",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "5cfb9197-e72b-454b-900e-c06b0c802b40",
@@ -1422,6 +2159,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "7d9a327e5585c2e504d3f605f1c0a2f7229369b5262668818810288dae2ff1fc"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1429,8 +2169,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "b047b4095c5c2bce8b6642a352055a6a486f189ce484068323aeb9c1ea48a433",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
@@ -1446,12 +2194,24 @@
         "open"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "d2d70d1105eb584870fb19722f3e749f3c2f7437057039c1cdcb75934b97bd25",
+        "7829619780663b779d9d06262f00c59945f41f00fba0f20dcdf1c6843def6ef9"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "78dc2ae5603a3bf8d7ff6a55ebc63cdf0921ef915ec9354fae89d6ece0fa851b",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a434992a-89df-4577-925c-0c58b747f0f4",
@@ -1466,12 +2226,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6442c34c0e47c9827f9ad285934e2ca8bdd3906dfa923b35aad831cc38c05b29"
+      ],
       "evaluator_function": "compare_pptx_files_tolerant",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "2eef5aff22ccf1339a8e7046e5c9a3a1a03e4113cbc7247ee257a8a33a9a9780",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
@@ -1486,12 +2257,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "fb406197e68796ae74a000f054fe1bc34a078b29a4c08468d7c058efed28efdf"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "70b3c4d209f01214a150399e1f92d4b6d1f9fa046865ddaf3b39aa53c7829514",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "73c99fb9-f828-43ce-b87a-01dc07faa224",
@@ -1506,12 +2288,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "30575418dd1c251787fdfa36a177bb7dd278901709520096265670e48df3b29a"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "acfa1a0cd44534619f819865d7b20ec1e6b50368f60d9af0a46b20145ce58e0d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "8979838c-54a5-4454-a2b8-3d135a1a5c8f",
@@ -1526,12 +2319,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "58bac2d1671b947781eb39de83d6690944e1e08dda8bb46e991dadefb5a04f7d"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "e9b19d840def8a26c472b644278b453a0c5c367c5980e1ff625e346d7a1f536d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "b8adbc24-cef2-4b15-99d5-ecbe7ff445eb",
@@ -1546,12 +2350,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "cec6482e8c618aebf28cdde1f967e761e6a79a46b29f5a5c423cc83c6ad2da2c"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "e6ae87505e44472b71a00d394d5ea38bf857b4479ca6d992f2969ecd455ec591",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a097acff-6266-4291-9fbd-137af7ecd439",
@@ -1566,12 +2381,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "f69cb5efc0ce298f49b14507439091634ac972ec8bd14e26db08ea34bda3d2fd"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "873da6c6bf5deeb4d45e1bc0be6c6764cf8076dd08f696829a98495f2abf45f3",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "2eb136e1f7647e327487736350e662f71da5cd06e30efd5e48c96df4beb251f2",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "9cf05d24-6bd9-4dae-8967-f67d88f5d38a",
@@ -1586,12 +2412,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "80252dfb879dce0ae7143765e892c34ffe6c0c7a6d050dfdc8b8513c06c84ba9"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "eafe641c317ad8258ac3ff849b318fc412448aad92a0f5d8fc6480847a9f3598",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "edb61b14-a854-4bf5-a075-c8075c11293a",
@@ -1606,12 +2443,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "2368a119c0def005d8d014dec8cc91622e78bfe95d758b80ad4c0129fe5f7af3"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "894bdb7c68bc7d47355eb5ac14627cc7d64d1212e412ca4ff5aefe3c124333bd",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "05dd4c1d-c489-4c85-8389-a7836c4f0567",
@@ -1626,6 +2474,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b9f50c08db08e5487d147b1dc221c501a995f6f8b7a41fe365db8c94fbc60a9a"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1633,8 +2484,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "27eff85059a3805c950456f4f1597748932eccb0c368893850a1b437d215ea9c",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3161d64e-3120-47b4-aaad-6a764a92493b",
@@ -1649,12 +2508,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6b37ea866e55335960ea9a860fc338c2234e0d17ce5cc73d76689b7985d41446"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "eb2733ad9e0dc822e3bf1e715639e2589c7512fd591c32388ad749e43c829ff5",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "a53f80cd-4a90-4490-8310-097b011433f6",
@@ -1669,6 +2539,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "8f74b0111a4edfcf3ed0b206f3318c8c973c27a61525178a5383c8324f364a72"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1676,8 +2549,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "b10de03d6265a93e3e5a5377fd133d830a4468e0841444dd487e9172bfead5e3",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "986fc832-6af2-417c-8845-9272b3a1528b",
@@ -1692,12 +2573,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d80c12647707039ea6a8a7bcd7f60792bc5e39fe14fb70ce08d30331a50a67db"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "81b71acd3975bdfc413af40aa7fb64b6381c3410388e47145948258b898f4f99",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
@@ -1712,6 +2604,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "2eeba88fbe17eb9f45d3d19812067fb8882c97741ec89d05b35a73c84febb482"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1719,8 +2614,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "48e39da0bfef9bf72f3deddf95dcd17f955da193d27dacddc307246e18fbd684",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4ed5abd0-8b5d-47bd-839f-cacfa15ca37a",
@@ -1735,6 +2638,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6c7848079b09f2511e6f8b98c8d7a6430c02e991542c471aad7efdb14d6af6f8"
+      ],
       "evaluator_function": [
         "compare_pptx_files_robust",
         "compare_pptx_files_robust"
@@ -1742,8 +2648,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "efb2bf8d471ceae104aa947152df6523f51c93f231e625002c6467ded8cc16e8",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "39be0d19-634d-4475-8768-09c130f5425d",
@@ -1758,12 +2672,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "43362963c2eb5cf599e9fbd76db1a56fba5c2a1e5cb4a3fc3c78c5c73a0530f7"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "8e76c69334a649cc153c282826d1410cbfaa8671114261357698c595ba1a7790",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "5c1a6c3d-c1b3-47cb-9b01-8d1b7544ffa1",
@@ -1778,6 +2703,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d058dd0e939493f9bac73a980b45bb1ae38c507c1be5039c2f5929e7bcd369b3"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1785,8 +2713,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "1820a9f03c739da8aa8ab44f6f7f540da6bca346a76c1a8feadd0293b9c3362a",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "ac1b39ff-ee4d-4483-abce-c117e98942f0",
@@ -1801,12 +2737,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "f1e838e36f7d5c7f9d7fad0a296b833898a75c4da1a312033662666cad4a616c"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "b9912e33a4b396672824681885384dd47ddf5d7eb865c77e32fabfcb255b2039",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "15aece23-a215-4579-91b4-69eec72e18da",
@@ -1821,12 +2768,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "05bfc636ebd9812d8630a9513c87e0ec5e18f5e02319ce430d148ed5a83ec48c"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "3de4e29462ca568d4ee5a8230ce01ce739a1f6aea4157d75befe7d9fcff84e23",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "7ae48c60-f143-4119-b659-15b8f485eb9a",
@@ -1841,6 +2799,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ea07647280b4faa63688e207a6b106dc4720819c1f4f149cf379f80260f56530"
+      ],
       "evaluator_function": [
         "compare_pptx_files",
         "compare_pptx_files"
@@ -1848,8 +2809,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "c49d2d84da64250fbb0de28ea318ecbc4428954e1d93eb8464a1fcb6e136c319",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
@@ -1866,12 +2835,23 @@
         "execute"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "6fdd769209835fad7e22ae61a90eacad6d36dcaad161334bf19090d4373cdacb"
+      ],
       "evaluator_function": "check_transition",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "ee270ead7d04a113461778d6e4c55f6007b208963fab86dd303029bdcc1fddcf",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "6a527fbd38ae9e9c727a8044c13d49147c742c91eab748c9065eaf492e58604d",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
@@ -1886,12 +2866,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "8f32e78af26d105c1da7ed6d6c391add89a0e8ff43423c2391ad54cf2ccff9d4"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "13c09d20b67a9339d21227a7cdc64454018cf2319d508b6691edc98e7ea1fe39",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
@@ -1906,12 +2897,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "ef301098a591fdb5c2f452bd2a7a0d2296bcfd8c912831b6bddd1856f3f94eb7"
+      ],
       "evaluator_function": "check_page_number_colors",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "9ec7631fb24f3dd1d83f5ca10b2cb9beed3a89fe85ab784d8f94393961352900",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "1ca5f51b62b53d689cb0ef4e7a4653ff206d7cea6bd91c1fc8e954c343e713e4",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "ed43c15f-00cb-4054-9c95-62c880865d68",
@@ -1926,12 +2928,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "acc9b45c657438f6418829579f8c70b2af9e114e177992d1662a961b5cff8c8c"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "38c810fe1aedabd2264dadb16b3e7583330b3a0258be2316c40ddaee0ea7121f",
-      "source_group_size_in_candidate_pool": 30
+      "input_asset_basename_family_sha256": "3f525e9caaeb88f6e45ced4a2b0c9951f8f10ad7e091a81b62a1ecf64a79f70f",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 30,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
@@ -1945,12 +2958,21 @@
         "launch"
       ],
       "download_asset_references": 0,
+      "input_asset_name_sha256s": [],
       "evaluator_function": "check_auto_saving_time",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "ce1d81ac02f3b23e5d4d59cd8dc38f6d0018075127847c34998643b431d1a5dc",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "f680c3bed288f75e0132bebdc4ce7bfd3e2869674b59bd30c6ede92c124072d7",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "5d901039-a89c-4bfb-967b-bf66f4df075e",
@@ -1965,12 +2987,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "15d4468aef9e6efab2b79e90d33c89d9723fc429b5510e0869f816bfd9b55664"
+      ],
       "evaluator_function": "check_image_stretch_and_center",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "1ce422123824e9237234b5c4d9d72cb9101b34c00d2a68a4e842301d31b3f050",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "6dee5118dadce427013a784478a03707aa5e02458257031f2d94eb0b13eb9cfc",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
@@ -1985,12 +3018,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "bbb984ee7fcd9907c1129bb50e0bb72c87540ed2575b02c17d9283ffb9c50ce0"
+      ],
       "evaluator_function": "compare_images",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "a29d28b1a3ead28c41dfff0febf4fa50c9c7b5cd16c1261fc829144592fc17c0",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "085558ebec1ef9869d6b24e479896bd35464dc1930305118c4a48eafe862d106",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "ce88f674-ab7a-43da-9201-468d38539e4a",
@@ -2005,12 +3049,21 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "333cf36a11a68d70ffea3efef8c91690957c420c377b4b42820ba2cc11962114"
+      ],
       "evaluator_function": "check_slide_orientation_Portrait",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "856645c01d9a779f647710a54d4c3585d950d0710a6db5270b944bc5b3bf4350",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "915f336542b74a08301295be1cc958fa6d5f48b3ef56ba5f2c1ee66ebc2a06da",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
@@ -2025,12 +3078,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c6af0c361f352e97ecc75e346d8da4a2491a34b4ecd41a93a2e0cda5e615f560"
+      ],
       "evaluator_function": "check_italic_font_size_14",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "13293bbf28a6ad7a03886f5f9912b923cfd221486494a34d6cfe025654002b84",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "77a7f4eb85d9a786113ee90bb16eac95172e53eb75bea74594b9154d78921e22",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
@@ -2045,12 +3109,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c63ae1f59f17f9d8c2321c10913ef4dc4e31f8e53756d6da724d4b280e135e98"
+      ],
       "evaluator_function": "compare_line_spacing",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "55fede03b7afc45853b79868bd951da3739b550916dce1114a9df4ea81417f9a",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "b3682eb10f2ad789a18a2a2cc394172d082c5f47ead3b536f05a92726c5c6d9b",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "adf5e2c3-64c7-4644-b7b6-d2f0167927e7",
@@ -2065,12 +3140,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4f389c7e6c7d5a2932fa917d7b3adf47bf19ff543464ff6fb7fa1185826c4c9c"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "f0902f6e89071ea4ee2f7ed33a8781060dc603b7d593edabd58d1e10769654ae",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "7da7a5f0e3e40503c1115b4109f2304981149637b0700d8ad001795dd50b5691",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0810415c-bde4-4443-9047-d5f70165a697",
@@ -2085,6 +3171,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c4d4c8dad08381364f0ee2adfaad326832fce5956549c3465d4bbdef3ceb6de1"
+      ],
       "evaluator_function": [
         "compare_line_spacing",
         "compare_line_spacing"
@@ -2092,8 +3181,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "322f64eefd17dd50da0c16be8b7ccaf53a697d182bb2cff393f72f18736c823a",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "387174b51560bdd602f4e54759b6fcfc24f641637cb130837d0c19bcf4567cfb",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "6ada715d-3aae-4a32-a6a7-429b2e43fb93",
@@ -2110,12 +3207,24 @@
         "execute"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "9461eefa9b19f0a23b166f412d5d0825ea819237eca6f034e2b7bde43aa2b246",
+        "c9c20ad379740f089cbcdafe1ecae31d6e5095da11b58a94ce039fd5ff72eda2"
+      ],
       "evaluator_function": "compare_docx_images",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "808657df4621c614954d32f31d8367e0d33432a1adb09eda20f57d7e836fba10",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "72706f79fca606ba0557318fe452337ab3a80d37fbcc852a2e76e07b869f32ad",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3ef2b351-8a84-4ff2-8724-d86eae9b842e",
@@ -2130,12 +3239,21 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "b92c59010c5c5fce86a1fd9f02f2ad8e95f26290f37be9d2b8403d2e30648714"
+      ],
       "evaluator_function": "is_first_line_centered",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "bad1ac5e03c7e3d78a972a52cf271f66ee37fb0e5e08debd44265b5e8ee328fa",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "0b66625387f4a60652e61e610bd6675b465bf85eda7e07eaf84265abf3e17019",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
@@ -2150,12 +3268,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "d07ad18cc0da72ca5938448a97adca958c8a47ca7f11be332e30117c6ddd6c3a"
+      ],
       "evaluator_function": "check_highlighted_words",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "1d290cc25ae3e70a67672845831fae0497376326401a73377811f413b3b78657",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "48e7bc73f31d9cd709e45652507ec5cdd35588ae4fff3d5b5fa8e6f49497ffb4",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "d53ff5ee-3b1a-431e-b2be-30ed2673079b",
@@ -2170,12 +3299,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "a2f3c0e91366c84d1d06275f4c8f8812783e152980fc0445e313aad6073a46d4"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "1f0bd98100fa1388cbc5a6ddbaa8cd0bfe6944397b9f71a1c02d178caaa588a8",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e71f4e7787984c9635669f865b18563041b73cef27cb862c29d251d7d9f7dc7e",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
@@ -2190,6 +3330,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "32ff051d5e68a7f7486344ee0ab21a1f07d31c405b69d7349d2ef5b3a08a2f89"
+      ],
       "evaluator_function": [
         "compare_docx_files",
         "compare_subscript_contains"
@@ -2197,8 +3340,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "013b2eba79a3cf6064a362aaad0031c478ec078a8e6e13be1dd0dbcb40a18ad8",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "921c71fabf7334716f2427097b0face5ada0f47ecef505fb17bcbd6274ae0492",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "e528b65e-1107-4b8c-8988-490e4fece599",
@@ -2213,12 +3364,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "49305c2228c6f786e76bba4f21c638a83aedb92da3f8cb713cdf8f784d7878d2"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "07c29eda496e5c07f28b2f6246a449d0a5df77e72facef58dfbfd9de47b71402",
-      "source_group_size_in_candidate_pool": 2
+      "input_asset_basename_family_sha256": "2635a8df319dea552620c9f6c3ee99494d013ff4f07a3ceac25165386e17d009",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 2,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "66399b0d-8fda-4618-95c4-bfc6191617e9",
@@ -2234,12 +3396,23 @@
         "execute"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "79d6e6fd31e681994d88c0fbaff02da99689ca7c3c1773ae8d4a74daa4384e8f"
+      ],
       "evaluator_function": "compare_docx_tables",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "279629f07188e30349c2580af75bc4d828c64b6305deb483300f3fdd3625b1c3",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "649924f3ea35ba9b85bc991a07e56c3f643e8e4fd929a68f1a6bd1bd4dc3be23",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "f178a4a9-d090-4b56-bc4c-4b72a61a035d",
@@ -2254,12 +3427,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "8b13e2b04c9aede76002574d2ddbc160763bceb4ec59b62b4f06259213858299"
+      ],
       "evaluator_function": "find_default_font",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "49fc6e1fe49685562ea42fda2ed92c0f2e236d6035fa47f0cc06b38a9dc10edb",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "e41bc8d5f36f6b464c07db56cded269471920ea2e0ae82faa1fe214ffa57a104",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "4bcb1253-a636-4df4-8cb0-a35c04dfef31",
@@ -2274,6 +3458,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "37a7b4e137e24c2b564fefde5fa60e216da3b7126c4f9efb2bd8f668e9d9830f"
+      ],
       "evaluator_function": [
         "compare_pdfs",
         "compare_pdfs",
@@ -2283,8 +3470,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "5126745e61d1c39b156a36b7635213ea84ccde81a08a54ea9b68613b570563c3",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "8137e173f136660f68d6e22d43c60b408e6b6f6f8857020826d91c95f153b462",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "8472fece-c7dd-4241-8d65-9b3cd1a0b568",
@@ -2299,12 +3494,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "72e0549b6c725d7d316d2f3ba75464b76e4c1ec0fcd70dfe7d4748685fb89715"
+      ],
       "evaluator_function": "evaluate_colored_words_in_tables",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "5036cb412c91f110727cae5f62611bacf97f14b27f1aaaa2616dc737e2be02a6",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "4e8ea71497667033e9a6d69801199863edbf68c040763778e84d65435bd7a2a7",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0a0faba3-5580-44df-965d-f562a99b291c",
@@ -2319,12 +3525,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "c4e47087487c60f38918b2011fd2ea3bbc749ff445d5023bbb617f7102e1e6cd"
+      ],
       "evaluator_function": "check_tabstops",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "cbc67eb4df34554142d3321120453ee1774541af4fa53bbb3b563b6655392261",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "dd744c6123149610e836fa2837e091f7c13ea4f1971d56bd04f072e338499fed",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "936321ce-5236-426a-9a20-e0e3c5dc536f",
@@ -2339,6 +3556,9 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "4573ccaf44e549f2a20bb303a91ce1833c3b4f298b6a491b6efbf8980028d65a"
+      ],
       "evaluator_function": [
         "compare_docx_tables",
         "compare_docx_tables"
@@ -2346,8 +3566,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "07c29eda496e5c07f28b2f6246a449d0a5df77e72facef58dfbfd9de47b71402",
-      "source_group_size_in_candidate_pool": 2
+      "input_asset_basename_family_sha256": "eca9e0879c41b5c0a46bb2c8d9a408e5f0263893737a4a4c4a45814f13c1e1dd",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 2,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
@@ -2362,12 +3590,21 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "e338f518c147d39c7829f445fb42c5ecb5b5b1f88e95fd1fade159c789b27682"
+      ],
       "evaluator_function": "has_page_numbers_in_footers",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "992768e280930e3a8d6eb3cd88190b8cad58348e5420307e3949520ad75a4010",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "87a008e7265a488866961b09360d08851e167d9d676c19c78c65c6b8f54b9a67",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
@@ -2382,12 +3619,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "620893311440543ff2f8cc53d3bd2d3ab3b1df6db4ae7bc6595355648e925e93"
+      ],
       "evaluator_function": "compare_font_names",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "dc67c0e02ce827572449407ff5ef1991da89e7a0d7cbcefdfe43d609bb85e48d",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "296afc28eac26ebf7336fc8f0a60ccb4412333689675bf08f6927b4e7e2642f4",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "eb303e01-261e-4972-8c07-c9b4e7a4922a",
@@ -2403,12 +3651,24 @@
         "open"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "0819f28e4c9bac16c8fed008785b8f8518624170ed77bc1bda6fd9b5aa2b516c",
+        "3b5f0bccbf1a7bed1b0deaf89f249fc9938710945d12b869fc777a487e5ba322"
+      ],
       "evaluator_function": "compare_pptx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "6a22f479bd9c6cef365d021cb4a7f41b489771da6b35de0636e0245db134b3bd",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "51f5801c-18b3-4f25-b0c3-02f85507a078",
@@ -2424,12 +3684,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "1decef0e419f47dc371890bd423b7c1436d001692a4a18222e306a75b09e0ae1"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "eb00346f0a5611a675a8830cf3c4463b215d412f9bc590e77f41bbd582b754c5",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "51fa57eca0759c2823bc7cc3aec74226c10f3361cf8340bc5c1b47c8cd16def3",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "bc2b57f3-686d-4ec9-87ce-edf850b7e442",
@@ -2445,12 +3716,24 @@
         "open"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "b0bb0c047f97e6b87c6ea5024d43e1165f3b3e52f47ad25b09e6539616ff0836",
+        "c18749448080b1026b73b37033e87450334f0606af5530b622092560338b5beb"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "46929d6980e14e278fbde6565f4af960ed00a8a1d24dcceb01f4ac99bea8669f",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "5bc63fb9-276a-4439-a7c1-9dc76401737f",
@@ -2465,12 +3748,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "9a4656e6e4b76af7378bf8323d74cff8b77980a099473370efc1cb245116c73f"
+      ],
       "evaluator_function": "compare_docx_files_and_ignore_new_lines",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "source_group_size_in_candidate_pool": 1
+      "input_asset_basename_family_sha256": "43d04b88d5a72e9afc96bbc91af15ac05247273c59aed431c1745b98bcd1f672",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 1,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "8df7e444-8e06-4f93-8a1a-c5c974269d82",
@@ -2486,12 +3780,24 @@
         "open"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "be42c31d4601a87218d852538edd1633fa72f7baafd8df70d5e567569b17ca1b",
+        "b0bb0c047f97e6b87c6ea5024d43e1165f3b3e52f47ad25b09e6539616ff0836"
+      ],
       "evaluator_function": "compare_zip_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "46929d6980e14e278fbde6565f4af960ed00a8a1d24dcceb01f4ac99bea8669f",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "881deb30-9549-4583-a841-8270c65f2a17",
@@ -2510,12 +3816,42 @@
         "open"
       ],
       "download_asset_references": 20,
+      "input_asset_name_sha256s": [
+        "a7009bacc1b8ab5ea8302dbcef6f0a646ab30638ce26045c75c8cae24c210cf8",
+        "8719f7724c2c53a85e955661be7144f67f11ce505876934befccef0f9100518d",
+        "75d8f0719554be45ed3157b7d802343e265e821643c19055f069b3ecd095f828",
+        "dc7db5c25d5700a8360111c8e7748d8591914979d798211284a182cc59dd862f",
+        "80174df9ec93b42dbe2e3276543c9da5e0c76bcd23109b57b60066b78b2a4131",
+        "558ff1354f495d7473ef93db49609ef24422b5ae887dbc92441d3b9e19563445",
+        "8eb46c1aaea29af5ccf689040f24acb6a2ddacac22ea4ba0f388216b01fb976c",
+        "e3c026972c3f952ebd80199d44f0b4123ab29964050ffbc4a47bee7cfb6b00f9",
+        "245e4f73bf7b259f2fd1ee3212f11d0de21c9f68b649f2e460fc34da28f7e06b",
+        "adf4403ec631af48bd4f5515bdfc0dd62c89a4b16eab0ee0c6ae568f4464bf05",
+        "45d6f13f721d45769f92e787a1c2b9bb0f07aae4ac14a8196b5fd30286bb7f1f",
+        "fc49301adbe603d8139bd9f3ea4cc4fb059ee3031cd97570d16b3ffeef29cf0f",
+        "9cd54a141738226dc2b23edf65c6775a478ef56039d533b08dae854b1b0c95ac",
+        "dd67087a7e07e478dc24fb6c50499ffcae7eeb13a9afadfb73088b79b13d5c2e",
+        "e8ded281d749c96f53c526be8e4f3367a5296f9ef3f498195c4d9510a8e477cf",
+        "858a66fd1ef84753af96ecd42e5a102934304e1a0a43e7150061948ace56a153",
+        "1ee2a7c57f46e3f3dfddab576a6b0fad39f1283cda18506c4e262b4fec632519",
+        "d03db46cb6b21652d3428022c01e5ff62ea9b91c2d98f946fd7990fe7809c80e",
+        "ffeaa1d0095d37b468867d03ce3bd31ed7810e696c5ac1d756c72358f64bfdd8",
+        "c8b6df46f55c2fadf4077c375d97d53fd5ef0d0a0812a2e2aac151a8444626d9"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "59a56145a1f32a200b225408877eefd5f2d4de041fdd9d537176640d0b13fefc",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "7e287123-70ca-47b9-8521-47db09b69b14",
@@ -2531,12 +3867,41 @@
         "download"
       ],
       "download_asset_references": 19,
+      "input_asset_name_sha256s": [
+        "a7009bacc1b8ab5ea8302dbcef6f0a646ab30638ce26045c75c8cae24c210cf8",
+        "8719f7724c2c53a85e955661be7144f67f11ce505876934befccef0f9100518d",
+        "75d8f0719554be45ed3157b7d802343e265e821643c19055f069b3ecd095f828",
+        "dc7db5c25d5700a8360111c8e7748d8591914979d798211284a182cc59dd862f",
+        "80174df9ec93b42dbe2e3276543c9da5e0c76bcd23109b57b60066b78b2a4131",
+        "558ff1354f495d7473ef93db49609ef24422b5ae887dbc92441d3b9e19563445",
+        "8eb46c1aaea29af5ccf689040f24acb6a2ddacac22ea4ba0f388216b01fb976c",
+        "e3c026972c3f952ebd80199d44f0b4123ab29964050ffbc4a47bee7cfb6b00f9",
+        "245e4f73bf7b259f2fd1ee3212f11d0de21c9f68b649f2e460fc34da28f7e06b",
+        "adf4403ec631af48bd4f5515bdfc0dd62c89a4b16eab0ee0c6ae568f4464bf05",
+        "45d6f13f721d45769f92e787a1c2b9bb0f07aae4ac14a8196b5fd30286bb7f1f",
+        "fc49301adbe603d8139bd9f3ea4cc4fb059ee3031cd97570d16b3ffeef29cf0f",
+        "9cd54a141738226dc2b23edf65c6775a478ef56039d533b08dae854b1b0c95ac",
+        "dd67087a7e07e478dc24fb6c50499ffcae7eeb13a9afadfb73088b79b13d5c2e",
+        "e8ded281d749c96f53c526be8e4f3367a5296f9ef3f498195c4d9510a8e477cf",
+        "858a66fd1ef84753af96ecd42e5a102934304e1a0a43e7150061948ace56a153",
+        "1ee2a7c57f46e3f3dfddab576a6b0fad39f1283cda18506c4e262b4fec632519",
+        "d03db46cb6b21652d3428022c01e5ff62ea9b91c2d98f946fd7990fe7809c80e",
+        "ffeaa1d0095d37b468867d03ce3bd31ed7810e696c5ac1d756c72358f64bfdd8"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "59a56145a1f32a200b225408877eefd5f2d4de041fdd9d537176640d0b13fefc",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     }
   ],
   "reserve": [
@@ -2556,12 +3921,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "8e0b4da02802fee8ec6e346e1c397f99ee98a6cee68fec2e1cdf4e5da3ff5539"
+      ],
       "evaluator_function": "compare_archive",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "3cff19ad0eeef6c91f9abca917dfa104eb73ad97d35d1502d65f4a3497d5b60c",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "02ce9a50-7af2-47ed-8596-af0c230501f8",
@@ -2579,6 +3955,9 @@
         "execute"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "712cbf459e53e8f64a059f862f79f9824fdcba5a7f0b6c3325413d5dfcd4770e"
+      ],
       "evaluator_function": [
         "compare_image_text",
         "compare_image_text",
@@ -2587,8 +3966,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "rule"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "a8dca52023e83e3ec0f51094c63457188c24de2f90fd0db25d28c2d906c6e8ae",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "3a93cae4-ad3e-403e-8c12-65303b271818",
@@ -2604,6 +3991,17 @@
         "download"
       ],
       "download_asset_references": 9,
+      "input_asset_name_sha256s": [
+        "d0ff11bd1a86c3d9eaa5906b876de963bcaeb9f4d1aa2698e01bd8406079df04",
+        "e9cce1300ac38f252422e110ca7d5e57ffda1dcba4fd82be568f4f000f01960d",
+        "bf91f513c832bfe8fe09ce69092103ef2e968332df57af7745a628eed7c62405",
+        "e1ce39a4754a090507a1d8038e5d418e6a905877958dc323c2323180423f7256",
+        "475f63368591199b679ad5d5b5f0f38d9a9338c3248e1b01fe344d7f5da5b3f8",
+        "4cb5ca605d413307ef5d3bdc9dab57aebfab43a336615e2935099795d365182f",
+        "834a77b9112d47ee73e5bccb01fd1528600310abc0990b5e1296d8efe97cfe4d",
+        "c428bde51887a23118557762ce6aede476a256f8c63d9e1e22585eee7ddbd280",
+        "7c8bc553e0b1f275e2053c540b50c0248305b049daaca3ba52bb1c3fe71b887d"
+      ],
       "evaluator_function": [
         "compare_table",
         "compare_table",
@@ -2612,8 +4010,16 @@
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "4ae51168f0a40de0d5417095af7458a50e1a97f57a4c7f5135d8c167fe25a4f4",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "00fa164e-2612-4439-992e-157d019a8436",
@@ -2631,12 +4037,24 @@
         "open"
       ],
       "download_asset_references": 2,
+      "input_asset_name_sha256s": [
+        "477e82946eed48eae1abb54057d5cf55deb236cb87794178394b79cee0bb2c93",
+        "f0c89d89d8b05a65760d9c3463647a28a2a5f06b821a68b12df1d2e680ed5a80"
+      ],
       "evaluator_function": "compare_docx_tables",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "27b83b65135cb6b6e7d300a38884d637c173174d3e9d8377c015c26aa5cf6d3e",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "1f18aa87-af6f-41ef-9853-cdb8f32ebdea",
@@ -2652,12 +4070,32 @@
         "download"
       ],
       "download_asset_references": 10,
+      "input_asset_name_sha256s": [
+        "6c5cf40d43e2423d3241c68448ef5796002523c2936532b57dde77e90a662bf8",
+        "bf91f513c832bfe8fe09ce69092103ef2e968332df57af7745a628eed7c62405",
+        "e1ce39a4754a090507a1d8038e5d418e6a905877958dc323c2323180423f7256",
+        "475f63368591199b679ad5d5b5f0f38d9a9338c3248e1b01fe344d7f5da5b3f8",
+        "85b9a76492931960a63f8cd4b349b4a289e15e7741d5e7927e83d8f0088e71a5",
+        "0ce37d0667efb7dc80cf402f2692be4ea37a927753775d14bdf1213a328fab7a",
+        "20edbe238608dab1ff1a5118db506d50709d80ec47363b24e02de5df1eed6d85",
+        "4cb5ca605d413307ef5d3bdc9dab57aebfab43a336615e2935099795d365182f",
+        "834a77b9112d47ee73e5bccb01fd1528600310abc0990b5e1296d8efe97cfe4d",
+        "c428bde51887a23118557762ce6aede476a256f8c63d9e1e22585eee7ddbd280"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "4ae51168f0a40de0d5417095af7458a50e1a97f57a4c7f5135d8c167fe25a4f4",
+      "input_asset_basename_family_size": 2,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": false
     },
     {
       "id": "b5062e3e-641c-4e3a-907b-ac864d2e7652",
@@ -2674,12 +4112,26 @@
         "launch"
       ],
       "download_asset_references": 4,
+      "input_asset_name_sha256s": [
+        "e9ec9f86b33d411a568d017731f93cbc5a424aa42b60f2a19a710febc8aebcb6",
+        "1ddc26f82d15b66b3655eeaac0e7113d49419821a33ca44aac0653d1231bef31",
+        "e68719fedca40b10665f3255487c4c64f5030ff47995df2b9a3cb4947d40c1ff",
+        "83a43a25b9f2163f141210df999917fe8642afa6f1c8aba31aba861376e11d64"
+      ],
       "evaluator_function": "compare_table",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": false,
+      "setup_uses_command_or_execute": true,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "b53c9db10937271008012740e4b5939f8ebf07242b0fb4bdcd5c206e22fa997a",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "81c425f5-78f3-4771-afd6-3d2973825947",
@@ -2696,12 +4148,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "f38f73d3e1ff7f0145119ae35d3c2b05b373ae518d46fff0191f8ba3c328a654"
+      ],
       "evaluator_function": "compare_docx_tables",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "d8083b79b896862870b08257b161e972463c6edc297d9833befc75924b9be8f6",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     },
     {
       "id": "bb83cab4-e5c7-42c7-a67b-e46068032b86",
@@ -2718,12 +4181,23 @@
         "open"
       ],
       "download_asset_references": 1,
+      "input_asset_name_sha256s": [
+        "3e674079824a79910fefe66a6b80f1c6ea8487e5e0cf82adf247194a7ffb557b"
+      ],
       "evaluator_function": "compare_docx_files",
       "evaluator_result_types": [
         "vm_file"
       ],
+      "evaluator_expected_types": [
+        "cloud_file"
+      ],
+      "evaluator_postconfig_saves": true,
+      "setup_uses_command_or_execute": false,
       "source_group_sha256": "8409421872147ea83473d444bfb4a5628aec3cecc3bbed4190c627089b135f20",
-      "source_group_size_in_candidate_pool": 13
+      "input_asset_basename_family_sha256": "a318515671abcb6b59cfcacf1406a010ccb34ada71e7b771adeace1365ce7dd8",
+      "input_asset_basename_family_size": 1,
+      "source_group_size_in_candidate_pool": 13,
+      "input_asset_names_unique_in_candidate_pool": true
     }
   ]
 }
