@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">EnvLoop computer-use data research experiment design</title>
+  <desc id="desc">Six original software environments, four researcher configurations, one Qwen vision student, twenty selection tasks and one hundred final tasks per environment, independently scored after saved-state readback and reset.</desc>
+  <defs>
+    <style>
+      .title{font:700 35px Helvetica,Arial,sans-serif;fill:#133941}
+      .sub{font:400 16px Helvetica,Arial,sans-serif;fill:#537078}
+      .section{font:700 13px Helvetica,Arial,sans-serif;letter-spacing:2px;fill:#0b756c}
+      .head{font:700 23px Helvetica,Arial,sans-serif;fill:#173d45}
+      .body{font:400 16px Helvetica,Arial,sans-serif;fill:#264a52}
+      .small{font:400 13px Helvetica,Arial,sans-serif;fill:#5c737a}
+      .pill{font:700 15px Helvetica,Arial,sans-serif;fill:#173d45}
+      .mono{font:700 18px Helvetica,Arial,sans-serif;fill:#0b756c}
+      .white{fill:#fff}
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1440" height="760" fill="#fbfcfb"/>
+  <path d="M70 116 H1370" stroke="#c8d9d7" stroke-width="2"/>
+  <text class="section" x="72" y="41">ENVLOOP / EXPERIMENT DESIGN</text>
+  <text class="title" x="70" y="91">Computer-use data research, frozen before outcomes</text>
+  <text class="sub" x="1014" y="88">4 researchers  ×  6 applications</text>
+
+  <rect x="70" y="145" width="366" height="478" rx="17" fill="#f0f6f4" stroke="#c4d7d3" stroke-width="1.5"/>
+  <text class="section" x="97" y="181">01 / TASK WORLDS</text>
+  <text class="head" x="97" y="213">Original software</text>
+  <text class="small" x="97" y="240">Independent worlds, roles, and task packages</text>
+  <g fill="#fff" stroke="#b6cfca" stroke-width="1.3">
+    <rect x="97" y="267" width="146" height="62" rx="9"/>
+    <rect x="262" y="267" width="146" height="62" rx="9"/>
+    <rect x="97" y="342" width="146" height="62" rx="9"/>
+    <rect x="262" y="342" width="146" height="62" rx="9"/>
+    <rect x="97" y="417" width="146" height="62" rx="9"/>
+    <rect x="262" y="417" width="146" height="62" rx="9"/>
+  </g>
+  <text class="pill" x="112" y="293">PowerPoint</text><text class="small" x="112" y="313">for the web</text>
+  <text class="pill" x="277" y="293">Excel</text><text class="small" x="277" y="313">for the web</text>
+  <text class="pill" x="112" y="368">LibreOffice</text><text class="small" x="112" y="388">native desktop</text>
+  <text class="pill" x="277" y="368">Odoo</text><text class="small" x="277" y="388">Community ERP</text>
+  <text class="pill" x="112" y="443">GitLab</text><text class="small" x="112" y="463">project work</text>
+  <text class="pill" x="277" y="443">Magento</text><text class="small" x="277" y="463">administration</text>
+  <path d="M97 504 H408" stroke="#c9d9d6" stroke-width="1.5"/>
+  <text class="mono" x="97" y="538">20 + 100</text>
+  <text class="small" x="97" y="561">selection + hidden final tasks per app</text>
+  <text class="small" x="97" y="588">Train sources, entities, and resets stay isolated.</text>
+
+  <path d="M445 380 H478" fill="none" stroke="#d9a43d" stroke-width="3.5"/>
+  <polygon points="486,380 476,374 476,386" fill="#d9a43d"/>
+
+  <rect x="502" y="145" width="426" height="478" rx="17" fill="#fff" stroke="#bdd6d1" stroke-width="1.5"/>
+  <text class="section" x="529" y="181">02 / DATA RESEARCH</text>
+  <text class="head" x="529" y="213">Fixed student, flexible data</text>
+  <text class="small" x="529" y="240">Same teacher, renderer, feedback and caps in each app</text>
+  <g fill="#eaf3f1" stroke="#c2d8d2" stroke-width="1">
+    <rect x="529" y="265" width="174" height="45" rx="8"/>
+    <rect x="726" y="265" width="174" height="45" rx="8"/>
+    <rect x="529" y="321" width="174" height="45" rx="8"/>
+    <rect x="726" y="321" width="174" height="45" rx="8"/>
+  </g>
+  <text class="pill" x="548" y="293">Astra 6</text>
+  <text class="pill" x="745" y="293">Sol 5.6</text>
+  <text class="pill" x="548" y="349">Sol 6</text>
+  <text class="pill" x="745" y="349">Luna 6</text>
+  <path d="M714 382 V393" stroke="#d9a43d" stroke-width="2.5"/>
+  <polygon points="714,401 708,391 720,391" fill="#d9a43d"/>
+  <rect x="529" y="412" width="371" height="53" rx="9" fill="#f7faf9" stroke="#d1e0dd"/>
+  <text class="body" x="548" y="436">Verified screenshot + GUI action data</text>
+  <text class="small" x="548" y="454">Source and saved-state proof before SFT</text>
+  <path d="M714 476 V488" stroke="#d9a43d" stroke-width="2.5"/>
+  <polygon points="714,496 708,486 720,486" fill="#d9a43d"/>
+  <rect x="529" y="505" width="371" height="65" rx="9" fill="#dff0ec" stroke="#9ec9bf"/>
+  <text class="pill" x="548" y="531">Qwen3.8-27B vision LoRA</text>
+  <text class="small" x="548" y="553">Tinker training  →  20-task checkpoint choice</text>
+  <text class="small" x="529" y="600">24 campaigns · 16 h and $500 Tinker cap each</text>
+
+  <path d="M938 380 H970" fill="none" stroke="#d9a43d" stroke-width="3.5"/>
+  <polygon points="978,380 968,374 968,386" fill="#d9a43d"/>
+
+  <rect x="994" y="145" width="376" height="478" rx="17" fill="#f0f6f4" stroke="#c4d7d3" stroke-width="1.5"/>
+  <text class="section" x="1021" y="181">03 / FINAL EVALUATION</text>
+  <text class="head" x="1021" y="213">Saved state decides</text>
+  <text class="small" x="1021" y="240">The actor sees only its live software UI.</text>
+  <rect x="1021" y="267" width="322" height="65" rx="9" fill="#fff" stroke="#b6cfca"/>
+  <text class="pill" x="1040" y="293">1 shared base + 4 selected</text>
+  <text class="small" x="1040" y="316">Same 100 frozen tasks in each application</text>
+  <path d="M1182 345 V360" stroke="#d9a43d" stroke-width="2.5"/>
+  <polygon points="1182,368 1176,358 1188,358" fill="#d9a43d"/>
+  <rect x="1021" y="379" width="322" height="75" rx="9" fill="#fff" stroke="#b6cfca"/>
+  <text class="pill" x="1040" y="405">Native GUI attempt</text>
+  <text class="small" x="1040" y="428">Artifact / SQL readback before postprocessing</text>
+  <path d="M1182 466 V481" stroke="#d9a43d" stroke-width="2.5"/>
+  <polygon points="1182,489 1176,479 1188,479" fill="#d9a43d"/>
+  <rect x="1021" y="500" width="322" height="69" rx="9" fill="#dff0ec" stroke="#9ec9bf"/>
+  <text class="pill" x="1040" y="526">Independent verifier + reset</text>
+  <text class="small" x="1040" y="548">No unrelated state change; invalids separate</text>
+  <text class="small" x="1021" y="600">600 identities  →  3,000 matched slot results</text>
+
+  <rect x="70" y="647" width="1300" height="74" rx="12" fill="#143c44"/>
+  <text x="96" y="677" style="font:700 17px Helvetica,Arial,sans-serif;fill:#fff">Publication gate</text>
+  <text x="96" y="703" style="font:400 15px Helvetica,Arial,sans-serif;fill:#d8ece8">All 600 tasks admitted · 24 lineages frozen · every cost/failure reconciled · 24 paired comparisons independently audited</text>
+</svg>

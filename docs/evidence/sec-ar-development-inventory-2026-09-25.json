@@ -1,0 +1,13 @@
+{
+  "schema": "sec-ar-public-development-inventory-v1",
+  "status": "three public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "net/gross receivables, doubtful-account allowance, DSO, and synthetic reserve stress",
+  "issuer_families": 3,
+  "original_10k_accessions": 3,
+  "excerpt_sha256_by_ticker": {
+    "PFE": "21acb340ce1da89ff8cb3e6c5881082212d38c4e366c7a314610922b7e442e30",
+    "ORCL": "97da743fdcf20ec6d4744c3af4c53f0750bde699e661db0cd1456d8934c9642b",
+    "AMZN": "6416645f028f6f38bbaa7102d84bebae8677d6bd70a6b7216dd5d4e2c7452032"
+  },
+  "official_final_credit": 0
+}

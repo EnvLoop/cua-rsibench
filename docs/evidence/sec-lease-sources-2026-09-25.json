@@ -1,0 +1,62 @@
+{
+  "schema": "sec-lease-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "four public filing sources, zero hidden or GUI admission",
+  "issuers": 4,
+  "original_accessions": 4,
+  "total_fact_rows": 87,
+  "units": [
+    "USD",
+    "pure"
+  ],
+  "sources": [
+    {
+      "ticker": "KO",
+      "cik": 21344,
+      "accession": "0000021344-25-000011",
+      "records": 21,
+      "units": [
+        "USD",
+        "pure"
+      ],
+      "raw_json_sha256": "53d363a9aa3071406cda9857654358f4dca42e174a1defb8cc1ce9ad2a4c9e40",
+      "excerpt_sha256": "8683c5dc2dcc902a8f5c7e120e94beaba73c688b8a071eb658e68977bbb1e192"
+    },
+    {
+      "ticker": "GOOGL",
+      "cik": 1652044,
+      "accession": "0001652044-25-000014",
+      "records": 24,
+      "units": [
+        "USD",
+        "pure"
+      ],
+      "raw_json_sha256": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
+      "excerpt_sha256": "41913f4411aaff4678ecffdffb55fe8a531f36d9d7107f4bdfd894fda980b36a"
+    },
+    {
+      "ticker": "WMT",
+      "cik": 104169,
+      "accession": "0000104169-24-000056",
+      "records": 24,
+      "units": [
+        "USD",
+        "pure"
+      ],
+      "raw_json_sha256": "54ec3fbf36dc203dd00a0333396b3df2b6695ecdf6cbb19b6ec41b053d86b517",
+      "excerpt_sha256": "b7838dfd9108e2b046148dfc240155b79d70c682e3fe52aac5039e9e901927e9"
+    },
+    {
+      "ticker": "ORCL",
+      "cik": 1341439,
+      "accession": "0000950170-24-075605",
+      "records": 18,
+      "units": [
+        "USD",
+        "pure"
+      ],
+      "raw_json_sha256": "0d7b72e393501d13b2d61b2d6663689e14b9abf83427315bc0820cd2802c43f7",
+      "excerpt_sha256": "2a8b4ec2b6a8d20565280fba52a0177fc5e78e75c7cb6e66c58c0113f0e6ec5c"
+    }
+  ]
+}

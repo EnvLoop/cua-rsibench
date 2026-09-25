@@ -1,0 +1,14 @@
+{
+  "actor_task_sha256": "876956c49d2205cc476774c075f182b8b2cd71155b78c5ab2170946bf4ebc963",
+  "input_sha256": "e7a7ee4ef664b1326b8755141ecbd00c017eca03b0e5fde0b5a4972294766fdd",
+  "instance_group": "wdi-native-mex-writer-brief",
+  "oracle_sha256": "7fdda5566c8b292cbd5f94b91f099af04ae42ac3ddeb28f0f7b879624a7c525a",
+  "package_sha256": "3a119d50c41fbec1ba42255b2d897c36d7ad5400520fae6aeb932e845dc79a3c",
+  "source_groups": [
+    "wdi-country:MEX"
+  ],
+  "split": "train",
+  "task_id": "wdi-native-mex-writer-brief",
+  "template_group": "train:writer-brief",
+  "workflow": "writer-brief"
+}

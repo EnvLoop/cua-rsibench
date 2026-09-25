@@ -1,0 +1,90 @@
+{
+  "schema": "sec-integrated-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "offline_candidate_only; no official final task or Excel-web admission",
+  "source_snapshot_sha256": {
+    "AAPL": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+    "MSFT": "f8aae2965b20ad0df44bdf7ccbedf797d275b6b8dc030154a7a311361bb7246f"
+  },
+  "counts": {
+    "train_candidate": {
+      "actor_reference_pairs_built": 20,
+      "reference_oracle_passes": 20,
+      "unsolved_actor_rejections": 20,
+      "injected_faults_each": "6-9",
+      "every_injected_fault_detectable_under_baseline_or_two_replays": true,
+      "formula_targets_per_workbook": [
+        25
+      ],
+      "distinct_source_filing_pairs": 4,
+      "distinct_issuer_entities": 2,
+      "distinct_template_groups": 1,
+      "distinct_fault_sets": 20,
+      "annual_source_rows_range": [
+        37,
+        46
+      ],
+      "q3_source_rows_range": [
+        32,
+        37
+      ]
+    },
+    "selection_candidate": {
+      "actor_reference_pairs_built": 20,
+      "reference_oracle_passes": 20,
+      "unsolved_actor_rejections": 20,
+      "injected_faults_each": "6-9",
+      "every_injected_fault_detectable_under_baseline_or_two_replays": true,
+      "formula_targets_per_workbook": [
+        33
+      ],
+      "distinct_source_filing_pairs": 4,
+      "distinct_issuer_entities": 2,
+      "distinct_template_groups": 1,
+      "distinct_fault_sets": 20,
+      "annual_source_rows_range": [
+        28,
+        29
+      ],
+      "q3_source_rows_range": [
+        32,
+        33
+      ]
+    },
+    "final_candidate": {
+      "actor_reference_pairs_built": 100,
+      "reference_oracle_passes": 100,
+      "unsolved_actor_rejections": 100,
+      "injected_faults_each": "6-9",
+      "every_injected_fault_detectable_under_baseline_or_two_replays": true,
+      "formula_targets_per_workbook": [
+        48
+      ],
+      "distinct_source_filing_pairs": 7,
+      "distinct_issuer_entities": 2,
+      "distinct_template_groups": 1,
+      "distinct_fault_sets": 39,
+      "annual_source_rows_range": [
+        28,
+        29
+      ],
+      "q3_source_rows_range": [
+        32,
+        33
+      ]
+    }
+  },
+  "source_filing_accession_split_overlap": 0,
+  "actor_workbook_semantic_duplicates": 0,
+  "semantic_artifact_integrity_commitment_sha256": "1baca0273d508370b59a02dfae9e3a333b80b4cf484dafe011d528d813d8544a",
+  "integrity_commitment_is_secrecy": false,
+  "individually_excel_web_gui_admitted_final": 0,
+  "sealed_hidden_final": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "The final candidate set repeats seven filing pairs from two issuers and one calculation template.",
+    "The same issuer identities recur in all splits, and comparative filing facts can repeat values.",
+    "The public builder and earlier prototypes expose related source facts and fault shapes.",
+    "No fresh Excel-web saved/downloaded readback or reset control was performed for these 140 files."
+  ]
+}

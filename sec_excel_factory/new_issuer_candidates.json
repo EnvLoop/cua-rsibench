@@ -1,0 +1,18 @@
+{
+  "schema": "sec-additional-issuer-candidates-v1",
+  "selected_on": "2026-09-25",
+  "identity_source": "https://www.sec.gov/files/company_tickers.json",
+  "status": "identity candidates only; no filing facts admitted",
+  "candidates": [
+    {"ticker": "TSLA", "cik": 1318605, "hypothesis": "electric vehicles and energy"},
+    {"ticker": "IBM", "cik": 51143, "hypothesis": "hybrid cloud and consulting"},
+    {"ticker": "INTC", "cik": 50863, "hypothesis": "semiconductor manufacturing"},
+    {"ticker": "CSCO", "cik": 858877, "hypothesis": "network equipment and subscriptions"},
+    {"ticker": "ADBE", "cik": 796343, "hypothesis": "creative software and subscriptions"},
+    {"ticker": "LOW", "cik": 60667, "hypothesis": "home-improvement retail"},
+    {"ticker": "MCD", "cik": 63908, "hypothesis": "restaurants and franchising"},
+    {"ticker": "PEP", "cik": 77476, "hypothesis": "beverages and snacks"},
+    {"ticker": "ADP", "cik": 8670, "hypothesis": "payroll services"},
+    {"ticker": "DE", "cik": 315189, "hypothesis": "farm equipment and finance"}
+  ]
+}

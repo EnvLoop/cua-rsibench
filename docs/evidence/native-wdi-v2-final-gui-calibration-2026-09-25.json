@@ -1,0 +1,154 @@
+{
+  "calibrated_tasks": [
+    {
+      "application": "Impress",
+      "attempts": {
+        "cold-reset": {
+          "cold_reset_sha256": "4a6adf7f8e487d656b930ddaf2270d2585402c56993c7f2de083331c7124130d",
+          "independent_verifier_passed": null,
+          "receipt_sha256": "fd64931ecb59ac347e7f1391336b296d68a9868c9b4850560f6f7747d98a4dbd",
+          "sandbox_stopped": true,
+          "saved_sha256": null
+        },
+        "near-miss": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": false,
+          "receipt_sha256": "7b4bff7165e347683b4170d45110bda2649441de1847a89c727dad8fa88e89c1",
+          "sandbox_stopped": true,
+          "saved_sha256": "c06138644f4904d24d59be9db097b1ba1770a2d1c396fa9e1ba18104faac1d55"
+        },
+        "positive": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": true,
+          "receipt_sha256": "ec3e1df8c6a2380ef26c4ea5fe6b0001243d811bb5c4c104b2199cc994342fc9",
+          "sandbox_stopped": true,
+          "saved_sha256": "f820ca6484f29e378564b33059a4a670907c4286d6abe3dffacb69435fa900a6"
+        }
+      },
+      "input_sha256": "4a6adf7f8e487d656b930ddaf2270d2585402c56993c7f2de083331c7124130d",
+      "normalization_receipt_sha256": "1d0b61058d611329c91f9f8ef9bd5724c588fad5a742c32e2de5bf8b9056d563",
+      "opaque_task_ref": "3793b3f6acc3d564b86af1979492fbe267bd419f8a8fd6616e11e59d418b075e",
+      "package_sha256": "38ca05bcde0da0b5d75a318ee844e335baf19491213c5fc4d1ca8a25091054cf"
+    },
+    {
+      "application": "Writer",
+      "attempts": {
+        "cold-reset": {
+          "cold_reset_sha256": "8172b7158eefb2a2c976b873e812c1c7622ba6777a027af33d56b5aa76dfc268",
+          "independent_verifier_passed": null,
+          "receipt_sha256": "aed528135af0465196fb2607c0decc96a7aee0d30bdf728a5ebd586015a0330c",
+          "sandbox_stopped": true,
+          "saved_sha256": null
+        },
+        "near-miss": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": false,
+          "receipt_sha256": "985c57de450412ad56e736edfefb073d7985ad70a5e38048d45946dea77b4c85",
+          "sandbox_stopped": true,
+          "saved_sha256": "76be0f7effd5e43cd129fd063d4c0847ae55b3cef3375889d365c1ef3c4c1182"
+        },
+        "positive": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": true,
+          "receipt_sha256": "cd2e7fb286ec23ace35ed8ba47cd9f5f895c615136f3ee84034a81fc797a4789",
+          "sandbox_stopped": true,
+          "saved_sha256": "68abd6d30d8ec88d79ea2d9be88942069d6e20ee70a42137e4b6a4afc8023dab"
+        }
+      },
+      "input_sha256": "8172b7158eefb2a2c976b873e812c1c7622ba6777a027af33d56b5aa76dfc268",
+      "normalization_receipt_sha256": null,
+      "opaque_task_ref": "8dda70461037d11cf80c98b5047efe8f730fc2eb213ee42efed79d338cc6223c",
+      "package_sha256": "ec4bbb663cab5547e9b031a8fa0e8c30cb0fe14e03bcd05f51da145a5d139afd"
+    },
+    {
+      "application": "Calc",
+      "attempts": {
+        "cold-reset": {
+          "cold_reset_sha256": "0f67c8521e831d9d9a5cc488d1c21bb195a94631b16903209435669e6f39ec53",
+          "independent_verifier_passed": null,
+          "receipt_sha256": "8f5a947490cdf1169ef479131cb1719eec5fa90e0bd7d1684efe1445ae01e4ba",
+          "sandbox_stopped": true,
+          "saved_sha256": null
+        },
+        "near-miss": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": false,
+          "receipt_sha256": "4a6ddd4e8cc12f3af5154f54e4c33f9cb68ca6197c2db5b29216d3b71554dc04",
+          "sandbox_stopped": true,
+          "saved_sha256": "3d0c827a0853dfcef5c59f3556d7881a497eef5b6bb6ffc29ef6aa54a0490093"
+        },
+        "positive": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": true,
+          "receipt_sha256": "841f8c76891d3231d3de4cb6f71a9d7d573659d3215ca14ac2c45f2406e1d080",
+          "sandbox_stopped": true,
+          "saved_sha256": "d7d667b93d046ac644035fadc1c2805084b47e8bfc18060e05403c66032b94b7"
+        }
+      },
+      "input_sha256": "0f67c8521e831d9d9a5cc488d1c21bb195a94631b16903209435669e6f39ec53",
+      "normalization_receipt_sha256": null,
+      "opaque_task_ref": "a08082b5362fa738e0f6f4c4b9904e30a0733c99aaf272fdad1f1631fa803b44",
+      "package_sha256": "b4419388ef5027231a11223437fed20d34356f12d3e4cd6e793a47ea6f8e2566"
+    },
+    {
+      "application": "Calc",
+      "attempts": {
+        "cold-reset": {
+          "cold_reset_sha256": "67c83dbdbf1d18102fad0a57b1537ceda0c23acb0153d9a7fac0d1fc0e74037a",
+          "independent_verifier_passed": null,
+          "receipt_sha256": "755e9e93a9853480389909ef93d82ae43bab21c027b399d3e3855d004a871e3f",
+          "sandbox_stopped": true,
+          "saved_sha256": null
+        },
+        "near-miss": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": false,
+          "receipt_sha256": "7f82bbd204b27eaf51d47d7c2c98260378df1dc281d740d2cc339bd6eee3dae5",
+          "sandbox_stopped": true,
+          "saved_sha256": "4aa37ddabd2657fde000a805c5111c30ce0bfdcde7f95d817054d8bcfb74ec2f"
+        },
+        "positive": {
+          "cold_reset_sha256": null,
+          "independent_verifier_passed": true,
+          "receipt_sha256": "236651804887991ddfcf42eff0069d679abd3fb65467e34ac4d3f4dd6c12ce47",
+          "sandbox_stopped": true,
+          "saved_sha256": "69460a0e8f9cf68ac0889d1baf3de9110b00f7005e7ba00b6c084f14f2379259"
+        }
+      },
+      "input_sha256": "67c83dbdbf1d18102fad0a57b1537ceda0c23acb0153d9a7fac0d1fc0e74037a",
+      "normalization_receipt_sha256": null,
+      "opaque_task_ref": "ba46393bbf6b943f60c0bee2f5971210ee9b36f93923efd75c8c701f8fede38a",
+      "package_sha256": "a785bbe14a4b6cf1992afd14e9de7c1ef9c098ad56423322180734e263c7e1f8"
+    }
+  ],
+  "candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "candidate_inventory_sha256": "c5b6aff9c3d35bb2f9dba980fec7aa9693fd744a13dc3aebe185e4831c029f98",
+  "checked_date": "2026-09-25",
+  "distinct_actor_control_sandbox_count": 12,
+  "final_candidate_applications": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "final_gui_control_application_counts": {
+    "Calc": 2,
+    "Impress": 1,
+    "Writer": 1
+  },
+  "final_gui_control_invalid_count": 0,
+  "final_gui_control_missing_count": 96,
+  "final_gui_control_passed_count": 4,
+  "final_gui_control_source_family_count": 2,
+  "normalized_final_impress_candidate_count": 1,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "private_map_sha256": "c09eb0720d6a90770583a575284dc4ee90e48648336e2a3279ab3837ab1cae36",
+  "schema": "cua-native-wdi-v2-final-gui-calibration-summary-v1",
+  "scope": "Private per-ID evaluator calibrations only; no Qwen model attempts, 96 candidate GUI trios absent, full image/profile and study action contract not frozen.",
+  "source_family_count_final": 25,
+  "source_snapshot_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f"
+}

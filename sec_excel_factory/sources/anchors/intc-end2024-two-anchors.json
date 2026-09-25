@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "INTC",
+  "cik": 50863,
+  "entity_name": "INTEL CORP",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000050863.json",
+  "proxy_raw_json_sha256": "70056711b8b04d3a27e4a42b6d86e26f85ddaa3d59e480039d66ccfb353eb0b8",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/50863/000005086325000009/0000050863-25-000009-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/50863/000005086325000009/intc-20241228.htm",
+  "filing_accession": "0000050863-25-000009",
+  "filing_filed": "2025-01-31",
+  "filing_period_end": "2024-12-28",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "a398b609b89e39789f31",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-12-28",
+      "value": 196485000000,
+      "accession": "0000050863-25-000009",
+      "filed": "2025-01-31",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "46cf636038e498fdccf0",
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "unit": "USD",
+      "start": "2023-12-31",
+      "end": "2024-12-28",
+      "value": 53101000000,
+      "accession": "0000050863-25-000009",
+      "filed": "2025-01-31",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

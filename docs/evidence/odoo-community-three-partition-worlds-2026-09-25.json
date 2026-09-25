@@ -1,0 +1,180 @@
+{
+  "schema": "envloop-odoo-three-partition-candidate-worlds-v1",
+  "status": "three_isolated_development_calibration_worlds_not_hidden_official_admission",
+  "candidate_counts": {
+    "train": 20,
+    "selection": 20,
+    "evaluation_candidate": 100
+  },
+  "family_counts": {
+    "train": {
+      "purchase": 5,
+      "inventory": 5,
+      "sales": 5,
+      "crm": 5
+    },
+    "selection": {
+      "purchase": 5,
+      "inventory": 5,
+      "sales": 5,
+      "crm": 5
+    },
+    "evaluation_candidate": {
+      "purchase": 25,
+      "inventory": 25,
+      "sales": 25,
+      "crm": 25
+    }
+  },
+  "causal_template_signatures": {
+    "train": {
+      "purchase": {
+        "source": "supplier_confirmation_pdf",
+        "target": "single_line_unit_price"
+      },
+      "inventory": {
+        "source": "product_purchase_planning_note",
+        "formula": "mean_weekly_demand"
+      },
+      "sales": {
+        "source": "customer_po_pdf",
+        "target": "reference_plus_single_price"
+      },
+      "crm": {
+        "source": "opportunity_handoff_pdf",
+        "target": "stage_and_owner"
+      }
+    },
+    "selection": {
+      "purchase": {
+        "source": "supplier_confirmation_pdf",
+        "target": "same_line_price_and_quantity"
+      },
+      "inventory": {
+        "source": "product_purchase_planning_note",
+        "formula": "peak_weekly_demand"
+      },
+      "sales": {
+        "source": "customer_po_pdf",
+        "target": "reference_plus_single_quantity"
+      },
+      "crm": {
+        "source": "opportunity_handoff_pdf",
+        "target": "revenue_date_priority"
+      }
+    },
+    "evaluation_candidate": {
+      "purchase": {
+        "source": "supplier_confirmation_pdf",
+        "target": "cross_line_two_or_three_line_reconciliation"
+      },
+      "inventory": {
+        "source": "product_purchase_planning_note",
+        "formula": "weighted_recent_demand_with_seasonal_uplift"
+      },
+      "sales": {
+        "source": "customer_po_pdf",
+        "target": "reference_plus_cross_line_mixed_faults"
+      },
+      "crm": {
+        "source": "opportunity_handoff_pdf",
+        "target": "stage_owner_revenue_date_priority"
+      }
+    }
+  },
+  "cross_split_overlap_counts": {
+    "train:selection": {
+      "ids": 0,
+      "partners": 0,
+      "skus": 0,
+      "source_names": 0,
+      "source_notes": 0,
+      "source_sha256": 0,
+      "salespeople": 0,
+      "template_groups": 0,
+      "causal_signatures": 0,
+      "instance_groups": 0
+    },
+    "train:evaluation_candidate": {
+      "ids": 0,
+      "partners": 0,
+      "skus": 0,
+      "source_names": 0,
+      "source_notes": 0,
+      "source_sha256": 0,
+      "salespeople": 0,
+      "template_groups": 0,
+      "causal_signatures": 0,
+      "instance_groups": 0
+    },
+    "selection:evaluation_candidate": {
+      "ids": 0,
+      "partners": 0,
+      "skus": 0,
+      "source_names": 0,
+      "source_notes": 0,
+      "source_sha256": 0,
+      "salespeople": 0,
+      "template_groups": 0,
+      "causal_signatures": 0,
+      "instance_groups": 0
+    }
+  },
+  "scale_final_v06_split_validator_passed_on_actual_private_seed": true,
+  "same_140_task_package_manifest_across_worlds": true,
+  "task_set_manifest_sha256": "3516b2e22d68b1c564b496f0ae70c9d80df2e9d3a5043346786778df172c4fe3",
+  "same_pinned_code_and_runtime_across_worlds": true,
+  "pinned_code_and_runtime_sha256": {
+    "bootstrap.py": "dd93138a5af29100aeedc5f366d24637e714d490815056d55e27abe5535a6723",
+    "create_partition_worlds.py": "a7ef55cb52daaac4ae496b942b4352f6ce797ab6b6dfad670a7a9b50eda11cef",
+    "partition_factory.py": "ea0800494570f980eb4c142735176c61350d53dc7d1bce4624a5d0e1daf13bd6",
+    "verify.py": "85643ef9b4ed81cd4f5bf434549ae662450fa7c34caaca2cdbd0f1cd809a4738",
+    "reset.py": "8fcf06f28f83928dece44aa376a9d5abaf716c8e089fb60835092477dbca3883",
+    "gui_controls.py": "b486d4d22f4e84766d2ec5bd875d3f53199941a75b1d397d247af6b5fcaec14e",
+    "sweep_partition.py": "b8104dc33e92f440ef4a2823f1c8900538da76b0b3db9c17a2ee5825a2e9d4d9",
+    "worker_lease.py": "e9bddf8dd07d799c529d8cf75765abaa921e9a7360b6ed1db1d92686321dd9be",
+    "audit_partition_receipts.py": "90238b58676c7fee8245e5ab31ab87156342828c132b305439e1192d24b17bf4",
+    "record_train_trace.py": "47b64137958c04d79dba51611f47b3579555225e6f9535bdb55d5047ec5c7c50",
+    "compose.yaml": "b68c4907d640d61c199893dd26fd065b8fdc3123d0e85fc5ae374b23aae4ba58"
+  },
+  "world_checkpoints": [
+    {
+      "split": "train",
+      "project": "envloop-odoo-train-v1",
+      "db_checkpoint_sha256": "505d625e516b358b9af9af4186f72e9e1fe0cb25551a8ba7e19856ecb6004d19",
+      "filestore_checkpoint_sha256": "81e5fb42ee352350d357e77ba999ff38902a239a2a94189f54cb43461e3d758e",
+      "case_manifest_sha256": "369eb0c95e7954a78c8dce0382cefda1905c4ada746fc5944dfac4002b97858b",
+      "source_hash_manifest_sha256": "9e1e7fa2e37bd2416ee9a46790ac75428a2f0fbd6cfa08244afe6b95da5884be",
+      "role_policy_sha256": "b97f4623c95789ea0aabc42eaac6450024663a699d77b1129e0bb615cbbd1bf5",
+      "actor_non_admin": true,
+      "filestore_file_count": 888
+    },
+    {
+      "split": "selection",
+      "project": "envloop-odoo-selection-v1",
+      "db_checkpoint_sha256": "bb0a748d488071b16495a107ce8020b6ef6b7b785725bf257bb9d912f438f7bc",
+      "filestore_checkpoint_sha256": "06ba13e9a4291e9b5ac7fc038fa8ea5ce0d04caf9971d99feb0cbceb16879dce",
+      "case_manifest_sha256": "11f40d3d8c37bf1aa33a1c062c9eec545e65baf360a9777dce3355831e396bc7",
+      "source_hash_manifest_sha256": "c988d9ae062f856cd937700eac4e69f9507825a39a0b78fbebb71263c65635f6",
+      "role_policy_sha256": "b97f4623c95789ea0aabc42eaac6450024663a699d77b1129e0bb615cbbd1bf5",
+      "actor_non_admin": true,
+      "filestore_file_count": 888
+    },
+    {
+      "split": "evaluation_candidate",
+      "project": "envloop-odoo-evaluation-v1",
+      "db_checkpoint_sha256": "3b7202621e14c36126dba17be4a3a5b134b3b4e091db4de9d7de30013284ed00",
+      "filestore_checkpoint_sha256": "dac25e429677bb467c1f56cff9fba72b4e5e02c1b89f94b755da9aa9f9184a1a",
+      "case_manifest_sha256": "9cdb164c73b7b2ac039f222ea55936f3dc5a4760a23e106cf2df7ee3482e5b59",
+      "source_hash_manifest_sha256": "0c662b3a6a40deb758340987af3d4477cfcebaa46cb9f04084730b978c91caba",
+      "role_policy_sha256": "b97f4623c95789ea0aabc42eaac6450024663a699d77b1129e0bb615cbbd1bf5",
+      "actor_non_admin": true,
+      "filestore_file_count": 1008
+    }
+  ],
+  "operational_source_data": "original synthetic procurement, inventory, sales and CRM documents",
+  "authentic_reference_data": "112 public historical SEC companyfacts observations, reference only",
+  "official_final_tasks_admitted": 0,
+  "researcher_campaigns": 0,
+  "model_attempts": 0
+}

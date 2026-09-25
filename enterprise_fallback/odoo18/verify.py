@@ -12,13 +12,40 @@ import subprocess
 from pathlib import Path
 
 from factory import HERE, PRIVATE
+from worker_lease import exclusive_worker_operation
 
 SQL = r"""
 SELECT json_build_object(
+  'global_business_identity', (
+    SELECT json_build_object(
+      'purchase_order', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM purchase_order),
+      'purchase_order_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM purchase_order_line),
+      'sale_order', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM sale_order),
+      'sale_order_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM sale_order_line),
+      'stock_picking', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_picking),
+      'stock_move', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_move),
+      'stock_move_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_move_line),
+      'account_move', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM account_move),
+      'account_move_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM account_move_line),
+      'crm_lead', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM crm_lead),
+      'res_partner', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM res_partner),
+      'res_users', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM res_users),
+      'product_product', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM product_product),
+      'stock_warehouse_orderpoint',
+        (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_warehouse_orderpoint),
+      'business_attachment', (
+        SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json)
+        FROM ir_attachment
+        WHERE res_model IN ('purchase.order', 'sale.order', 'crm.lead',
+                            'product.product', 'res.company', 'stock.picking',
+                            'account.move')
+      )
+    )
+  ),
   'orders', (
     SELECT COALESCE(json_agg(to_jsonb(x) ORDER BY x.id), '[]'::json)
     FROM (
-      SELECT id, name, origin, partner_id, state, currency_id,
+      SELECT id, name, origin, partner_id, partner_ref, state, currency_id,
              to_char(date_order, 'YYYY-MM-DD HH24:MI:SS') AS date_order
       FROM purchase_order WHERE origin = 'ENVLOOP-DEV'
     ) x
@@ -81,7 +108,8 @@ SELECT json_build_object(
   'sales_orders', (
     SELECT COALESCE(json_agg(to_jsonb(x) ORDER BY x.id), '[]'::json)
     FROM (
-      SELECT id, name, origin, partner_id, state, client_order_ref, note
+      SELECT id, name, origin, partner_id, state, client_order_ref, note,
+             to_char(validity_date, 'YYYY-MM-DD') AS validity_date
       FROM sale_order WHERE origin = 'ENVLOOP-SALES-DEV'
     ) x
   ),
@@ -102,7 +130,7 @@ SELECT json_build_object(
       SELECT id, name, type, partner_id, user_id, team_id, stage_id,
              expected_revenue::text AS revenue,
              to_char(date_deadline, 'YYYY-MM-DD') AS deadline,
-             priority, description, active
+             priority, email_from, phone, description, active
       FROM crm_lead WHERE name LIKE 'ELCRM-%'
     ) x
   ),
@@ -120,6 +148,7 @@ SELECT json_build_object(
       SELECT u.id, p.name, u.login, u.active, u.company_id
       FROM res_users u JOIN res_partner p ON p.id = u.partner_id
       WHERE u.login LIKE 'envloop.sales.%@example.invalid'
+         OR u.login LIKE 'envloop.actor.%@example.invalid'
     ) x
   ),
   'crm_stages', (
@@ -134,6 +163,11 @@ SELECT json_build_object(
 
 
 def snapshot() -> dict:
+    with exclusive_worker_operation("snapshot"):
+        return _snapshot_unlocked()
+
+
+def _snapshot_unlocked() -> dict:
     cmd = [
         "docker", "compose", "--env-file", ".env", "exec", "-T", "db",
         "psql", "-U", "bench_verify", "-d", "bench", "-At",
@@ -147,6 +181,18 @@ def keyed(rows: list[dict]) -> dict[int, dict]:
     return {row["id"]: row for row in rows}
 
 
+def global_identity_differences(baseline: dict, observed: dict) -> list[str]:
+    """Reject new/deleted business records outside the task's scoped rows."""
+    original = baseline.get("global_business_identity")
+    current = observed.get("global_business_identity")
+    if original is None and current is None:
+        # Older unit fixtures predate this guard; live checkpoints cannot.
+        return []
+    if original is None or current is None:
+        raise RuntimeError("Global business identity guard missing")
+    return ["global_business_record_identity_changed"] if current != original else []
+
+
 def freeze() -> dict:
     PRIVATE.mkdir(exist_ok=True)
     path = PRIVATE / "baseline_snapshot.json"
@@ -154,11 +200,18 @@ def freeze() -> dict:
         raise RuntimeError("Baseline already frozen; do not overwrite after an attempt")
     snap = snapshot()
     counts = {key: len(value) for key, value in snap.items()}
-    expected_counts = {"orders": 120, "lines": 360, "attachments": 161,
-                       "vendors": 24, "products": 48, "orderpoints": 20,
-                       "sales_orders": 20, "sales_lines": 60, "crm_leads": 20,
-                       "customers": 20, "salespeople": 3,
-                       "crm_stages": counts["crm_stages"]}
+    partition_receipt = PRIVATE / "partition_receipt.json"
+    if partition_receipt.exists():
+        expected_counts = json.loads(partition_receipt.read_text())["expected_snapshot_counts"]
+        expected_counts["crm_stages"] = counts["crm_stages"]
+        expected_counts["global_business_identity"] = 15
+    else:
+        expected_counts = {"orders": 120, "lines": 360, "attachments": 161,
+                           "vendors": 24, "products": 48, "orderpoints": 20,
+                           "sales_orders": 20, "sales_lines": 60, "crm_leads": 20,
+                           "customers": 20, "salespeople": 3,
+                           "crm_stages": counts["crm_stages"],
+                           "global_business_identity": 15}
     if counts["crm_stages"] < 4:
         raise RuntimeError("Expected at least four CRM stages")
     if counts != expected_counts:
@@ -168,12 +221,29 @@ def freeze() -> dict:
 
 
 def evaluate(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
-    for group in ("orders", "attachments", "vendors", "products", "orderpoints",
+    differences = global_identity_differences(baseline, observed)
+    for group in ("attachments", "vendors", "products", "orderpoints",
                   "sales_orders", "sales_lines", "crm_leads", "customers",
                   "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):
             differences.append(f"{group}_changed_or_missing")
+    original_orders = keyed(baseline["orders"])
+    actual_orders = keyed(observed["orders"])
+    if original_orders.keys() != actual_orders.keys():
+        differences.append("purchase_order_identity_set_changed")
+    for order_id, original in original_orders.items():
+        current = actual_orders.get(order_id)
+        if current is None:
+            continue
+        if order_id != target.get("order_id") or "vendor_reference" not in target:
+            if current != original:
+                differences.append("unrelated_or_target_order_changed")
+            continue
+        for key in original:
+            if key != "partner_ref" and current.get(key) != original[key]:
+                differences.append("target_purchase_order_identity_or_state_changed")
+        if current.get("partner_ref") != target["vendor_reference"]:
+            differences.append("target_vendor_reference_mismatch")
     baseline_lines = keyed(baseline["lines"])
     observed_lines = keyed(observed["lines"])
     if baseline_lines.keys() != observed_lines.keys():
@@ -208,7 +278,7 @@ def evaluate(case_id: str, target: dict, baseline: dict, observed: dict) -> dict
 
 
 def evaluate_replenishment(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products",
                   "sales_orders", "sales_lines", "crm_leads", "customers",
                   "salespeople", "crm_stages"):
@@ -244,7 +314,7 @@ def evaluate_replenishment(case_id: str, target: dict, baseline: dict, observed:
 
 
 def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products", "orderpoints",
                   "crm_leads", "customers", "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):
@@ -266,6 +336,11 @@ def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -
                     differences.append("target_sales_order_identity_or_state_changed")
             if current["client_order_ref"] != target["customer_reference"]:
                 differences.append("target_customer_reference_mismatch")
+            if "expiration_date" in target:
+                if current.get("validity_date") != target["expiration_date"]:
+                    differences.append("target_quotation_expiration_mismatch")
+            elif current.get("validity_date") != original.get("validity_date"):
+                differences.append("target_quotation_expiration_changed")
     base_lines = keyed(baseline["sales_lines"])
     actual_lines = keyed(observed["sales_lines"])
     if base_lines.keys() != actual_lines.keys():
@@ -293,7 +368,7 @@ def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -
 
 
 def evaluate_crm(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products", "orderpoints",
                   "sales_orders", "sales_lines", "customers", "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):
@@ -322,6 +397,11 @@ def evaluate_crm(case_id: str, target: dict, baseline: dict, observed: dict) -> 
                 differences.append(code)
         if round(float(current["revenue"]), 2) != expected["revenue"]:
             differences.append("target_crm_revenue_mismatch")
+        for key, code in (("email_from", "target_crm_verified_email_mismatch"),
+                          ("phone", "target_crm_verified_phone_mismatch")):
+            expected_value = expected[key] if key in expected else original.get(key)
+            if current.get(key) != expected_value:
+                differences.append(code)
     return _result(case_id, differences)
 
 
@@ -395,6 +475,11 @@ def include_physical_source_files(result: dict, baseline: dict) -> dict:
 
 
 def score(case_id: str) -> dict:
+    with exclusive_worker_operation("score"):
+        return _score_unlocked(case_id)
+
+
+def _score_unlocked(case_id: str) -> dict:
     if case_id.startswith("ELSQ-"):
         gold = json.loads((PRIVATE / "sales_gold.json").read_text())
         if case_id not in gold:

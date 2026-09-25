@@ -1,0 +1,15 @@
+{
+  "schema": "sec-cashquality-public-development-inventory-v1",
+  "status": "five public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "net income to operating-cash-flow noncash residual, reinvestment, and synthetic cash drag",
+  "issuer_families": 5,
+  "original_10k_accessions": 5,
+  "excerpt_sha256_by_ticker": {
+    "META": "1e20c02474cf38a0f414e9f63f0b70c288369cf60e135e3e79ca1c830fcde15f",
+    "CRM": "a2f2008dcf9954fc0215872eeb9c91e630ac4534f85c6128cbc2b80c95bec5cd",
+    "COST": "6255078337315cb4787767623481610f81318a7a937b5f0dc31b2759cd533dde",
+    "KO": "7c21a4e496297fcabed92077723d889044cd0e3beabd6e6c708b3e9fe4b75218",
+    "NFLX": "cb74bb14b13f7a0653ef3b82eb6ae4fa4450754c16ec9cc74d1322fcddcd32a0"
+  },
+  "official_final_credit": 0
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "sec-tax-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "three public original-filing source excerpts; zero hidden or GUI admission",
+  "issuers": 3,
+  "original_accessions": 3,
+  "total_fact_rows": 51,
+  "source_units": [
+    "USD"
+  ],
+  "sources": [
+    {
+      "ticker": "GOOGL",
+      "cik": 1652044,
+      "accession": "0001652044-25-000014",
+      "records": 17,
+      "raw_json_sha256": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
+      "excerpt_sha256": "9703fd3cb09f79759a20751bbe791b5ea328467323c1de44f8a11d7e5fee732e"
+    },
+    {
+      "ticker": "CRM",
+      "cik": 1108524,
+      "accession": "0001108524-24-000005",
+      "records": 17,
+      "raw_json_sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "excerpt_sha256": "e703e61b56d7192cb3b39d7aedc23806fe37704542097cd751390403f822a16b"
+    },
+    {
+      "ticker": "META",
+      "cik": 1326801,
+      "accession": "0001326801-25-000017",
+      "records": 17,
+      "raw_json_sha256": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
+      "excerpt_sha256": "91864a403588f985e4be56cbf7b459f76eba5f35e667dfb3492da1291642a21b"
+    }
+  ]
+}

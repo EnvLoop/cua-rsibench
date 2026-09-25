@@ -1,0 +1,51 @@
+{
+  "schema": "envloop-odoo-partition-candidate-gui-audit-v1",
+  "status": "candidate_environment_qualified",
+  "partition": "evaluation_candidate",
+  "run_id": "20260925T073121Z-50bb3c96",
+  "candidate_cases": 100,
+  "cases_with_all_per_id_controls": 100,
+  "per_family_qualified": {
+    "inventory": 25,
+    "sales": 25,
+    "crm": 25,
+    "purchase": 25
+  },
+  "negative_codes_required": {
+    "purchase": "unrelated_order_line_changed",
+    "inventory": "unrelated_replenishment_rule_changed",
+    "sales": "unrelated_sales_order_changed",
+    "crm": "unrelated_crm_opportunity_changed"
+  },
+  "all_sources_visible_in_native_gui": true,
+  "actor_role_scoped_no_admin_group": true,
+  "evaluator_select_only_on_scored_tables": true,
+  "exclusive_worker_lease_interval_verified": true,
+  "final_database_and_physical_filestore_reset_exact": true,
+  "protected_attachment_files_per_attempt": 76,
+  "product_planning_notes_in_database_snapshot": 25,
+  "world_case_manifest_sha256": "9cdb164c73b7b2ac039f222ea55936f3dc5a4760a23e106cf2df7ee3482e5b59",
+  "world_source_hash_manifest_sha256": "0c662b3a6a40deb758340987af3d4477cfcebaa46cb9f04084730b978c91caba",
+  "task_set_manifest_sha256": "3516b2e22d68b1c564b496f0ae70c9d80df2e9d3a5043346786778df172c4fe3",
+  "role_policy_sha256": "b97f4623c95789ea0aabc42eaac6450024663a699d77b1129e0bb615cbbd1bf5",
+  "pinned_code_and_runtime_sha256": {
+    "bootstrap.py": "dd93138a5af29100aeedc5f366d24637e714d490815056d55e27abe5535a6723",
+    "create_partition_worlds.py": "a7ef55cb52daaac4ae496b942b4352f6ce797ab6b6dfad670a7a9b50eda11cef",
+    "partition_factory.py": "ea0800494570f980eb4c142735176c61350d53dc7d1bce4624a5d0e1daf13bd6",
+    "verify.py": "85643ef9b4ed81cd4f5bf434549ae662450fa7c34caaca2cdbd0f1cd809a4738",
+    "reset.py": "8fcf06f28f83928dece44aa376a9d5abaf716c8e089fb60835092477dbca3883",
+    "gui_controls.py": "b486d4d22f4e84766d2ec5bd875d3f53199941a75b1d397d247af6b5fcaec14e",
+    "sweep_partition.py": "b8104dc33e92f440ef4a2823f1c8900538da76b0b3db9c17a2ee5825a2e9d4d9",
+    "worker_lease.py": "e9bddf8dd07d799c529d8cf75765abaa921e9a7360b6ed1db1d92686321dd9be",
+    "audit_partition_receipts.py": "90238b58676c7fee8245e5ab31ab87156342828c132b305439e1192d24b17bf4",
+    "record_train_trace.py": "47b64137958c04d79dba51611f47b3579555225e6f9535bdb55d5047ec5c7c50",
+    "compose.yaml": "b68c4907d640d61c199893dd26fd065b8fdc3123d0e85fc5ae374b23aae4ba58"
+  },
+  "world_seed_sha256": "6d94b762fb3aed8d602c2a241137135417a826ead64a44adb3acf116498f2f32",
+  "db_checkpoint_sha256": "3b7202621e14c36126dba17be4a3a5b134b3b4e091db4de9d7de30013284ed00",
+  "filestore_checkpoint_sha256": "dac25e429677bb467c1f56cff9fba72b4e5e02c1b89f94b755da9aa9f9184a1a",
+  "official_final_tasks_admitted": 0,
+  "researcher_campaigns": 0,
+  "model_attempts": 0,
+  "global_hidden_task_and_action_contract_freeze_pending": true
+}

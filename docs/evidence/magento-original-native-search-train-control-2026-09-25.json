@@ -1,0 +1,48 @@
+{
+  "app_architecture": "amd64",
+  "app_image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "application": "Magento Open Source 2.4.6 admin",
+  "checked_date": "2026-09-25",
+  "fresh_same_topology_exact_reset_passed": true,
+  "frozen_normalized_baseline_sha256": "a485f6be2ba843183368b2ded80b385fd3f336d71ae411ad0553a125d5f9623a",
+  "known_limit": "One evaluator-scripted train-only parent. Final 100 identities, per-ID GUI controls, researcher action contract, and model difficulty remain unqualified.",
+  "model_calls": 0,
+  "monitored_catalog_table_count": 9,
+  "monitored_other_business_table_count": 7,
+  "native_search_architecture": "arm64",
+  "native_search_image_sha256": "sha256:2c257b68f361872e13bdd476cba152e232a314ec61b0eedfc1f71b628ba39432",
+  "native_search_version": "7.10.2 OSS",
+  "neutral_saves_preserved_non_target_business_state": 2,
+  "normalized_gui_positive_score": 1.0,
+  "official_final_tasks_admitted": 0,
+  "pre_normalization_failure_codes": [
+    "target_nonprice_changed"
+  ],
+  "pre_normalization_strict_positive_score": 0.0,
+  "private_receipt_sha256": {
+    "finalization_first": "806d7f47fbe2b79b51e14147fe93f4b9a54c811bf051d8c4632c180e6ac8a9ba",
+    "finalization_second": "31304ab966db3654db7ab480d42d3b5c7d98f1930ba24de9ceb9def6be5ebe32",
+    "fresh_reset": "ba1a89fbaa38ec92f69c106661b901062b23931c4e16821802dc5b8ff3256686",
+    "neutral_first": "96bc1db0adad0669b990a075cabfc9ebcdb38307869c39c2f5da97b5dc22437f",
+    "neutral_second": "79360c0b78d83635ae84bdd27b9dc595761b76f8ab2d891ba2e24a187432f88f",
+    "positive": "cf321dcd49fbb23725ff8184539e279d9eb139d44078c5ec5522ff650909f4c7",
+    "runtime_first": "2c221d7f36723148ca682e7b91ebe993e84158d209ea4f83093818dca7ab557f",
+    "runtime_second": "277e8466f129416440b650949d9613dc038aceb2e97d5bfbf14ef2e70a449879",
+    "strict_after": "bd5584ce6738639fa1600827cc636b2dcc55ebb4fb2b8288a2a5ebf502de47c6",
+    "strict_before": "898e969b066c92ea1db7746b0f3c3e3f79d334da076d2d88f4ad42d1491907dc",
+    "wrong_variant": "00235690da73dc1cd59931315cfe7501fb97b0a3d9011652d75e90ac4235cb47"
+  },
+  "researcher_campaigns": 0,
+  "same_topology_distinct_app_containers": 2,
+  "same_topology_distinct_search_containers": 2,
+  "schema": "envloop-magento-original-native-search-train-control-public-v1",
+  "search_document_baseline_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+  "search_document_count": 181,
+  "status": "train_only_development_trio_not_final_admission",
+  "wrong_variant_failure_codes": [
+    "target_price_or_identity_mismatch",
+    "untouched_variant_changed",
+    "other_catalog_changed"
+  ],
+  "wrong_variant_gui_negative_score": 0.0
+}

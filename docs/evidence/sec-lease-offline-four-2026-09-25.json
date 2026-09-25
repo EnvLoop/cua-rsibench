@@ -1,0 +1,35 @@
+{
+  "schema": "sec-lease-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 4,
+  "distinct_issuer_families": 4,
+  "distinct_original_10k_accessions": 4,
+  "issuers": [
+    "GOOGL",
+    "KO",
+    "ORCL",
+    "WMT"
+  ],
+  "sheets_per_case": 9,
+  "formula_targets_per_case": 52,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 4,
+  "unsolved_seed_rejections": 4,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "reported_maturity_buckets_per_case": 6,
+  "source_units": [
+    "USD",
+    "pure"
+  ],
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "bec110cee37ca50b99deaae5ec744fe0c9ce53468af9124380990470c2f0d9eb",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Undiscounted payments less reported lease liability is an arithmetic gap, not a separately reported fact.",
+    "Synthetic payment changes do not revise contractual obligations or represent SEC guidance.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

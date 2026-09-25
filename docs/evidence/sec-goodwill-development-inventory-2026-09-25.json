@@ -1,0 +1,13 @@
+{
+  "schema": "sec-goodwill-public-development-inventory-v1",
+  "status": "three public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "goodwill acquisition residual, intangible carrying values, and synthetic impairment/amortization stress",
+  "issuer_families": 3,
+  "original_10k_accessions": 3,
+  "excerpt_sha256_by_ticker": {
+    "PFE": "fac49a39745723eac9e62410f923e8ec0ec5bd3d15da9b546d53812b31fe716d",
+    "NVDA": "5a2f35235f62c3c01a1603505391e484e075415175ef7338ce2a488aa6040910",
+    "META": "6c6d3131e6555214987c564fb59afe83a790ba040b87defa5f1b6359824ecc1c"
+  },
+  "official_final_credit": 0
+}

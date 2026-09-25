@@ -1,0 +1,29 @@
+{
+  "schema": "sec-goodwill-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 3,
+  "distinct_issuer_families": 3,
+  "distinct_original_10k_accessions": 3,
+  "issuers": [
+    "META",
+    "NVDA",
+    "PFE"
+  ],
+  "sheets_per_case": 9,
+  "formula_targets_per_case": 45,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 3,
+  "unsolved_seed_rejections": 3,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "8ddf662af71fd9d3d27e8e442a681567ee6f6a4f666033034f49146bbdd5c589",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Goodwill and intangible residuals do not identify an acquisition, impairment, or FX component uniquely.",
+    "The synthetic write-down and added amortization ignore tax and full impairment accounting.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

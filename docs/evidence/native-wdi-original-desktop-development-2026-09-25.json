@@ -1,0 +1,166 @@
+{
+  "candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "candidate_inventory_sha256": "85666453d5ec30cb15667997d314d5c55df0fd4ff2a3af7ea73e77b98f215a04",
+  "checked_date": "2026-09-25",
+  "development_controls": [
+    {
+      "actor_action_counts": {
+        "cold-reset": 0,
+        "near-miss": 10,
+        "positive": 10
+      },
+      "application": "Calc",
+      "development_task_id": "wdi-native-mex-calc-growth",
+      "fresh_cold_reset_sha256": "8edcfd3fdbe099830596642c765413a709ae99acaf2dae3970aa307a1369f228",
+      "near_miss_reasons": [
+        "target_formula_wrong:Review!B4",
+        "target_cached_result_wrong:Review!B4"
+      ],
+      "near_miss_saved_sha256": "783f747d7c3a0c31c11c20e38af80f3c4a05fb0571608cd05e665a95252809b2",
+      "near_miss_verifier_passed": false,
+      "positive_saved_sha256": "564cb35b59bda3376d8c698552936f70afc6bda661fb19876048fe28bb6a0bb6",
+      "positive_verifier_passed": true,
+      "receipt_sha256": {
+        "cold-reset": "c561343615ce6929746a2afe5e12877e999752cdfbbce75e1024198a33ea9929",
+        "near-miss": "68f995875319f3510c1a9ef1bf5e04a5dc7bdbbb5e33091ab4a39e5b652266db",
+        "positive": "8737c277f0d0ad8c6eb676047b1f7855bdae0f9a9afa4f4c43212f795365a678"
+      },
+      "same_input_sha256": "8edcfd3fdbe099830596642c765413a709ae99acaf2dae3970aa307a1369f228",
+      "sandbox_id_sha256": {
+        "cold-reset": "67716ab9a25a54d523eaa71e380dc8b69a16bfd0f339e2002d1f689b64052d89",
+        "near-miss": "ae1b9ec8c074e798ec6213fe3922789448f9aa29b0fc5d7c974c49580f992d83",
+        "positive": "d3b61c61f1e157ab2044cedcb1d99a661c8004384430c39b8cf499c22d3cc76e"
+      },
+      "screenshots_sha256": {
+        "cold-reset": {
+          "initial": "157a0a272c508ef1675d7fdab8b926e35fadca7bf799634f9546e45a06f8f22f"
+        },
+        "near-miss": {
+          "edited": "d41e74a5827d669ce999936bea8f4b2a705754b1ae5265c07edf1c6f5e14f814",
+          "initial": "157a0a272c508ef1675d7fdab8b926e35fadca7bf799634f9546e45a06f8f22f"
+        },
+        "positive": {
+          "edited": "6ae08a325a50ea337501d81ff5bad4dad84745d51e489d5ae2bfc4afef8e76f8",
+          "initial": "cb55cb491d386effbcbdb3d81a5e7b9d4045894ed3e55adef17535b46d4571ee"
+        }
+      }
+    },
+    {
+      "actor_action_counts": {
+        "cold-reset": 0,
+        "near-miss": 8,
+        "positive": 8
+      },
+      "application": "Impress",
+      "development_task_id": "wdi-native-mex-impress-deck-normalized",
+      "fresh_cold_reset_sha256": "44b56a796b84af002c9c598d5d2508da21e2708145774e6b0c30c607a9049ceb",
+      "near_miss_reasons": [
+        "target_text_wrong:slide3:shape2"
+      ],
+      "near_miss_saved_sha256": "6414cb00a390d6db5d046e0796ef712104afc2c911750619a07f971e227c21a4",
+      "near_miss_verifier_passed": false,
+      "positive_saved_sha256": "f4fbf6e1499954f03576b6aa360f98b8f30078be8ddcb2da4e45029caa358137",
+      "positive_verifier_passed": true,
+      "receipt_sha256": {
+        "cold-reset": "16247522bce053bf3706f84110f3280fac0ecbe70ece4739b9692b3c89b7512a",
+        "near-miss": "6fb838a9f1245a029c644e8c1341f6af20ad737928c4a0307277ddb35e0b1b8a",
+        "positive": "f4d4f03899461a5a3c71625a687041f8e8733327092f53ad9eeda7fa199a8383"
+      },
+      "same_input_sha256": "44b56a796b84af002c9c598d5d2508da21e2708145774e6b0c30c607a9049ceb",
+      "sandbox_id_sha256": {
+        "cold-reset": "89fbb0daf403d101151a5db6135b2d397e7aaa39aa0e56bf4c8a067d316f04e5",
+        "near-miss": "55d8e5ace1e71612aa55f12edd6ca39f773342a440e402fce007a8d3e331505a",
+        "positive": "b857d4c9028dc4f24e6bac158a0216e7f1d67cb2648ae6fc8ed0acc69b77c873"
+      },
+      "screenshots_sha256": {
+        "cold-reset": {
+          "initial": "883417d86b2bbf1761d903f4082989b2745500fa91244eab06a68df6044ebe84"
+        },
+        "near-miss": {
+          "edited": "610696f36f703d45d1861901952ca7d3f4a51cb2210ef1fc8f5c093bf73f9f6c",
+          "initial": "47bad59f2d323da76936e22518daec0d56e4e5551bf70df2aec6d83f3e00d865"
+        },
+        "positive": {
+          "edited": "87923ddd3c7d12ba7983518857980b2d1da9e35ff2d9a1cc4b5bd2c74a839783",
+          "initial": "47bad59f2d323da76936e22518daec0d56e4e5551bf70df2aec6d83f3e00d865"
+        }
+      }
+    },
+    {
+      "actor_action_counts": {
+        "cold-reset": 0,
+        "near-miss": 7,
+        "positive": 7
+      },
+      "application": "Writer",
+      "development_task_id": "wdi-native-mex-writer-brief",
+      "fresh_cold_reset_sha256": "e7a7ee4ef664b1326b8755141ecbd00c017eca03b0e5fde0b5a4972294766fdd",
+      "near_miss_reasons": [
+        "target_text_wrong:paragraph5"
+      ],
+      "near_miss_saved_sha256": "5a33d10a05e5aa11d509b2f46072be018ed0d82c55bc450c37520b7c2be1abd6",
+      "near_miss_verifier_passed": false,
+      "positive_saved_sha256": "58d69c7e73a15380ca266ab4f890beaabd679c4aa95d9e4cf5878523fdd805be",
+      "positive_verifier_passed": true,
+      "receipt_sha256": {
+        "cold-reset": "6c523ddf869f488361a5cd380b2fb756a2fab517bab219ea12b3438c5b1a7687",
+        "near-miss": "15bfe9f988a349aab8420f1fc66fb03440e497a3d8a35ed1dd73d8435d771f97",
+        "positive": "060e758e5e018eae30d4f5c7e58df823cced1c30ddab0376d2af5a1edc799568"
+      },
+      "same_input_sha256": "e7a7ee4ef664b1326b8755141ecbd00c017eca03b0e5fde0b5a4972294766fdd",
+      "sandbox_id_sha256": {
+        "cold-reset": "3b4b70c6a4e5edfbbafa937e9ca3a689a8b070a1b2a36edd20b1900b02e14050",
+        "near-miss": "6cf4b3658f1a938c80dd6833ec21bd03392999bbf03e8e18864957bb25b7297f",
+        "positive": "e916ceeac688941df17dd94de37c0f7d5b3211177e1763cb5f76686a605231a8"
+      },
+      "screenshots_sha256": {
+        "cold-reset": {
+          "initial": "54a2a82d2de9481b9e8bfb339ce824858262653d606d7039e245a6143abb5bc3"
+        },
+        "near-miss": {
+          "edited": "13d49d36089b160859d407b041da4e1cffe3afc0cf7100b404cb0dc634224b57",
+          "initial": "c1e45a53f1f43c308c92948fee61324680eecdbbe05fc4775f6836a4ae54a133"
+        },
+        "positive": {
+          "initial": "0cea4fc770453e6d7fd4685987acf03d6071931463446f9728bad20f41587bfa",
+          "opened": "9742fe1c5f735476faf399286fa64eb7e63b1dfaed78e94e687a509d2505191e",
+          "save-dialog": "ba1d09a1d13de4e994210cc6a796f4a4aa2813f223d61068eead8fee8088b8f4",
+          "selected": "c72f1c3664e133ff7e1aed9ee5a60e6f92e113cc3dacaa2b138c699a26652805"
+        }
+      }
+    }
+  ],
+  "final_candidate_application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "impress_trusted_neutral_save": {
+    "normalized_sha256": "44b56a796b84af002c9c598d5d2508da21e2708145774e6b0c30c607a9049ceb",
+    "original_sha256": "d109286764e413c32d06668c74aeaf16fe2c75a11666e5ba75eb795fce113d7c",
+    "receipt_sha256": "c239caad72ea8bd2c51b8f0d68cb0c53cd63230c67dd2f8f96e1315098023e5f",
+    "sandbox_id_sha256": "0065d9b0f44401ca254ead31070d23384047f40b7ed322af339c3a2acac6d418"
+  },
+  "official_model_attempt_count": 0,
+  "private_split_map_sha256": "c09eb0720d6a90770583a575284dc4ee90e48648336e2a3279ab3837ab1cae36",
+  "qualified_final_task_count": 0,
+  "runtime_probe": "LibreOffice 7.3.7.2 30(Build:2)\n\neb926ee03b6ba1b18e89b4a94cbb7a060ceac31f171b4bf9db5677e848451f86  /usr/bin/libreoffice",
+  "schema": "cua-native-wdi-original-desktop-development-receipt-v1",
+  "scope": "Original WDI-derived LibreOffice content, not OSWorld; three exposed train-only development tasks; candidate generation and controls do not admit any official final identity.",
+  "source": {
+    "catalog_url": "https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators",
+    "country_count": 35,
+    "dataset": "World Development Indicators",
+    "indicators": 5,
+    "license": "CC BY 4.0",
+    "license_url": "https://datacatalog.worldbank.org/public-licenses",
+    "observation_count": 1050,
+    "snapshot_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+    "source_url": "https://api.worldbank.org/v2/country/USA;CAN;MEX;GBR;FRA;DEU;ESP;ITA;NLD;SWE;NOR;FIN;POL;CZE;TUR;JPN;KOR;CHN;IND;IDN;THA;MYS;PHL;VNM;AUS;NZL;ZAF;EGY;KEN;NGA;BRA;CHL;ARG;COL;PER/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;FP.CPI.TOTL.ZG;SP.POP.TOTL;SL.UEM.TOTL.ZS?source=2&format=json&date=2019:2024&per_page=20000",
+    "years": "2019\u20132024"
+  }
+}
