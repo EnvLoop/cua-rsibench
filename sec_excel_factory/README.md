@@ -26,6 +26,8 @@ A tenth [property, plant and equipment carrying-value development workflow](../d
 
 The [private 20/20/100 split readiness screen](../docs/evidence/sec-private-split-readiness-2026-09-25.md) fails closed at 0/0/0 registered evaluator-held cases. All 28 current issuer identities and ten structural workflows are public development inventory. The preregistered source/template-isolated split requires at least 28 **additional** verified issuer families and ten new final semantic workflow families before its structure can qualify; actual Excel-web save/download/readback and reset remain a separate per-case admission gate.
 
+An evaluator-held [40-issuer candidate acquisition](../docs/evidence/sec-private-source-candidate-aggregate-2026-09-25.md) now offers possible new source identities and broad two-period proxy data coverage. All 40 original 10-K index identities were independently matched in SEC-hosted pages, but only two sample numeric facts received a non-proxy check; **zero** full source-fact families are authenticated and no private task was admitted. The untrusted proxy payloads and detailed identity receipts remain ignored under `work/`.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled

@@ -1,0 +1,29 @@
+{
+  "schema": "sec-private-source-candidate-aggregate-v1",
+  "date": "2026-09-25",
+  "status": "evaluator-held proxy-sourced candidates; no accepted source family or hidden task",
+  "candidate_issuer_identities": 40,
+  "pinned_direct_sec_transport_controls_passed": 2,
+  "proxy_companyfacts_snapshots_saved": 40,
+  "proxy_payloads_with_original_2024_10k_candidate": 40,
+  "proxy_payloads_with_at_least_30_current_usd_concepts": 40,
+  "proxy_payloads_with_at_least_12_two_period_usd_concepts": 40,
+  "official_sec_index_cik_accession_period_and_form_matches": 40,
+  "sample_numeric_facts_checked_in_nonproxy_sec_filing_view": 2,
+  "complete_issuer_fact_families_independently_verified": 0,
+  "private_split_tasks_registered": {"train": 0, "selection": 0, "final": 0},
+  "microsoft_excel_web_final_admissions": 0,
+  "evaluator_only_commitments_sha256": {
+    "identity_manifest": "df233eeb092bfefc5f040f7ce260127c9693157eb9368d6468888adb4f211baf",
+    "proxy_capture_receipt": "827cc8ef966ef529ebee9eb5eed8243dffa20385b51553ca7079ffc9a8605ccf",
+    "coverage_detail": "0bfe9ac2ea89aad228bb6356f8fafb5563a92a11a005769892d0f3a5a05370a6",
+    "official_index_controls": "7caa4d575a80ad0883f9f194f98f503ba080214870d32eaf3f90f3d1abe7c01f",
+    "two_value_control": "964b750d3f576ec55e9205a39fd2ac5171e48450dca4f858b6f79cec30267867"
+  },
+  "limits": [
+    "The read-only text proxy is untrusted for new raw payloads; transport control success does not authenticate each new numeric fact.",
+    "Official SEC index checks verify issuer, accession, reporting period and Form 10-K only.",
+    "Two sample values do not qualify any whole issuer source family for a complex task.",
+    "No new hidden semantic workflows, Excel-web saved/downloaded readback, or reset were admitted."
+  ]
+}
