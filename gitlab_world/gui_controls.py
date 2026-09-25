@@ -9,20 +9,22 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from datetime import date
 import hashlib
 import json
 from pathlib import Path
 import time
 from urllib.parse import urlsplit
 
-from . import bootstrap, factory, reset, runtime, verify
+from . import bootstrap, factory, quarantine, reset, runtime, verify
 
 
 PRIVATE = runtime.PRIVATE / "gui-controls"
 
 
 def _task(task_id: str) -> dict:
-    found = [task for task in bootstrap.world()["tasks"] if task["task_id"] == task_id]
+    found = [task for task in bootstrap.all_tasks(bootstrap.world())
+             if task["task_id"] == task_id]
     if len(found) != 1:
         raise ValueError("task ID not unique in private world")
     task = found[0]
@@ -83,15 +85,26 @@ async def _gui_issue_triage(page, project: dict, progress: dict,
 
     dates = page.locator('[data-testid="work-item-due-dates"]')
     await dates.locator('[data-testid="edit-button"]').click()
-    due = dates.locator("#due-date-input")
-    await due.fill(policy["issue_due"])
-    await due.press("Tab")
-    await dates.locator('[data-testid="apply-button"]').click()
-    value = dates.locator('[data-testid="due-date-value"]')
-    await value.filter(has_not_text="None").wait_for(timeout=30000)
+    expected_date = date.fromisoformat(policy["issue_due"]).strftime("%b %d, %Y").replace(" 0", " ")
+    visible_date = ""
+    for _ in range(3):
+        due = dates.locator("#due-date-input")
+        await due.fill(policy["issue_due"])
+        await due.press("Tab")
+        if await due.input_value() != policy["issue_due"]:
+            continue
+        await dates.locator('[data-testid="apply-button"]').click()
+        value = dates.locator('[data-testid="due-date-value"]')
+        await value.filter(has_not_text="None").wait_for(timeout=30000)
+        visible_date = (await value.inner_text()).strip()
+        if visible_date == expected_date:
+            break
+        await dates.locator('[data-testid="edit-button"]').click()
+    if visible_date != expected_date:
+        raise RuntimeError("GitLab visible due date differs from policy after bounded retries")
     await page.screenshot(path=str(folder / "issue-after.png"), full_page=True)
     return {"policy_rendered": True, "issue_iid": issue_iid,
-            "visible_assignee": await assignee.get_by_text(user, exact=False).count() > 0,
+            "visible_assignee": await assignee.locator('a[href$="/' + user + '"]').count() > 0,
             "visible_priority": await labels.locator('[data-testid="' + label + '"]').count() > 0,
             "visible_due_date": True,
             "screenshot_sha256": {name: hashlib.sha256((folder / name).read_bytes()).hexdigest()
@@ -131,6 +144,7 @@ async def attempt(browser, task: dict, issue_key: str, name: str,
     finally:
         await context.close()
     after = verify.state_snapshot()
+    factory.write_private(folder / "after-persisted-state.json", after)
     scored = verify.evaluate_final_task(task, before, after)
     receipt = {"schema": "envloop-gitlab-gui-control-attempt-v1", "task_id": task["task_id"],
                "case": name, "issue_key": issue_key,
@@ -143,7 +157,7 @@ async def attempt(browser, task: dict, issue_key: str, name: str,
     return receipt
 
 
-async def run(task_id: str) -> dict:
+async def run(task_id: str, *, exposed_development: bool = True) -> dict:
     from playwright.async_api import async_playwright
     task = _task(task_id)
     PRIVATE.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -173,12 +187,19 @@ async def run(task_id: str) -> dict:
         item["cold_reset"]["same_business_sha256"] and
         item["gui"]["policy_rendered"] and item["gui"]["visible_due_date"]
         for item in attempts)
+    # Direct development inspection exposes a whole project family. The
+    # evaluator-owned sweeper retains every task ID, screenshot, and oracle in
+    # private storage, and does not release a task-level result to researchers.
+    exposure = (quarantine.add_by_task(task_id, reason="gui_development_control")
+                if exposed_development else quarantine.public_counts())
     result = {"schema": "envloop-gitlab-original-world-gui-trio-v1",
               "task_id": task_id, "source_family_sha256": factory.sha256(task["source_family"]),
               "development_gui_control_passed": passed, "scores": scores,
               "fresh_browser_attempts": len(attempts),
               "cold_resets": sum(bool(item["cold_reset"]["cold_reset"]) for item in attempts),
               "model_calls": 0, "official_final_admitted": 0,
+              "evaluator_owned_private_control": not exposed_development,
+              "exposure_quarantine": exposure,
               "limitation": "Unsealed original development candidate; one GUI trio does not qualify 100 tasks."}
     factory.write_private(run_folder / "trio-private.json", {
         **result, "attempts": attempts})

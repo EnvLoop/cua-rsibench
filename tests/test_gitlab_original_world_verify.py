@@ -15,7 +15,8 @@ TASK = next(task for task in WORLD["tasks"]
             and task["template_group"] == "cross_record_issue_triage")
 PROGRESS = {"project_id": 17,
             "issue_iids": {"active": 1, "validation": 2},
-            "user_ids": {"oncall": 101}}
+            "user_ids": {"oncall": 101, "contractor": 102, "incoming": 103},
+            "mr_iids": {"approved": 1, "stale": 2}}
 
 
 def snapshot():
@@ -88,6 +89,49 @@ class GitLabWorldOracleTests(unittest.TestCase):
         self.assertEqual(delta["db"]["issues"]["modified"], [201])
         self.assertEqual(delta["db"]["issue_assignees"]["added"], [(201, 101)])
         self.assertEqual(delta["git_project_ids"], [])
+
+    def test_linked_milestone_requires_two_issues_and_exact_window(self):
+        task = next(row for row in WORLD["tasks"]
+                    if row["project_family"] == PROJECT["full_path"] and
+                    row["template_group"] == "release_milestone_coordination")
+        before = snapshot()
+        after = copy.deepcopy(before)
+        after["business_sha256"] = "after"
+        policy = PROJECT["policy"]
+        after["db"]["milestones"].append({
+            "id": 401, "project_id": 17, "title": policy["milestone_title"],
+            "start_date": policy["milestone_start"], "due_date": policy["milestone_due"]})
+        after["db"]["issues"][0]["milestone_id"] = 401
+        after["db"]["issues"][1]["milestone_id"] = 401
+        with patch.object(verify, "_context", return_value=(PROJECT, PROGRESS)):
+            self.assertEqual(verify.evaluate_final_task(
+                task, before, after, inspect_live_git=False)["score"], 1.0)
+            after["db"]["issues"][1]["milestone_id"] = None
+            self.assertEqual(verify.evaluate_final_task(
+                task, before, after, inspect_live_git=False)["score"], 0.0)
+
+    def test_access_handoff_rejects_overprivileged_incoming_role(self):
+        task = next(row for row in WORLD["tasks"]
+                    if row["project_family"] == PROJECT["full_path"] and
+                    row["template_group"] == "least_privilege_access_handoff")
+        before = snapshot()
+        before["db"]["members"] = [
+            {"id": 501, "source_id": 17, "user_id": 102,
+             "access_level": 20, "expires_at": None},
+            {"id": 502, "source_id": 17, "user_id": 101,
+             "access_level": 30, "expires_at": None}]
+        after = copy.deepcopy(before)
+        after["business_sha256"] = "after"
+        after["db"]["members"] = [before["db"]["members"][1].copy(),
+                                   {"id": 503, "source_id": 17, "user_id": 103,
+                                    "access_level": 20,
+                                    "expires_at": PROJECT["policy"]["access_expiry"]}]
+        with patch.object(verify, "_context", return_value=(PROJECT, PROGRESS)):
+            self.assertEqual(verify.evaluate_final_task(
+                task, before, after, inspect_live_git=False)["score"], 1.0)
+            after["db"]["members"][-1]["access_level"] = 40
+            self.assertEqual(verify.evaluate_final_task(
+                task, before, after, inspect_live_git=False)["score"], 0.0)
 
 
 if __name__ == "__main__":

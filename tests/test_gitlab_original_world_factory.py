@@ -33,6 +33,22 @@ class GitLabWorldFactoryTests(unittest.TestCase):
         self.assertEqual(len({task["task_id"] for task in self.world["tasks"]}), 140)
         self.assertEqual(len({task["source_family"] for task in self.world["tasks"]}), 30)
 
+    def test_reserve_refills_an_exposed_whole_final_project_family(self):
+        reserve = factory.reserve_replacement(SEED)
+        self.assertEqual(len(reserve["tasks"]), 5)
+        self.assertEqual(reserve["project"]["index"], 31)
+        self.assertEqual(reserve["project"]["partition"], "final_candidate_unsealed")
+        self.assertFalse({row["cveID"] for row in reserve["project"]["advisories"]} &
+                         {row["cveID"] for project in self.world["projects"]
+                          for row in project["advisories"]})
+        self.assertFalse({row["vendorProject"].casefold()
+                          for row in reserve["project"]["advisories"]} &
+                         {row["vendorProject"].casefold()
+                          for project in self.world["projects"]
+                          for row in project["advisories"]})
+        self.assertNotIn(reserve["project"]["full_path"],
+                         {project["full_path"] for project in self.world["projects"]})
+
     def test_real_advisory_facts_and_synthetic_overlay_are_labeled(self):
         project = self.world["projects"][10]
         self.assertIn(project["advisories"][0]["cveID"], project["files"]["security/kev-register.csv"])

@@ -17,11 +17,11 @@ SCHEMA = "envloop-gitlab-persisted-state-v1"
 
 def _ids() -> list[int]:
     progress = json.loads(bootstrap.PROGRESS_FILE.read_text())
-    if len(progress["projects"]) != 30 or not all(
+    if len(progress["projects"]) not in (30, 31) or not all(
             item.get("complete") for item in progress["projects"].values()):
-        raise RuntimeError("all 30 GitLab projects must be fully bootstrapped")
+        raise RuntimeError("GitLab project roster must be fully bootstrapped")
     ids = sorted(int(item["project_id"]) for item in progress["projects"].values())
-    if len(set(ids)) != 30 or any(value <= 0 for value in ids):
+    if len(set(ids)) != len(ids) or any(value <= 0 for value in ids):
         raise RuntimeError("project IDs invalid")
     return ids
 
@@ -155,8 +155,13 @@ def counts(snapshot: dict) -> dict:
 
 
 def verify_bootstrap(snapshot: dict) -> dict:
-    expected = {"projects": 30, "issues": 180, "members": 90,
-                "merge_requests": 60, "projects_with_git_refs": 30}
+    project_count = len(snapshot["project_ids"])
+    if project_count not in (30, 31):
+        raise RuntimeError("GitLab project count is not an admitted bootstrap stage")
+    expected = {"projects": project_count, "issues": project_count * 6,
+                "members": project_count * 3,
+                "merge_requests": project_count * 2,
+                "projects_with_git_refs": project_count}
     actual = counts(snapshot)
     for name, value in expected.items():
         if actual[name] != value:
@@ -182,7 +187,7 @@ def _require(condition: bool, reason: str) -> None:
 
 def _context(task: dict) -> tuple[dict, dict]:
     world = bootstrap.world()
-    matches = [project for project in world["projects"]
+    matches = [project for project in bootstrap.all_projects(world)
                if project["full_path"] == task["project_family"]]
     if len(matches) != 1:
         raise ValueError("task project not found uniquely in private world")
@@ -249,7 +254,12 @@ def _only_issue_fields(before: dict, after: dict,
     for issue_id, old in b.items():
         expected = dict(old)
         expected.update(allowed.get(issue_id, {}))
-        _require(a[issue_id] == expected, "issue changed beyond allowed target fields")
+        if a[issue_id] != expected:
+            fields = sorted({*a[issue_id], *expected})
+            changed = [name for name in fields
+                       if a[issue_id].get(name) != expected.get(name)]
+            raise QualificationError("issue fields differ from target/no-regression contract: "
+                                     + ",".join(changed))
 
 
 def _added_label_link(before: dict, after: dict, issue_id: int, label_id: int) -> None:

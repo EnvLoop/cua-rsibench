@@ -40,15 +40,56 @@ def world() -> dict:
     return result
 
 
+def with_reserve_replacement() -> dict:
+    """Attach an unused project without rewriting the original 30-project split."""
+    result = world()
+    if result.get("reserve_projects"):
+        if len(result["reserve_projects"]) != 1 or len(result.get("reserve_tasks", [])) != 5:
+            raise RuntimeError("private reserve manifest is partial")
+        return result
+    reserve = factory.reserve_replacement(SEED_FILE.read_text().strip())
+    original_sources = {row["cveID"] for project in result["projects"]
+                        for row in project["advisories"]}
+    if any(row["cveID"] in original_sources for row in reserve["project"]["advisories"]):
+        raise RuntimeError("reserve source CVE overlaps original world")
+    result["reserve_projects"] = [reserve["project"]]
+    result["reserve_tasks"] = reserve["tasks"]
+    result["reserve_source_excerpt_sha256"] = reserve["source_excerpt_sha256"]
+    temporary = WORLD_FILE.with_suffix(".tmp")
+    temporary.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    temporary.chmod(0o600)
+    temporary.replace(WORLD_FILE)
+    return result
+
+
+def all_projects(manifest: dict) -> list[dict]:
+    return manifest["projects"] + manifest.get("reserve_projects", [])
+
+
+def all_tasks(manifest: dict) -> list[dict]:
+    return manifest["tasks"] + manifest.get("reserve_tasks", [])
+
+
 def api_token() -> str:
     if TOKEN_FILE.exists():
         if TOKEN_FILE.stat().st_mode & 0o077:
             raise RuntimeError("token file permissions are not restrictive")
-        return TOKEN_FILE.read_text().strip()
+        cached = TOKEN_FILE.read_text().strip()
+        request = Request(runtime.BASE + "/api/v4/user", method="GET",
+                          headers={"PRIVATE-TOKEN": cached})
+        try:
+            with urlopen(request, timeout=15) as response:
+                if response.status == 200:
+                    return cached
+        except HTTPError as exc:
+            if exc.code not in (401, 403):
+                raise RuntimeError("GitLab bootstrap token validation failed") from None
+            TOKEN_FILE.rename(PRIVATE / ("bootstrap-token-expired-" +
+                                         str(int(time.time())) + ".txt"))
     ruby = (
         "u=User.find_by_username('root') or raise 'root missing';"
         "t=u.personal_access_tokens.create!(name:'envloop-world-bootstrap',"
-        "scopes:['api'],expires_at:Date.today+2);"
+        "scopes:['api'],expires_at:Date.today+30);"
         "puts t.token"
     )
     output = runtime.docker("exec", runtime.WORLD, "gitlab-rails", "runner", ruby,
@@ -267,39 +308,48 @@ def _merge_requests(api: GitLabAPI, project_id: int, project: dict) -> dict[str,
     return out
 
 
-def seed(max_projects: int = 30) -> dict:
+def _seed_one(api: GitLabAPI, project: dict, progress: dict) -> None:
+    full = project["full_path"]
+    if full in progress["projects"] and progress["projects"][full].get("complete"):
+        _labels(api, int(progress["projects"][full]["project_id"]))
+        return
+    group_id = _group(api, project["group_path"], progress)
+    user_ids = {role: _user(api, name, progress)
+                for role, name in project["principals"].items()}
+    item = _project(api, project, group_id)
+    project_id = int(item["id"])
+    _files(api, project_id, project)
+    _labels(api, project_id)
+    issue_iids = _issues(api, project_id, project)
+    _members(api, project_id, project, user_ids)
+    mr_iids = _merge_requests(api, project_id, project)
+    progress["projects"][full] = {
+        "complete": True, "project_id": project_id,
+        "issue_iids": issue_iids, "mr_iids": mr_iids,
+        "user_ids": user_ids, "default_branch": "main"}
+    _save_progress(progress)
+
+
+def seed(max_projects: int = 30, *, with_replacement: bool = False) -> dict:
     if not 1 <= max_projects <= 30:
         raise ValueError("max_projects must be 1..30")
     state = runtime.proof(runtime.WORLD)
     if not state["running"] or state["health"] != "healthy":
         raise RuntimeError("disposable GitLab world is not healthy")
-    manifest = world()
+    manifest = with_reserve_replacement() if with_replacement else world()
     api = GitLabAPI(api_token())
     progress = _progress()
     for project in manifest["projects"][:max_projects]:
-        full = project["full_path"]
-        if full in progress["projects"] and progress["projects"][full].get("complete"):
-            _labels(api, int(progress["projects"][full]["project_id"]))
-            continue
-        group_id = _group(api, project["group_path"], progress)
-        user_ids = {role: _user(api, name, progress)
-                    for role, name in project["principals"].items()}
-        item = _project(api, project, group_id)
-        project_id = int(item["id"])
-        _files(api, project_id, project)
-        _labels(api, project_id)
-        issue_iids = _issues(api, project_id, project)
-        _members(api, project_id, project, user_ids)
-        mr_iids = _merge_requests(api, project_id, project)
-        progress["projects"][full] = {
-            "complete": True, "project_id": project_id,
-            "issue_iids": issue_iids, "mr_iids": mr_iids,
-            "user_ids": user_ids, "default_branch": "main"}
-        _save_progress(progress)
+        _seed_one(api, project, progress)
+    if with_replacement:
+        if max_projects != 30:
+            raise ValueError("replacement requires all original projects seeded")
+        _seed_one(api, manifest["reserve_projects"][0], progress)
     counts = {"groups": len(progress["groups"]), "users": len(progress["users"]),
               "projects_complete": sum(bool(row.get("complete")) for row in progress["projects"].values()),
               "issues_expected": 6 * len(progress["projects"]),
               "merge_requests_expected": 2 * len(progress["projects"]),
+              "reserve_replacement_projects": len(manifest.get("reserve_projects", [])),
               "candidate_final_admitted": 0}
     return {"schema": "envloop-gitlab-bootstrap-summary-v1", "counts": counts,
             "source_excerpt_sha256": factory.EXCERPT_SHA256,
@@ -310,8 +360,10 @@ def seed(max_projects: int = 30) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--max-projects", type=int, default=30)
+    parser.add_argument("--with-replacement", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(seed(args.max_projects), indent=2, sort_keys=True))
+    print(json.dumps(seed(args.max_projects, with_replacement=args.with_replacement),
+                     indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

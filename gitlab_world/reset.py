@@ -19,7 +19,8 @@ from . import factory, runtime, verify
 
 PRIVATE = runtime.PRIVATE
 STATE_FILE = PRIVATE / "cow-reset-state.json"
-VM_ROOT = "/var/lib/envloop-gitlab-cow-v1"
+VM_ROOT = "/var/lib/envloop-gitlab-cow-" + runtime.ACTIVE_VERSION
+LEGACY_VM_ROOT = "/var/lib/envloop-gitlab-cow-v1"
 
 
 def vm_shell(script: str, *, timeout: int = 120) -> str:
@@ -137,6 +138,73 @@ def freeze() -> dict:
         raise
 
 
+def promote_replacement_baseline() -> dict:
+    """Freeze 31-project state on new named volumes after reserve refill.
+
+    This one-time migration copies a stopped, verified v1 overlay merge into
+    new v2 seed volumes. The 30-project seed, first overlay, and its receipts
+    remain private for forensic replay; no final outcome is promoted.
+    """
+    from . import bootstrap, quarantine, sweep
+
+    if not STATE_FILE.exists():
+        # STATE_FILE is the v1 path name shared by the migration; its contents
+        # record the actual old lowerdirs and must be preserved before replace.
+        raise RuntimeError("v1 cold clone state is missing")
+    global VM_ROOT
+    old_state = _state()
+    if runtime.ACTIVE_VERSION != "v1":
+        raise RuntimeError("reserve baseline is already promoted")
+    if len(bootstrap.all_projects(bootstrap.world())) != 31:
+        raise RuntimeError("replacement project was not generated")
+    if len(sweep.candidates()) != 100 or not quarantine.public_counts()[
+            "refill_complete_as_inventory_only"]:
+        raise RuntimeError("five exposed candidates not fully refilled")
+    current = verify.state_snapshot()
+    if len(current["project_ids"]) != 31:
+        raise RuntimeError("replacement project is not persisted")
+    verify.verify_bootstrap(current)
+    old_baseline = json.loads((PRIVATE / "baseline-persisted-state.json").read_text())
+    if len(old_baseline["project_ids"]) != 30:
+        raise RuntimeError("original 30-project baseline was not preserved")
+    _stop_remove_case()
+    next_volumes = runtime.volume_names("v2")
+    for role, volume in next_volumes.items():
+        runtime.docker("volume", "create", volume, timeout=30)
+        source = f"{LEGACY_VM_ROOT}/{role}/merged/."
+        target = f"/var/lib/docker/volumes/{volume}/_data/"
+        vm_shell(f"set -eu; cp -a {source} {target}", timeout=600)
+    for role in runtime.DESTS:
+        base = f"{LEGACY_VM_ROOT}/{role}"
+        vm_shell("set -eu; "
+                 f"if mountpoint -q {base}/merged; then umount {base}/merged; fi")
+    args = ["run", "-d", "--name", runtime.WORLD, "--hostname", "gitlab-world.local",
+            "--restart", "no", "--env-file", str(runtime._env_file()),
+            "-p", "127.0.0.1:8014:8014"]
+    for role, destination in runtime.DESTS.items():
+        args.extend(["-v", next_volumes[role] + ":" + destination])
+    args.append(runtime.IMAGE)
+    runtime.docker(*args)
+    runtime.wait_world()
+    copied = verify.state_snapshot()
+    if copied["business_sha256"] != current["business_sha256"]:
+        raise RuntimeError("new seed volumes differ from verified 31-project state")
+    (PRIVATE / "baseline-persisted-state.json").rename(
+        PRIVATE / "baseline-persisted-state-v1.json")
+    STATE_FILE.rename(PRIVATE / "cow-reset-state-v1.json")
+    verify.save_baseline(copied)
+    runtime.private_write(runtime.ACTIVE_VERSION_FILE, "v2\n")
+    runtime.ACTIVE_VERSION = "v2"
+    runtime.VOLUMES = next_volumes
+    VM_ROOT = "/var/lib/envloop-gitlab-cow-v2"
+    result = freeze()
+    return {"replacement_source_refilled": True, "final_unexposed_candidate_count": 100,
+            "new_project_count": 31,
+            "new_business_sha256": copied["business_sha256"],
+            "new_cold_clone_equal": result["same_business_sha256"],
+            "official_final_admitted": 0}
+
+
 def reset() -> dict:
     state = _state()
     baseline = _baseline()
@@ -203,12 +271,16 @@ def restore_preserved_demo(*, remove_seed_volumes: bool = False) -> dict:
         if remove_seed_volumes:
             for volume in runtime.VOLUMES.values():
                 runtime.docker("volume", "rm", volume, timeout=120)
-    return runtime.restore_demo(remove_world=False)
+    restored = runtime.restore_demo(remove_world=False)
+    restored["world_removed"] = True
+    restored["seed_volumes_retained_for_replay"] = not remove_seed_volumes
+    return restored
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["freeze", "reset", "restore-demo", "resume"])
+    parser.add_argument("action", choices=["freeze", "reset", "restore-demo",
+                                           "resume", "promote-reserve"])
     args = parser.parse_args()
     if args.action == "freeze":
         result = freeze()
@@ -216,6 +288,8 @@ def main() -> None:
         result = reset()
     elif args.action == "resume":
         result = resume_after_demo()
+    elif args.action == "promote-reserve":
+        result = promote_replacement_baseline()
     else:
         result = restore_preserved_demo()
     print(json.dumps(result, indent=2, sort_keys=True))

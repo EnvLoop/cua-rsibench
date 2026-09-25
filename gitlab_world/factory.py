@@ -19,6 +19,8 @@ import re
 HERE = Path(__file__).resolve().parent
 EXCERPT = HERE / "data/kev_excerpt.json"
 EXCERPT_SHA256 = "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2"
+RESERVE_EXCERPT = HERE / "data/kev_reserve_excerpt.json"
+RESERVE_EXCERPT_SHA256 = "dfd9c995f9e1db3f086144c9272a100734ffde79508037b5c86720cfa3f43bc6"
 SOURCE_COMMIT = "203fa4633af39c6944608e30984996f04ccc4541"
 SOURCE_FULL_SHA256 = "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1"
 SCHEMA = "envloop-gitlab-original-world-v1"
@@ -220,6 +222,45 @@ def _tasks(project: dict) -> list[dict]:
     return tasks
 
 
+def _make_project(seed: str, index: int, partition: str, four: list[dict]) -> dict:
+    if len(four) != 4 or partition not in SPLIT_PARTITIONS:
+        raise ValueError("project requires four advisories and a recognized partition")
+    primary = four[0]
+    site = SITE_CODES[(index - 1) % len(SITE_CODES)]
+    slug = _slug(seed, index)
+    split_slug = {"train": "training", "selection": "selection",
+                  "final_candidate_unsealed": "evaluation"}[partition]
+    group = "bench-" + split_slug + "-" + rank(seed, "namespace", partition)[:8]
+    principals = {role: _name(seed, f"{split_slug}-{role}", index)
+                  for role in ("oncall", "incoming", "contractor", "observer")}
+    start = AS_OF + timedelta(days=5 + (index % 8))
+    due = start + timedelta(days=8 + (index % 5))
+    policy = {
+        "issue_due": (start - timedelta(days=1)).isoformat(),
+        "milestone_title": "Response " + primary["cveID"] + " / " + site,
+        "milestone_start": start.isoformat(),
+        "milestone_due": due.isoformat(),
+        "access_expiry": (due + timedelta(days=7)).isoformat(),
+    }
+    project = {
+        "index": index, "partition": partition,
+        "display_name": "Security asset portfolio " + str(index).zfill(2),
+        "group_path": group, "project_path": slug,
+        "full_path": group + "/" + slug,
+        "source_family": "cisa-kev:" + sha256(canonical([r["cveID"] for r in four]))[:16],
+        "site": site,
+        "asset_id": "INV-" + rank(seed, "asset", str(index))[:8].upper(),
+        "principals": principals, "policy": policy,
+        "advisories": four,
+    }
+    project["files"] = _files(project)
+    project["issues"] = _issues(project)
+    return project
+
+
+SPLIT_PARTITIONS = {partition for partition, _, _ in SPLITS}
+
+
 def build_world(seed: str, *, records: list[dict] | None = None) -> dict:
     """Build evaluator-only world data. Caller stores it in ignored 0600 storage."""
     if not isinstance(seed, str) or len(seed) < 20:
@@ -234,36 +275,7 @@ def build_world(seed: str, *, records: list[dict] | None = None) -> dict:
         for _ in range(project_count):
             four = advisories[index * 4:index * 4 + 4]
             index += 1
-            primary = four[0]
-            site = SITE_CODES[(index - 1) % len(SITE_CODES)]
-            slug = _slug(seed, index)
-            split_slug = {"train": "training", "selection": "selection",
-                          "final_candidate_unsealed": "evaluation"}[partition]
-            group = "bench-" + split_slug + "-" + rank(seed, "namespace", partition)[:8]
-            principals = {role: _name(seed, f"{split_slug}-{role}", index)
-                          for role in ("oncall", "incoming", "contractor", "observer")}
-            start = AS_OF + timedelta(days=5 + (index % 8))
-            due = start + timedelta(days=8 + (index % 5))
-            policy = {
-                "issue_due": (start - timedelta(days=1)).isoformat(),
-                "milestone_title": "Response " + primary["cveID"] + " / " + site,
-                "milestone_start": start.isoformat(),
-                "milestone_due": due.isoformat(),
-                "access_expiry": (due + timedelta(days=7)).isoformat(),
-            }
-            project = {
-                "index": index, "partition": partition,
-                "display_name": "Security asset portfolio " + str(index).zfill(2),
-                "group_path": group, "project_path": slug,
-                "full_path": group + "/" + slug,
-                "source_family": "cisa-kev:" + sha256(canonical([r["cveID"] for r in four]))[:16],
-                "site": site,
-                "asset_id": "INV-" + rank(seed, "asset", str(index))[:8].upper(),
-                "principals": principals, "policy": policy,
-                "advisories": four,
-            }
-            project["files"] = _files(project)
-            project["issues"] = _issues(project)
+            project = _make_project(seed, index, partition, four)
             projects.append(project)
             tasks.extend(_tasks(project))
     if index != 30 or len(tasks) != 140:
@@ -279,6 +291,34 @@ def build_world(seed: str, *, records: list[dict] | None = None) -> dict:
             "world_seed_sha256": sha256(seed),
             "projects": projects, "tasks": tasks, "split_audit": audit,
             "candidate_status": "not_individually_gui_admitted"}
+
+
+def reserve_replacement(seed: str) -> dict:
+    """Five unexposed replacement candidates on four unused CISA records."""
+    raw = RESERVE_EXCERPT.read_bytes()
+    if sha256(raw) != RESERVE_EXCERPT_SHA256:
+        raise ValueError("reserve CISA excerpt bytes changed")
+    reserve = json.loads(raw)
+    if (reserve.get("schema") != "envloop-gitlab-kev-reserve-source-v1"
+            or reserve.get("source_commit") != SOURCE_COMMIT
+            or reserve.get("source_full_file_sha256") != SOURCE_FULL_SHA256):
+        raise ValueError("reserve source pin changed")
+    four = reserve.get("records")
+    if not isinstance(four, list) or len(four) != 4:
+        raise ValueError("reserve requires four advisory records")
+    primary = source_excerpt()["records"]
+    if ({row["cveID"] for row in primary} & {row["cveID"] for row in four}
+            or {row["vendorProject"].casefold() for row in primary} &
+            {row["vendorProject"].casefold() for row in four}):
+        raise ValueError("reserve source overlaps primary source")
+    project = _make_project(seed, 31, "final_candidate_unsealed",
+                            _record_sort(seed, four))
+    tasks = _tasks(project)
+    if len(tasks) != 5:
+        raise AssertionError("reserve project must yield five task candidates")
+    return {"source_excerpt_sha256": RESERVE_EXCERPT_SHA256,
+            "project": project, "tasks": tasks,
+            "status": "unsealed_replacement_source_not_gui_admitted"}
 
 
 def split_audit(projects: list[dict], tasks: list[dict]) -> dict:

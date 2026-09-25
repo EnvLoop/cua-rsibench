@@ -24,8 +24,19 @@ IMAGE = "gitlab/gitlab-ce:18.5.0-ce.0"
 IMAGE_ID = "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e"
 BASE = "http://127.0.0.1:8014"
 PRIVATE = Path(__file__).resolve().parents[1] / "work/gitlab-full-world"
-VOLUMES = {"config": WORLD + "-config", "logs": WORLD + "-logs",
-           "data": WORLD + "-data"}
+ACTIVE_VERSION_FILE = PRIVATE / "active-volume-version.txt"
+
+
+def volume_names(version: str) -> dict[str, str]:
+    if version not in ("v1", "v2"):
+        raise ValueError("unknown GitLab volume generation")
+    return {role: f"envloop-gitlab-world-{version}-{role}"
+            for role in ("config", "logs", "data")}
+
+
+ACTIVE_VERSION = (ACTIVE_VERSION_FILE.read_text().strip()
+                  if ACTIVE_VERSION_FILE.exists() else "v1")
+VOLUMES = volume_names(ACTIVE_VERSION)
 DESTS = {"config": "/etc/gitlab", "logs": "/var/log/gitlab",
          "data": "/var/opt/gitlab"}
 
