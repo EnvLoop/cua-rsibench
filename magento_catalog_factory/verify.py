@@ -34,8 +34,9 @@ $catalog=['catalog_product_entity','catalog_product_entity_decimal',
 $business=['sales_order','sales_order_item','customer_entity',
   'customer_address_entity','quote','cms_page','cms_page_store'];
 $hashes=['full'=>[],'other_catalog'=>[],'target_nonprice'=>[],'business'=>[]];
+$targetRows=[];
 foreach(array_merge($catalog,$business) as $table){
-  $all=[];$other=[];$nonprice=[];
+  $all=[];$other=[];$nonprice=[];$selected=[];
   foreach($db->query('SELECT * FROM `'.$table.'`') as $row){
     $canonical=[];foreach($row as $key=>$value){if(is_string($key))$canonical[$key]=$value;}
     ksort($canonical);$rowHash=hash('sha256',json_encode($canonical,JSON_UNESCAPED_SLASHES));
@@ -46,6 +47,7 @@ foreach(array_merge($catalog,$business) as $table){
       $isTarget=in_array($entity,$target,true);
       $isDerivedParent=($entity===$parent && str_starts_with($table,'catalog_product_index_price'));
       if(!$isTarget && !$isDerivedParent)$other[]=$rowHash;
+      if($isTarget)$selected[]=$canonical;
       if($isTarget && !str_starts_with($table,'catalog_product_index_price')){
         if($table==='catalog_product_entity_decimal' &&
            (int)$canonical['attribute_id']===77 && (int)$canonical['store_id']===0)continue;
@@ -59,6 +61,8 @@ foreach(array_merge($catalog,$business) as $table){
     sort($other);sort($nonprice);
     $hashes['other_catalog'][$table]=hash('sha256',implode("\n",$other));
     $hashes['target_nonprice'][$table]=hash('sha256',implode("\n",$nonprice));
+    usort($selected,fn($a,$b)=>strcmp(json_encode($a),json_encode($b)));
+    $targetRows[$table]=$selected;
   }else{$hashes['business'][$table]=$hashes['full'][$table];}
 }
 $list=implode(',',$ids);
@@ -76,7 +80,8 @@ $query->execute([$page]);$quote=$query->fetch(PDO::FETCH_ASSOC);
 if($quote===false)throw new Exception('trusted quote page disappeared');
 $quote['content_sha256']=hash('sha256',$quote['content']);unset($quote['content']);
 $db->rollBack();
-echo json_encode(['hashes'=>$hashes,'prices'=>$prices,'quote'=>$quote],JSON_THROW_ON_ERROR);
+echo json_encode(['hashes'=>$hashes,'prices'=>$prices,'quote'=>$quote,
+                  'target_rows'=>$targetRows],JSON_THROW_ON_ERROR);
 '''
 
 

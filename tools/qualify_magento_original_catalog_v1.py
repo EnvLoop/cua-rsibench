@@ -43,8 +43,14 @@ async def sign_in(page, base_url: str, source: Path) -> None:
 async def read_quote_in_gui(page, case: dict, out: Path) -> dict:
     # The fixture must be discoverable through the real CMS, not only SQL.
     content_menu = page.locator('#menu-magento-backend-content > a')
-    await content_menu.click()
-    await page.locator('[data-ui-id="menu-magento-cms-cms-page"] > a').click()
+    pages_menu = page.locator('[data-ui-id="menu-magento-cms-cms-page"] > a')
+    for _ in range(4):
+        if await pages_menu.is_visible():
+            break
+        await content_menu.click()
+        await page.wait_for_timeout(300)
+    require(await pages_menu.is_visible(), 'native CMS Pages menu did not open')
+    await pages_menu.click()
     await page.get_by_role('heading', name='Pages', exact=True).wait_for(timeout=120000)
     search = page.locator('input#fulltext:visible').first
     await search.wait_for(timeout=120000)
@@ -54,15 +60,39 @@ async def read_quote_in_gui(page, case: dict, out: Path) -> dict:
     await row.wait_for(timeout=120000)
     require(case['quote_page_title'] in await row.inner_text(),
             'quote page not visible in native CMS grid')
+    # Magento's CMS grid keeps the Edit action inside a collapsed row menu.
+    actions = row.locator('button.action-select')
+    await actions.click()
     await row.get_by_text('Edit', exact=True).click()
-    await page.get_by_text(case['quote_page_title'], exact=True).first.wait_for(timeout=120000)
-    content = page.locator('textarea[name="content"]:visible').first
-    if not await content.is_visible():
-        content = page.locator('textarea[name="page[content]"]:visible').first
-    await content.wait_for(timeout=120000)
-    html = await content.input_value()
-    require(hashlib.sha256(html.encode()).hexdigest() == case['quote_page_body_sha256'],
-            'native CMS editor did not expose the exact private source quote')
+    await page.locator('h1.page-title').filter(
+        has_text=case['quote_page_title']).wait_for(timeout=120000)
+    # Magento 2.4.6 collapses the Content accordion and displays raw HTML in
+    # its Page Builder staging region, rather than a visible textarea.
+    page_builder = page.get_by_text('Edit with Page Builder', exact=True)
+    if not await page_builder.is_visible():
+        section = None
+        for _ in range(40):
+            for candidate in await page.get_by_text('Content', exact=True).all():
+                box = await candidate.bounding_box()
+                if box is not None and box['x'] >= 100 and box['y'] >= 250:
+                    section = candidate
+                    break
+            if section is not None:
+                break
+            await page.wait_for_timeout(250)
+        require(section is not None, 'visible CMS Content accordion missing')
+        await section.click()
+    await page_builder.wait_for(timeout=120000)
+    visible_text = ''
+    for _ in range(40):
+        visible_text = await page.locator('body').inner_text()
+        if case['quote_page_body'] in visible_text:
+            break
+        await page.wait_for_timeout(250)
+    require(case['quote_page_body'] in visible_text and
+            hashlib.sha256(case['quote_page_body'].encode()).hexdigest() ==
+            case['quote_page_body_sha256'],
+            'native CMS Content region did not show the exact private quote')
     screenshot = out / 'private-quote-page.png'
     await page.screenshot(path=str(screenshot), full_page=False,
                           mask=[page.locator('.admin-user')])
