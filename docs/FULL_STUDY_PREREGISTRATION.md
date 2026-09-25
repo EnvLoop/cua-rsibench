@@ -20,6 +20,8 @@ Can a researcher agent improve a fixed vision-capable computer-use student by co
 
 For Excel for the web, [the filing-pinned SEC integrated candidate audit](evidence/sec-integrated-offline-140-2026-09-25.md) adds 20/20/100 authored workbook pairs and an independent offline OOXML oracle. Those 100 final candidates currently share only seven filing pairs from two issuers and one structural workflow, so they are an engineering pool, not a discriminating hidden final set. Source-family/template expansion and per-document Excel-web save, download, and fresh-copy reset remain required before the Excel cell can freeze.
 
+For PowerPoint for the web, the [original WDI brief plan](plans/2026-09-25-original-wdi-ppt-web.md) proposes an authored 20/20/100 replacement for the public PPT-Eval queue. It is a design only: no deck, task-specific GUI control, or official identity has been created under that plan. The public PPT-Eval task count remains a development source screen, not a sealed final denominator.
+
 The primary endpoint for each cell and researcher is the paired percentage-point difference between its selected checkpoint and **one shared base-model execution** on the same 100 frozen task identities. Both numerator and valid denominator are published. A task scores 1 only when the application-native target is saved and an independent verifier accepts the intended change with no disallowed side effects; otherwise a valid model outcome scores 0. Provider, transport, environment, and verifier failures are not model failures and remain separately counted. A partial state may be reported diagnostically but does not change the binary primary endpoint unless the task rubric was frozen with graded credit.
 
 ## Admission and isolation
