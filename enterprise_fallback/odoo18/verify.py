@@ -120,6 +120,7 @@ SELECT json_build_object(
       SELECT u.id, p.name, u.login, u.active, u.company_id
       FROM res_users u JOIN res_partner p ON p.id = u.partner_id
       WHERE u.login LIKE 'envloop.sales.%@example.invalid'
+         OR u.login LIKE 'envloop.actor.%@example.invalid'
     ) x
   ),
   'crm_stages', (
@@ -154,11 +155,16 @@ def freeze() -> dict:
         raise RuntimeError("Baseline already frozen; do not overwrite after an attempt")
     snap = snapshot()
     counts = {key: len(value) for key, value in snap.items()}
-    expected_counts = {"orders": 120, "lines": 360, "attachments": 161,
-                       "vendors": 24, "products": 48, "orderpoints": 20,
-                       "sales_orders": 20, "sales_lines": 60, "crm_leads": 20,
-                       "customers": 20, "salespeople": 3,
-                       "crm_stages": counts["crm_stages"]}
+    partition_receipt = PRIVATE / "partition_receipt.json"
+    if partition_receipt.exists():
+        expected_counts = json.loads(partition_receipt.read_text())["expected_snapshot_counts"]
+        expected_counts["crm_stages"] = counts["crm_stages"]
+    else:
+        expected_counts = {"orders": 120, "lines": 360, "attachments": 161,
+                           "vendors": 24, "products": 48, "orderpoints": 20,
+                           "sales_orders": 20, "sales_lines": 60, "crm_leads": 20,
+                           "customers": 20, "salespeople": 3,
+                           "crm_stages": counts["crm_stages"]}
     if counts["crm_stages"] < 4:
         raise RuntimeError("Expected at least four CRM stages")
     if counts != expected_counts:

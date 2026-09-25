@@ -21,6 +21,7 @@ from factory import (  # noqa: E402
     proposed_clustered_split, sha256_bytes, split_audit, train_world_candidates,
 )
 from multifamily import crm_candidates, crm_pdf, sales_candidates, sales_pdf  # noqa: E402
+from partition_factory import candidate_world, split_audit as partition_split_audit  # noqa: E402
 import bootstrap as bootstrap_module  # noqa: E402
 from verify import (  # noqa: E402
     evaluate, evaluate_replenishment, evaluate_sales, evaluate_crm,
@@ -29,6 +30,37 @@ from verify import (  # noqa: E402
 
 
 class OdooFixtureTests(unittest.TestCase):
+    def test_bootstrap_password_cannot_begin_with_cli_option_prefix(self):
+        with mock.patch.object(bootstrap_module.secrets, "token_urlsafe", return_value="-dash-start"):
+            self.assertEqual(bootstrap_module.local_password(), "p-dash-start")
+
+    def test_four_family_partition_worlds_are_entity_and_asset_disjoint(self):
+        seed = "local-test-seed-only-0123456789abcdef"
+        audit = partition_split_audit(seed)
+        self.assertTrue(audit["entity_disjoint"])
+        self.assertEqual(audit["template_generalization"], "within_template_only")
+        self.assertEqual(audit["family_counts"], {
+            "train": {"purchase": 5, "inventory": 5, "sales": 5, "crm": 5},
+            "selection": {"purchase": 5, "inventory": 5, "sales": 5, "crm": 5},
+            "evaluation_candidate": {"purchase": 25, "inventory": 25,
+                                     "sales": 25, "crm": 25},
+        })
+        self.assertTrue(all(value == 0 for pair in audit["overlaps"].values()
+                            for value in pair.values()))
+        for part in audit["family_counts"]:
+            world = candidate_world(seed, part)
+            self.assertEqual(world, candidate_world(seed, part))
+            self.assertEqual(len({case["id"] for family in world["cases"].values()
+                                  for case in family}), sum(audit["family_counts"][part].values()))
+            self.assertTrue(all(case["initial"] != case["expected"]
+                                for case in world["cases"]["inventory"]))
+            self.assertTrue(all(any(line["initial"] != line["expected"]
+                                    for line in case["lines"])
+                                for case in world["cases"]["purchase"]
+                                + world["cases"]["sales"]))
+        self.assertNotEqual(candidate_world(seed, "train"),
+                            candidate_world(seed + "-different", "train"))
+
     def test_bootstrap_rejects_occupied_loopback_port_before_credentials(self):
         with socket.socket() as occupied, tempfile.TemporaryDirectory() as scratch:
             occupied.bind(("127.0.0.1", 0))

@@ -15,9 +15,9 @@ from reset import restore
 from verify import score
 
 
-def browser_login(page, port: int, password: str) -> None:
+def browser_login(page, port: int, password: str, login: str = "admin") -> None:
     page.goto(f"http://127.0.0.1:{port}/web/login")
-    page.locator('input[name="login"]').fill("admin")
+    page.locator('input[name="login"]').fill(login)
     page.locator('input[name="password"]').fill(password)
     page.get_by_role("button", name="Log in").click()
     page.wait_for_url("**/odoo/**", wait_until="domcontentloaded")
@@ -25,15 +25,130 @@ def browser_login(page, port: int, password: str) -> None:
 
 def open_sales(page, port: int, case_id: str) -> None:
     page.goto(f"http://127.0.0.1:{port}/odoo/sales")
-    page.get_by_text(case_id, exact=True).click()
+    # Odoo opens Sales with a default "My Quotations" facet. The benchmark
+    # actor has all-document Sales access, but the seeded quotes belong to
+    # synthetic salespeople; remove the default UI filter before searching.
+    page.locator("small.o_facet_value").filter(has_text="My Quotations").wait_for()
+    page.locator("button.o_facet_remove").first.click()
+    if not page.get_by_role("cell", name=case_id, exact=True).count():
+        search = page.get_by_role("searchbox")
+        search.fill(case_id)
+        search.press("Enter")
+    page.get_by_role("cell", name=case_id, exact=True).click()
     page.wait_for_url("**/odoo/sales/*")
+
+
+def open_purchase(page, port: int, case_id: str) -> None:
+    page.goto(f"http://127.0.0.1:{port}/odoo/purchase")
+    search = page.get_by_role("searchbox")
+    search.fill(case_id)
+    search.press("Enter")
+    page.get_by_role("cell", name=case_id, exact=True).click()
+    page.wait_for_url("**/odoo/purchase/*")
+
+
+def save_purchase_if_pending(page) -> None:
+    """Odoo sometimes autosaves an RFQ grid cell on Tab, hiding Save."""
+    save = page.get_by_role("button", name="Save", exact=True)
+    if save.count():
+        save.click()
+        save.wait_for(state="hidden")
+    else:
+        page.wait_for_timeout(350)
+
+
+def purchase_case(page, case: dict, *, positive: bool = True) -> None:
+    """Reconcile an RFQ entirely through its native three-line editor."""
+    if not positive:
+        other = case["lines"][0]
+        wrong_price = round(other["initial"]["price"] + 1.25, 2)
+        row = page.locator("tr").filter(has_text=other["sku"]).first
+        row.locator('td[name="price_unit"]').click()
+        page.locator('td[name="price_unit"] input').first.fill(str(wrong_price))
+        page.locator('td[name="price_unit"] input').first.press("Tab")
+        save_purchase_if_pending(page)
+        page.reload()
+        observed = page.locator("tr").filter(has_text=other["sku"]).first.locator(
+            'td[name="price_unit"]').inner_text().strip()
+        if round(float(observed), 2) != wrong_price:
+            raise RuntimeError("Wrong-object purchase edit did not persist")
+        return
+    for line in case["lines"]:
+        changed_qty = line["initial"]["qty"] != line["expected"]["qty"]
+        changed_price = line["initial"]["price"] != line["expected"]["price"]
+        if changed_qty:
+            row = page.locator("tr").filter(has_text=line["sku"]).first
+            row.locator('td[name="product_qty"]').click()
+            page.locator('td[name="product_qty"] input').first.fill(str(line["expected"]["qty"]))
+            page.locator('td[name="product_qty"] input').first.press("Tab")
+            save_purchase_if_pending(page)
+            page.reload()
+            actual_qty = page.locator("tr").filter(has_text=line["sku"]).first.locator(
+                'td[name="product_qty"]').inner_text().strip()
+            if float(actual_qty) != line["expected"]["qty"]:
+                raise RuntimeError("Purchase quantity edit did not persist")
+        if changed_price or changed_qty:
+            row = page.locator("tr").filter(has_text=line["sku"]).first
+            row.locator('td[name="price_unit"]').click()
+            page.locator('td[name="price_unit"] input').first.fill(str(line["expected"]["price"]))
+            page.locator('td[name="price_unit"] input').first.press("Tab")
+            save_purchase_if_pending(page)
+            page.reload()
+            actual_price = page.locator("tr").filter(has_text=line["sku"]).first.locator(
+                'td[name="price_unit"]').inner_text().strip()
+            if round(float(actual_price), 2) != line["expected"]["price"]:
+                raise RuntimeError("Purchase unit price edit did not persist")
+
+
+def open_inventory_note(page, port: int, case: dict) -> bool:
+    """Read the actual Product > Purchase source field in the native GUI."""
+    page.goto(f"http://127.0.0.1:{port}/odoo/action-430")
+    search = page.get_by_role("searchbox")
+    search.fill(case["sku"])
+    search.press("Enter")
+    page.get_by_text(f"[{case['sku']}]", exact=True).click()
+    page.get_by_role("tab", name="Purchase").click()
+    return page.locator('[name="description_purchase"] textarea').input_value() == case["source_note"]
+
+
+def open_replenishment(page, port: int) -> None:
+    page.goto(f"http://127.0.0.1:{port}/odoo/inventory")
+    page.get_by_role("button", name="Operations", exact=True).click()
+    page.get_by_text("Replenishment", exact=True).click()
+    page.wait_for_url("**/odoo/replenishment")
+
+
+def inventory_case(page, case: dict, *, positive: bool = True) -> None:
+    row = page.locator("tr").filter(has_text=case["sku"]).first
+    if positive:
+        edits = (("product_min_qty", case["expected"]["minimum"]),
+                 ("product_max_qty", case["expected"]["maximum"]))
+    else:
+        edits = (("product_min_qty", case["initial"]["minimum"] + 1),)
+    for cell, value in edits:
+        row.locator(f'td[name="{cell}"]').click()
+        page.locator(f'td[name="{cell}"] input').first.fill(str(value))
+        page.locator(f'td[name="{cell}"] input').first.press("Tab")
+        page.wait_for_timeout(350)
+    page.reload()
+    if positive:
+        row = page.locator("tr").filter(has_text=case["sku"]).first
+        for cell, expected in edits:
+            observed = row.locator(f'td[name="{cell}"]').inner_text().strip()
+            if float(observed) != expected:
+                raise RuntimeError(f"Replenishment edit did not persist: {cell}")
 
 
 def open_crm(page, port: int, case_id: str) -> None:
     page.goto(f"http://127.0.0.1:{port}/odoo/crm")
     page.locator("button.o_facet_remove").click()
-    page.get_by_text(case_id, exact=True).click()
-    page.wait_for_url("**/odoo/crm/*")
+    card = page.locator("span.fw-bold.fs-5").filter(has_text=case_id)
+    if not card.count():
+        search = page.get_by_role("searchbox")
+        search.fill(case_id)
+        search.press("Enter")
+    card.click()
+    page.wait_for_url("**/odoo/crm/*", wait_until="domcontentloaded")
 
 
 def view_attachment(page, filename: str) -> bool:
@@ -91,7 +206,7 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
         page.locator('[name="stage_id"] button[role="radio"]').filter(
             has_text=expected["stage_name"]
         ).click()
-        names = ["Avery Lane", "Morgan Ellis", "Riley Chen"]
+        names = case.get("salesperson_names", ["Avery Lane", "Morgan Ellis", "Riley Chen"])
         name = names[expected["salesperson_index"]]
         page.locator('[name="user_id"] input').fill(name.split()[0])
         page.get_by_role("option", name=name).click()
