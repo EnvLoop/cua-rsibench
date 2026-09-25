@@ -60,6 +60,7 @@
   "runtime": {
     "application": "GitLab CE 18.5.0-ce.0",
     "copy_on_write_cold_container_reset": true,
+    "frozen_world_resumed_after_demo_restore": true,
     "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
     "isolated_loopback_instance": true,
     "post_reserve_business_sha256": "0b46f02098932c6a0c2d63bddbd8f38a5d828de6c8f6302ff0bbabd445a42344",
