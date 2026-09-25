@@ -333,9 +333,9 @@ def verify(baseline: bytes, saved: bytes, oracle: dict) -> dict:
     workflow = oracle["workflow"]
     if workflow.startswith("calc-"):
         result = verify_calc(baseline, saved, oracle)
-    elif workflow == "impress-deck":
+    elif workflow.startswith("impress-"):
         result = verify_impress(baseline, saved, oracle)
-    elif workflow == "writer-brief":
+    elif workflow.startswith("writer-"):
         result = verify_writer(baseline, saved, oracle)
     else:
         raise ValueError("Unknown workflow")

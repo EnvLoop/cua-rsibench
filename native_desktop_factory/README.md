@@ -28,12 +28,24 @@ python native_desktop_factory/admit.py \
   --out work/native-desktop/admission-audit.json --require-complete
 ```
 
-The last command **must fail** at present because the structural templates overlap across splits and all 100 final GUI receipts are absent. An absent receipt counts as missing, never as a score. The GUI calibration shell supports final candidates only with `--candidate-calibration`; keep all attempts private. After a valid template policy and the 100-task gate pass, convert its evidence into the study's evaluator-owned cell manifest and freeze the runtime/action/verifier bytes before campaign dispatch. The current generator itself does not call a model or provider.
+The last command **must fail for this v1 pool** because its structural templates overlap across splits and all 100 final GUI receipts are absent. An absent receipt counts as missing, never as a score. The GUI calibration shell supports final candidates only with `--candidate-calibration`; keep all attempts private. After a valid template policy and the 100-task gate pass, convert its evidence into the study's evaluator-owned cell manifest and freeze the runtime/action/verifier bytes before campaign dispatch. The generator itself does not call a model or provider.
+
+## v2 distinct-template candidate inventory
+
+The [v2 factory](factory_v2.py) is the current provisional design. It retains the exposed one-edit train documents, creates substantively different two-factor selection documents, and creates three-edit final decision cases with separate evidence, policy/validation, and provenance structures. Calc has 2/3/4 sheets, Impress 4/5/7 slides, and Writer final tasks add a second rule table. The semantic template groups are disjoint because the actual documents and workflows differ. The source-country split is unchanged and still private. Rebuild offline with:
+
+```bash
+python native_desktop_factory/factory_v2.py \
+  --private-map work/native-desktop/private-map.json \
+  --output work/native-desktop/candidates-v2
+```
+
+The v2 factory regenerated the same 140 candidate package bytes on a second run. Its final candidate pool still requires per-ID native-GUI qualification; the [field-limited v2 receipt](../docs/evidence/native-wdi-v2-final-gui-calibration-2026-09-25.json) reports **4/100 private final GUI controls passed across two source-country families** and **96/100 absent**. Exactly one of 25 final Impress inputs underwent a neutral LibreOffice normalization and subsequent fresh actor calibration. This engineering gate does **not** admit a full-study final identity or produce a model result. The original v1 shared-template pool above remains historical development evidence and must not be used as the frozen final denominator.
 
 ## Remaining work before a publishable final cell
 
 - Run the native GUI and independent positive/near-miss/reset gate **for each of the 100 final identities**, including all three required edits. Verify the actor's saved file before any evaluator correction. Preserve screenshots and actual file bytes privately.
-- Resolve the shared-template issue before admission: build structurally distinct workflows for train/selection/final, or adopt an explicit, dated, pre-result within-template-transfer amendment and update the study validator accordingly. Merely renaming template labels is invalid.
+- Confirm the v2 split-template design in a pre-campaign freeze; its physical structure differs across train/selection/final, but transfer difficulty and discrimination still need controlled training/selection pilots. Merely renaming template labels would be invalid.
 - Confirm that the stock E2B Desktop image is stable across runs, pin its image digest, fonts and LibreOffice profile, and measure per-task time/cost ceilings. The three development controls currently bind LibreOffice 7.3.7.2 and its observed executable hash, not an image digest.
 - Apply and hash a neutral LibreOffice normalization step to each final Impress input before actor evaluation, then verify the same per-ID non-target geometry guard. The current final-candidate generator emits raw python-pptx files, so those 25 candidates are **not** eligible for admission as-is.
 - Audit task difficulty with real model attempts on training/selection only; expand distinct workflows if a single repeated template or too-easy one-cell correction makes the 100-task set weakly discriminating. Do not use final feedback for redesign.
