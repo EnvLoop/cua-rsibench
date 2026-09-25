@@ -16,6 +16,11 @@ from .plan import require
 from .seed import CONTEXT, check_clone
 
 
+NATIVE_SEARCH_HOST = 'envloop-magento-native-es'
+NATIVE_SEARCH_IMAGE = 'sha256:2c257b68f361872e13bdd476cba152e232a314ec61b0eedfc1f71b628ba39432'
+NATIVE_SEARCH_NETWORK = 'envloop-magento-native-search'
+
+
 PHP_READ = r'''<?php
 $request=json_decode(stream_get_contents(STDIN),true,512,JSON_THROW_ON_ERROR);
 $ids=array_map('intval',$request['variant_ids']);
@@ -100,9 +105,27 @@ def _docker(container: str, *args: str, input_text: str | None = None,
     return result.stdout
 
 
+def check_native_search_sidecar(container: str) -> None:
+    raw = subprocess.run(['docker', '--context', CONTEXT, 'inspect',
+                          container, NATIVE_SEARCH_HOST],
+                         capture_output=True, text=True, timeout=30,
+                         check=True).stdout
+    app, search = json.loads(raw)
+    require(app['State']['Running'] and search['State']['Running'] and
+            search['Image'] == NATIVE_SEARCH_IMAGE and not search['Mounts'] and
+            NATIVE_SEARCH_NETWORK in app['NetworkSettings']['Networks'] and
+            NATIVE_SEARCH_NETWORK in search['NetworkSettings']['Networks'],
+            'native search sidecar/image/network contract changed')
+
+
 def read_snapshot(case: dict, container: str, http_port: int,
-                  control_port: int, page_id: int) -> dict:
+                  control_port: int, page_id: int,
+                  *, search_host: str = '127.0.0.1') -> dict:
     check_clone(container, http_port, control_port)
+    require(search_host in ('127.0.0.1', NATIVE_SEARCH_HOST),
+            'unapproved Magento search host')
+    if search_host == NATIVE_SEARCH_HOST:
+        check_native_search_sidecar(container)
     target_ids = [int(row['entity_id']) for row in case['target_variants']]
     comparator_ids = [int(row['entity_id']) for row in case['untouched_comparators']]
     require(target_ids and len(set(target_ids + comparator_ids)) ==
@@ -114,7 +137,7 @@ def read_snapshot(case: dict, container: str, http_port: int,
                             PHP_READ.removeprefix('<?php\n'),
                             input_text=json.dumps(request, sort_keys=True)))
     search = json.loads(_docker(container, 'curl', '-fsS', '--max-time', '30',
-                                'http://127.0.0.1:9200/magento2_product_1/_search?size=1000',
+                                f'http://{search_host}:9200/magento2_product_1/_search?size=1000',
                                 timeout=45))
     hits = search['hits']['hits']
     require(search['hits']['total']['value'] == len(hits) and len(hits) > 100,

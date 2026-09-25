@@ -112,6 +112,21 @@ class MagentoCatalogSavedStateTests(unittest.TestCase):
         self.assertNotIn(CASE['quote_page_body'], ' '.join(args[0]))
         self.assertEqual(kwargs['timeout'], 120)
 
+    def test_native_sidecar_requires_pinned_image_and_shared_network(self):
+        app = {'State': {'Running': True},
+               'NetworkSettings': {'Networks': {verify.NATIVE_SEARCH_NETWORK: {}}}}
+        search = {'State': {'Running': True},
+                  'Image': verify.NATIVE_SEARCH_IMAGE, 'Mounts': [],
+                  'NetworkSettings': {'Networks': {verify.NATIVE_SEARCH_NETWORK: {}}}}
+        response = SimpleNamespace(stdout=json.dumps([app, search]))
+        with patch.object(verify.subprocess, 'run', return_value=response):
+            verify.check_native_search_sidecar('envloop-magento-original-control')
+        search['Image'] = 'sha256:' + '0' * 64
+        response = SimpleNamespace(stdout=json.dumps([app, search]))
+        with patch.object(verify.subprocess, 'run', return_value=response):
+            with self.assertRaisesRegex(ValueError, 'sidecar/image/network'):
+                verify.check_native_search_sidecar('envloop-magento-original-control')
+
     def test_fresh_reset_requires_distinct_clone_and_identical_state(self):
         first = baseline()
         second = copy.deepcopy(first)
@@ -125,11 +140,39 @@ class MagentoCatalogSavedStateTests(unittest.TestCase):
                               'loopback_ports': [7794, 7795]}}
         seed_two = copy.deepcopy(seed_one)
         seed_two['clone']['container_id_sha256'] = '2' * 64
+        def bound(seed_receipt, state, sidecar_id):
+            digest = reset_audit.snapshot_sha256(state)
+            runtime = {'schema': 'envloop-magento-native-sidecar-runtime-private-v1',
+                       'app': seed_receipt['clone'],
+                       'sidecar_image_sha256': verify.NATIVE_SEARCH_IMAGE,
+                       'sidecar_id_sha256': sidecar_id,
+                       'network': verify.NATIVE_SEARCH_NETWORK,
+                       'baseline_sha256': digest}
+            finalization = {'status': 'normalized_baseline_frozen_not_gui_admitted',
+                            'task_id': CASE['task_id'],
+                            'package_sha256': CASE['package_sha256'],
+                            'clone': seed_receipt['clone'],
+                            'search_backend': verify.NATIVE_SEARCH_HOST,
+                            'normalized_baseline_sha256': digest}
+            return runtime, finalization
+        first_runtime, first_finalization = bound(seed_one, first, '3' * 64)
+        second_runtime, second_finalization = bound(seed_two, second, '4' * 64)
         self.assertTrue(reset_audit.audit(CASE, first, second,
-                                          seed_one, seed_two)['fresh_clone_reset_passed'])
+                                          seed_one, seed_two,
+                                          first_runtime, second_runtime,
+                                          first_finalization,
+                                          second_finalization)['fresh_clone_reset_passed'])
         seed_two['clone']['container_id_sha256'] = '1' * 64
         with self.assertRaisesRegex(ValueError, 'same container'):
-            reset_audit.audit(CASE, first, second, seed_one, seed_two)
+            reset_audit.audit(CASE, first, second, seed_one, seed_two,
+                              first_runtime, second_runtime,
+                              first_finalization, second_finalization)
+        seed_two['clone']['container_id_sha256'] = '2' * 64
+        second_runtime['sidecar_id_sha256'] = '3' * 64
+        with self.assertRaisesRegex(ValueError, 'same search container'):
+            reset_audit.audit(CASE, first, second, seed_one, seed_two,
+                              first_runtime, second_runtime,
+                              first_finalization, second_finalization)
 
 
 if __name__ == '__main__':

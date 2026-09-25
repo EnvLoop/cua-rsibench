@@ -94,7 +94,8 @@ def validate_only_timestamp_changed(case: dict, before: dict, after: dict) -> No
 
 def finalize(case: dict, neutral: dict, neutral_after: dict,
              container: str, http_port: int, control_port: int,
-             page_id: int) -> tuple[dict, dict]:
+             page_id: int,
+             search_host: str = '127.0.0.1') -> tuple[dict, dict]:
     clone = check_clone(container, http_port, control_port)
     require(neutral['status'] == 'neutral_fixture_normalization_development_only'
             and neutral['mode'] == 'neutral' and
@@ -103,7 +104,10 @@ def finalize(case: dict, neutral: dict, neutral_after: dict,
             neutral['neutral_preserved_other_business_state'] is True and
             neutral['fresh_clone_reset_passed'] is False,
             'neutral native GUI control was not independently accepted')
-    before = read_snapshot(case, container, http_port, control_port, page_id)
+    require(neutral['search_backend'] == search_host,
+            'neutral control search backend differs from finalizer')
+    before = read_snapshot(case, container, http_port, control_port,
+                           page_id, search_host=search_host)
     require(before == neutral_after,
             'clone state moved since the accepted neutral GUI save')
     ids = [row['entity_id'] for row in case['target_variants']]
@@ -115,13 +119,15 @@ def finalize(case: dict, neutral: dict, neutral_after: dict,
     require(result.returncode == 0 and
             json.loads(result.stdout)['updated_target_count'] == len(ids),
             'trusted target timestamp finalization failed')
-    after = read_snapshot(case, container, http_port, control_port, page_id)
+    after = read_snapshot(case, container, http_port, control_port,
+                          page_id, search_host=search_host)
     validate_only_timestamp_changed(case, before, after)
     receipt = {'schema': 'envloop-magento-neutral-baseline-finalization-v1',
                'status': 'normalized_baseline_frozen_not_gui_admitted',
                'task_id': case['task_id'],
                'package_sha256': case['package_sha256'],
                'clone': clone, 'page_id': page_id,
+               'search_backend': search_host,
                'frozen_timestamp': FROZEN_TIMESTAMP,
                'target_count': len(ids),
                'before_state_sha256': sha((json.dumps(before, sort_keys=True, indent=2) + '\n').encode()),
@@ -140,6 +146,8 @@ def main() -> None:
     parser.add_argument('--http-port', type=int, required=True)
     parser.add_argument('--control-port', type=int, required=True)
     parser.add_argument('--page-id', type=int, required=True)
+    parser.add_argument('--search-host', default='127.0.0.1',
+                        choices=('127.0.0.1', 'envloop-magento-native-es'))
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--baseline-out', type=Path, required=True)
     args = parser.parse_args()
@@ -148,7 +156,7 @@ def main() -> None:
     after, after_sha = read_private(args.neutral_after)
     receipt, baseline = finalize(case, neutral, after, args.container,
                                  args.http_port, args.control_port,
-                                 args.page_id)
+                                 args.page_id, args.search_host)
     receipt.update(neutral_result_sha256=neutral_sha,
                    neutral_after_sha256=after_sha)
     baseline_sha = write_private(args.baseline_out, baseline)

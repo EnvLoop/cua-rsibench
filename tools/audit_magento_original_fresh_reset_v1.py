@@ -13,6 +13,9 @@ from pathlib import Path
 
 from magento_catalog_factory.plan import ROOT, require
 from magento_catalog_factory.seed import IMAGE, load_case
+from magento_catalog_factory.verify import (
+    NATIVE_SEARCH_HOST, NATIVE_SEARCH_IMAGE, NATIVE_SEARCH_NETWORK,
+)
 from magento_catalog_factory.verify import check_baseline, check_exact_reset
 
 
@@ -24,8 +27,14 @@ def read_private(path: Path) -> tuple[dict, str]:
     return json.loads(raw), hashlib.sha256(raw).hexdigest()
 
 
+def snapshot_sha256(value: dict) -> str:
+    return hashlib.sha256((json.dumps(value, sort_keys=True, indent=2) + '\n').encode()).hexdigest()
+
+
 def audit(case: dict, first: dict, second: dict,
-          first_seed: dict, second_seed: dict) -> dict:
+          first_seed: dict, second_seed: dict,
+          first_runtime: dict, second_runtime: dict,
+          first_finalization: dict, second_finalization: dict) -> dict:
     check_baseline(case, first)
     check_baseline(case, second)
     for receipt in (first_seed, second_seed):
@@ -45,11 +54,32 @@ def audit(case: dict, first: dict, second: dict,
     require(first['page_id'] == first_seed['page_id'] and
             second['page_id'] == second_seed['page_id'],
             'snapshot and trusted seed page differ')
+    for state, seed, runtime, finalization in (
+            (first, first_seed, first_runtime, first_finalization),
+            (second, second_seed, second_runtime, second_finalization)):
+        require(runtime['schema'] ==
+                'envloop-magento-native-sidecar-runtime-private-v1' and
+                runtime['app'] == seed['clone'] and
+                runtime['sidecar_image_sha256'] == NATIVE_SEARCH_IMAGE and
+                runtime['network'] == NATIVE_SEARCH_NETWORK and
+                runtime['baseline_sha256'] == snapshot_sha256(state) and
+                finalization['status'] == 'normalized_baseline_frozen_not_gui_admitted' and
+                finalization['task_id'] == case['task_id'] and
+                finalization['package_sha256'] == case['package_sha256'] and
+                finalization['clone'] == seed['clone'] and
+                finalization['search_backend'] == NATIVE_SEARCH_HOST and
+                finalization['normalized_baseline_sha256'] == snapshot_sha256(state),
+                'same-topology normalized runtime binding changed')
+    require(first_runtime['sidecar_id_sha256'] !=
+            second_runtime['sidecar_id_sha256'],
+            'fresh reset reused the same search container')
     check_exact_reset(first, second)
     return {'schema': 'envloop-magento-original-fresh-reset-v1',
             'task_id': case['task_id'], 'package_sha256': case['package_sha256'],
             'fresh_clone_reset_passed': True,
             'different_container_ids': True,
+            'different_search_container_ids': True,
+            'same_pinned_application_and_search_images': True,
             'exact_monitored_sql_and_search_state': True,
             'official_final_tasks_admitted': 0}
 
@@ -63,6 +93,10 @@ def main() -> None:
     parser.add_argument('--second-before', type=Path, required=True)
     parser.add_argument('--first-seed', type=Path, required=True)
     parser.add_argument('--second-seed', type=Path, required=True)
+    parser.add_argument('--first-runtime', type=Path, required=True)
+    parser.add_argument('--second-runtime', type=Path, required=True)
+    parser.add_argument('--first-finalization', type=Path, required=True)
+    parser.add_argument('--second-finalization', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     out = args.out.resolve()
@@ -71,10 +105,14 @@ def main() -> None:
     case = load_case(args.plan, args.plan_sha256, args.task_id)
     values = [read_private(path) for path in
               (args.first_before, args.second_before,
-               args.first_seed, args.second_seed)]
+               args.first_seed, args.second_seed,
+               args.first_runtime, args.second_runtime,
+               args.first_finalization, args.second_finalization)]
     result = audit(case, *(row[0] for row in values))
     result['input_sha256'] = {name: value[1] for name, value in zip(
-        ('first_before', 'second_before', 'first_seed', 'second_seed'), values)}
+        ('first_before', 'second_before', 'first_seed', 'second_seed',
+         'first_runtime', 'second_runtime',
+         'first_finalization', 'second_finalization'), values)}
     out.parent.mkdir(parents=True, exist_ok=True)
     raw = (json.dumps(result, sort_keys=True, indent=2) + '\n').encode()
     with out.open('xb') as stream:

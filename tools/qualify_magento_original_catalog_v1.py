@@ -156,11 +156,12 @@ async def edit_variant(page, row: dict, intended_price: str,
 
 async def run(case: dict, source: Path, container: str,
               http_port: int, control_port: int, page_id: int,
-              mode: str, out: Path) -> dict:
+              mode: str, out: Path, search_host: str = '127.0.0.1') -> dict:
     from playwright.async_api import async_playwright
 
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
-    before = read_snapshot(case, container, http_port, control_port, page_id)
+    before = read_snapshot(case, container, http_port, control_port,
+                           page_id, search_host=search_host)
     check_baseline(case, before)
     before_sha = write_private(out / 'private-before.json', before)
     base = f'http://localhost:{http_port}/admin'
@@ -201,7 +202,8 @@ async def run(case: dict, source: Path, container: str,
         finally:
             await context.close()
             await browser.close()
-    after = read_snapshot(case, container, http_port, control_port, page_id)
+    after = read_snapshot(case, container, http_port, control_port,
+                          page_id, search_host=search_host)
     after_sha = write_private(out / 'private-after.json', after)
     score = score_saved_state(case, before, after)
     neutral_preserved = (
@@ -227,6 +229,7 @@ async def run(case: dict, source: Path, container: str,
               'before_sha256': before_sha, 'after_sha256': after_sha,
               'quote': quote, 'saved': saves, 'score': score,
               'external_requests_blocked': blocked,
+              'search_backend': search_host,
               'neutral_preserved_other_business_state':
                   neutral_preserved if mode == 'neutral' else None,
               'model_calls': 0, 'official_final_tasks_admitted': 0,
@@ -245,6 +248,8 @@ def main() -> None:
     parser.add_argument('--http-port', type=int, required=True)
     parser.add_argument('--control-port', type=int, required=True)
     parser.add_argument('--page-id', type=int, required=True)
+    parser.add_argument('--search-host', default='127.0.0.1',
+                        choices=('127.0.0.1', 'envloop-magento-native-es'))
     parser.add_argument('--mode', choices=('neutral', 'positive', 'wrong-variant'),
                         required=True)
     parser.add_argument('--out', type=Path, required=True)
@@ -256,7 +261,8 @@ def main() -> None:
     try:
         result = asyncio.run(run(case, args.source, args.container,
                                  args.http_port, args.control_port,
-                                 args.page_id, args.mode, out))
+                                 args.page_id, args.mode, out,
+                                 args.search_host))
         print(json.dumps({'status': result['status'], 'mode': result['mode'],
                           'score': result['score']['score'],
                           'official_final_tasks_admitted': 0}, sort_keys=True))
