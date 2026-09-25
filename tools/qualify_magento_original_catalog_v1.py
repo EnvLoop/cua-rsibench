@@ -187,6 +187,8 @@ async def run(case: dict, source: Path, container: str,
             quote = await read_quote_in_gui(page, case, out)
             if mode == 'positive':
                 edits = [(row, row['target_price']) for row in case['target_variants']]
+            elif mode == 'neutral':
+                edits = [(row, row['initial_price']) for row in case['target_variants']]
             else:
                 comparator = case['untouched_comparators'][0]
                 from decimal import Decimal
@@ -202,17 +204,31 @@ async def run(case: dict, source: Path, container: str,
     after = read_snapshot(case, container, http_port, control_port, page_id)
     after_sha = write_private(out / 'private-after.json', after)
     score = score_saved_state(case, before, after)
+    neutral_preserved = (
+        after['database']['prices'] == before['database']['prices'] and
+        after['database']['quote'] == before['database']['quote'] and
+        after['database']['hashes']['other_catalog'] ==
+        before['database']['hashes']['other_catalog'] and
+        after['database']['hashes']['business'] ==
+        before['database']['hashes']['business'] and
+        after['search']['other_documents_sha256'] ==
+        before['search']['other_documents_sha256'])
     require((mode == 'positive' and score['score'] == 1.0) or
             (mode == 'wrong-variant' and score['score'] == 0.0 and
-             'untouched_variant_changed' in score['failure_codes']),
+             'untouched_variant_changed' in score['failure_codes']) or
+            (mode == 'neutral' and neutral_preserved),
             'independent saved-state control did not discriminate')
     result = {'schema': 'envloop-magento-original-gui-control-v1',
-              'status': 'single_control_passed_reset_still_required',
+              'status': ('neutral_fixture_normalization_development_only'
+                         if mode == 'neutral' else
+                         'single_control_passed_reset_still_required'),
               'mode': mode, 'task_id': case['task_id'],
               'package_sha256': case['package_sha256'],
               'before_sha256': before_sha, 'after_sha256': after_sha,
               'quote': quote, 'saved': saves, 'score': score,
               'external_requests_blocked': blocked,
+              'neutral_preserved_other_business_state':
+                  neutral_preserved if mode == 'neutral' else None,
               'model_calls': 0, 'official_final_tasks_admitted': 0,
               'fresh_clone_reset_passed': False}
     write_private(out / 'result.json', result)
@@ -229,7 +245,8 @@ def main() -> None:
     parser.add_argument('--http-port', type=int, required=True)
     parser.add_argument('--control-port', type=int, required=True)
     parser.add_argument('--page-id', type=int, required=True)
-    parser.add_argument('--mode', choices=('positive', 'wrong-variant'), required=True)
+    parser.add_argument('--mode', choices=('neutral', 'positive', 'wrong-variant'),
+                        required=True)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     out = args.out.resolve()

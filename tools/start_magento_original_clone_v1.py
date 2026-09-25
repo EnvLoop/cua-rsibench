@@ -50,6 +50,21 @@ def search_health(container: str) -> dict | None:
         return None
 
 
+def restart_stuck_search(container: str) -> None:
+    """Clear orphaned Java startup helpers in this disposable clone only."""
+    docker('exec', container, 'supervisorctl', 'stop', 'elasticsearch', timeout=60)
+    process_list = docker('exec', container, 'ps', '-eo', 'pid,args', timeout=15)
+    helper_classes = ('org.elasticsearch.tools.java_version_checker.JavaVersionChecker',
+                      'org.elasticsearch.tools.launchers.JvmOptionsParser')
+    stale = [line.strip().split(None, 1)[0] for line in process_list.splitlines()
+             if any(name in line for name in helper_classes)]
+    if stale:
+        require(all(pid.isdigit() for pid in stale),
+                'non-numeric isolated search helper PID')
+        docker('exec', container, 'kill', '-KILL', *stale, timeout=15)
+    docker('exec', container, 'supervisorctl', 'start', 'elasticsearch', timeout=60)
+
+
 def wait_search(container: str, deadline_seconds: int = 420) -> dict:
     deadline = time.monotonic() + deadline_seconds
     attempted_restart = False
@@ -59,8 +74,7 @@ def wait_search(container: str, deadline_seconds: int = 420) -> dict:
                 status['pending_tasks'] == 0):
             return status
         if not attempted_restart and time.monotonic() > deadline - deadline_seconds / 2:
-            docker('exec', container, 'supervisorctl', 'restart', 'elasticsearch',
-                   timeout=60)
+            restart_stuck_search(container)
             attempted_restart = True
         time.sleep(10)
     raise TimeoutError('dedicated Magento search service did not become ready')
@@ -94,15 +108,40 @@ def audit_running(container: str, http_port: int,
             'official_final_tasks_admitted': 0}
 
 
+def configure_base_url(container: str, http_port: int) -> None:
+    base = f'http://localhost:{http_port}/'
+    for key in ('web/unsecure/base_url', 'web/secure/base_url'):
+        docker('exec', container, 'php', '/var/www/magento2/bin/magento',
+               'config:set', key, base, timeout=180)
+    docker('exec', container, 'php', '/var/www/magento2/bin/magento',
+           'cache:clean', 'config', timeout=180)
+
+
 def prepare(container: str, http_port: int, control_port: int,
-            *, adopt_existing: bool = False) -> dict:
+            *, adopt_existing: bool = False,
+            resume_existing: bool = False) -> dict:
     require(CONTAINER_NAME.fullmatch(container) is not None and
             http_port != control_port and 1024 <= http_port <= 65535 and
             1024 <= control_port <= 65535,
             'dedicated clone name and unprivileged ports required')
+    require(not (adopt_existing and resume_existing),
+            'choose at most one existing-clone recovery mode')
     if adopt_existing:
         return audit_running(container, http_port, control_port,
                              'read_only_adoption_after_interrupted_preparation')
+    if resume_existing:
+        check_clone(container, http_port, control_port)
+        config = json.loads(docker('exec', container, 'php', '-r', READ_PREP_PHP,
+                                   timeout=30))
+        require(config['quote_pages'] == 0,
+                'cannot resume preparation after a task was seeded')
+        health = search_health(container)
+        require(health is not None and health['number_of_nodes'] == 1 and
+                health['pending_tasks'] == 0,
+                'cannot resume preparation before search is healthy')
+        configure_base_url(container, http_port)
+        return audit_running(container, http_port, control_port,
+                             'resumed_after_search_startup_timeout')
     try:
         docker('inspect', container, timeout=15)
     except ValueError:
@@ -129,12 +168,7 @@ def prepare(container: str, http_port: int, control_port: int,
     else:
         raise TimeoutError('dedicated Magento HTTP service did not become ready')
     wait_search(container)
-    base = f'http://localhost:{http_port}/'
-    for key in ('web/unsecure/base_url', 'web/secure/base_url'):
-        docker('exec', container, 'php', '/var/www/magento2/bin/magento',
-               'config:set', key, base, timeout=180)
-    docker('exec', container, 'php', '/var/www/magento2/bin/magento',
-           'cache:clean', 'config', timeout=180)
+    configure_base_url(container, http_port)
     return audit_running(container, http_port, control_port, 'new_clone')
 
 
@@ -145,6 +179,8 @@ def main() -> None:
     parser.add_argument('--control-port', type=int, required=True)
     parser.add_argument('--adopt-existing', action='store_true',
                         help='read-only audit after an interrupted preparation')
+    parser.add_argument('--resume-existing', action='store_true',
+                        help='configure an unseeded clone after slow search startup')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     out = args.out.resolve()
@@ -153,7 +189,8 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     try:
         receipt = prepare(args.container, args.http_port, args.control_port,
-                          adopt_existing=args.adopt_existing)
+                          adopt_existing=args.adopt_existing,
+                          resume_existing=args.resume_existing)
     except Exception as error:
         print(json.dumps({'status': 'clone_preparation_failed',
                           'error_type': type(error).__name__,
