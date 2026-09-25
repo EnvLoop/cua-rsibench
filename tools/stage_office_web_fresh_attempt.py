@@ -93,12 +93,16 @@ def stage(source: Path, expected_sha256: str, cell_id: str,
     if root.exists():
         raise ValueError("attempt directory already exists; never reuse a prior attempt")
     root.mkdir(parents=True, mode=0o700)
+    snapshot = root / f"source_snapshot{suffix}"
+    private_copy(source, snapshot)
+    if digest(snapshot) != source_sha:
+        raise ValueError("private source snapshot differs from frozen pin")
     inputs = root / "inputs"
     inputs.mkdir(mode=0o700)
     records = {}
     for slot in SLOTS:
         target = inputs / f"{slot}{suffix}"
-        private_copy(source, target)
+        private_copy(snapshot, target)
         records[slot] = {"path": str(target.relative_to(root)), "sha256": digest(target),
                          "size_bytes": target.stat().st_size,
                          "device": target.stat().st_dev, "inode": target.stat().st_ino}
@@ -106,7 +110,8 @@ def stage(source: Path, expected_sha256: str, cell_id: str,
         "schema": SCHEMA, "status": "local_fresh_inputs_staged_no_gui_credit",
         "cell_id": cell_id, "task_id": task_id,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
-        "evaluator_source_path": str(source), "source_sha256": source_sha,
+        "evaluator_source_origin_path": str(source), "source_sha256": source_sha,
+        "source_snapshot_path": str(snapshot.relative_to(root)),
         "source_size_bytes": source.stat().st_size,
         "slots": records, "downloads": {},
         "cloud_upload_verified": False, "saved_file_readback_verified": False,
@@ -135,10 +140,11 @@ def verify_staged(root: Path) -> dict:
     manifest = json.loads((root / "controller.json").read_text())
     if manifest.get("schema") != SCHEMA or manifest.get("cell_id") not in SUFFIXES:
         raise ValueError("unrecognized controller manifest")
-    source = Path(manifest["evaluator_source_path"])
+    source = _slot_path(root, manifest["source_snapshot_path"])
     if not source.is_file() or digest(source) != manifest["source_sha256"]:
-        raise ValueError("frozen Office source was changed or removed")
+        raise ValueError("private frozen Office source snapshot was changed or removed")
     suffix = SUFFIXES[manifest["cell_id"]]
+    valid_office_package(source, suffix)
     slots = manifest.get("slots") or {}
     if set(slots) != set(SLOTS):
         raise ValueError("controller slots are incomplete")

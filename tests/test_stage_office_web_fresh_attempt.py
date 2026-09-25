@@ -56,9 +56,13 @@ class FreshOfficeControllerTests(unittest.TestCase):
     def test_source_and_input_tampering_fail_closed(self):
         controller.stage(self.source, self.sha, "powerpoint-web", "selection-control", self.attempt)
         pptx(self.source, b"source changed")
-        with self.assertRaisesRegex(ValueError, "frozen Office source"):
+        # The private source snapshot remains auditable if the upstream
+        # worktree is later modified or removed.
+        self.assertFalse(controller.verify_staged(self.attempt)["gui_admitted"])
+        pptx(self.attempt / "source_snapshot.pptx", b"snapshot changed")
+        with self.assertRaisesRegex(ValueError, "source snapshot"):
             controller.verify_staged(self.attempt)
-        pptx(self.source)
+        pptx(self.attempt / "source_snapshot.pptx")
         pptx(self.attempt / "inputs/positive.pptx", b"candidate changed")
         with self.assertRaisesRegex(ValueError, "fresh input changed"):
             controller.verify_staged(self.attempt)

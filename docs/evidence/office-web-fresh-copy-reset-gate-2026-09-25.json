@@ -13,7 +13,8 @@
     "slots": ["untouched", "positive", "partial_negative", "collateral_negative", "fresh_reset"],
     "all_copy_hashes_match_frozen_baseline": true,
     "distinct_file_inodes_checked": true,
-    "private_controller_receipt_sha256": "6af1c98c635b2ceca18bc70fb4c72cd65624d60be191a2c49a4fd25380eeddf1",
+    "private_source_snapshot_persists_independently_of_original_worktree": true,
+    "private_controller_receipt_sha256": "35819f6ab59eb751f47784590efd52f2b5d4b18c9b2f340c3438015344ba4c67",
     "tamper_and_reuse_tests_passed": true
   },
   "browser_gate": {
