@@ -43,6 +43,11 @@ def fake_rows() -> list[dict]:
                      'eval': [{'evaluator': 'AgentResponseEvaluator',
                                'expected': {'task_type': 'retrieve', 'status': 'SUCCESS'}}]})
         next_id += 1
+    # Reserve one source family for a train-only demonstration.
+    for row in rows[:4]:
+        row['intent_template_id'] = 240
+    rows[0]['task_id'] = 538
+    rows[0]['instantiation_dict'] = {'order_id': '299'}
     assert len(rows) == 182
     return rows
 
@@ -73,7 +78,7 @@ class MagentoBacklogTests(unittest.TestCase):
         self.assertFalse(record['requires_no_state_change_oracle'])
         self.assertEqual(record['expected_status'], 'SUCCESS')
         self.assertTrue(record['official_hard_subset'])
-        self.assertEqual(record['source_entity_hints'], ['order_id:1000'])
+        self.assertEqual(record['source_entity_hints'], ['order_id:299'])
 
     def test_unexpected_evaluator_or_insufficient_pool_fails(self):
         row = fake_rows()[0]
@@ -106,13 +111,22 @@ class MagentoBacklogTests(unittest.TestCase):
 
     def test_pinned_problem_ids_are_excluded_but_other_family_members_remain(self):
         rows = fake_rows()
-        for row, task_id in zip(rows[:3], (423, 491, 790)):
+        for row, task_id in zip(rows[4:7], (423, 491, 790)):
             row['task_id'] = task_id
         result = plan.manifest(rows, set())
         all_ids = {row['task_id'] for name in ('selection', 'provisional_final')
                    for row in result['task_sets'][name]}
         self.assertFalse({423, 491, 790} & all_ids)
-        self.assertEqual(result['counts']['quarantined_task_ids'], 9)
+        self.assertEqual(result['counts']['quarantined_task_ids'], 13)
+
+    def test_train_only_template_and_explicit_entity_are_absent_from_both_splits(self):
+        rows = fake_rows()
+        rows[10]['instantiation_dict'] = {'order_id': '299'}
+        result = plan.manifest(rows, set())
+        selected = result['task_sets']['selection'] + result['task_sets']['provisional_final']
+        self.assertFalse(any(row['template_group'] == 'shopping_admin:240' for row in selected))
+        self.assertFalse(any('order_id:299' in row['source_entity_hints'] for row in selected))
+        self.assertEqual(result['counts']['train_only_entity_overlap_excluded_tasks'], 1)
 
 
 if __name__ == '__main__':

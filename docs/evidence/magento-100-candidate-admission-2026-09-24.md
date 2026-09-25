@@ -1,5 +1,7 @@
 # Magento admin: a 100-task admission backlog, not a final benchmark
 
+**2026-09-25 supersession:** The counts below document the original offline candidate backlog. Task 538 is now assigned to a train-only GUI demonstration. The current planner quarantines its complete template 240 and explicit source-entity matches, then refills the private 100-candidate queue. The updated Magento counts are 20 selection and 100 provisional final candidates, with 58 mutation, 37 retrieval, five navigation, and 44 published hard-subset IDs in the provisional final set. No official final identity is admitted. See the [current two-cell admission audit](saas-100-candidate-admission-2026-09-25.md); do not use the historical counts below as a disjoint final split.
+
 ## Measured source and offline result
 
 The pinned [WebArena Verified](https://github.com/ServiceNow/webarena-verified/tree/6473f72db5dcefc97b5725b59e734504edc28a21) dataset has **182** Magento-admin single-site task IDs from **41** intent templates. Its dataset SHA-256 is `d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30`; the published hard-subset JSON SHA-256 is `3b0a4df231bb5a0c642215e521c3fa97701a384f52a734dc2db8f617ad0591a7`. Only **55** of the 182 admin IDs are in that published hard subset. Neither the full count nor the hard label establishes that a task is GUI-solvable, difficult for our student, or independently scorable. A [source and evaluator audit](magento-100-candidate-audit-2026-09-24.md) found three task-specific exceptions that are excluded from the corrected backlog.

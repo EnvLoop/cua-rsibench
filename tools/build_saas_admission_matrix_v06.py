@@ -52,6 +52,13 @@ def make_cell(site: str, manifest: dict) -> dict:
         raise ValueError("template family appears in both splits")
     if any(row["expected_status"] != "SUCCESS" for row in final):
         raise ValueError("non-success source task in successful final queue")
+    if site == "shopping_admin" and any(
+        row["task_id"] in magento.TRAIN_ONLY_TASK_IDS
+        or row["template_group"] in {"shopping_admin:" + str(template)
+                                      for template in magento.QUARANTINED_TEMPLATES}
+        for row in selection + final
+    ):
+        raise ValueError("train-only or quarantined Magento template leaked into candidate splits")
     for row in selection + final:
         if row.get("admission_status", "offline_candidate_unverified") not in {
             "offline_candidate_unverified"

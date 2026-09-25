@@ -10,7 +10,9 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import build_saas_admission_matrix_v06 as matrix  # noqa: E402
 import plan_gitlab_final_candidates_v06 as gitlab  # noqa: E402
+import plan_magento_final_candidates_v06 as magento  # noqa: E402
 from tests.test_plan_gitlab_final_candidates_v06 import fake_rows  # noqa: E402
+from tests.test_plan_magento_final_candidates_v06 import fake_rows as fake_magento_rows  # noqa: E402
 
 
 class SaaSMatrixTests(unittest.TestCase):
@@ -44,6 +46,13 @@ class SaaSMatrixTests(unittest.TestCase):
         modified["task_sets"]["provisional_final"][0]["admission_status"] = "official_final"
         with self.assertRaisesRegex(ValueError, "unsupported admission claim"):
             matrix.make_cell("gitlab", modified)
+
+    def test_train_only_magento_template_cannot_reenter_candidate_matrix(self):
+        manifest = magento.manifest(fake_magento_rows(), set())
+        modified = copy.deepcopy(manifest)
+        modified["task_sets"]["provisional_final"][0]["template_group"] = "shopping_admin:240"
+        with self.assertRaisesRegex(ValueError, "train-only or quarantined"):
+            matrix.make_cell("shopping_admin", modified)
 
 
 if __name__ == "__main__":
