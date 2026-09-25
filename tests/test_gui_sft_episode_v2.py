@@ -148,6 +148,13 @@ class EpisodeV2Tests(unittest.TestCase):
             self.assertIn('visible-ref', request['instruction'])
             self.assertIn('c001', request['visible_text'])
 
+    def test_frozen_split_cannot_rely_only_on_declared_entity_hints(self):
+        self.selection['status'] = 'frozen'
+        self.write()
+        with self.assertRaisesRegex(EpisodeGateError,
+                                    'frozen_entity_coverage_incomplete'):
+            self.validate()
+
     def test_train_task_template_and_entity_overlap_each_rejected(self):
         for field, value, code in (
                 ('task_id', self.source['task_id'], 'train_task_in_evaluation_split'),

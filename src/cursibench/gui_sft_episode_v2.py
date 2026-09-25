@@ -143,6 +143,9 @@ def _manifest(path: Path, *, expected_split: str, cell: str, source: dict) -> tu
              manifest.get('status') in ('provisional', 'frozen') and
              manifest.get('entity_coverage') in ('complete', 'declared_hints_only'),
              'split_manifest_mismatch')
+    if manifest['status'] == 'frozen':
+        _require(manifest['entity_coverage'] == 'complete',
+                 'frozen_entity_coverage_incomplete')
     items = manifest.get('items')
     _require(type(items) is list and items, 'empty_split_manifest')
     for item in items:
@@ -195,7 +198,7 @@ def validate_split_exclusion(source: dict, cell: str,
         'train_source_task_template_and_declared_entities_disjoint': True,
         'selection_final_task_template_disjoint': True,
         'selection_final_declared_entities_disjoint': True,
-        'official_final_admitted': False if final['status'] == 'provisional' else None,
+        'official_final_admitted': False,
     }
 
 
