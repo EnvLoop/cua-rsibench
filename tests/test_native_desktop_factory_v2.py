@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from native_desktop_factory import admit, factory, factory_v2, source, verify
+from native_desktop_factory import admit, factory, factory_v2, formula_semantics, source, verify
 
 
 DEPENDENCIES = all(importlib.util.find_spec(name) is not None for name in
@@ -76,6 +76,18 @@ class DistinctDesktopTemplateTests(unittest.TestCase):
                 for wrong, expected in oracle["targets"].items():
                     if isinstance(expected, str):
                         self.assertNotEqual(wrong, expected)
+                if row["workflow"].startswith("calc-"):
+                    directory = one / row["split"] / row["task_id"]
+                    cells = verify.xlsx_cells(next(directory.glob("*.xlsx")).read_bytes())
+                    for address, rule in oracle["targets"].items():
+                        sheet, cell = address.split("!", 1)
+                        baseline_formula = "=" + cells[sheet][cell]["formula"]
+                        self.assertTrue(formula_semantics.semantically_equivalent(
+                            rule["formula"], rule["formula"], cells,
+                            private_salt="test-only-counterfactual-salt"))
+                        self.assertFalse(formula_semantics.semantically_equivalent(
+                            baseline_formula, rule["formula"], cells,
+                            private_salt="test-only-counterfactual-salt"))
             gate = admit.audit(one, Path(temp) / "missing-gui")
             self.assertEqual((gate["qualified_final_count"], gate["missing_receipt_count"],
                               gate["status"]), (0, 100, "incomplete"))

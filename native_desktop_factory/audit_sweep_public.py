@@ -63,7 +63,8 @@ def summarize(candidate_root: Path, attempts_root: Path,
         record = json.loads(raw)
         if record.get("schema") != "cua-native-wdi-final-gui-sweep-v1" or record.get("dry_run") is not False:
             raise ValueError("Non-actual GUI sweep receipt")
-        if record.get("status") not in ("finished_incomplete", "gui_gate_complete"):
+        if record.get("status") not in ("finished_incomplete", "gui_gate_complete",
+                                         "infrastructure_circuit_open"):
             raise ValueError("Sweep receipt still active or uncertain")
         if record.get("candidate_inventory_sha256") != digest(inventory_raw):
             raise ValueError("Sweep used a different candidate inventory")
@@ -85,6 +86,8 @@ def summarize(candidate_root: Path, attempts_root: Path,
         raise ValueError("LibreOffice runtime changed across calibrated tasks")
     sandbox_ids = set()
     resource_shapes = set()
+    provider_template_ids = set()
+    provider_envd_versions = set()
     for row in gate["admitted"]:
         for attempt in admit.ATTEMPTS:
             receipt = json.loads((attempts_root / row["task_id"] / attempt / "receipt.json").read_bytes())
@@ -92,10 +95,16 @@ def summarize(candidate_root: Path, attempts_root: Path,
             if "resource_probe" in receipt:
                 probe = receipt["resource_probe"]
                 resource_shapes.add((probe["vcpu_visible"], probe["memory_kib_visible"]))
+            if "provider_sandbox_info" in receipt:
+                info = receipt["provider_sandbox_info"]
+                provider_template_ids.add(info["template_id"])
+                provider_envd_versions.add(info["envd_version"])
     if len(sandbox_ids) != gate["qualified_final_count"] * 3:
         raise ValueError("A calibrated task reused another task's sandbox")
     if any(cpu > 8 or mem > 8 * 1024 * 1024 for cpu, mem in resource_shapes):
         raise ValueError("Observed Desktop resource shape exceeds priced cap")
+    if len(provider_template_ids) > 1 or len(provider_envd_versions) > 1:
+        raise ValueError("Provider Desktop template/envd identity changed across calibrated tasks")
     template_counts = dict(sorted(Counter(row["template_group"] for row in final).items()))
     invalid_types = dict(sorted(Counter(row["error_type"] for row in gate["invalid"]).items()))
     return {
@@ -115,6 +124,8 @@ def summarize(candidate_root: Path, attempts_root: Path,
         "calibrated_application_counts": dict(sorted(app_counts.items())),
         "distinct_calibrated_actor_sandboxes": len(sandbox_ids),
         "observed_resource_shapes": [{"vcpu": cpu, "memory_kib": mem} for cpu, mem in sorted(resource_shapes)],
+        "provider_template_ids_observed": sorted(provider_template_ids),
+        "provider_envd_versions_observed": sorted(provider_envd_versions),
         "libreoffice_runtime_probe": next(iter(runtime_probes)) if runtime_probes else None,
         "sweep_runs": run_summaries,
         "published_8vcpu_8gib_marginal_compute_usd_per_hour": 0.5328,
