@@ -15,6 +15,32 @@ from factory import HERE, PRIVATE
 
 SQL = r"""
 SELECT json_build_object(
+  'global_business_identity', (
+    SELECT json_build_object(
+      'purchase_order', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM purchase_order),
+      'purchase_order_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM purchase_order_line),
+      'sale_order', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM sale_order),
+      'sale_order_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM sale_order_line),
+      'stock_picking', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_picking),
+      'stock_move', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_move),
+      'stock_move_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_move_line),
+      'account_move', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM account_move),
+      'account_move_line', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM account_move_line),
+      'crm_lead', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM crm_lead),
+      'res_partner', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM res_partner),
+      'res_users', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM res_users),
+      'product_product', (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM product_product),
+      'stock_warehouse_orderpoint',
+        (SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json) FROM stock_warehouse_orderpoint),
+      'business_attachment', (
+        SELECT COALESCE(json_agg(id ORDER BY id), '[]'::json)
+        FROM ir_attachment
+        WHERE res_model IN ('purchase.order', 'sale.order', 'crm.lead',
+                            'product.product', 'res.company', 'stock.picking',
+                            'account.move')
+      )
+    )
+  ),
   'orders', (
     SELECT COALESCE(json_agg(to_jsonb(x) ORDER BY x.id), '[]'::json)
     FROM (
@@ -148,6 +174,18 @@ def keyed(rows: list[dict]) -> dict[int, dict]:
     return {row["id"]: row for row in rows}
 
 
+def global_identity_differences(baseline: dict, observed: dict) -> list[str]:
+    """Reject new/deleted business records outside the task's scoped rows."""
+    original = baseline.get("global_business_identity")
+    current = observed.get("global_business_identity")
+    if original is None and current is None:
+        # Older unit fixtures predate this guard; live checkpoints cannot.
+        return []
+    if original is None or current is None:
+        raise RuntimeError("Global business identity guard missing")
+    return ["global_business_record_identity_changed"] if current != original else []
+
+
 def freeze() -> dict:
     PRIVATE.mkdir(exist_ok=True)
     path = PRIVATE / "baseline_snapshot.json"
@@ -159,12 +197,14 @@ def freeze() -> dict:
     if partition_receipt.exists():
         expected_counts = json.loads(partition_receipt.read_text())["expected_snapshot_counts"]
         expected_counts["crm_stages"] = counts["crm_stages"]
+        expected_counts["global_business_identity"] = 15
     else:
         expected_counts = {"orders": 120, "lines": 360, "attachments": 161,
                            "vendors": 24, "products": 48, "orderpoints": 20,
                            "sales_orders": 20, "sales_lines": 60, "crm_leads": 20,
                            "customers": 20, "salespeople": 3,
-                           "crm_stages": counts["crm_stages"]}
+                           "crm_stages": counts["crm_stages"],
+                           "global_business_identity": 15}
     if counts["crm_stages"] < 4:
         raise RuntimeError("Expected at least four CRM stages")
     if counts != expected_counts:
@@ -174,7 +214,7 @@ def freeze() -> dict:
 
 
 def evaluate(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "attachments", "vendors", "products", "orderpoints",
                   "sales_orders", "sales_lines", "crm_leads", "customers",
                   "salespeople", "crm_stages"):
@@ -214,7 +254,7 @@ def evaluate(case_id: str, target: dict, baseline: dict, observed: dict) -> dict
 
 
 def evaluate_replenishment(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products",
                   "sales_orders", "sales_lines", "crm_leads", "customers",
                   "salespeople", "crm_stages"):
@@ -250,7 +290,7 @@ def evaluate_replenishment(case_id: str, target: dict, baseline: dict, observed:
 
 
 def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products", "orderpoints",
                   "crm_leads", "customers", "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):
@@ -299,7 +339,7 @@ def evaluate_sales(case_id: str, target: dict, baseline: dict, observed: dict) -
 
 
 def evaluate_crm(case_id: str, target: dict, baseline: dict, observed: dict) -> dict:
-    differences = []
+    differences = global_identity_differences(baseline, observed)
     for group in ("orders", "lines", "attachments", "vendors", "products", "orderpoints",
                   "sales_orders", "sales_lines", "customers", "salespeople", "crm_stages"):
         if keyed(observed[group]) != keyed(baseline[group]):

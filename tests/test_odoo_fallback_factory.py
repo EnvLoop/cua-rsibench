@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import math
 import os
 import socket
 import sys
@@ -21,7 +22,14 @@ from factory import (  # noqa: E402
     proposed_clustered_split, sha256_bytes, split_audit, train_world_candidates,
 )
 from multifamily import crm_candidates, crm_pdf, sales_candidates, sales_pdf  # noqa: E402
-from partition_factory import candidate_world, split_audit as partition_split_audit  # noqa: E402
+from partition_factory import (candidate_world, scale_final_task_sets,
+                               split_audit as partition_split_audit)  # noqa: E402
+SPLIT_VALIDATOR = Path(__file__).resolve().parents[1] / "src/cursibench/scale_final_v06.py"
+SPEC = importlib.util.spec_from_file_location("odoo_scale_final_v06", SPLIT_VALIDATOR)
+assert SPEC is not None and SPEC.loader is not None
+SCALE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(SCALE)
+validate_splits = SCALE.validate_splits
 import bootstrap as bootstrap_module  # noqa: E402
 from verify import (  # noqa: E402
     evaluate, evaluate_replenishment, evaluate_sales, evaluate_crm,
@@ -38,7 +46,8 @@ class OdooFixtureTests(unittest.TestCase):
         seed = "local-test-seed-only-0123456789abcdef"
         audit = partition_split_audit(seed)
         self.assertTrue(audit["entity_disjoint"])
-        self.assertEqual(audit["template_generalization"], "within_template_only")
+        self.assertEqual(audit["template_generalization"],
+                         "held_out_causal_templates_within_four_workflows")
         self.assertEqual(audit["family_counts"], {
             "train": {"purchase": 5, "inventory": 5, "sales": 5, "crm": 5},
             "selection": {"purchase": 5, "inventory": 5, "sales": 5, "crm": 5},
@@ -60,6 +69,64 @@ class OdooFixtureTests(unittest.TestCase):
                                 + world["cases"]["sales"]))
         self.assertNotEqual(candidate_world(seed, "train"),
                             candidate_world(seed + "-different", "train"))
+        task_sets = scale_final_task_sets(seed)
+        self.assertEqual({name: len(rows) for name, rows in task_sets.items()},
+                         {"train": 20, "selection": 20, "official": 100})
+        self.assertEqual(len(validate_splits(task_sets)), 100)
+
+    def test_partition_causal_templates_change_actual_target_transformations(self):
+        worlds = {split: candidate_world("causal-template-test-0123456789abcdef", split)
+                  for split in ("train", "selection", "evaluation_candidate")}
+        for split, world in worlds.items():
+            for case in world["cases"]["purchase"]:
+                faults = [(position, field) for position, line in enumerate(case["lines"])
+                          for field in ("qty", "price")
+                          if line["initial"][field] != line["expected"][field]]
+                positions = {position for position, _ in faults}
+                if split == "train":
+                    self.assertEqual(len(faults), 1)
+                    self.assertEqual(faults[0][1], "price")
+                elif split == "selection":
+                    self.assertEqual(len(faults), 2)
+                    self.assertEqual(len(positions), 1)
+                else:
+                    self.assertGreaterEqual(len(positions), 2)
+            for case in world["cases"]["sales"]:
+                changed = [(position, field) for position, line in enumerate(case["lines"])
+                           for field in ("qty", "price")
+                           if line["initial"][field] != line["expected"][field]]
+                if split == "train":
+                    self.assertEqual(len(changed), 1)
+                    self.assertEqual(changed[0][1], "price")
+                elif split == "selection":
+                    self.assertEqual(len(changed), 1)
+                    self.assertEqual(changed[0][1], "qty")
+                else:
+                    self.assertGreaterEqual(len({pos for pos, _ in changed}), 2)
+                    self.assertEqual({field for _, field in changed}, {"qty", "price"})
+            for case in world["cases"]["crm"]:
+                changed = {field for field in case["expected"]
+                           if case["initial"][field] != case["expected"][field]}
+                self.assertEqual(changed, {
+                    "train": {"stage_name", "salesperson_index"},
+                    "selection": {"revenue", "deadline", "priority"},
+                    "evaluation_candidate": set(case["expected"]),
+                }[split])
+            for case in world["cases"]["inventory"]:
+                params = case["formula_inputs"]
+                weeks = params["weeks"]
+                if split == "train":
+                    basis = sum(weeks) / 4
+                elif split == "selection":
+                    basis = max(weeks)
+                else:
+                    basis = sum((index + 1) * value for index, value in enumerate(weeks)) / 10
+                    basis *= (100 + params["seasonal_uplift_pct"]) / 100
+                minimum = math.ceil(basis * params["lead_days"] / 7)
+                minimum += params["safety_stock"]
+                self.assertEqual(case["expected"], {
+                    "minimum": minimum,
+                    "maximum": minimum + 2 * params["case_pack"]})
 
     def test_bootstrap_rejects_occupied_loopback_port_before_credentials(self):
         with socket.socket() as occupied, tempfile.TemporaryDirectory() as scratch:
@@ -240,6 +307,20 @@ class IndependentEvaluatorTests(unittest.TestCase):
         observed["attachments"][0]["checksum"] = "tampered"
         self.assertIn("attachments_changed_or_missing",
                       evaluate("ELPO-0001", target, self.baseline, observed)["difference_codes"])
+
+    def test_global_business_identity_guard_rejects_new_unscoped_document(self):
+        self.baseline["global_business_identity"] = {
+            "purchase_order": [1], "stock_move": [3], "account_move": []}
+        target = {"rule_id": 1, "expected": {"minimum": 13, "maximum": 21}}
+        observed = copy.deepcopy(self.baseline)
+        observed["orderpoints"][0]["minimum"] = "13"
+        observed["orderpoints"][0]["maximum"] = "21"
+        self.assertEqual(evaluate_replenishment("ELRP-0001", target,
+                                                self.baseline, observed)["reward"], 1.0)
+        observed["global_business_identity"]["purchase_order"].append(2)
+        result = evaluate_replenishment("ELRP-0001", target, self.baseline, observed)
+        self.assertEqual(result["reward"], 0.0)
+        self.assertIn("global_business_record_identity_changed", result["difference_codes"])
 
     def test_replenishment_positive_and_wrong_rule_negative(self):
         target = {"rule_id": 1, "expected": {"minimum": 13, "maximum": 21}}

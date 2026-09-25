@@ -20,7 +20,7 @@ from gui_controls import (
     open_purchase, open_replenishment, open_sales, purchase_case, sales_case,
     view_attachment,
 )
-from partition_factory import FAMILIES
+from partition_factory import FAMILIES, SPLIT_COUNTS
 from reset import restore
 from verify import score
 
@@ -148,8 +148,8 @@ def admit_one(family: str, case: dict, wrong_case: dict) -> dict:
 def run(family: str | None = None, limit: int | None = None,
         case_id: str | None = None) -> dict:
     world, cases = _case_index()
-    if world["split"] != "evaluation_candidate":
-        raise RuntimeError("This sweep only qualifies final candidate cases")
+    if world["split"] not in SPLIT_COUNTS:
+        raise RuntimeError("Unknown candidate partition")
     if family:
         cases = [row for row in cases if row[0] == family]
     if case_id:

@@ -203,21 +203,29 @@ def sales_case(page, case: dict, *, positive: bool) -> None:
 def crm_case(page, case: dict, *, positive: bool) -> None:
     if positive:
         expected = case["expected"]
-        page.locator('[name="stage_id"] button[role="radio"]').filter(
-            has_text=expected["stage_name"]
-        ).click()
+        initial = case["initial"]
+        if initial["stage_name"] != expected["stage_name"]:
+            page.locator('[name="stage_id"] button[role="radio"]').filter(
+                has_text=expected["stage_name"]
+            ).click()
         names = case.get("salesperson_names", ["Avery Lane", "Morgan Ellis", "Riley Chen"])
-        name = names[expected["salesperson_index"]]
-        page.locator('[name="user_id"] input').fill(name.split()[0])
-        page.get_by_role("option", name=name).click()
-        page.locator('[name="expected_revenue"] input').fill(str(expected["revenue"]))
-        month, day, year = expected["deadline"][5:7], expected["deadline"][8:10], expected["deadline"][:4]
-        page.locator('[name="date_deadline"] input').fill(f"{month}/{day}/{year}")
-        page.locator('[name="date_deadline"] input').press("Tab")
-        priority = {"1": "Medium", "2": "High", "3": "Very High"}[expected["priority"]]
-        page.locator(f'[name="priority"] [aria-label="{priority}"]').click()
+        if initial["salesperson_index"] != expected["salesperson_index"]:
+            name = names[expected["salesperson_index"]]
+            page.locator('[name="user_id"] input').fill(name.split()[0])
+            page.get_by_role("option", name=name).click()
+        if initial["revenue"] != expected["revenue"]:
+            page.locator('[name="expected_revenue"] input').fill(str(expected["revenue"]))
+        if initial["deadline"] != expected["deadline"]:
+            month, day, year = expected["deadline"][5:7], expected["deadline"][8:10], expected["deadline"][:4]
+            page.locator('[name="date_deadline"] input').fill(f"{month}/{day}/{year}")
+            page.locator('[name="date_deadline"] input').press("Tab")
+        if initial["priority"] != expected["priority"]:
+            priority = {"1": "Medium", "2": "High", "3": "Very High"}[expected["priority"]]
+            page.locator(f'[name="priority"] [aria-label="{priority}"]').click()
     else:
-        page.locator('[name="priority"] [aria-label="Medium"]').click()
+        current = case["initial"]["priority"]
+        wrong = {"0": "Medium", "1": "High", "2": "Very High", "3": "Medium"}[current]
+        page.locator(f'[name="priority"] [aria-label="{wrong}"]').click()
     save = page.get_by_role("button", name="Save")
     if save.count():
         save.click()

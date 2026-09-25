@@ -9,32 +9,72 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import importlib.util
 import json
 import math
 import random
 import secrets
 from datetime import date, timedelta
 
-from factory import (CATALOG, PRIVATE, SOURCE, OdooRPC,
+from factory import (CATALOG, CODE_DIR, PRIVATE, SOURCE, OdooRPC,
                      confirmation, sha256_bytes)
 from multifamily import attach, crm_pdf, sales_pdf
 
 SPLIT_COUNTS = {"train": 5, "selection": 5, "evaluation_candidate": 25}
 FAMILIES = ("purchase", "inventory", "sales", "crm")
 PREFIX = {"train": "TRN", "selection": "SEL", "evaluation_candidate": "EVC"}
+ROLE_GROUP_XMLIDS = ("base.group_user", "purchase.group_purchase_user",
+                     "stock.group_stock_manager",
+                     "sales_team.group_sale_salesman_all_leads")
 # Odoo Community's pinned purchase form exposes quantity and unit price in the
 # editable native RFQ line grid. Promised date is preserved by the oracle, but
 # excluded from candidate repairs until a native GUI date editor is qualified.
-PURCHASE_FAULTS = (
-    ("line-one-price", ((0, "price"),)),
-    ("line-one-quantity", ((0, "qty"),)),
-    ("same-line-price-and-quantity", ((1, "price"), (1, "qty"))),
+EVALUATION_PURCHASE_FAULTS = (
     ("two-line-prices", ((0, "price"), (2, "price"))),
     ("two-line-quantities", ((0, "qty"), (2, "qty"))),
     ("cross-line-quantity-and-price", ((1, "qty"), (2, "price"))),
+    ("cross-line-price-and-quantity", ((0, "price"), (1, "qty"))),
     ("three-line-price-quantity-price", ((0, "price"), (1, "qty"), (2, "price"))),
     ("three-line-quantity-price-quantity", ((0, "qty"), (1, "price"), (2, "qty"))),
+    ("two-line-full-repair", ((0, "price"), (0, "qty"), (2, "price"), (2, "qty"))),
+    ("three-line-full-repair", ((0, "price"), (1, "qty"), (1, "price"),
+                                (2, "qty"), (2, "price"))),
 )
+
+TEMPLATE_SIGNATURES = {
+    "purchase": {
+        "train": {"source": "supplier_confirmation_pdf", "target": "single_line_unit_price"},
+        "selection": {"source": "supplier_confirmation_pdf", "target": "same_line_price_and_quantity"},
+        "evaluation_candidate": {"source": "supplier_confirmation_pdf",
+                                 "target": "cross_line_two_or_three_line_reconciliation"},
+    },
+    "inventory": {
+        "train": {"source": "product_purchase_planning_note", "formula": "mean_weekly_demand"},
+        "selection": {"source": "product_purchase_planning_note", "formula": "peak_weekly_demand"},
+        "evaluation_candidate": {"source": "product_purchase_planning_note",
+                                 "formula": "weighted_recent_demand_with_seasonal_uplift"},
+    },
+    "sales": {
+        "train": {"source": "customer_po_pdf", "target": "reference_plus_single_price"},
+        "selection": {"source": "customer_po_pdf", "target": "reference_plus_single_quantity"},
+        "evaluation_candidate": {"source": "customer_po_pdf",
+                                 "target": "reference_plus_cross_line_mixed_faults"},
+    },
+    "crm": {
+        "train": {"source": "opportunity_handoff_pdf", "target": "stage_and_owner"},
+        "selection": {"source": "opportunity_handoff_pdf", "target": "revenue_date_priority"},
+        "evaluation_candidate": {"source": "opportunity_handoff_pdf",
+                                 "target": "stage_owner_revenue_date_priority"},
+    },
+}
+
+
+def _identity(family: str, split: str, tag: str, index: int) -> dict:
+    signature = {"workflow": family, **TEMPLATE_SIGNATURES[family][split]}
+    key = hashlib.sha256(json.dumps(signature, sort_keys=True).encode()).hexdigest()[:16]
+    return {"template_signature": signature,
+            "template_group": f"odoo-causal-{key}",
+            "instance_group": f"odoo-instance-{tag}-{family}-{index + 1:04d}"}
 
 
 def _rng(master_seed: str, split: str, family: str) -> random.Random:
@@ -45,10 +85,9 @@ def _rng(master_seed: str, split: str, family: str) -> random.Random:
 def candidate_world(master_seed: str, split: str) -> dict:
     """Return exactly 5/5/25 cases per family, with split-specific entities.
 
-    Deliberately tests *within-template* transfer: the four workflows and the
-    purchase fault grammar is shared across worlds; the 25-case evaluation
-    world covers all eight patterns, and the 5-case train/selection worlds
-    each cover five.
+    The four workflow applications recur across splits, while the causal
+    correction templates differ: simpler train/selection transformations
+    cannot share a template group with the final multi-field transfer set.
     The case values, entity identities and source documents differ by split.
     """
     if split not in SPLIT_COUNTS:
@@ -72,7 +111,14 @@ def candidate_world(master_seed: str, split: str) -> dict:
     rng = _rng(master_seed, split, "purchase")
     for index in range(count):
         case_id = f"ELPO-{code}-{index + 1:04d}"
-        pattern, faults = PURCHASE_FAULTS[index % len(PURCHASE_FAULTS)]
+        if split == "train":
+            pattern = "single-line-price"
+            faults = ((index % 3, "price"),)
+        elif split == "selection":
+            pattern = "same-line-price-and-quantity"
+            faults = ((index % 3, "price"), (index % 3, "qty"))
+        else:
+            pattern, faults = EVALUATION_PURCHASE_FAULTS[index % len(EVALUATION_PURCHASE_FAULTS)]
         lines = []
         for position, product in enumerate(rng.sample(products, 3)):
             promised = date(2026, 1, 15) + timedelta(days=rng.randint(3, 75))
@@ -88,6 +134,7 @@ def candidate_world(master_seed: str, split: str) -> dict:
                           "expected": expected, "initial": initial})
         cases["purchase"].append({
             "id": case_id, "family": "purchase", "partition": split,
+            **_identity("purchase", split, tag, index),
             "vendor": vendors[index], "pattern": pattern,
             "order_date": "2026-01-05", "lines": lines,
             "prompt": (f"In Purchase, reconcile RFQ {case_id} against its attached supplier "
@@ -104,15 +151,32 @@ def candidate_world(master_seed: str, split: str) -> dict:
         lead = rng.choice((7, 14, 21, 28))
         safety = rng.randint(2, 12)
         pack = rng.choice((4, 6, 8, 12))
-        minimum = math.ceil(sum(weeks) / 4 * lead / 7) + safety
+        uplift = (5, 10, 15, 20)[index % 4]
+        if split == "train":
+            demand_basis = sum(weeks) / 4
+            formula = "mean weekly demand"
+        elif split == "selection":
+            demand_basis = max(weeks)
+            formula = "highest of the four weekly counts"
+        else:
+            weighted = sum((position + 1) * week for position, week in enumerate(weeks)) / 10
+            demand_basis = weighted * (100 + uplift) / 100
+            formula = ("recency-weighted weekly demand "
+                       "(week 1 + 2 x week 2 + 3 x week 3 + 4 x week 4) / 10 "
+                       f"with an additional {uplift}% seasonal uplift")
+        minimum = math.ceil(demand_basis * lead / 7) + safety
         maximum = minimum + 2 * pack
         cases["inventory"].append({
             "id": case_id, "family": "inventory", "partition": split,
+            **_identity("inventory", split, tag, index),
             "sku": product["sku"],
+            "formula_inputs": {"weeks": weeks, "lead_days": lead,
+                               "safety_stock": safety, "case_pack": pack,
+                               "seasonal_uplift_pct": uplift if split == "evaluation_candidate" else 0},
             "source_note": ("Synthetic four-week demand counts: " + ", ".join(map(str, weeks)) +
                             f" units. Supplier lead: {lead} days. Safety stock: {safety} units. "
-                            f"Case pack: {pack} units. Planning rule: minimum is ceil(mean "
-                            "weekly demand x lead days / 7) plus safety stock; maximum is "
+                            f"Case pack: {pack} units. Planning rule: minimum is ceil({formula} "
+                            "x lead days / 7) plus safety stock; maximum is "
                             "minimum plus two case packs."),
             "expected": {"minimum": minimum, "maximum": maximum},
             "initial": {"minimum": minimum + rng.randint(2, 4),
@@ -132,15 +196,22 @@ def candidate_world(master_seed: str, split: str) -> dict:
                         "price": round(rng.uniform(24, 270), 2),
                         "discount": rng.choice((0, 5, 10, 15))}
             initial = dict(expected)
-            if position == index % 3 or (index % 4 == 0 and position == (index + 1) % 3):
-                if (index + position) % 2:
-                    initial["price"] = round(expected["price"] + 4.75, 2)
-                else:
+            if split == "train" and position == index % 3:
+                initial["price"] = round(expected["price"] + 4.75, 2)
+            elif split == "selection" and position == index % 3:
+                initial["qty"] += 2
+            elif split == "evaluation_candidate":
+                if position == index % 3:
                     initial["qty"] += 2
+                elif position == (index + 1) % 3:
+                    initial["price"] = round(expected["price"] + 4.75, 2)
+                elif index % 4 == 0:
+                    initial["qty"] += 1
             lines.append({"sku": product["sku"], "expected": expected, "initial": initial})
         reference = f"CPO-{code}-{tag}-{index + 1:04d}"
         cases["sales"].append({
             "id": case_id, "family": "sales", "partition": split,
+            **_identity("sales", split, tag, index),
             "customer": customers[index], "customer_reference": reference,
             "initial_customer_reference": f"DRAFT-{reference}", "lines": lines,
             "prompt": (f"In Sales, reconcile quotation {case_id} with the attached customer "
@@ -158,12 +229,16 @@ def candidate_world(master_seed: str, split: str) -> dict:
                     "revenue": float(rng.randrange(12_000, 170_000, 250)),
                     "deadline": closing, "priority": str(1 + index % 3)}
         initial = dict(expected)
-        initial.update({"stage_name": "New", "salesperson_index": (index + 1) % 3,
-                        "revenue": expected["revenue"] + 1_800,
-                        "deadline": (date.fromisoformat(closing) + timedelta(days=14)).isoformat(),
-                        "priority": "0"})
+        if split in ("train", "evaluation_candidate"):
+            initial.update({"stage_name": "New", "salesperson_index": (index + 1) % 3})
+        if split in ("selection", "evaluation_candidate"):
+            initial.update({"revenue": expected["revenue"] + 1_800,
+                            "deadline": (date.fromisoformat(closing)
+                                         + timedelta(days=14)).isoformat(),
+                            "priority": "0"})
         cases["crm"].append({
             "id": case_id, "family": "crm", "partition": split,
+            **_identity("crm", split, tag, index),
             "customer": customers[index], "salesperson_names": salespeople,
             "expected": expected, "initial": initial,
             "prompt": (f"In CRM, follow the attached sales handoff PDF for opportunity {case_id}. "
@@ -181,14 +256,7 @@ def split_audit(master_seed: str) -> dict:
     identifiers = {}
     for part, world in worlds.items():
         rows = [case for family in FAMILIES for case in world["cases"][family]]
-        source_hashes = (
-            {sha256_bytes(confirmation(case)) for case in world["cases"]["purchase"]}
-            | {sha256_bytes(case["source_note"].encode())
-               for case in world["cases"]["inventory"]}
-            | {sha256_bytes(sales_pdf(case)) for case in world["cases"]["sales"]}
-            | {sha256_bytes(crm_pdf(case, world["salespeople"]))
-               for case in world["cases"]["crm"]}
-        )
+        source_hashes = {sha256_bytes(source_asset(case, world)) for case in rows}
         identifiers[part] = {
             "ids": {case["id"] for case in rows},
             "partners": set(world["vendors"] + world["customers"]),
@@ -198,6 +266,10 @@ def split_audit(master_seed: str) -> dict:
             "source_notes": {case["source_note"] for case in world["cases"]["inventory"]},
             "source_sha256": source_hashes,
             "salespeople": set(world["salespeople"]),
+            "template_groups": {case["template_group"] for case in rows},
+            "causal_signatures": {json.dumps(case["template_signature"], sort_keys=True)
+                                  for case in rows},
+            "instance_groups": {case["instance_group"] for case in rows},
         }
     overlaps = {}
     parts = list(SPLIT_COUNTS)
@@ -212,7 +284,57 @@ def split_audit(master_seed: str) -> dict:
             "overlaps": overlaps,
             "entity_disjoint": all(value == 0 for pair in overlaps.values()
                                    for value in pair.values()),
-            "template_generalization": "within_template_only"}
+            "template_generalization": "held_out_causal_templates_within_four_workflows",
+            "template_signatures": {
+                part: {family: TEMPLATE_SIGNATURES[family][part] for family in FAMILIES}
+                for part in SPLIT_COUNTS}}
+
+
+def source_asset(case: dict, world: dict) -> bytes:
+    if case["family"] == "purchase":
+        return confirmation(case)
+    if case["family"] == "inventory":
+        return case["source_note"].encode()
+    if case["family"] == "sales":
+        return sales_pdf(case)
+    if case["family"] == "crm":
+        return crm_pdf(case, world["salespeople"])
+    raise ValueError("Unknown task family")
+
+
+def scale_final_task_sets(master_seed: str) -> dict[str, list[dict]]:
+    """Expose exact identity rows for the existing v0.6 split validator.
+
+    This proves only split identity invariants, never GUI qualification.
+    """
+    out = {"train": [], "selection": [], "official": []}
+    for split in SPLIT_COUNTS:
+        world = candidate_world(master_seed, split)
+        destination = "official" if split == "evaluation_candidate" else split
+        for family in FAMILIES:
+            for case in world["cases"][family]:
+                asset = source_asset(case, world)
+                source_hash = sha256_bytes(asset)
+                package_hash = sha256_bytes(
+                    json.dumps(case, sort_keys=True).encode() + b"\n" + asset)
+                out[destination].append({
+                    "task_id": case["id"], "package_sha256": package_hash,
+                    "source_groups": [f"odoo-source-{source_hash}"],
+                    "template_group": case["template_group"],
+                    "instance_group": case["instance_group"],
+                })
+    return out
+
+
+def validate_scale_splits(task_sets: dict[str, list[dict]]) -> None:
+    validator = CODE_DIR.parents[1] / "src/cursibench/scale_final_v06.py"
+    spec = importlib.util.spec_from_file_location("odoo_scale_final_v06", validator)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Existing v0.6 split validator unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if len(module.validate_splits(task_sets)) != 100:
+        raise RuntimeError("v0.6 split validator did not accept the 100 identities")
 
 
 def _xml_group(rpc: OdooRPC, module: str, name: str) -> int:
@@ -255,10 +377,7 @@ def seed_partition(split: str, master_seed: str) -> dict:
         uoms[item["sku"]] = rpc.call("product.product", "read", [product_id],
                                       fields=["uom_po_id"])[0]["uom_po_id"][0]
 
-    group_ids = [_xml_group(rpc, "base", "group_user"),
-                 _xml_group(rpc, "purchase", "group_purchase_user"),
-                 _xml_group(rpc, "stock", "group_stock_manager"),
-                 _xml_group(rpc, "sales_team", "group_sale_salesman_all_leads")]
+    group_ids = [_xml_group(rpc, *xmlid.split(".", 1)) for xmlid in ROLE_GROUP_XMLIDS]
     admin_group = _xml_group(rpc, "base", "group_system")
     actor_password = secrets.token_urlsafe(32)
     actor_login = f"envloop.actor.{PREFIX[split].lower()}.{world['namespace'].lower()}@example.invalid"
@@ -381,12 +500,15 @@ def seed_partition(split: str, master_seed: str) -> dict:
     attach(rpc, "res.company", company_id,
            "Public-SEC-retailer-companyfacts-excerpt.json", sec)
     PRIVATE.mkdir(parents=True, exist_ok=True)
+    task_set_manifest = scale_final_task_sets(master_seed)
+    validate_scale_splits(task_set_manifest)
     for filename, payload in (("development_gold.json", purchase_gold),
                               ("replenishment_gold.json", inventory_gold),
                               ("sales_gold.json", sales_gold),
                               ("crm_gold.json", crm_gold),
                               ("partition_cases.json", world),
-                              ("source_hashes.json", source_hashes)):
+                              ("source_hashes.json", source_hashes),
+                              ("task_set_manifest.json", task_set_manifest)):
         path = PRIVATE / filename
         path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         path.chmod(0o600)
@@ -400,13 +522,23 @@ def seed_partition(split: str, master_seed: str) -> dict:
         "vendors": count, "products": len(products), "orderpoints": count,
         "sales_orders": count, "sales_lines": 3 * count, "crm_leads": count,
         "customers": count, "salespeople": 4,
+        "global_business_identity": 15,
     }
+    role_policy = {"required_group_xmlids": list(ROLE_GROUP_XMLIDS),
+                   "forbidden_group_xmlids": ["base.group_system"],
+                   "email_domain": "example.invalid"}
+    pinned_files = {name: sha256_bytes((CODE_DIR / name).read_bytes())
+                    for name in ("partition_factory.py", "verify.py", "reset.py",
+                                 "gui_controls.py", "sweep_partition.py", "compose.yaml")}
     receipt = {"schema": "envloop-odoo-partition-candidate-v1",
         "status": "seeded_unsealed_candidate_not_gui_admitted",
         "partition": split, "source_type": "synthetic_operational_plus_public_sec_reference",
         "master_seed_sha256": sha256_bytes(master_seed.encode()),
         "case_manifest_sha256": sha256_bytes(json.dumps(world, sort_keys=True).encode()),
         "source_hash_manifest_sha256": sha256_bytes(json.dumps(source_hashes, sort_keys=True).encode()),
+        "task_set_manifest_sha256": sha256_bytes(json.dumps(task_set_manifest, sort_keys=True).encode()),
+        "role_policy_sha256": sha256_bytes(json.dumps(role_policy, sort_keys=True).encode()),
+        "pinned_code_and_runtime_sha256": pinned_files,
         "sec_reference_sha256": sha256_bytes(sec),
         "entity_disjoint_audit": audit,
         "family_counts": {family: len(world["cases"][family]) for family in FAMILIES},
