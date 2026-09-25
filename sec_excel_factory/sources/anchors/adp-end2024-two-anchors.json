@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "ADP",
+  "cik": 8670,
+  "entity_name": "Automatic Data Processing, Inc.",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000008670.json",
+  "proxy_raw_json_sha256": "bf7d53d14fa29530fa1dd594ace14438282b8b6117069a8b3550e5c46059e034",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/0000008670-24-000024-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/8670/000000867024000024/adp-20240630.htm",
+  "filing_accession": "0000008670-24-000024",
+  "filing_filed": "2024-08-07",
+  "filing_period_end": "2024-06-30",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "9efcfd2103a446ffbd64",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-06-30",
+      "value": 54362700000,
+      "accession": "0000008670-24-000024",
+      "filed": "2024-08-07",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "caaae59b25c12fb0d286",
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "unit": "USD",
+      "start": "2023-07-01",
+      "end": "2024-06-30",
+      "value": 19202600000,
+      "accession": "0000008670-24-000024",
+      "filed": "2024-08-07",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

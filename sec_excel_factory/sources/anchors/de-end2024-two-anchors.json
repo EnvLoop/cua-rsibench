@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "DE",
+  "cik": 315189,
+  "entity_name": "DEERE & CO",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000315189.json",
+  "proxy_raw_json_sha256": "b845478ca3e2c2a83471cfb92524b33d83ec47fd3c1c68614f3f2487f1606b6c",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/315189/000155837024016169/0001558370-24-016169-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/315189/000155837025000116/de-20241027xars.pdf",
+  "filing_accession": "0001558370-24-016169",
+  "filing_filed": "2024-12-12",
+  "filing_period_end": "2024-10-27",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "64860bf06e5fda77111c",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-10-27",
+      "value": 107320000000,
+      "accession": "0001558370-24-016169",
+      "filed": "2024-12-12",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "f64b89bdeddc17e4e9c0",
+      "concept": "Revenues",
+      "unit": "USD",
+      "start": "2023-10-30",
+      "end": "2024-10-27",
+      "value": 51716000000,
+      "accession": "0001558370-24-016169",
+      "filed": "2024-12-12",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

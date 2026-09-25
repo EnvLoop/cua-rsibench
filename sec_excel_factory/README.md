@@ -6,6 +6,8 @@ The newer [filing-close integrated candidate pool](../docs/evidence/sec-integrat
 
 A separate [source expansion and contract-obligations workflow](../docs/evidence/sec-source-expansion-rpo-2026-09-25.md) freezes compact public original 10-K filing excerpts with report periods ending in calendar 2024 for 16 more issuers, each byte-bound to the prior direct-SEC source audit. Home Depot's source is fiscal **2023** ending January 28, 2024; fiscal labels are preserved as reported. Four eight-sheet RPO/deferred-revenue development cases use Alphabet, Oracle, NVIDIA, and Disney filings and a different dependency graph. They pass local independent OOXML and perturbation controls, but also have **zero Excel-web GUI admissions**. The public excerpts are development material; a future hidden final set needs evaluator-held, non-exposed source and template families.
 
+Ten more issuer identities have [two source facts each cross-checked directly in SEC-hosted filing views](../docs/evidence/sec-ten-official-crosschecked-anchors-2026-09-25.md). This raises the development identity inventory to 28, but only the previous 18 full companyfacts payloads are bound to earlier direct-SEC SHA-256 values. The ten new full proxy responses stay quarantined in ignored `work/`; only 20 officially cross-checked asset/revenue anchors are committed. None is a qualified hidden or Excel-web final item.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled

@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "IBM",
+  "cik": 51143,
+  "entity_name": "INTERNATIONAL BUSINESS MACHINES CORP",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000051143.json",
+  "proxy_raw_json_sha256": "1660477fa5713e5749c3038cf22b3c776414acfc6e1e721d1772c91101dc5e5c",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/51143/000005114325000015/0000051143-25-000015-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/51143/000110465925022191/tm2429998d6_ars.pdf",
+  "filing_accession": "0000051143-25-000015",
+  "filing_filed": "2025-02-25",
+  "filing_period_end": "2024-12-31",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "09e8cc31027808d4ffbf",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-12-31",
+      "value": 137175000000,
+      "accession": "0000051143-25-000015",
+      "filed": "2025-02-25",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "9df6e9e5d46cf0d70a88",
+      "concept": "Revenues",
+      "unit": "USD",
+      "start": "2024-01-01",
+      "end": "2024-12-31",
+      "value": 62753000000,
+      "accession": "0000051143-25-000015",
+      "filed": "2025-02-25",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

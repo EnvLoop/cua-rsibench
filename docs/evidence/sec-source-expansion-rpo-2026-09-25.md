@@ -12,6 +12,8 @@ Four public development cases use distinct original 10-K accessions from Alphabe
 
 The 16 new excerpts and the four RPO tasks increase real-source and workflow diversity, but they do **not** satisfy the full-study Excel admission gate. The existing 100 proposed final workbook variants still repeat seven filing pairs, two issuers, and one template; they have **0/100** individually admitted final cases. A publication-grade hidden set needs new evaluator-held source families and workflow templates frozen before researcher access, followed by task-by-task Excel-web GUI and independent downloaded-artifact verification. These public excerpts are suitable as development or training material, not as a sealed final exam.
 
+A later [ten-issuer anchor check](sec-ten-official-crosschecked-anchors-2026-09-25.md) brought the public development **identity** inventory to 28. It verifies only assets and revenue in direct SEC views for those ten; their other proxy-delivered facts remain quarantined. This does not change the 18 full-payload hash tier or any official final-admission count.
+
 Rebuild the public source excerpts and the four offline cases from verified local raw snapshots:
 
 ```bash
