@@ -5,7 +5,7 @@
   "application": "original_odoo_community_18.0-20260908",
   "actor_interface": "native_odoo_browser_gui",
   "fixture_seed_interface": "environment_owned_xmlrpc_before_freeze_only",
-  "evaluator_interface": "postgresql_select_only_plus_protected_filestore_sha256",
+  "evaluator_interface": "postgresql_select_only_plus_protected_store_paths_and_filestore_sha256",
   "world": {
     "purchase_rfq_candidates": 120,
     "inventory_replenishment_candidates": 20,
@@ -40,6 +40,22 @@
     "crm_alternate_stage_case_gui_reward": 1.0,
     "protected_source_files_checked_per_score": 161
   },
+  "unsealed_gui_solvability_sweep": {
+    "sales_attempted_and_passed": 20,
+    "crm_attempted_and_passed": 20,
+    "total_attempted_and_passed": 40,
+    "all_cases_baseline_reward_zero": true,
+    "all_source_pdfs_visible_in_native_viewer": true,
+    "all_cases_cold_reset_before": true,
+    "all_cases_gui_oracle_reward_one": true,
+    "all_cases_protected_source_bytes_checked": true,
+    "store_path_check_added_after_sweep": true,
+    "post_sweep_store_path_live_check_count": 161,
+    "post_sweep_sales_gui_positive_with_store_path_check": true,
+    "final_full_reset_exact": true,
+    "per_case_public_receipt": "odoo-community-development-gui-sweep-2026-09-25.json",
+    "official_final_tasks_admitted": 0
+  },
   "reset": {
     "database_dump_sha256": "3b566c05be51be967a54eb3dcb4d137cfb20bf5aa280b9887ea8909f914a0d5e",
     "filestore_archive_sha256": "0ae169a970d843e30f84a31d82c234b33b9b09d18f2d25064e5fd5764333ae4b",
@@ -54,7 +70,10 @@
   "limits": [
     "Public development fixture and source templates are not sealed final data",
     "No entity-disjoint deployed train/selection/final worlds across all four families",
+    "Sales discount values are protected against change but no discount-correction tasks are seeded because the pinned default GUI hides that field",
     "No per-task 100-case final admission sweep or independent model campaign",
+    "Development GUI controls use local administrator; role-scoped actor ACLs are not yet qualified",
+    "No-regression scoring covers benchmark CRM opportunities, not Odoo default demo opportunities outside the fixture",
     "No evidence of source-family transfer beyond the implemented development controls"
   ]
 }

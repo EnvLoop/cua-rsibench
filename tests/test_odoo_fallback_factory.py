@@ -74,6 +74,10 @@ class OdooFixtureTests(unittest.TestCase):
             self.assertEqual(len(case["lines"]), 3)
             self.assertTrue(any(line["initial"] != line["expected"] for line in case["lines"]))
             self.assertNotEqual(case["initial_customer_reference"], case["customer_reference"])
+            self.assertTrue(all(line["initial"]["discount"] == line["expected"]["discount"]
+                                for line in case["lines"]))
+        self.assertEqual({sum(line["initial"] != line["expected"] for line in case["lines"])
+                          for case in sales}, {1, 2, 3})
         for case in crm:
             self.assertEqual(set(case["expected"]), set(case["initial"]))
             self.assertTrue(all(case["expected"][key] != case["initial"][key]

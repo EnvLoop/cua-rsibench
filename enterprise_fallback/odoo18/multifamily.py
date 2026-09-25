@@ -79,7 +79,7 @@ def crm_candidates() -> list[dict]:
             "prompt": (f"In CRM, open opportunity {case_id}. Follow the attached synthetic sales "
                        "handoff memo to update stage, salesperson, forecast revenue, expected closing "
                        "date and priority. Preserve the customer, opportunity notes, all other "
-                       "opportunities and attachments."),
+                       "ELCRM benchmark opportunities and attachments."),
         })
     return out
 
