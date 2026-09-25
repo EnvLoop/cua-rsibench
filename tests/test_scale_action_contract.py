@@ -131,6 +131,30 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ContractError, 'invalid_action_json'):
             validate_action(duplicate, self.frame, current_frame_id=self.frame.frame_id)
 
+    def test_exact_single_json_fence_is_transport_normalized(self):
+        payload = json.dumps(self.action())
+        for fenced in (f'```json\n{payload}\n```',
+                       f'```\n{payload}\n```',
+                       f'  ```json\n{payload}\n```  '):
+            with self.subTest(fence=fenced[:10]):
+                action = validate_action(fenced, self.frame,
+                                         current_frame_id=self.frame.frame_id)
+                self.assertEqual(action['type'], 'click')
+                self.assertEqual(action['target'], {'ref': 'save'})
+        for malformed in (f'Here is the action:\n```json\n{payload}\n```',
+                          f'```json\n{payload}\n```\nDone.',
+                          f'```JSON\n{payload}\n```',
+                          f'```json\n{payload}\n```\n```json\n{payload}\n```',
+                          '```json\n\n```'):
+            with self.subTest(malformed=malformed[:20]):
+                with self.assertRaisesRegex(ContractError, 'invalid_action_json'):
+                    validate_action(malformed, self.frame,
+                                    current_frame_id=self.frame.frame_id)
+        duplicate = json.dumps(self.action())[:-1] + ',"type":"shell"}'
+        with self.assertRaisesRegex(ContractError, 'invalid_action_json'):
+            validate_action(f'```json\n{duplicate}\n```', self.frame,
+                            current_frame_id=self.frame.frame_id)
+
     def test_observation_bounds_and_previous_result_schema(self):
         changes = [
             {'task_binding_sha256': 'not-a-digest'},
