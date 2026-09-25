@@ -8,6 +8,7 @@ from PIL import Image
 
 from cursibench.gui_sft_episode_v2 import (
     ACTION_VERSION, CELLS, GATE_SCHEMA, MODEL, PROCESSOR, RENDERER,
+    STUDY_CELL_BY_ADAPTER,
     SCHEMA, SPLIT_SCHEMA, EpisodeGateError, _source_binding,
     render_model_turn, sha256, validate_episode,
 )
@@ -138,6 +139,7 @@ class EpisodeV2Tests(unittest.TestCase):
             self.write()
             episode, turns, proof = self.validate()
             self.assertEqual(episode['cell'], cell)
+            self.assertEqual(proof['study_cell_id'], STUDY_CELL_BY_ADAPTER[cell])
             self.assertEqual(len(turns), 2)
             self.assertEqual(proof['split']['selection_count'], 1)
             self.assertEqual(proof['split']['official_final_admitted'], False)

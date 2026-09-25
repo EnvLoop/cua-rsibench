@@ -17,6 +17,7 @@ from pathlib import Path
 import re
 import subprocess
 
+from .full_study_matrix_v1 import CELLS as FULL_STUDY_CELLS
 from .scale_action_contract import ContractLimits, make_observation, render_for_proxy
 from .scale_action_output_v062 import normalize_model_action
 from .scale_vision_proxy import MODEL, PROCESSOR, RENDERER, QwenVisionRenderer
@@ -34,6 +35,16 @@ CELLS = frozenset({
     'magento_admin', 'gitlab_project', 'odoo_erp',
     'office_excel_web', 'office_powerpoint_web', 'libreoffice_desktop',
 })
+STUDY_CELL_BY_ADAPTER = {
+    'magento_admin': 'magento-admin',
+    'gitlab_project': 'gitlab',
+    'odoo_erp': 'odoo-community',
+    'office_excel_web': 'excel-web',
+    'office_powerpoint_web': 'powerpoint-web',
+    'libreoffice_desktop': 'desktop-native',
+}
+if set(STUDY_CELL_BY_ADAPTER) != CELLS or set(STUDY_CELL_BY_ADAPTER.values()) != set(FULL_STUDY_CELLS):
+    raise RuntimeError('GUI SFT adapter roster differs from frozen full-study cells')
 _IDENTIFIER = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.:/-]{0,199}\Z')
 _HEX64 = re.compile(r'[0-9a-f]{64}\Z')
 _GATE_KINDS = {
@@ -310,6 +321,7 @@ def validate_episode(episode_dir: Path, *, selection_manifest: Path,
             _require(action['type'] == 'finish', 'missing_finish')
         turns.append({'observation': observation, 'action': action})
     return episode, turns, {'split': split,
+                             'study_cell_id': STUDY_CELL_BY_ADAPTER[cell],
                              'gate_receipt_sha256': {k: refs[k]['sha256']
                                                      for k in _GATE_KINDS},
                              'episode_sha256': sha256(raw),
