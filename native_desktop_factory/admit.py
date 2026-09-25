@@ -137,7 +137,7 @@ def audit(candidate_root: Path, attempts_root: Path) -> dict:
     sandbox_ids = set()
     for row in final:
         directory = attempts_root / row["task_id"]
-        if not directory.exists():
+        if not directory.exists() or any(not (directory / name).exists() for name in ATTEMPTS):
             missing.append(row["task_id"])
             continue
         try:

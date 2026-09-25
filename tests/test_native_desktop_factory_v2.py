@@ -79,6 +79,11 @@ class DistinctDesktopTemplateTests(unittest.TestCase):
             gate = admit.audit(one, Path(temp) / "missing-gui")
             self.assertEqual((gate["qualified_final_count"], gate["missing_receipt_count"],
                               gate["status"]), (0, 100, "incomplete"))
+            partial = Path(temp) / "partial-gui"
+            (partial / next(r["task_id"] for r in first["tasks"] if r["split"] == "final_candidate") / "positive").mkdir(parents=True)
+            partial_gate = admit.audit(one, partial)
+            self.assertEqual((partial_gate["missing_receipt_count"],
+                              partial_gate["invalid_receipt_count"]), (100, 0))
 
 
 if __name__ == "__main__":

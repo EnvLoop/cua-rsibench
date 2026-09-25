@@ -34,7 +34,11 @@ def main() -> int:
     parser.add_argument("--attempt", choices=("positive", "near-miss", "cold-reset"), required=True)
     parser.add_argument("--candidate-calibration", action="store_true",
                         help="Explicitly allow a private final candidate for pre-result GUI qualification")
+    parser.add_argument("--sandbox-timeout-seconds", type=int, default=600)
+    parser.add_argument("--expected-template-id", help="Fail if provider Desktop template identity drifts")
     args = parser.parse_args()
+    if not 120 <= args.sandbox_timeout_seconds <= 600:
+        raise ValueError("Sandbox lease must be between 120 and 600 seconds")
     if not os.environ.get("E2B_API_KEY"):
         raise ValueError("E2B_API_KEY missing; source your private shell environment")
     if args.out.exists():
@@ -55,7 +59,8 @@ def main() -> int:
     receipt = {"schema": "cua-native-wdi-gui-development-attempt-v1", "attempt": args.attempt,
                "task_id": oracle["task_id"], "input_sha256": digest(baseline),
                "sdk_version": importlib.metadata.version("e2b-desktop"),
-               "status": "started", "screenshots": {}, "actor_actions": []}
+               "status": "started", "screenshots": {}, "actor_actions": [],
+               "command_errors": [], "sandbox_timeout_seconds": args.sandbox_timeout_seconds}
     sandbox = None
 
     def persist() -> None:
@@ -99,12 +104,31 @@ def main() -> int:
     try:
         from e2b_desktop import Sandbox
         sandbox = Sandbox.create(template="desktop", resolution=(1280, 800),
-                                 timeout=600, allow_internet_access=False)
+                                 timeout=args.sandbox_timeout_seconds, allow_internet_access=False)
         receipt["sandbox_id_sha256"] = digest(sandbox.sandbox_id.encode())
+        info = sandbox.get_info(request_timeout=12)
+        receipt["provider_sandbox_info"] = {
+            "template_id": info.template_id, "vcpu": info.cpu_count,
+            "memory_mb": info.memory_mb, "envd_version": info.envd_version,
+        }
+        if args.expected_template_id and info.template_id != args.expected_template_id:
+            raise ValueError("E2B Desktop template identity drifted")
+        if info.cpu_count > 8 or info.memory_mb > 8192:
+            raise ValueError("Provider Desktop shape exceeds priced 8-vCPU/8-GiB class")
         probe = sandbox.commands.run("libreoffice --version; sha256sum /usr/bin/libreoffice")
         if probe.exit_code != 0 or "LibreOffice 7.3.7.2" not in probe.stdout:
             raise ValueError("Unexpected LibreOffice runtime")
         receipt["runtime_probe"] = probe.stdout.strip()
+        resources = sandbox.commands.run("nproc; awk '/MemTotal:/ {print $2}' /proc/meminfo")
+        try:
+            cpu_text, memory_kib_text = resources.stdout.strip().splitlines()[:2]
+            cpu_count, memory_kib = int(cpu_text), int(memory_kib_text)
+        except (TypeError, ValueError):
+            raise ValueError("Desktop CPU/RAM shape not measurable") from None
+        receipt["resource_probe"] = {"vcpu_visible": cpu_count,
+                                     "memory_kib_visible": memory_kib}
+        if cpu_count > 8 or memory_kib > 8 * 1024 * 1024:
+            raise ValueError("Desktop shape exceeds priced 8-vCPU/8-GiB planning bound")
         sandbox.files.write(remote, baseline)
         staged = bytes(sandbox.files.read(remote, format="bytes"))
         if staged != baseline:
@@ -135,16 +159,18 @@ def main() -> int:
                 else:
                     print(json.dumps({"error": "unknown_command"}), flush=True)
             except Exception as exc:
+                receipt["command_errors"].append({"command": name, "error_type": type(exc).__name__})
+                persist()
                 print(json.dumps({"error_type": type(exc).__name__, "error": str(exc)[:180]}), flush=True)
         if args.attempt == "cold-reset":
             latest = bytes(sandbox.files.read(remote, format="bytes"))
             receipt["restored_state_sha256"] = digest(latest)
-            receipt["status"] = "cold_reset_observed" if latest == baseline else "cold_reset_failed"
+            receipt["status"] = "cold_reset_observed" if latest == baseline and not receipt["command_errors"] else "cold_reset_failed"
         else:
             if "verifier" not in receipt:
                 readback()
             expected = args.attempt == "positive"
-            receipt["status"] = "control_passed" if receipt["verifier"]["passed"] == expected and receipt["saved_sha256"] != receipt["input_sha256"] else "control_failed"
+            receipt["status"] = "control_passed" if not receipt["command_errors"] and receipt["verifier"]["passed"] == expected and receipt["saved_sha256"] != receipt["input_sha256"] else "control_failed"
     except Exception as exc:
         receipt["status"] = "error"
         receipt["error_type"] = type(exc).__name__

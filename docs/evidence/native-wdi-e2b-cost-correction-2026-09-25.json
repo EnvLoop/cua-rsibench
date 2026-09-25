@@ -1,0 +1,41 @@
+{
+  "actual_billed_usd": null,
+  "affected_batches": [
+    {
+      "adopted_count": 2,
+      "batch_receipt_sha256": "7243f887e0746f0fb8c1e01636b20bafc77a1e825935588919c4cc5dc796cc64",
+      "corrected_conservative_reserve_at_1_usd_per_hour": 0.083333,
+      "neutral_save_attempt_count": 2,
+      "observed_client_elapsed_seconds": 60.669,
+      "prior_assumed_usd_per_hour": 0.35,
+      "prior_reserved_usd": 0.029166666666666664,
+      "prior_usd_reservation_valid_upper_bound": false,
+      "server_lease_seconds": 300
+    },
+    {
+      "adopted_count": 22,
+      "batch_receipt_sha256": "2487f768fc165e41f6230f67c71eccccded20bf0b72b8ce1d5c96f1952cb3b21",
+      "corrected_conservative_reserve_at_1_usd_per_hour": 0.277778,
+      "neutral_save_attempt_count": 22,
+      "observed_client_elapsed_seconds": 605.128,
+      "prior_assumed_usd_per_hour": 0.35,
+      "prior_reserved_usd": 0.09722222222222222,
+      "prior_usd_reservation_valid_upper_bound": false,
+      "server_lease_seconds": 1000
+    }
+  ],
+  "billing_note": "The available E2B SDK/control receipts provide runtime and resource observations, not a per-batch invoice. Actual provider billing and any plan fees, credits, or discounts are unknown and must be reconciled separately.",
+  "checked_date": "2026-09-25",
+  "future_reservation_usd_per_hour": 1.0,
+  "measured_resource_class": {
+    "memory_kib_visible": 8146768,
+    "vcpu_visible": 8
+  },
+  "measured_resource_probe_receipt_sha256": "d55244581b10cdda0caafdc07db038f66f5c7d9203c972db2175d7385c62e5ef",
+  "official_pricing_url": "https://e2b.dev/pricing",
+  "published_8cpu_8gib_cpu_usd_per_second": 0.000112,
+  "published_8cpu_8gib_ram_usd_per_second": 3.6e-05,
+  "published_marginal_compute_usd_per_hour": 0.5328,
+  "schema": "cua-native-desktop-e2b-cost-correction-v1",
+  "status": "prior_usd_planning_bounds_invalid_runtime_leases_verified"
+}
