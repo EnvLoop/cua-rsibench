@@ -30,6 +30,12 @@
   "exclusive_worker_lease_audited": true,
   "private_run_summary_sha256": "9c8c8ea495850cb3cc702d30c70f0f992012b9e3c2ee1580f79161c9e21098be",
   "private_independent_audit_sha256": "4198176854d0e28b9624bfb440ffdc827f04fada25429c4d371d711fb29e3b15",
+  "seed_namespaced_id_spot_controls": {
+    "separate_evaluator_private_worker": true,
+    "one_case_per_family": true,
+    "gui_positive_negative_reset_passed": 4,
+    "official_hidden_seed_used": false
+  },
   "official_final_tasks_admitted": 0,
   "researcher_campaigns": 0,
   "model_attempts": 0
