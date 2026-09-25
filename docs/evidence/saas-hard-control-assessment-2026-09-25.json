@@ -1,0 +1,58 @@
+{
+  "controls": [
+    {
+      "control": "native_gui_positive_near_miss_positive_with_independent_postgresql_and_reset",
+      "development_workflow_qualified": true,
+      "environment_seed_kind": "minimal_synthetic_not_original_webarena_snapshot",
+      "in_provisional_final": false,
+      "official_final_task_admitted": false,
+      "private_result_sha256": "997fc71eb4ec934fb7486886fd802d167ee316e6b0c04708064fe4e600673359",
+      "published_hard_subset": true,
+      "site": "gitlab",
+      "task_id": 590,
+      "task_record_sha256": "f2d2470d440643bb6d96ef2a71c0330eea3102c7678c9d907ba02a622d028ce0"
+    },
+    {
+      "control": "native_gui_persisted_but_raw_trace_invalid_then_fresh_clone_search_failure",
+      "development_workflow_qualified": false,
+      "environment_seed_kind": "pinned_magento_image_disposable_clones",
+      "in_provisional_final": true,
+      "official_final_task_admitted": false,
+      "private_failure_sha256": "25177fdbe8c2bf6470001779ae4820c0880eef015d93fe7099545b84c418a202",
+      "private_forensic_sha256": "9689b1fa3b9d388e4c608765363c421f21eff313483eb689d6284053cabdc2a2",
+      "published_hard_subset": true,
+      "rejected_unscored_attempt": true,
+      "site": "shopping_admin",
+      "task_id": 499,
+      "task_record_sha256": "caf8418d69214dba9ecca456c1fb9854b47d6739fac96d2caab6644141f9baab"
+    }
+  ],
+  "counts": {
+    "cells": 2,
+    "development_attempts_in_provisional_final": 1,
+    "development_workflows_qualified": 1,
+    "official_final_admitted": 0,
+    "provisional_final_candidates": 200,
+    "rejected_unscored_attempts": 1,
+    "selection_candidates": 40
+  },
+  "pending_by_site": {
+    "gitlab": {
+      "official_final_admitted": 0,
+      "pending_gate_instances": 100,
+      "provisional_final_candidates": 100
+    },
+    "shopping_admin": {
+      "official_final_admitted": 0,
+      "pending_gate_instances": 100,
+      "provisional_final_candidates": 100
+    }
+  },
+  "schema": "cua-saas-control-assessment-v1",
+  "source": {
+    "commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "hard_subset_sha256": "3b0a4df231bb5a0c642215e521c3fa97701a384f52a734dc2db8f617ad0591a7"
+  },
+  "status": "development_controls_only_no_sealed_final_admission"
+}
