@@ -1,0 +1,40 @@
+{
+  "schema": "envloop-odoo-hidden-study-environment-aggregate-v1",
+  "status": "all_environment_gui_gates_passed_global_campaign_freeze_pending",
+  "candidate_counts": {
+    "train": 20,
+    "selection": 20,
+    "official_hidden": 100
+  },
+  "all_per_id_gui_positive_negative_reset_controls_passed": true,
+  "common_task_set_manifest_sha256": "6418ffb542c684053577927336874930214ae6050237bc18b7e7c522664c181b",
+  "same_pinned_application_runtime_verifier_across_three_worlds": true,
+  "source_entity_instance_overlap_with_exposed_development": 0,
+  "causal_template_overlap_with_exposed_development": 0,
+  "evaluator_private_qa_template_overlap_disclosed": 4,
+  "source_entity_instance_overlap_with_private_qa": 0,
+  "train_only_actor_visible_trace_steps": 11,
+  "train_only_actor_visible_trace_sha256": "67cc6277775b9ea421075352d22c8fcdcd57f2bb676a1836a8e6ea80888e5ce5",
+  "native_model_adapter_live_gui_smoke_passed": true,
+  "bounded_qwen38_train_frame_provider_sample_completed": true,
+  "bounded_qwen38_train_frame_action_valid": false,
+  "provider_billed_tokens": null,
+  "provider_cost_usd": null,
+  "official_final_tasks_admitted": 0,
+  "completed_researcher_campaigns": 0,
+  "completed_official_model_attempts": 0,
+  "outstanding_gates": [
+    "atomic per-campaign spend and call ceilings",
+    "Odoo model-run evaluation through the frozen action adapter",
+    "global checkpoint and hidden-set pre-campaign freeze"
+  ],
+  "evidence_sha256": {
+    "train_gui": "fcffd9fed2860488c962ed7e844fa3551fe3c4382fcdbd3c2c833cd9aa174a09",
+    "selection_gui": "0cf55ead91386e0c6dddcd1c2101f19aebf201a271e138e3ef952d3c17be4522",
+    "hidden_gui": "63824cf042c8244750fff2254bd40ab80ab5b50cf8a54b6dfd5561ada82d5903",
+    "hidden_boundary": "e50e64e1a3d84e065f5883758b67c5276375ae36adb171f0da6356e0d7b4c05d",
+    "native_adapter": "f5f6a8fef193ef2e789ad16f6731ab3c87d93a55cd7bc3d0fabf08cb29368ed1",
+    "qwen_train_frame": "4cd63af02272b597bf16302281a201af591fcf04e312b76a127d3ecd876e0b0b",
+    "qwen_runtime": "e6d8f323709b92d0b7973a24816f9c03f7c3bac78ef9f2c8fb87fda2a934c121"
+  }
+}

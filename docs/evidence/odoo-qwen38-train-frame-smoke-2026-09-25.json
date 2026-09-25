@@ -1,0 +1,76 @@
+{
+  "schema": "envloop-odoo-qwen38-train-frame-smoke-v1",
+  "status": "sampled",
+  "partition": "train_only",
+  "official_hidden_task_used": false,
+  "model_actions_dispatched": 0,
+  "student": "Qwen/Qwen3.8-27B",
+  "model_action_schema_status": "rejected_not_dispatched",
+  "model_action_error_code": "invalid_action_json",
+  "sampling": {
+    "version": "scale-vision-proxy-v1",
+    "model": "Qwen/Qwen3.8-27B",
+    "renderer": "qwen3_5_disable_thinking",
+    "request_id_sha256": "eb11a747446148cd8f2afe4952f53f90916b30d93db1fbaa2b9eae8ca722a280",
+    "binding_sha256": "4dc1607f11b9ccd4f216287170304576637ef8bdf1004a94105e719ffc955d53",
+    "status": "completed",
+    "error_subtype": null,
+    "usage": {
+      "input_tokens": 4923,
+      "image_tokens": 1395,
+      "output_tokens": 216,
+      "prompt_cache_hit_tokens": 0,
+      "basis": "rendered multimodal length and returned sample length; not billing",
+      "provider_billed_tokens": null
+    },
+    "image": {
+      "format": "png",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 122946,
+      "pixels": 1440000,
+      "sha256": "08162c95e4f32cbc04cc6bb5fb03c816e393b57dcf73c10d41fd9a7142cd44d6"
+    },
+    "elapsed_seconds": 14.85283595797955,
+    "reused": false,
+    "new_dispatch": true,
+    "stop_reason": "stop",
+    "text_sha256": "d62b7437de9c4d9a2c43968627de48ea86d7ccd64392dd8dce42bed11aae0ac3",
+    "cost_usd": null
+  },
+  "odoo_binding": {
+    "schema": "envloop-odoo-native-model-boundary-v1",
+    "version": "odoo-native-browser-v1",
+    "student_model": "Qwen/Qwen3.8-27B",
+    "renderer": "qwen3_5_disable_thinking",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "max_actions": 90,
+    "wall_seconds": 720,
+    "observation_modalities": [
+      "screenshot",
+      "visible_control_labels"
+    ],
+    "actor_actions": [
+      "click",
+      "type",
+      "key",
+      "scroll",
+      "drag",
+      "wait",
+      "finish"
+    ],
+    "no_actor_shell_sql_application_rpc_or_arbitrary_url": true,
+    "bindings_sha256": {
+      "odoo_native_adapter": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+      "shared_action_contract": "6954f1fc8c8cc64d3aef4cca8c647d115f39412b469a0cc707a2eeb2a3e8a2f6",
+      "qwen_vision_proxy": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2"
+    },
+    "binding_sha256": "57ce5a82a7cba12e6729170b9f134d14b40d04f063c3d38ac7345261f383d015"
+  },
+  "post_sample_database_filestore_reset_exact": true,
+  "host_only_gold_or_sql_in_model_input": false,
+  "provider_cost_usd": null
+}
