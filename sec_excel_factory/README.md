@@ -10,6 +10,8 @@ Ten more issuer identities have [two source facts each cross-checked directly in
 
 A third [debt-maturity and cash-capacity development workflow](../docs/evidence/sec-debt-workflow-2026-09-25.md) uses five of the fully hash-pinned issuer excerpts. It tracks current/noncurrent long-term-debt disclosures, historical cash flow, and separately modeled refinancing stress. Five eight-sheet reference workbooks pass an independent 33-target OOXML/counterfactual oracle; none has an Excel-web GUI or hidden-final admission. The tracked two-tag debt subtotal must not be represented as an issuer's total corporate debt.
 
+A fourth [mixed-unit EPS and shareholder-return development workflow](../docs/evidence/sec-eps-workflow-2026-09-25.md) uses four other filing contexts and 84 pinned facts in USD, shares, and USD/share units. Its eight-sheet workbooks cover two fiscal years, diluted-share and EPS analysis, cash returns, and a synthetic repurchase case. Four references pass a 50-target independent OOXML/counterfactual oracle, with **zero Excel-web or hidden-final admissions**. Reported EPS need not equal a simple net-income/share quotient.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
