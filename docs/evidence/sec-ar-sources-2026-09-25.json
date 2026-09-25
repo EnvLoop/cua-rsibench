@@ -1,0 +1,40 @@
+{
+  "schema": "sec-receivable-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "three public original-filing source excerpts; zero hidden or GUI admission",
+  "issuers": 3,
+  "original_accessions": 3,
+  "total_fact_rows": 37,
+  "source_units": [
+    "USD"
+  ],
+  "sources": [
+    {
+      "ticker": "PFE",
+      "cik": 78003,
+      "accession": "0000078003-25-000054",
+      "revenue_concept": "Revenues",
+      "records": 12,
+      "raw_json_sha256": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
+      "excerpt_sha256": "21acb340ce1da89ff8cb3e6c5881082212d38c4e366c7a314610922b7e442e30"
+    },
+    {
+      "ticker": "ORCL",
+      "cik": 1341439,
+      "accession": "0000950170-24-075605",
+      "revenue_concept": "Revenues",
+      "records": 12,
+      "raw_json_sha256": "0d7b72e393501d13b2d61b2d6663689e14b9abf83427315bc0820cd2802c43f7",
+      "excerpt_sha256": "97da743fdcf20ec6d4744c3af4c53f0750bde699e661db0cd1456d8934c9642b"
+    },
+    {
+      "ticker": "AMZN",
+      "cik": 1018724,
+      "accession": "0001018724-25-000004",
+      "revenue_concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "records": 13,
+      "raw_json_sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4",
+      "excerpt_sha256": "6416645f028f6f38bbaa7102d84bebae8677d6bd70a6b7216dd5d4e2c7452032"
+    }
+  ]
+}

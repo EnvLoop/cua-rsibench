@@ -18,6 +18,8 @@ A sixth [tax-provision and cash-tax development workflow](../docs/evidence/sec-t
 
 A seventh [goodwill and intangible-asset development workflow](../docs/evidence/sec-goodwill-workflow-2026-09-25.md) audits acquired goodwill against total carrying movement, intangible amortization and asset mix, and a clearly synthetic write-down. Three original-filing references pass a 45-target independent OOXML/counterfactual oracle. The residual movements are not assumed to identify acquisitions or impairment uniquely; **Excel-web and hidden-final admissions remain zero**.
 
+An eighth [receivables and doubtful-account allowance development workflow](../docs/evidence/sec-ar-workflow-2026-09-25.md) uses three original filings to infer gross receivables from reported net and allowance values, calculate average-balance days, and model an explicitly synthetic reserve/cash-realization stress. Three nine-sheet references pass a 49-target independent OOXML/counterfactual oracle. Operating cash flow is not presented as a customer-collections ledger; **Excel-web and hidden-final admissions remain zero**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
