@@ -20,6 +20,8 @@ A seventh [goodwill and intangible-asset development workflow](../docs/evidence/
 
 An eighth [receivables and doubtful-account allowance development workflow](../docs/evidence/sec-ar-workflow-2026-09-25.md) uses three original filings to infer gross receivables from reported net and allowance values, calculate average-balance days, and model an explicitly synthetic reserve/cash-realization stress. Three nine-sheet references pass a 49-target independent OOXML/counterfactual oracle. Operating cash flow is not presented as a customer-collections ledger; **Excel-web and hidden-final admissions remain zero**.
 
+A ninth [cash-flow quality and reinvestment development workflow](../docs/evidence/sec-cashquality-workflow-2026-09-25.md) uses five original filings to bridge net income to operating cash flow with separately reported depreciation/amortization and share-based compensation, preserving an unexplained residual. It computes reinvestment and repurchase coverage and applies a clearly synthetic cash stress. Five nine-sheet references pass a 48-target independent OOXML/counterfactual oracle; **Excel-web and hidden-final admissions remain zero**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
