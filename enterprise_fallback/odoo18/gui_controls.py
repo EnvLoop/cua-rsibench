@@ -213,6 +213,11 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
             name = names[expected["salesperson_index"]]
             page.locator('[name="user_id"] input').fill(name.split()[0])
             page.get_by_role("option", name=name).click()
+            # The many2one popup displays a choice before the CRM form has
+            # committed it. Blur the field so the pinned Odoo form exposes
+            # its manual Save control, especially for the two-field train task.
+            page.locator('[name="user_id"] input').press("Tab")
+            page.wait_for_timeout(400)
         if initial["revenue"] != expected["revenue"]:
             page.locator('[name="expected_revenue"] input').fill(str(expected["revenue"]))
         if initial["deadline"] != expected["deadline"]:
@@ -226,9 +231,23 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
         current = case["initial"]["priority"]
         wrong = {"0": "Medium", "1": "High", "2": "Very High", "3": "Medium"}[current]
         page.locator(f'[name="priority"] [aria-label="{wrong}"]').click()
+    page.wait_for_timeout(350)
     save = page.get_by_role("button", name="Save")
     if save.count():
-        save.click()
+        # CRM autosaves some field combinations while the button is still
+        # briefly in the DOM. A disappearing Save is acceptable only when
+        # the subsequent persisted-state verifier confirms every target.
+        from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+        try:
+            save.click(timeout=1500)
+            save.wait_for(state="hidden", timeout=1500)
+        except PlaywrightTimeoutError:
+            pass
+    page.reload()
+    if positive and case["initial"]["salesperson_index"] != case["expected"]["salesperson_index"]:
+        selected = page.locator('[name="user_id"] input').input_value()
+        if selected != names[case["expected"]["salesperson_index"]]:
+            raise RuntimeError("CRM salesperson edit did not persist")
 
 
 def run() -> dict:
