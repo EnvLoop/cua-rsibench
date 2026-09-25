@@ -24,6 +24,8 @@ A ninth [cash-flow quality and reinvestment development workflow](../docs/eviden
 
 A tenth [property, plant and equipment carrying-value development workflow](../docs/evidence/sec-ppe-workflow-2026-09-25.md) uses five original filings to reconcile gross, accumulated and net PPE, compare year-over-year carrying values with capex and D&A, and model a separate synthetic write-down/capex sensitivity. Five nine-sheet references pass a 55-target independent OOXML/counterfactual oracle. Reported D&A may include non-PPE assets; the movement residual has no asserted cause. **Excel-web and hidden-final admissions remain zero**.
 
+The [private 20/20/100 split readiness screen](../docs/evidence/sec-private-split-readiness-2026-09-25.md) fails closed at 0/0/0 registered evaluator-held cases. All 28 current issuer identities and ten structural workflows are public development inventory. The preregistered source/template-isolated split requires at least 28 **additional** verified issuer families and ten new final semantic workflow families before its structure can qualify; actual Excel-web save/download/readback and reset remain a separate per-case admission gate.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
