@@ -124,11 +124,11 @@ class StudyBudgetLedger:
 
     def _append(self, record: dict) -> None:
         row = {**record, 'hash': cell_final.digest(_canonical(record))}
-        with self.path.open('ab') as stream:
+        descriptor = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+        with os.fdopen(descriptor, 'ab') as stream:
             stream.write(_canonical(row))
             stream.flush()
             os.fsync(stream.fileno())
-        os.chmod(self.path, 0o600)
 
     def _totals(self, state: dict) -> tuple[Decimal, dict]:
         by_owner = {owner: {'all_in': Decimal(0),
