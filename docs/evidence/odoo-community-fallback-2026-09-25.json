@@ -1,0 +1,93 @@
+{
+  "schema": "envloop-odoo-community-fallback-development-v1",
+  "date": "2026-09-25",
+  "status": "two_workflow_local_development_controls_only",
+  "software": {
+    "application": "Odoo Community 18.0-20260908",
+    "odoo_image_digest": "sha256:478065867b945579649373aa4cca3b56f7b74daf0522e5fdf85e7d1262e11d39",
+    "postgres_image_digest": "sha256:724292da1f2e50bdccfc3302ce75bbba7f4a6076701b588cc795fcac65683550",
+    "actor_interface": "native_odoo_browser_gui",
+    "seed_interface": "environment_owned_xmlrpc",
+    "evaluator_interface": "postgresql_select_only_role"
+  },
+  "world": {
+    "synthetic_vendors": 24,
+    "synthetic_products": 48,
+    "synthetic_rfqs": 120,
+    "rfq_lines": 360,
+    "synthetic_supplier_pdf_attachments": 120,
+    "rfq_fault_patterns": 8,
+    "cases_per_fault_pattern": 15,
+    "synthetic_replenishment_rules": 20,
+    "synthetic_product_planning_notes": 20,
+    "authentic_sec_reference_records": 112,
+    "authentic_sec_reference_sha256": "df9f56387b2c30bc521d8a4eb13c6e437a065d3b921ed4ae3a5fab1e1f20f64a",
+    "odoo_filestore_sec_attachment_sha256_equal_source": true,
+    "public_selection_candidates": 20,
+    "public_unsealed_scale_candidates": 100,
+    "undeployed_train_generator_candidates": 40,
+    "selection_scale_overlap": {"rfq_ids": 0, "vendors": 20, "skus": 36, "fault_patterns": 8},
+    "train_selection_overlap": {"rfq_ids": 0, "vendors": 0, "skus": 0},
+    "train_scale_overlap": {"rfq_ids": 0, "vendors": 0, "skus": 0},
+    "official_entity_and_pattern_disjoint_gate": false,
+    "undeployed_clustered_split_blueprint": {
+      "train_candidates": 40,
+      "selection_candidates": 20,
+      "evaluation_candidates": 100,
+      "vendor_clusters": {"train": 8, "selection": 4, "evaluation": 20},
+      "cases_per_vendor_cluster": 5,
+      "cross_partition_id_vendor_sku_overlap": 0,
+      "cross_partition_fault_pattern_overlap": 8,
+      "endpoint_if_used": "within_template_generalization",
+      "deployed_or_gui_admitted": false
+    },
+    "official_final_tasks_admitted": 0
+  },
+  "gui_development_controls": {
+    "positive_case_count": 4,
+    "wrong_object_negative_case_count": 2,
+    "purchase_multiline": {
+      "case_id": "ELPO-0005",
+      "baseline_reward": 0.0,
+      "visible_gui_positive_reward": 1.0,
+      "other_rfq_gui_edit_reward": 0.0,
+      "negative_difference_code": "unrelated_order_line_changed",
+      "after_reset_reward": 0.0
+    },
+    "inventory_cross_screen": {
+      "case_id": "ELRP-0001",
+      "baseline_reward": 0.0,
+      "visible_gui_positive_reward": 1.0,
+      "other_rule_gui_edit_reward": 0.0,
+      "negative_difference_code": "unrelated_replenishment_rule_changed",
+      "after_reset_reward": 0.0
+    },
+    "purchase_second_vendor_pattern": {
+      "case_id": "ELPO-0004",
+      "fault_pattern": "price-and-quantity",
+      "visible_gui_positive_reward": 1.0,
+      "after_reset_reward": 0.0
+    },
+    "inventory_second_sku_lead_time": {
+      "case_id": "ELRP-0002",
+      "visible_gui_positive_reward": 1.0,
+      "after_reset_reward": 0.0
+    }
+  },
+  "reset": {
+    "database_dump_sha256": "481b959ab2a48c0d0ba94d0e9f106f5864ad13546e037b3fef71abfb563e05ce",
+    "filestore_archive_sha256": "bf5c460cf6829b26185d68f0e2e79358a2ce9f37568a0e77af122d71bc40fa25",
+    "filestore_file_count": 1346,
+    "filestore_manifest_sha256": "681d38f3be848dc575d9922c0bbc244a5acb26c8c24702608bc726d401fc05c9",
+    "evaluator_scope_snapshot_equal_after_restore": true,
+    "physical_filestore_manifest_equal_before_web_restart": true
+  },
+  "limits": [
+    "No 100-task GUI admission sweep",
+    "No hidden final or private source-family split",
+    "No model run or researcher campaign",
+    "The 120 RFQ candidates share one causal family and eight fault patterns",
+    "Train-only generator is not deployed",
+    "No concurrent-worker or E2B fleet control"
+  ]
+}
