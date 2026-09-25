@@ -61,7 +61,8 @@ class FullStudyMatrixTests(unittest.TestCase):
                      'temperature': '0', 'max_output_tokens': 512}
                     if role == 'student' else
                     {'reasoning_effort': 'max',
-                     'temperature': '0', 'max_output_tokens': 4096})
+                     'reasoning_mode': 'standard',
+                     'max_output_tokens': 4096})
         path = directory / 'config.json'
         path.write_bytes(cell_final.json_bytes({
             'schema': 'cua-model-configuration-v1',
@@ -416,6 +417,18 @@ class FullStudyMatrixTests(unittest.TestCase):
             ref['sha256'] = sha(path.read_bytes())
             with self.assertRaisesRegex(ValueError, 'configured model or role changed'):
                 matrix.prepare(self.write_matrix(bad), self.root / 'bad-model-config')
+        finally:
+            path.write_bytes(original)
+        bad = copy.deepcopy(self.matrix)
+        ref = bad['configurations']['researchers']['astra']
+        try:
+            value = json.loads(original)
+            value['settings']['temperature'] = '0'
+            path.write_bytes(cell_final.json_bytes(value))
+            ref['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError,
+                                        'unsupported reasoning or temperature'):
+                matrix.prepare(self.write_matrix(bad), self.root / 'bad-reasoning-temperature')
         finally:
             path.write_bytes(original)
         asset_path = path.parent / 'prompt.txt'

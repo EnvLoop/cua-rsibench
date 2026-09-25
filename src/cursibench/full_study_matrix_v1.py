@@ -69,10 +69,22 @@ def _configuration(root: Path, reference: object, *, role: str,
                        f'{role}: settings required')
     needed = ({'renderer', 'image_processor', 'temperature', 'max_output_tokens'}
               if role == 'student' else
-              {'reasoning_effort', 'temperature', 'max_output_tokens'})
+              {'reasoning_effort', 'reasoning_mode', 'max_output_tokens'})
     cell_final.require(needed <= set(settings) and
                        all(settings[key] is not None for key in needed),
                        f'{role}: required inference settings missing')
+    cell_final.positive_integer(settings['max_output_tokens'],
+                                f'{role}: max_output_tokens', 100_000)
+    if role != 'student':
+        from .agentrouter import REASONING_EFFORTS, REASONING_MODES
+        cell_final.require(settings['reasoning_effort'] in REASONING_EFFORTS and
+                           settings['reasoning_mode'] in REASONING_MODES and
+                           ('temperature' not in settings or settings['temperature'] is None),
+                           f'{role}: unsupported reasoning or temperature setting')
+    else:
+        cell_final.require(cell_final.amount(settings['temperature'],
+                                               'student temperature') <= 2,
+                           'student temperature exceeds bound')
     asset_names = {'prompt', 'harness', 'tool_grammar', 'decoding', 'provider_route'}
     if role == 'student':
         asset_names.add('training')
