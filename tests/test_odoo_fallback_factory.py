@@ -8,6 +8,7 @@ import json
 import math
 import os
 import socket
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -24,6 +25,8 @@ from factory import (  # noqa: E402
 from multifamily import crm_candidates, crm_pdf, sales_candidates, sales_pdf  # noqa: E402
 from partition_factory import (candidate_world, scale_final_task_sets,
                                split_audit as partition_split_audit)  # noqa: E402
+from worker_lease import WorkerBusyError, exclusive_worker_operation  # noqa: E402
+from gui_controls import browser_login  # noqa: E402
 SPLIT_VALIDATOR = Path(__file__).resolve().parents[1] / "src/cursibench/scale_final_v06.py"
 SPEC = importlib.util.spec_from_file_location("odoo_scale_final_v06", SPLIT_VALIDATOR)
 assert SPEC is not None and SPEC.loader is not None
@@ -38,6 +41,33 @@ from verify import (  # noqa: E402
 
 
 class OdooFixtureTests(unittest.TestCase):
+    def test_worker_operation_lease_rejects_concurrent_process(self):
+        child = (
+            "import sys; from pathlib import Path; "
+            "sys.path.insert(0,sys.argv[2]); "
+            "from worker_lease import exclusive_worker_operation,WorkerBusyError; "
+            "root=Path(sys.argv[1]); "
+            "\ntry:\n"
+            " with exclusive_worker_operation('child',root=root): pass\n"
+            "except WorkerBusyError:\n sys.exit(23)\n"
+        )
+        with tempfile.TemporaryDirectory() as scratch:
+            directory = Path(scratch)
+            with exclusive_worker_operation("parent", root=directory):
+                with exclusive_worker_operation("nested", root=directory):
+                    blocked = subprocess.run(
+                        [sys.executable, "-c", child, str(directory), str(ODDO_DIR)],
+                        capture_output=True, text=True)
+                    self.assertEqual(blocked.returncode, 23, blocked.stderr)
+            accepted = subprocess.run(
+                [sys.executable, "-c", child, str(directory), str(ODDO_DIR)],
+                capture_output=True, text=True)
+            self.assertEqual(accepted.returncode, 0, accepted.stderr)
+
+    def test_native_gui_helper_requires_worker_lease(self):
+        with self.assertRaises(WorkerBusyError):
+            browser_login(object(), 8078, "unread")
+
     def test_bootstrap_password_cannot_begin_with_cli_option_prefix(self):
         with mock.patch.object(bootstrap_module.secrets, "token_urlsafe", return_value="-dash-start"):
             self.assertEqual(bootstrap_module.local_password(), "p-dash-start")

@@ -12,6 +12,7 @@ import subprocess
 from pathlib import Path
 
 from factory import HERE, PRIVATE
+from worker_lease import exclusive_worker_operation
 
 SQL = r"""
 SELECT json_build_object(
@@ -161,6 +162,11 @@ SELECT json_build_object(
 
 
 def snapshot() -> dict:
+    with exclusive_worker_operation("snapshot"):
+        return _snapshot_unlocked()
+
+
+def _snapshot_unlocked() -> dict:
     cmd = [
         "docker", "compose", "--env-file", ".env", "exec", "-T", "db",
         "psql", "-U", "bench_verify", "-d", "bench", "-At",
@@ -441,6 +447,11 @@ def include_physical_source_files(result: dict, baseline: dict) -> dict:
 
 
 def score(case_id: str) -> dict:
+    with exclusive_worker_operation("score"):
+        return _score_unlocked(case_id)
+
+
+def _score_unlocked(case_id: str) -> dict:
     if case_id.startswith("ELSQ-"):
         gold = json.loads((PRIVATE / "sales_gold.json").read_text())
         if case_id not in gold:

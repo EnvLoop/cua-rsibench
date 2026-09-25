@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import secrets
 from datetime import datetime, timezone
 
@@ -21,8 +22,9 @@ from gui_controls import (
     view_attachment,
 )
 from partition_factory import FAMILIES, SPLIT_COUNTS
-from reset import restore
+from reset import file_hash, restore
 from verify import score
+from worker_lease import exclusive_worker_operation, require_worker_lease
 
 NEGATIVE_CODES = {
     "purchase": "unrelated_order_line_changed",
@@ -87,11 +89,20 @@ def admit_one(family: str, case: dict, wrong_case: dict) -> dict:
     from playwright.sync_api import sync_playwright
 
     config = local_config()
+    require_worker_lease()
     port = int(config["ODOO_PORT"])
     credentials = json.loads((PRIVATE / "actor_credentials.json").read_text())
+    package_rows = json.loads((PRIVATE / "task_set_manifest.json").read_text())
+    package = next(row for rows in package_rows.values() for row in rows
+                   if row["task_id"] == case["id"])
     result = {"case_id": case["id"], "family": family,
               "status": "candidate_environment_gate_failed",
-              "official_final_task": False}
+              "official_final_task": False,
+              "started_at_utc": datetime.now(timezone.utc).isoformat(),
+              "task_package_sha256": package["package_sha256"],
+              "baseline_snapshot_sha256": file_hash(PRIVATE / "baseline_snapshot.json"),
+              "exclusive_worker_lease_held": True,
+              "worker_pid": os.getpid()}
     try:
         before_restore = restore()
         before = score(case["id"])
@@ -142,11 +153,18 @@ def admit_one(family: str, case: dict, wrong_case: dict) -> dict:
             and recovery["physical_filestore_equal_before_web_restart"])
         if not result["failure_recovery_reset_exact"]:
             raise RuntimeError("Admission failed and worker recovery was not exact") from error
+    result["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
     return result
 
 
 def run(family: str | None = None, limit: int | None = None,
         case_id: str | None = None) -> dict:
+    with exclusive_worker_operation("sweep_partition"):
+        return _run_unlocked(family, limit, case_id)
+
+
+def _run_unlocked(family: str | None = None, limit: int | None = None,
+                  case_id: str | None = None) -> dict:
     world, cases = _case_index()
     if world["split"] not in SPLIT_COUNTS:
         raise RuntimeError("Unknown candidate partition")

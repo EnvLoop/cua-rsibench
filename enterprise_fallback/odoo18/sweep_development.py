@@ -16,9 +16,15 @@ from gui_controls import (
 from multifamily import crm_candidates, sales_candidates
 from reset import restore
 from verify import score
+from worker_lease import exclusive_worker_operation
 
 
 def sweep(family: str, limit: int | None = None) -> dict:
+    with exclusive_worker_operation("sweep_development"):
+        return _sweep_unlocked(family, limit)
+
+
+def _sweep_unlocked(family: str, limit: int | None = None) -> dict:
     from playwright.sync_api import sync_playwright
 
     config = local_config()

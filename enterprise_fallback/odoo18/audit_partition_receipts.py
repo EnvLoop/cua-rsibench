@@ -12,12 +12,14 @@ import hashlib
 import json
 import subprocess
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 from factory import CODE_DIR, HERE, PRIVATE, OdooRPC, local_config
 from partition_factory import FAMILIES, ROLE_GROUP_XMLIDS, SPLIT_COUNTS, validate_scale_splits
 from reset import file_hash, restore
 from sweep_partition import NEGATIVE_CODES
+from worker_lease import exclusive_worker_operation
 
 
 def _read_only_privileges() -> bool:
@@ -41,6 +43,11 @@ def _read_only_privileges() -> bool:
 
 
 def audit(run_id: str, output: Path) -> dict:
+    with exclusive_worker_operation("audit_partition"):
+        return _audit_unlocked(run_id, output)
+
+
+def _audit_unlocked(run_id: str, output: Path) -> dict:
     config = local_config()
     partition = config.get("ODOO_PARTITION")
     if partition not in SPLIT_COUNTS:
@@ -77,6 +84,8 @@ def audit(run_id: str, output: Path) -> dict:
             raise RuntimeError(f"Frozen {archive} drift")
     expected = {case["id"]: family for family in FAMILIES
                 for case in world["cases"][family]}
+    packages = {row["task_id"]: row["package_sha256"]
+                for rows in task_sets.values() for row in rows}
     if len(expected) != expected_count:
         raise RuntimeError("Candidate world does not contain its exact frozen ID count")
     run_dir = PRIVATE / "admission_runs" / run_id
@@ -93,13 +102,52 @@ def audit(run_id: str, output: Path) -> dict:
     if {row["case_id"]: row for row in recorded["cases"]} != {
             row["case_id"]: row for row in rows}:
         raise RuntimeError("Recorded run summary differs from per-case receipts")
+    ordered = recorded["cases"]
+    for earlier, later in zip(ordered, ordered[1:]):
+        if datetime.fromisoformat(earlier["finished_at_utc"]) > datetime.fromisoformat(
+                later["started_at_utc"]):
+            raise RuntimeError("Per-case GUI intervals overlap")
+    pids = {row["worker_pid"] for row in ordered}
+    if len(pids) != 1:
+        raise RuntimeError("A single admission run changed worker process")
+    worker_pid = next(iter(pids))
+    first_start = datetime.fromisoformat(ordered[0]["started_at_utc"])
+    last_finish = datetime.fromisoformat(ordered[-1]["finished_at_utc"])
+    events_path = PRIVATE / "worker-lease-events.jsonl"
+    events = [json.loads(line) for line in events_path.read_text().splitlines()]
+    exclusive_interval = False
+    for index, event in enumerate(events):
+        if (event["operation"] != "sweep_partition" or event["event"] != "acquired"
+                or event["pid"] != worker_pid
+                or datetime.fromisoformat(event["at_utc"]) > first_start):
+            continue
+        release = next((row for row in events[index + 1:]
+                        if row["operation"] == "sweep_partition"
+                        and row["event"] == "released" and row["pid"] == worker_pid), None)
+        if release and datetime.fromisoformat(release["at_utc"]) >= last_finish:
+            exclusive_interval = True
+            break
+    if not exclusive_interval:
+        raise RuntimeError("No completed exclusive worker lease encloses every case")
+    if any(first_start <= datetime.fromisoformat(event["at_utc"]) <= last_finish
+           and (event["pid"] != worker_pid or event["operation"] != "sweep_partition")
+           for event in events):
+        raise RuntimeError("Another worker operation overlapped admission cases")
     qualified = []
+    baseline_digest = file_hash(PRIVATE / "baseline_snapshot.json")
     for row in rows:
         family = expected[row["case_id"]]
+        start = datetime.fromisoformat(row["started_at_utc"])
+        finish = datetime.fromisoformat(row["finished_at_utc"])
         passed = (
             row["family"] == family
+            and start.tzinfo is not None and finish.tzinfo is not None and start <= finish
             and row["status"] == "candidate_environment_gui_qualified"
             and row["official_final_task"] is False
+            and row["task_package_sha256"] == packages[row["case_id"]]
+            and row["baseline_snapshot_sha256"] == baseline_digest
+            and row["exclusive_worker_lease_held"] is True
+            and row["worker_pid"] == worker_pid
             and row["cold_reset_before"] is True
             and row["cold_reset_after"] is True
             and row["source_visible_in_native_gui"] is True
@@ -140,6 +188,7 @@ def audit(run_id: str, output: Path) -> dict:
         "all_sources_visible_in_native_gui": len(qualified) == expected_count,
         "actor_role_scoped_no_admin_group": bool(actor_scoped),
         "evaluator_select_only_on_scored_tables": bool(read_only),
+        "exclusive_worker_lease_interval_verified": exclusive_interval,
         "final_database_and_physical_filestore_reset_exact": bool(final_reset_exact),
         "protected_attachment_files_per_attempt": expected_source_files,
         "product_planning_notes_in_database_snapshot": SPLIT_COUNTS[partition],

@@ -12,6 +12,7 @@ import xmlrpc.client
 from factory import HERE, PRIVATE, seed
 from reset import checkpoint, compose, wait_web
 from verify import freeze
+from worker_lease import exclusive_worker_operation
 
 ROLE_SQL = """
 CREATE ROLE bench_verify LOGIN;
@@ -39,6 +40,11 @@ def local_password() -> str:
 
 
 def bootstrap() -> dict:
+    with exclusive_worker_operation("bootstrap", root=PRIVATE):
+        return _bootstrap_unlocked()
+
+
+def _bootstrap_unlocked() -> dict:
     env = HERE / ".env"
     if env.exists() or (PRIVATE / "baseline_snapshot.json").exists():
         raise RuntimeError("This one-shot bootstrap requires a fresh isolated project and no .env")

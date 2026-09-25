@@ -528,8 +528,11 @@ def seed_partition(split: str, master_seed: str) -> dict:
                    "forbidden_group_xmlids": ["base.group_system"],
                    "email_domain": "example.invalid"}
     pinned_files = {name: sha256_bytes((CODE_DIR / name).read_bytes())
-                    for name in ("partition_factory.py", "verify.py", "reset.py",
-                                 "gui_controls.py", "sweep_partition.py", "compose.yaml")}
+                    for name in ("bootstrap.py", "create_partition_worlds.py",
+                                 "partition_factory.py", "verify.py", "reset.py",
+                                 "gui_controls.py", "sweep_partition.py",
+                                 "worker_lease.py", "audit_partition_receipts.py",
+                                 "compose.yaml")}
     receipt = {"schema": "envloop-odoo-partition-candidate-v1",
         "status": "seeded_unsealed_candidate_not_gui_admitted",
         "partition": split, "source_type": "synthetic_operational_plus_public_sec_reference",

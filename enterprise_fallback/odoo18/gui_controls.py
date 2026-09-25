@@ -13,9 +13,11 @@ from factory import PRIVATE, local_config
 from multifamily import crm_candidates, sales_candidates
 from reset import restore
 from verify import score
+from worker_lease import exclusive_worker_operation, require_worker_lease
 
 
 def browser_login(page, port: int, password: str, login: str = "admin") -> None:
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/web/login")
     page.locator('input[name="login"]').fill(login)
     page.locator('input[name="password"]').fill(password)
@@ -24,6 +26,7 @@ def browser_login(page, port: int, password: str, login: str = "admin") -> None:
 
 
 def open_sales(page, port: int, case_id: str) -> None:
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/odoo/sales")
     # Odoo opens Sales with a default "My Quotations" facet. The benchmark
     # actor has all-document Sales access, but the seeded quotes belong to
@@ -39,6 +42,7 @@ def open_sales(page, port: int, case_id: str) -> None:
 
 
 def open_purchase(page, port: int, case_id: str) -> None:
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/odoo/purchase")
     search = page.get_by_role("searchbox")
     search.fill(case_id)
@@ -59,6 +63,7 @@ def save_purchase_if_pending(page) -> None:
 
 def purchase_case(page, case: dict, *, positive: bool = True) -> None:
     """Reconcile an RFQ entirely through its native three-line editor."""
+    require_worker_lease()
     if not positive:
         other = case["lines"][0]
         wrong_price = round(other["initial"]["price"] + 1.25, 2)
@@ -102,6 +107,7 @@ def purchase_case(page, case: dict, *, positive: bool = True) -> None:
 
 def open_inventory_note(page, port: int, case: dict) -> bool:
     """Read the actual Product > Purchase source field in the native GUI."""
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/odoo/action-430")
     search = page.get_by_role("searchbox")
     search.fill(case["sku"])
@@ -112,6 +118,7 @@ def open_inventory_note(page, port: int, case: dict) -> bool:
 
 
 def open_replenishment(page, port: int) -> None:
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/odoo/inventory")
     page.get_by_role("button", name="Operations", exact=True).click()
     page.get_by_text("Replenishment", exact=True).click()
@@ -119,6 +126,7 @@ def open_replenishment(page, port: int) -> None:
 
 
 def inventory_case(page, case: dict, *, positive: bool = True) -> None:
+    require_worker_lease()
     row = page.locator("tr").filter(has_text=case["sku"]).first
     if positive:
         edits = (("product_min_qty", case["expected"]["minimum"]),
@@ -140,6 +148,7 @@ def inventory_case(page, case: dict, *, positive: bool = True) -> None:
 
 
 def open_crm(page, port: int, case_id: str) -> None:
+    require_worker_lease()
     page.goto(f"http://127.0.0.1:{port}/odoo/crm")
     page.locator("button.o_facet_remove").click()
     card = page.locator("span.fw-bold.fs-5").filter(has_text=case_id)
@@ -152,6 +161,7 @@ def open_crm(page, port: int, case_id: str) -> None:
 
 
 def view_attachment(page, filename: str) -> bool:
+    require_worker_lease()
     page.locator("button.o-mail-Chatter-attachFiles").click()
     item = page.get_by_text(filename, exact=True)
     item.wait_for()
@@ -163,6 +173,7 @@ def view_attachment(page, filename: str) -> bool:
 
 
 def sales_case(page, case: dict, *, positive: bool) -> None:
+    require_worker_lease()
     page.get_by_text("Other Info", exact=True).click()
     reference = case["customer_reference"] if positive else "WRONG-OBJECT-CONTROL"
     page.locator('[name="client_order_ref"] input').fill(reference)
@@ -201,6 +212,7 @@ def sales_case(page, case: dict, *, positive: bool) -> None:
 
 
 def crm_case(page, case: dict, *, positive: bool) -> None:
+    require_worker_lease()
     if positive:
         expected = case["expected"]
         initial = case["initial"]
@@ -251,6 +263,11 @@ def crm_case(page, case: dict, *, positive: bool) -> None:
 
 
 def run() -> dict:
+    with exclusive_worker_operation("gui_controls"):
+        return _run_unlocked()
+
+
+def _run_unlocked() -> dict:
     from playwright.sync_api import sync_playwright
 
     config = local_config()
