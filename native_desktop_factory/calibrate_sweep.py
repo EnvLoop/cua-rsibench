@@ -71,7 +71,7 @@ def actor_script(package_dir: Path, oracle: dict, attempt: str) -> str:
         target_order = [text for text in pptx_slide_shapes(raw)[4] if text in oracle["targets"]]
         if len(target_order) != 3:
             raise ValueError("Impress target texts not found exactly three times")
-        lines += ["click 81,557"]  # Visible slide-five thumbnail.
+        lines += ["click 81,557", "wait 2"]  # Wait for visible slide-five transition.
         for i, old in enumerate(target_order):
             replacement = oracle["targets"][old]
             if attempt == "near-miss" and i == 2:
