@@ -51,6 +51,39 @@ def _identities(rows: list[dict]) -> list[dict]:
     return [cell_final.task_identity(row, 'matrix task identity') for row in rows]
 
 
+def _configuration(root: Path, reference: object, *, role: str,
+                   model: str) -> dict:
+    value, sha256, path = _json_reference(root, reference, f'{role} configuration')
+    value = cell_final.exact(value, {'schema', 'role', 'model', 'snapshot_id',
+                                     'settings', 'assets'}, f'{role} configuration')
+    cell_final.require(value['schema'] == 'cua-model-configuration-v1' and
+                       value['role'] == role and value['model'] == model,
+                       f'{role}: configured model or role changed')
+    cell_final.require(value['snapshot_id'] is None or
+                       (isinstance(value['snapshot_id'], str) and
+                        value['snapshot_id'].strip() == value['snapshot_id'] and
+                        value['snapshot_id']),
+                       f'{role}: invalid provider-reported snapshot identity')
+    settings = value['settings']
+    cell_final.require(isinstance(settings, dict) and settings,
+                       f'{role}: settings required')
+    needed = ({'renderer', 'image_processor', 'temperature', 'max_output_tokens'}
+              if role == 'student' else
+              {'reasoning_effort', 'temperature', 'max_output_tokens'})
+    cell_final.require(needed <= set(settings) and
+                       all(settings[key] is not None for key in needed),
+                       f'{role}: required inference settings missing')
+    asset_names = {'prompt', 'harness', 'tool_grammar', 'decoding', 'provider_route'}
+    if role == 'student':
+        asset_names.add('training')
+    assets = cell_final.exact(value['assets'], asset_names, f'{role} assets')
+    for name, asset in assets.items():
+        cell_final.evidence_file(path.parent, asset, f'{role}/{name} asset')
+    return {'config_sha256': sha256,
+            'asset_sha256': {name: asset['sha256'] for name, asset in assets.items()},
+            'snapshot_id': value['snapshot_id']}
+
+
 def _slot(root: Path, reference: object, *, cell_id: str, researcher_id: str,
           role: str) -> dict:
     manifest, manifest_sha, path = _json_reference(
@@ -85,7 +118,7 @@ def _slot(root: Path, reference: object, *, cell_id: str, researcher_id: str,
 def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     manifest = cell_final.exact(manifest, {
         'schema', 'study_id', 'student_model', 'teacher_model',
-        'researchers', 'cells', 'budget',
+        'researchers', 'configurations', 'cells', 'budget',
     }, 'matrix')
     cell_final.require(manifest['schema'] == SCHEMA and
                        cell_final.is_slug(manifest['study_id']),
@@ -94,8 +127,25 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                        manifest['teacher_model'] == TEACHER and
                        manifest['researchers'] == RESEARCHERS,
                        'student, teacher, or researcher roster changed')
+    configs = cell_final.exact(manifest['configurations'],
+                               {'student', 'teacher', 'researchers'},
+                               'model configuration bindings')
+    researcher_configs = cell_final.exact(configs['researchers'], set(RESEARCHERS),
+                                          'researcher configuration bindings')
+    frozen_configs = {
+        'student': _configuration(root, configs['student'], role='student', model=STUDENT),
+        'teacher': _configuration(root, configs['teacher'], role='teacher', model=TEACHER),
+        'researchers': {key: _configuration(root, researcher_configs[key],
+                                             role='researcher', model=RESEARCHERS[key])
+                        for key in RESEARCHERS},
+    }
     budget = cell_final.exact(manifest['budget'], {
         'campaign_hours', 'tinker_usd_per_campaign',
+        'researcher_inference_usd_per_campaign', 'researcher_calls_per_campaign',
+        'teacher_rollout_tokens_per_campaign', 'teacher_rollout_calls_per_campaign',
+        'e2b_sandbox_hours_per_campaign', 'e2b_peak_concurrency',
+        'candidate_submissions_per_campaign', 'selection_evaluations_per_campaign',
+        'per_campaign_all_in_ceiling_usd',
         'global_all_in_ceiling_usd', 'available_all_in_usd',
         'spending_authorized_by_user',
     }, 'matrix budget')
@@ -108,6 +158,20 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                        'global_all_in_ceiling_usd', positive=True)
     available = cell_final.amount(budget['available_all_in_usd'],
                                   'available_all_in_usd', positive=True)
+    campaign_all_in = cell_final.amount(budget['per_campaign_all_in_ceiling_usd'],
+                                        'per_campaign_all_in_ceiling_usd', positive=True)
+    researcher_inference = cell_final.amount(
+        budget['researcher_inference_usd_per_campaign'],
+        'researcher_inference_usd_per_campaign', positive=True)
+    e2b_hours = cell_final.amount(budget['e2b_sandbox_hours_per_campaign'],
+                                  'e2b_sandbox_hours_per_campaign', positive=True)
+    bounded_counts = (
+        'researcher_calls_per_campaign', 'teacher_rollout_tokens_per_campaign',
+        'teacher_rollout_calls_per_campaign', 'e2b_peak_concurrency',
+        'candidate_submissions_per_campaign', 'selection_evaluations_per_campaign',
+    )
+    for key in bounded_counts:
+        cell_final.positive_integer(budget[key], key)
     cells = manifest['cells']
     cell_final.require(isinstance(cells, list) and len(cells) == len(CELLS),
                        'exactly six cells required')
@@ -142,6 +206,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                slot['execution'] == base['execution'],
                                f'{cell_id}/{researcher_id}: matched environment or policy differs')
             all_in += slot['cost_maximum']
+            if researcher_id != 'shared-base':
+                cell_final.require(slot['cost_maximum'] <= campaign_all_in,
+                                   f'{cell_id}/{researcher_id}: campaign all-in cap exceeded')
         output_cells.append({
             'cell_id': cell_id,
             'official_task_count': OFFICIAL_PER_CELL,
@@ -161,7 +228,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'schema': PLAN_SCHEMA, 'study_id': manifest['study_id'],
         'matrix_manifest_sha256': manifest_sha256,
         'student_model': STUDENT, 'teacher_model': TEACHER,
-        'researchers': RESEARCHERS, 'cell_ids': list(CELLS),
+        'researchers': RESEARCHERS, 'configuration_bindings': frozen_configs,
+        'cell_ids': list(CELLS),
         'campaign_count': len(CELLS) * len(RESEARCHERS),
         'shared_base_evaluation_count': len(CELLS),
         'distinct_official_task_identities': len(CELLS) * OFFICIAL_PER_CELL,
@@ -170,6 +238,10 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'initial_total_final_trials': len(CELLS) * (1 + len(RESEARCHERS)) * OFFICIAL_PER_CELL,
         'campaign_hours_cap': CAMPAIGN_HOURS,
         'tinker_usd_cap_per_campaign': str(TINKER_USD_PER_CAMPAIGN),
+        'researcher_inference_usd_cap_per_campaign': str(researcher_inference),
+        'e2b_sandbox_hours_cap_per_campaign': str(e2b_hours),
+        'per_campaign_all_in_ceiling_usd': str(campaign_all_in),
+        'matched_non_tinker_campaign_caps': {key: budget[key] for key in bounded_counts},
         'nominal_tinker_cap_all_campaigns_usd': str(
             TINKER_USD_PER_CAMPAIGN * len(CELLS) * len(RESEARCHERS)),
         'declared_all_in_cost_upper_bound_usd': str(all_in),

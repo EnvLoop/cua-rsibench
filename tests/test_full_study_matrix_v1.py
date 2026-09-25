@@ -44,6 +44,31 @@ class FullStudyMatrixTests(unittest.TestCase):
         return {'path': path.relative_to(cls.root).as_posix(),
                 'sha256': sha(path.read_bytes())}
 
+    @classmethod
+    def configuration(cls, name: str, role: str, model: str) -> dict:
+        directory = cls.root / 'configs' / name
+        directory.mkdir(parents=True)
+        assets = {}
+        names = ['prompt', 'harness', 'tool_grammar', 'decoding', 'provider_route']
+        if role == 'student':
+            names.append('training')
+        for asset in names:
+            assets[asset] = cls.local_ref(directory, asset + '.txt',
+                                          (name + ':' + asset).encode())
+        settings = ({'renderer': 'qwen3_8_disable_thinking',
+                     'image_processor': 'pinned',
+                     'temperature': '0', 'max_output_tokens': 512}
+                    if role == 'student' else
+                    {'reasoning_effort': 'max',
+                     'temperature': '0', 'max_output_tokens': 4096})
+        path = directory / 'config.json'
+        path.write_bytes(cell_final.json_bytes({
+            'schema': 'cua-model-configuration-v1',
+            'role': role, 'model': model, 'snapshot_id': None,
+            'settings': settings, 'assets': assets,
+        }))
+        return cls.matrix_ref(path)
+
     @staticmethod
     def task(cell_id: str, split: str, index: int) -> dict:
         identity = f'{cell_id}-{split}-{index:03d}'
@@ -147,8 +172,24 @@ class FullStudyMatrixTests(unittest.TestCase):
             'schema': matrix.SCHEMA, 'study_id': 'full-computer-use-v1',
             'student_model': matrix.STUDENT, 'teacher_model': matrix.TEACHER,
             'researchers': matrix.RESEARCHERS, 'cells': cells,
+            'configurations': {
+                'student': cls.configuration('student', 'student', matrix.STUDENT),
+                'teacher': cls.configuration('teacher', 'teacher', matrix.TEACHER),
+                'researchers': {key: cls.configuration(
+                    key, 'researcher', model)
+                    for key, model in matrix.RESEARCHERS.items()},
+            },
             'budget': {'campaign_hours': 16,
                        'tinker_usd_per_campaign': '500',
+                       'researcher_inference_usd_per_campaign': '100',
+                       'researcher_calls_per_campaign': 1000,
+                       'teacher_rollout_tokens_per_campaign': 1000000,
+                       'teacher_rollout_calls_per_campaign': 1000,
+                       'e2b_sandbox_hours_per_campaign': '20',
+                       'e2b_peak_concurrency': 3,
+                       'candidate_submissions_per_campaign': 25,
+                       'selection_evaluations_per_campaign': 25,
+                       'per_campaign_all_in_ceiling_usd': '150',
                        'global_all_in_ceiling_usd': '3000',
                        'available_all_in_usd': '3000',
                        'spending_authorized_by_user': True},
@@ -168,6 +209,11 @@ class FullStudyMatrixTests(unittest.TestCase):
         self.assertEqual((plan['initial_base_final_trials'],
                           plan['initial_selected_final_trials']), (600, 2400))
         self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '3000')
+        self.assertEqual(len(plan['configuration_bindings']['researchers']), 4)
+        self.assertIn('training', plan['configuration_bindings']['student']['asset_sha256'])
+        self.assertEqual(plan['researcher_inference_usd_cap_per_campaign'], '100')
+        self.assertEqual(plan['matched_non_tinker_campaign_caps'][
+            'teacher_rollout_tokens_per_campaign'], 1000000)
         self.assertFalse(plan['provider_dispatch_enabled'])
         self.assertFalse(plan['scores_present'])
         self.assertEqual(result['provider_calls'], 0)
@@ -188,6 +234,14 @@ class FullStudyMatrixTests(unittest.TestCase):
         bad['budget']['available_all_in_usd'] = '2999'
         with self.assertRaisesRegex(ValueError, 'all-in upper bound exceeds'):
             matrix.prepare(self.write_matrix(bad), self.root / 'bad-budget')
+        bad = copy.deepcopy(self.matrix)
+        bad['budget']['researcher_calls_per_campaign'] = None
+        with self.assertRaisesRegex(ValueError, 'positive integer required'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'missing-external-cap')
+        bad = copy.deepcopy(self.matrix)
+        bad['budget']['per_campaign_all_in_ceiling_usd'] = '99'
+        with self.assertRaisesRegex(ValueError, 'campaign all-in cap exceeded'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'weak-campaign-cap')
 
     def test_unqualified_slot_and_cross_researcher_drift_fail_closed(self):
         bad = copy.deepcopy(self.matrix)
@@ -209,6 +263,29 @@ class FullStudyMatrixTests(unittest.TestCase):
                 matrix.prepare(self.write_matrix(bad), self.root / 'bad-matched')
         finally:
             slot_path.write_bytes(original)
+
+    def test_model_configuration_or_prompt_byte_drift_is_rejected(self):
+        bad = copy.deepcopy(self.matrix)
+        ref = bad['configurations']['researchers']['astra']
+        path = self.root / ref['path']
+        original = path.read_bytes()
+        try:
+            value = json.loads(original)
+            value['model'] = 'different-model'
+            path.write_bytes(cell_final.json_bytes(value))
+            ref['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError, 'configured model or role changed'):
+                matrix.prepare(self.write_matrix(bad), self.root / 'bad-model-config')
+        finally:
+            path.write_bytes(original)
+        asset_path = path.parent / 'prompt.txt'
+        original_prompt = asset_path.read_bytes()
+        try:
+            asset_path.write_bytes(original_prompt + b' changed')
+            with self.assertRaisesRegex(ValueError, 'evidence bytes changed'):
+                matrix.prepare(self.manifest_path, self.root / 'bad-prompt')
+        finally:
+            asset_path.write_bytes(original_prompt)
 
     def test_tampered_intent_or_plan_and_missing_proof_fail_closed(self):
         out = self.root / 'prepared'

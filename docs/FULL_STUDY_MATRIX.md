@@ -18,6 +18,16 @@ The matrix manifest has these top-level fields:
     "sol6": "gpt-6-sol",
     "luna6": "gpt-6-luna"
   },
+  "configurations": {
+    "student": {"path": "configs/student/config.json", "sha256": "..."},
+    "teacher": {"path": "configs/teacher/config.json", "sha256": "..."},
+    "researchers": {
+      "astra": {"path": "configs/astra/config.json", "sha256": "..."},
+      "sol56": {"path": "configs/sol56/config.json", "sha256": "..."},
+      "sol6": {"path": "configs/sol6/config.json", "sha256": "..."},
+      "luna6": {"path": "configs/luna6/config.json", "sha256": "..."}
+    }
+  },
   "cells": [
     {
       "cell_id": "powerpoint-web",
@@ -33,6 +43,15 @@ The matrix manifest has these top-level fields:
   "budget": {
     "campaign_hours": 16,
     "tinker_usd_per_campaign": "500",
+    "researcher_inference_usd_per_campaign": "...",
+    "researcher_calls_per_campaign": 0,
+    "teacher_rollout_tokens_per_campaign": 0,
+    "teacher_rollout_calls_per_campaign": 0,
+    "e2b_sandbox_hours_per_campaign": "...",
+    "e2b_peak_concurrency": 0,
+    "candidate_submissions_per_campaign": 0,
+    "selection_evaluations_per_campaign": 0,
+    "per_campaign_all_in_ceiling_usd": "...",
     "global_all_in_ceiling_usd": "...",
     "available_all_in_usd": "...",
     "spending_authorized_by_user": true
@@ -40,7 +59,7 @@ The matrix manifest has these top-level fields:
 }
 ```
 
-The example shows only the first cell; a real manifest must include `excel-web`, `desktop-native`, `servicenow`, `gitlab`, and `magento-admin` as well. Every reference must point to a local file under the manifest directory and bind its exact SHA-256. The per-campaign Tinker ceiling is $500 and the nominal 24-campaign Tinker ceiling is $12,000. The required global *all-in* ceiling and available balance are separate fields; they include other inference, compute, storage, and application services. Declared upper bounds are not invoices or account-entitlement proof.
+The example shows only the first cell; a real manifest must include `excel-web`, `desktop-native`, `servicenow`, `gitlab`, and `magento-admin` as well. Ellipses and zero call limits are placeholders and **fail validation**. Every reference must point to a local file under the manifest directory and bind its exact SHA-256. Each `cua-model-configuration-v1` file binds the role, provider-reported model and snapshot when available, reasoning/renderer settings, and the exact bytes of its prompt, harness, tool grammar, decoding, provider route, and student training configuration. A null snapshot is explicitly reported rather than silently called a weight attestation. No provider key belongs in those files. The per-campaign Tinker ceiling is $500 and the nominal 24-campaign Tinker ceiling is $12,000. Equal researcher inference, teacher rollout, E2B, candidate, and selection caps are required for all 24 campaigns. The per-campaign and global *all-in* ceilings and available balance are separate fields; they include other inference, compute, storage, and application services. Declared upper bounds are not invoices or account-entitlement proof.
 
 After all 30 qualified slot manifests exist, prepare offline with:
 
