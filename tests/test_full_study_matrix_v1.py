@@ -205,9 +205,11 @@ class FullStudyMatrixTests(unittest.TestCase):
         result = matrix.prepare(self.manifest_path, out)
         plan = json.loads((out / 'matrix-plan.json').read_text())
         self.assertEqual((result['campaign_count'], result['distinct_official_task_identities'],
-                          result['initial_total_final_trials']), (24, 600, 3000))
+                          result['initial_total_slot_task_results']), (24, 600, 3000))
         self.assertEqual((plan['initial_base_final_trials'],
                           plan['initial_selected_final_trials']), (600, 2400))
+        self.assertEqual(result['planned_unique_checkpoint_task_executions'], 3000)
+        self.assertTrue(all(cell['unique_checkpoint_count'] == 5 for cell in plan['cells']))
         self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '3000')
         self.assertEqual(len(plan['configuration_bindings']['researchers']), 4)
         self.assertIn('training', plan['configuration_bindings']['student']['asset_sha256'])
@@ -286,6 +288,37 @@ class FullStudyMatrixTests(unittest.TestCase):
                 matrix.prepare(self.manifest_path, self.root / 'bad-prompt')
         finally:
             asset_path.write_bytes(original_prompt)
+
+    def test_identical_selected_checkpoint_reuses_frozen_base_evidence(self):
+        changed = copy.deepcopy(self.matrix)
+        cell = changed['cells'][0]
+        base_path = self.root / cell['base_manifest']['path']
+        selected_ref = cell['selected_manifests']['luna6']
+        selected_path = self.root / selected_ref['path']
+        selected_original = selected_path.read_bytes()
+        selected = json.loads(selected_original)
+        freeze_path = selected_path.parent / selected['bindings']['checkpoint']['freeze_receipt']['path']
+        freeze_original = freeze_path.read_bytes()
+        try:
+            base = json.loads(base_path.read_text())
+            base_checkpoint = base['bindings']['checkpoint']['sha256']
+            selected['bindings']['checkpoint']['sha256'] = base_checkpoint
+            freeze = json.loads(freeze_original)
+            freeze['checkpoint_sha256'] = base_checkpoint
+            freeze_path.write_bytes(cell_final.json_bytes(freeze))
+            selected['bindings']['checkpoint']['freeze_receipt']['sha256'] = sha(
+                freeze_path.read_bytes())
+            selected_path.write_bytes(cell_final.json_bytes(selected))
+            selected_ref['sha256'] = sha(selected_path.read_bytes())
+            result = matrix.prepare(self.write_matrix(changed), self.root / 'reused-base')
+            plan = json.loads(Path(result['matrix_plan_path']).read_text())
+            self.assertEqual(result['initial_total_slot_task_results'], 3000)
+            self.assertEqual(result['planned_unique_checkpoint_task_executions'], 2900)
+            self.assertEqual(plan['cells'][0]['execution_evidence_owner_by_slot']['luna6'],
+                             'shared-base')
+        finally:
+            selected_path.write_bytes(selected_original)
+            freeze_path.write_bytes(freeze_original)
 
     def test_tampered_intent_or_plan_and_missing_proof_fail_closed(self):
         out = self.root / 'prepared'

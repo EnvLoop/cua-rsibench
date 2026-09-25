@@ -178,6 +178,7 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     seen: set[str] = set()
     output_cells = []
     all_in = Decimal(0)
+    unique_final_executions = 0
     for raw in cells:
         cell = cell_final.exact(raw, {'cell_id', 'base_manifest',
                                      'selected_manifests'}, 'matrix cell')
@@ -209,6 +210,13 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             if researcher_id != 'shared-base':
                 cell_final.require(slot['cost_maximum'] <= campaign_all_in,
                                    f'{cell_id}/{researcher_id}: campaign all-in cap exceeded')
+        execution_owners: dict[str, str] = {}
+        reuse = {}
+        for researcher_id in ('shared-base', *RESEARCHERS):
+            checkpoint = slots[researcher_id]['plan']['bindings']['checkpoint']
+            owner = execution_owners.setdefault(checkpoint, researcher_id)
+            reuse[researcher_id] = owner
+        unique_final_executions += len(execution_owners) * OFFICIAL_PER_CELL
         output_cells.append({
             'cell_id': cell_id,
             'official_task_count': OFFICIAL_PER_CELL,
@@ -217,6 +225,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             'official_identities_sha256': cell_final.digest(cell_final.json_bytes(base['official'])),
             'qualification_sha256': base['qualification_sha256'],
             'matched_bindings': base['matched_bindings'],
+            'unique_checkpoint_count': len(execution_owners),
+            'execution_evidence_owner_by_slot': reuse,
             'base': base['plan'],
             'researcher_plans': {key: slots[key]['plan'] for key in RESEARCHERS},
         })
@@ -235,7 +245,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'distinct_official_task_identities': len(CELLS) * OFFICIAL_PER_CELL,
         'initial_base_final_trials': len(CELLS) * OFFICIAL_PER_CELL,
         'initial_selected_final_trials': len(CELLS) * len(RESEARCHERS) * OFFICIAL_PER_CELL,
-        'initial_total_final_trials': len(CELLS) * (1 + len(RESEARCHERS)) * OFFICIAL_PER_CELL,
+        'initial_total_slot_task_results': len(CELLS) * (1 + len(RESEARCHERS)) * OFFICIAL_PER_CELL,
+        'planned_unique_checkpoint_task_executions': unique_final_executions,
         'campaign_hours_cap': CAMPAIGN_HOURS,
         'tinker_usd_cap_per_campaign': str(TINKER_USD_PER_CAMPAIGN),
         'researcher_inference_usd_cap_per_campaign': str(researcher_inference),
@@ -299,7 +310,8 @@ def prepare(manifest_path: str | Path, out_dir: str | Path) -> dict:
         'state': 'prepared_offline', 'study_id': plan['study_id'],
         'campaign_count': plan['campaign_count'],
         'distinct_official_task_identities': plan['distinct_official_task_identities'],
-        'initial_total_final_trials': plan['initial_total_final_trials'],
+        'initial_total_slot_task_results': plan['initial_total_slot_task_results'],
+        'planned_unique_checkpoint_task_executions': plan['planned_unique_checkpoint_task_executions'],
         'intent_path': str(intent_path), 'matrix_plan_path': str(plan_path),
         'declared_all_in_cost_upper_bound_usd': plan['declared_all_in_cost_upper_bound_usd'],
         'provider_calls': 0, 'scores_present': False,
