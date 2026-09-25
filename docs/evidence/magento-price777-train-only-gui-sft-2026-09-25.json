@@ -46,9 +46,26 @@
     },
     "tinker_sdk_version": "0.30.1"
   },
+  "paid_checkpoint_smoke": {
+    "checkpoint_saved_and_sampled": true,
+    "held_out_evaluation_or_improvement_measured": false,
+    "loss_metrics_present": true,
+    "measured_rendered_sampling_prompt_tokens": 2285,
+    "measured_rendered_training_input_tokens": 2300,
+    "model": "Qwen/Qwen3.8-27B",
+    "nominal_published_rate_token_subtotal_usd": "0.013770925",
+    "optimizer_steps_completed": 1,
+    "provider_billed_tokens_known": false,
+    "provider_invoice_usd": null,
+    "published_rate_max_reservation_usd": "0.01422412",
+    "sampled_output_sha256": "46a29746ff48d71b38c97e701fb64e624a8c04a535b548d3d2ff8c0144c9fa8e",
+    "sampled_output_tokens": 15,
+    "train_only": true
+  },
   "private_evidence_sha256": {
     "episode": "8ae9143ab98ea96572a19c3e5cd4a8a529f5dc320cb61044a57acddc2c5b22f0",
     "offline_render_receipt": "60e8d066662caf6fcd533b5c19dd6a33a74bb763263234f3843b37859595c8ce",
+    "paid_smoke_result": "dfff96745e9f0ce0bd101e79ef00ba2c9c76dd412f990e03a3edf5f047d5dffd",
     "recorder_result": "c7a383f70d3bc808a55fff12cd225df51443e87a43027e4e46437b06cf7a4ac6"
   },
   "publication_boundary": {

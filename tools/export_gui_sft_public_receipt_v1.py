@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
@@ -16,7 +17,8 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def public_receipt(episode_dir: Path, offline_receipt: Path) -> dict:
+def public_receipt(episode_dir: Path, offline_receipt: Path,
+                   paid_receipt: Path | None = None) -> dict:
     episode, turns = validate_episode(episode_dir)
     private = json.loads((Path(episode_dir) / 'result.json').read_text())
     offline = json.loads(Path(offline_receipt).read_text())
@@ -43,7 +45,7 @@ def public_receipt(episode_dir: Path, offline_receipt: Path) -> dict:
     if admission.get('native_save_count') != 5 or \
             admission.get('search_index_reset_verified') is not True:
         raise ValueError('five_save_or_search_reset_gate_missing')
-    return {
+    public = {
         'schema': 'magento-gui-sft-train-only-evidence-v1',
         'evidence_class': 'measured_real_gui_development_training_interface',
         'source': {
@@ -99,15 +101,60 @@ def public_receipt(episode_dir: Path, offline_receipt: Path) -> dict:
             'official_final_tasks_added': 0,
         },
     }
+    if paid_receipt is not None:
+        paid = json.loads(Path(paid_receipt).read_text())
+        usage = paid.get('measured_rendered_usage') or {}
+        preflight = paid.get('paid_preflight') or {}
+        if (paid.get('episode_sha256') != offline['episode_sha256'] or
+                paid.get('renderer_identity') != offline['renderer_identity'] or
+                paid.get('cookbook_commit') != COOKBOOK_COMMIT or
+                paid.get('paid_one_step_requested') is not True or
+                paid.get('optimizer_steps_completed') != 1 or
+                paid.get('checkpoint_saved') is not True or
+                paid.get('checkpoint_sampled') is not True or
+                paid.get('loss_metrics_available') is not True or
+                paid.get('checkpoint_path_published') is not False or
+                paid.get('trained_improvement_measured') is not False or
+                paid.get('paid_provider_calls') != 2 or
+                usage.get('training_input_tokens') != offline['first_supervised_tokens'] or
+                usage.get('sampling_prompt_tokens') != offline['first_prompt_tokens'] or
+                type(usage.get('sampling_output_tokens')) is not int or
+                not 0 <= usage['sampling_output_tokens'] <= 96 or
+                usage.get('provider_billed_tokens_known') is not False or
+                paid.get('provider_invoice_usd') is not None or
+                Decimal(paid['nominal_published_rate_subtotal_usd']) >
+                Decimal(preflight['max_published_rate_reservation_usd'])):
+            raise ValueError('paid_smoke_receipt_contract_mismatch')
+        public['paid_checkpoint_smoke'] = {
+            'model': MODEL, 'train_only': True,
+            'optimizer_steps_completed': 1,
+            'checkpoint_saved_and_sampled': True,
+            'loss_metrics_present': True,
+            'measured_rendered_training_input_tokens': usage['training_input_tokens'],
+            'measured_rendered_sampling_prompt_tokens': usage['sampling_prompt_tokens'],
+            'sampled_output_tokens': usage['sampling_output_tokens'],
+            'sampled_output_sha256': paid['sample_token_sha256'],
+            'published_rate_max_reservation_usd':
+                preflight['max_published_rate_reservation_usd'],
+            'nominal_published_rate_token_subtotal_usd':
+                paid['nominal_published_rate_subtotal_usd'],
+            'provider_billed_tokens_known': False,
+            'provider_invoice_usd': None,
+            'held_out_evaluation_or_improvement_measured': False,
+        }
+        public['private_evidence_sha256']['paid_smoke_result'] = sha(Path(paid_receipt))
+    return public
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--episode', type=Path, required=True)
     parser.add_argument('--offline-receipt', type=Path, required=True)
+    parser.add_argument('--paid-receipt', type=Path)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
-    public = public_receipt(args.episode, args.offline_receipt)
+    public = public_receipt(args.episode, args.offline_receipt,
+                            paid_receipt=args.paid_receipt)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open('x') as stream:
         json.dump(public, stream, indent=2, sort_keys=True)
