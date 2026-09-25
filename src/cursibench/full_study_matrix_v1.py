@@ -115,31 +115,8 @@ def _slot(root: Path, reference: object, *, cell_id: str, researcher_id: str,
     }
 
 
-def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
-    manifest = cell_final.exact(manifest, {
-        'schema', 'study_id', 'student_model', 'teacher_model',
-        'researchers', 'configurations', 'cells', 'budget',
-    }, 'matrix')
-    cell_final.require(manifest['schema'] == SCHEMA and
-                       cell_final.is_slug(manifest['study_id']),
-                       'invalid full-study schema or ID')
-    cell_final.require(manifest['student_model'] == STUDENT and
-                       manifest['teacher_model'] == TEACHER and
-                       manifest['researchers'] == RESEARCHERS,
-                       'student, teacher, or researcher roster changed')
-    configs = cell_final.exact(manifest['configurations'],
-                               {'student', 'teacher', 'researchers'},
-                               'model configuration bindings')
-    researcher_configs = cell_final.exact(configs['researchers'], set(RESEARCHERS),
-                                          'researcher configuration bindings')
-    frozen_configs = {
-        'student': _configuration(root, configs['student'], role='student', model=STUDENT),
-        'teacher': _configuration(root, configs['teacher'], role='teacher', model=TEACHER),
-        'researchers': {key: _configuration(root, researcher_configs[key],
-                                             role='researcher', model=RESEARCHERS[key])
-                        for key in RESEARCHERS},
-    }
-    budget = cell_final.exact(manifest['budget'], {
+def _budget(raw_budget: object) -> dict:
+    budget = cell_final.exact(raw_budget, {
         'campaign_hours', 'tinker_usd_per_campaign',
         'researcher_inference_usd_per_campaign', 'researcher_calls_per_campaign',
         'teacher_rollout_tokens_per_campaign', 'teacher_rollout_calls_per_campaign',
@@ -172,12 +149,55 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     )
     for key in bounded_counts:
         cell_final.positive_integer(budget[key], key)
+    cell_final.require(campaign_all_in >= TINKER_USD_PER_CAMPAIGN + researcher_inference,
+                       'campaign all-in cap cannot cover known Tinker and researcher caps')
+    return {'raw': budget, 'global_ceiling': global_ceiling, 'available': available,
+            'campaign_all_in': campaign_all_in,
+            'researcher_inference': researcher_inference,
+            'e2b_hours': e2b_hours, 'bounded_counts': bounded_counts}
+
+
+def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
+    manifest = cell_final.exact(manifest, {
+        'schema', 'study_id', 'student_model', 'teacher_model',
+        'researchers', 'configurations', 'cells', 'budget',
+        'pre_campaign_protocol', 'pre_campaign_plan',
+    }, 'matrix')
+    cell_final.require(manifest['schema'] == SCHEMA and
+                       cell_final.is_slug(manifest['study_id']),
+                       'invalid full-study schema or ID')
+    cell_final.require(manifest['student_model'] == STUDENT and
+                       manifest['teacher_model'] == TEACHER and
+                       manifest['researchers'] == RESEARCHERS,
+                       'student, teacher, or researcher roster changed')
+    configs = cell_final.exact(manifest['configurations'],
+                               {'student', 'teacher', 'researchers'},
+                               'model configuration bindings')
+    researcher_configs = cell_final.exact(configs['researchers'], set(RESEARCHERS),
+                                          'researcher configuration bindings')
+    frozen_configs = {
+        'student': _configuration(root, configs['student'], role='student', model=STUDENT),
+        'teacher': _configuration(root, configs['teacher'], role='teacher', model=TEACHER),
+        'researchers': {key: _configuration(root, researcher_configs[key],
+                                             role='researcher', model=RESEARCHERS[key])
+                        for key in RESEARCHERS},
+    }
+    limits = _budget(manifest['budget'])
+    budget = limits['raw']
+    global_ceiling = limits['global_ceiling']
+    available = limits['available']
+    campaign_all_in = limits['campaign_all_in']
+    researcher_inference = limits['researcher_inference']
+    e2b_hours = limits['e2b_hours']
+    bounded_counts = limits['bounded_counts']
     cells = manifest['cells']
     cell_final.require(isinstance(cells, list) and len(cells) == len(CELLS),
                        'exactly six cells required')
     seen: set[str] = set()
+    seen_official_ids: set[str] = set()
     output_cells = []
-    all_in = Decimal(0)
+    final_slot_upper_bound = Decimal(0)
+    shared_base_upper_bound = Decimal(0)
     unique_final_executions = 0
     for raw in cells:
         cell = cell_final.exact(raw, {'cell_id', 'analysis_families', 'base_manifest',
@@ -190,6 +210,10 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                     f'{cell_id} researcher manifests')
         base = _slot(root, cell['base_manifest'], cell_id=cell_id,
                      researcher_id='shared-base', role='base')
+        cell_ids = {row['task_id'] for row in base['official']}
+        cell_final.require(not cell_ids.intersection(seen_official_ids),
+                           'official task identity repeated across cells')
+        seen_official_ids.update(cell_ids)
         family_binding, family_sha256, _ = _json_reference(
             root, cell['analysis_families'], f'{cell_id} analysis families')
         family_binding = cell_final.exact(family_binding,
@@ -220,10 +244,14 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                slot['sampling'] == base['sampling'] and
                                slot['execution'] == base['execution'],
                                f'{cell_id}/{researcher_id}: matched environment or policy differs')
-            all_in += slot['cost_maximum']
+            final_slot_upper_bound += slot['cost_maximum']
             if researcher_id != 'shared-base':
-                cell_final.require(slot['cost_maximum'] <= campaign_all_in,
+                cell_final.require(slot['cost_maximum'] == base['cost_maximum'] and
+                                   TINKER_USD_PER_CAMPAIGN + researcher_inference +
+                                   slot['cost_maximum'] <= campaign_all_in,
                                    f'{cell_id}/{researcher_id}: campaign all-in cap exceeded')
+            else:
+                shared_base_upper_bound += slot['cost_maximum']
         execution_owners: dict[str, str] = {}
         reuse = {}
         for researcher_id in ('shared-base', *RESEARCHERS):
@@ -247,13 +275,48 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             'base': base['plan'],
             'researcher_plans': {key: slots[key]['plan'] for key in RESEARCHERS},
         })
-    cell_final.require(seen == set(CELLS), 'six declared cells not covered')
-    cell_final.require(all_in <= global_ceiling and all_in <= available,
+    cell_final.require(seen == set(CELLS) and len(seen_official_ids) == 600,
+                       'six declared cells or 600 unique identities not covered')
+    campaign_reservation = campaign_all_in * len(CELLS) * len(RESEARCHERS)
+    study_upper_bound = shared_base_upper_bound + campaign_reservation
+    cell_final.require(study_upper_bound <= global_ceiling and study_upper_bound <= available,
                        'matrix all-in upper bound exceeds declared ceiling or available balance')
     output_cells.sort(key=lambda item: CELLS.index(item['cell_id']))
+    # The selected checkpoints appear only after training. Bind them back to
+    # the six-cell protocol frozen before any campaign could consume feedback.
+    from . import full_study_pre_campaign_v1 as pre_campaign
+    protocol, protocol_sha256, protocol_path = _json_reference(
+        root, manifest['pre_campaign_protocol'], 'pre-campaign protocol')
+    frozen_pre_plan = pre_campaign.build(protocol, protocol_path.parent,
+                                         protocol_sha256)
+    pre_plan, pre_plan_sha256, _ = _json_reference(
+        root, manifest['pre_campaign_plan'], 'pre-campaign plan')
+    cell_final.require(pre_plan == frozen_pre_plan and
+                       pre_plan['study_id'] == manifest['study_id'] and
+                       protocol['budget'] == manifest['budget'] and
+                       pre_plan['configuration_bindings'] == frozen_configs and
+                       pre_plan['declared_shared_base_cost_upper_bound_usd'] == str(shared_base_upper_bound) and
+                       pre_plan['declared_campaign_reservation_usd'] == str(campaign_reservation) and
+                       pre_plan['declared_all_in_cost_upper_bound_usd'] == str(study_upper_bound),
+                       'final matrix differs from frozen pre-campaign protocol')
+    pre_cells = {row['cell_id']: row for row in pre_plan['cells']}
+    for cell in output_cells:
+        prior = pre_cells[cell['cell_id']]
+        base = cell['base']
+        cell_final.require(
+            prior['base_manifest_sha256'] == base['manifest_sha256'] and
+            prior['qualification_sha256'] == cell['qualification_sha256'] and
+            prior['analysis_family_sha256'] == cell['analysis_family_sha256'] and
+            prior['official_identities_sha256'] == cell['official_identities_sha256'] and
+            prior['matched_bindings'] == cell['matched_bindings'] and
+            prior['sampling'] == base['sampling'] and
+            prior['execution'] == base['execution'],
+            f"{cell['cell_id']}: final matrix drifted from pre-campaign cell")
     return {
         'schema': PLAN_SCHEMA, 'study_id': manifest['study_id'],
         'matrix_manifest_sha256': manifest_sha256,
+        'pre_campaign_protocol_sha256': protocol_sha256,
+        'pre_campaign_plan_sha256': pre_plan_sha256,
         'student_model': STUDENT, 'teacher_model': TEACHER,
         'researchers': RESEARCHERS, 'configuration_bindings': frozen_configs,
         'cell_ids': list(CELLS),
@@ -272,7 +335,11 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'matched_non_tinker_campaign_caps': {key: budget[key] for key in bounded_counts},
         'nominal_tinker_cap_all_campaigns_usd': str(
             TINKER_USD_PER_CAMPAIGN * len(CELLS) * len(RESEARCHERS)),
-        'declared_all_in_cost_upper_bound_usd': str(all_in),
+        'declared_final_slot_cost_upper_bound_usd': str(final_slot_upper_bound),
+        'declared_shared_base_cost_upper_bound_usd': str(shared_base_upper_bound),
+        'declared_campaign_reservation_usd': str(campaign_reservation),
+        'declared_all_in_cost_upper_bound_usd': str(study_upper_bound),
+        'selected_final_cost_included_in_campaign_reservation': True,
         'cost_bound_is_declaration_not_invoice': True,
         'cells': output_cells,
         'provider_dispatch_enabled': False, 'scores_present': False,

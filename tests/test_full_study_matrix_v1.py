@@ -11,6 +11,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from cursibench import full_study_matrix_v1 as matrix  # noqa: E402
+from cursibench import full_study_pre_campaign_v1 as pre_campaign  # noqa: E402
 from cursibench import scale_final_v06 as cell_final  # noqa: E402
 
 
@@ -176,7 +177,7 @@ class FullStudyMatrixTests(unittest.TestCase):
     @classmethod
     def build_fixture(cls) -> dict:
         cells = [cls.build_cell(cell_id) for cell_id in matrix.CELLS]
-        return {
+        value = {
             'schema': matrix.SCHEMA, 'study_id': 'full-computer-use-v1',
             'student_model': matrix.STUDENT, 'teacher_model': matrix.TEACHER,
             'researchers': matrix.RESEARCHERS, 'cells': cells,
@@ -197,16 +198,121 @@ class FullStudyMatrixTests(unittest.TestCase):
                        'e2b_peak_concurrency': 3,
                        'candidate_submissions_per_campaign': 25,
                        'selection_evaluations_per_campaign': 25,
-                       'per_campaign_all_in_ceiling_usd': '150',
-                       'global_all_in_ceiling_usd': '3000',
-                       'available_all_in_usd': '3000',
+                       'per_campaign_all_in_ceiling_usd': '750',
+                       'global_all_in_ceiling_usd': '20000',
+                       'available_all_in_usd': '20000',
                        'spending_authorized_by_user': True},
         }
+        protocol = copy.deepcopy(value)
+        protocol['schema'] = pre_campaign.SCHEMA
+        for cell in protocol['cells']:
+            del cell['selected_manifests']
+        protocol_path = cls.root / 'pre-campaign-protocol.json'
+        protocol_path.write_bytes(cell_final.json_bytes(protocol))
+        frozen = pre_campaign.build(protocol, cls.root,
+                                    sha(protocol_path.read_bytes()))
+        plan_path = cls.root / 'pre-campaign-plan.json'
+        plan_path.write_bytes(cell_final.json_bytes(frozen))
+        value['pre_campaign_protocol'] = cls.matrix_ref(protocol_path)
+        value['pre_campaign_plan'] = cls.matrix_ref(plan_path)
+        return value
 
     def write_matrix(self, value: dict, name='changed.json') -> Path:
         path = self.root / name
         path.write_bytes(cell_final.json_bytes(value))
         return path
+
+    def pre_campaign_manifest(self) -> dict:
+        value = copy.deepcopy(self.matrix)
+        value['schema'] = pre_campaign.SCHEMA
+        del value['pre_campaign_protocol']
+        del value['pre_campaign_plan']
+        for cell in value['cells']:
+            del cell['selected_manifests']
+        return value
+
+    def test_pre_campaign_freeze_requires_six_qualified_bases_before_training(self):
+        source = self.write_matrix(self.pre_campaign_manifest(), 'pre-campaign.json')
+        out = self.root / 'pre-campaign-prepared'
+        result = pre_campaign.prepare(source, out)
+        plan = json.loads((out / 'campaign-plan.json').read_text())
+        self.assertEqual((result['campaign_count'],
+                          result['distinct_official_task_identities']), (24, 600))
+        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_campaign_reservation_usd'], '18000')
+        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '18600')
+        self.assertEqual(len(plan['campaign_intents']), 24)
+        self.assertTrue(all(row['selected_checkpoint_known'] is False and
+                            row['provider_dispatch_enabled'] is False
+                            for row in plan['campaign_intents']))
+        self.assertEqual(pre_campaign.prepare(source, out), result)
+        plan_path = out / 'campaign-plan.json'
+        original = plan_path.read_bytes()
+        try:
+            plan_path.write_bytes(original + b' ')
+            with self.assertRaisesRegex(ValueError, 'existing pre-campaign plan changed'):
+                pre_campaign.prepare(source, out)
+        finally:
+            plan_path.write_bytes(original)
+
+    def test_pre_campaign_rejects_incomplete_cell_and_underfunded_study(self):
+        bad = self.pre_campaign_manifest()
+        bad['cells'].pop()
+        with self.assertRaisesRegex(ValueError, 'exactly six pre-campaign cells'):
+            pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-missing-cell')
+        bad = self.pre_campaign_manifest()
+        bad['budget']['available_all_in_usd'] = '3000'
+        with self.assertRaisesRegex(ValueError, 'pre-campaign all-in upper bound exceeds'):
+            pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-budget-shortfall')
+        bad = self.pre_campaign_manifest()
+        bad['budget']['per_campaign_all_in_ceiling_usd'] = '600'
+        with self.assertRaisesRegex(ValueError, 'omits selected final-evaluation'):
+            pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-final-omitted')
+
+    def test_pre_campaign_rejects_changed_base_qualification_or_model_asset(self):
+        bad = self.pre_campaign_manifest()
+        ref = bad['cells'][0]['base_manifest']
+        path = self.root / ref['path']
+        original = path.read_bytes()
+        try:
+            value = json.loads(original)
+            value['qualification_status'] = 'candidate'
+            path.write_bytes(cell_final.json_bytes(value))
+            ref['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError, 'cell is not qualified'):
+                pre_campaign.prepare(self.write_matrix(bad), self.root / 'pre-unqualified')
+        finally:
+            path.write_bytes(original)
+        prompt = self.root / 'configs/astra/prompt.txt'
+        original = prompt.read_bytes()
+        try:
+            prompt.write_bytes(original + b' changed')
+            with self.assertRaisesRegex(ValueError, 'evidence bytes changed'):
+                pre_campaign.prepare(self.write_matrix(self.pre_campaign_manifest()),
+                                     self.root / 'pre-prompt-drift')
+        finally:
+            prompt.write_bytes(original)
+
+    def test_final_matrix_cannot_replace_frozen_pre_campaign_plan(self):
+        changed = copy.deepcopy(self.matrix)
+        reference = changed['pre_campaign_plan']
+        path = self.root / reference['path']
+        original = path.read_bytes()
+        try:
+            plan = json.loads(original)
+            plan['campaign_count'] = 23
+            path.write_bytes(cell_final.json_bytes(plan))
+            reference['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError,
+                                        'differs from frozen pre-campaign protocol'):
+                matrix.prepare(self.write_matrix(changed), self.root / 'pre-plan-replaced')
+        finally:
+            path.write_bytes(original)
+        changed = copy.deepcopy(self.matrix)
+        changed['budget']['teacher_rollout_calls_per_campaign'] = 999
+        with self.assertRaisesRegex(ValueError,
+                                    'differs from frozen pre-campaign protocol'):
+            matrix.prepare(self.write_matrix(changed), self.root / 'pre-budget-drift')
 
     def test_matched_six_cell_matrix_has_24_campaigns_and_3000_final_trials(self):
         out = self.root / 'prepared'
@@ -218,7 +324,10 @@ class FullStudyMatrixTests(unittest.TestCase):
                           plan['initial_selected_final_trials']), (600, 2400))
         self.assertEqual(result['planned_unique_checkpoint_task_executions'], 3000)
         self.assertTrue(all(cell['unique_checkpoint_count'] == 5 for cell in plan['cells']))
-        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '3000')
+        self.assertEqual(plan['declared_final_slot_cost_upper_bound_usd'], '3000')
+        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_campaign_reservation_usd'], '18000')
+        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '18600')
         self.assertEqual(len(plan['configuration_bindings']['researchers']), 4)
         self.assertIn('training', plan['configuration_bindings']['student']['asset_sha256'])
         self.assertEqual(plan['researcher_inference_usd_cap_per_campaign'], '100')
@@ -252,8 +361,16 @@ class FullStudyMatrixTests(unittest.TestCase):
             matrix.prepare(self.write_matrix(bad), self.root / 'missing-external-cap')
         bad = copy.deepcopy(self.matrix)
         bad['budget']['per_campaign_all_in_ceiling_usd'] = '99'
-        with self.assertRaisesRegex(ValueError, 'campaign all-in cap exceeded'):
+        with self.assertRaisesRegex(ValueError, 'cannot cover known Tinker'):
             matrix.prepare(self.write_matrix(bad), self.root / 'weak-campaign-cap')
+        bad = copy.deepcopy(self.matrix)
+        bad['budget']['per_campaign_all_in_ceiling_usd'] = '600'
+        with self.assertRaisesRegex(ValueError, 'campaign all-in cap exceeded'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'missing-final-in-cap')
+        bad = copy.deepcopy(self.matrix)
+        bad['budget']['global_all_in_ceiling_usd'] = '3000'
+        with self.assertRaisesRegex(ValueError, 'matrix all-in upper bound exceeds'):
+            matrix.prepare(self.write_matrix(bad), self.root / 'training-omitted-global')
 
     def test_unqualified_slot_and_cross_researcher_drift_fail_closed(self):
         bad = copy.deepcopy(self.matrix)
