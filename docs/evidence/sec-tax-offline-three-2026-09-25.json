@@ -1,0 +1,29 @@
+{
+  "schema": "sec-tax-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 3,
+  "distinct_issuer_families": 3,
+  "distinct_original_10k_accessions": 3,
+  "issuers": [
+    "CRM",
+    "GOOGL",
+    "META"
+  ],
+  "sheets_per_case": 9,
+  "formula_targets_per_case": 46,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 3,
+  "unsolved_seed_rejections": 3,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "6a8270c02eb45dbefd23341069ee6bac6fbb82761ee9bb0a7ca42baaa812b574",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Cash paid, accrual provision, and deferred-tax-asset movement have different accounting bases.",
+    "The synthetic rate/income stress is not SEC guidance or tax advice.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

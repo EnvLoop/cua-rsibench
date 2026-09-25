@@ -14,6 +14,8 @@ A fourth [mixed-unit EPS and shareholder-return development workflow](../docs/ev
 
 A fifth [operating-lease maturity development workflow](../docs/evidence/sec-lease-workflow-2026-09-25.md) pins six contractual payment buckets and a reported discount rate across four original filings. Its nine-sheet workbooks reconcile the maturity ladder and liabilities and distinguish a synthetic payment stress from contractual obligations. Four references pass a 52-target independent OOXML/counterfactual oracle, again with **zero Excel-web or hidden-final admissions**.
 
+A sixth [tax-provision and cash-tax development workflow](../docs/evidence/sec-tax-workflow-2026-09-25.md) uses current and prior-year SEC tax disclosures from three original filings. It reconciles current/deferred provision, cash payments, and deferred-tax assets without conflating their accounting bases. Three nine-sheet references pass a 46-target independent OOXML/counterfactual oracle; the rate/income scenario is synthetic and **no Excel-web or hidden-final admission exists**.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
