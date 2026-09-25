@@ -1,0 +1,48 @@
+{
+  "schema": "sec-integrated-candidate-inventory-v1",
+  "scope": "offline source and task-design candidates only; no Excel-web GUI or hidden-final admission",
+  "source": "hash-pinned SEC companyfacts snapshots for AAPL and MSFT",
+  "source_packages": 15,
+  "counts": {
+    "train_candidate": {
+      "candidate_count": 20,
+      "distinct_source_filing_pairs": 4,
+      "distinct_issuers": 2,
+      "template_groups": 1,
+      "fiscal_years": [
+        2019,
+        2020
+      ]
+    },
+    "selection_candidate": {
+      "candidate_count": 20,
+      "distinct_source_filing_pairs": 4,
+      "distinct_issuers": 2,
+      "template_groups": 1,
+      "fiscal_years": [
+        2021,
+        2022
+      ]
+    },
+    "final_candidate": {
+      "candidate_count": 100,
+      "distinct_source_filing_pairs": 7,
+      "distinct_issuers": 2,
+      "template_groups": 1,
+      "fiscal_years": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    }
+  },
+  "source_accession_split_overlap": 0,
+  "candidate_identity_commitment_sha256": "f4ef6b546914e0e14e5c8c80dbba79a7f005968954430f4a5b82a7cc0b74de11",
+  "limitations": [
+    "Only two issuer families",
+    "The same issuer and the same calculation template recur across splits",
+    "Some final-source facts and fault shapes appeared in public development prototypes",
+    "No final item is sealed or GUI-admitted"
+  ]
+}

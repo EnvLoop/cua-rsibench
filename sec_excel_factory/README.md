@@ -2,6 +2,8 @@
 
 This directory contains runnable **development prototypes**, not an admitted 100-task Microsoft Excel for the web benchmark. The checked-in five-sheet fixture uses authentic public SEC XBRL facts; its ready-to-open actor package is in `fixtures/actor/`. Two additional development task shapes are described below. The harness retains SEC snapshots, generated reference solutions, and independent verifier code outside the actor workspace.
 
+The newer [filing-close integrated candidate pool](../docs/evidence/sec-integrated-offline-140-2026-09-25.md) builds 20/20/100 **offline** train/selection/proposed-final workbook pairs from these same pinned Apple/Microsoft SEC snapshots. Its final template has ten tabs and 48 independent numeric targets; the 100 final files still repeat seven source filing pairs, two issuer entities, and one calculation template. Every reference passes the local OOXML/counterfactual oracle and every unsolved seed fails, but **zero of the 100 is a hidden or Excel-web GUI-admitted final task**. `prepare_integrated_cases.py`, `build_integrated_workbooks.mjs`, `verify_integrated_candidate.py`, and `audit_integrated_cases.py` provide the reproducible development pipeline. Keep generated actor/reference files and private case manifests in ignored `work/`.
+
 The checked-in fixture is a transparent development example. Its source records and verifier logic are public, so this exact task must never be counted as a hidden official final instance. Future final tasks need distinct source families and evaluator-only perturbations that are frozen outside the actor and public release.
 
 ## What is real and what is modeled
