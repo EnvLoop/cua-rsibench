@@ -1,0 +1,47 @@
+{
+  "admission": {
+    "100_task_cell_ready": false,
+    "development_workflow_qualified": false,
+    "next_gate": "stable_clone_search_and_raw_har_before_native_gui_positive_negative_state_reset",
+    "official_final_task_admitted": false
+  },
+  "cleanup": {
+    "both_disposable_clones_removed": true,
+    "odoo_containers_running": true,
+    "shared_magento_smoke_running": true
+  },
+  "first_disposable_clone": {
+    "accepted_scored_control": false,
+    "independent_sql_tracking_and_carrier_matched": true,
+    "native_gui_save_persisted_target_shipment_and_track": true,
+    "private_forensic_sha256": "9689b1fa3b9d388e4c608765363c421f21eff313483eb689d6284053cabdc2a2",
+    "raw_and_sanitized_evaluator_disagreement": true,
+    "raw_har_score_retained": false,
+    "sanitized_har_score": 1.0,
+    "wrong_order_unchanged": true
+  },
+  "fresh_image_retry": {
+    "accepted_scored_control": false,
+    "full_content_har_requested": true,
+    "gui_submit_navigation_timeout": true,
+    "local_search_probe_exit_code": 7,
+    "official_evaluation_completed": false,
+    "private_failure_sha256": "25177fdbe8c2bf6470001779ae4820c0880eef015d93fe7099545b84c418a202",
+    "target_shipment_count_after_timeout": 0,
+    "wrong_order_shipment_count_after_timeout": 0
+  },
+  "image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "published_hard_subset": true,
+  "schema": "magento-hard-shipment-control-rejection-public-v1",
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "hard_subset": true,
+    "task_record_sha256": "caf8418d69214dba9ecca456c1fb9854b47d6739fac96d2caab6644141f9baab"
+  },
+  "task_id": 499,
+  "usage": {
+    "model_calls": 0,
+    "paid_provider_calls": 0
+  }
+}

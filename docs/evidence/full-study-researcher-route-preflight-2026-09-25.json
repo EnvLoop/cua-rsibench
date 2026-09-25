@@ -1,0 +1,74 @@
+{
+  "checked_date": "2026-09-25",
+  "is_full_campaign": false,
+  "max_output_tokens_for_probe": 128,
+  "official_campaigns_completed": 0,
+  "private_receipt_sha256": "08aa15434b23fda41a44fc7b34a281461a2bfda2cef0c808f9996be41b985a1b",
+  "reasoning_effort_for_probe": "low",
+  "reported_model_is_weight_attestation": false,
+  "request_prompt_sha256": "abe9b5647d8046e2a1f90be481202589d17f91c01fd7d5b13a05362ccc24a147",
+  "route": "OpenAI-compatible Responses via AgentRouterHub",
+  "rows": [
+    {
+      "answer_exact": true,
+      "cost_usd": null,
+      "elapsed_seconds": 6.093,
+      "error_type": null,
+      "gateway_reported_model": "gpt-6-astra",
+      "gateway_usage": {
+        "cached_input_tokens": 3968,
+        "input_tokens": 4128,
+        "output_tokens": 9,
+        "reasoning_tokens": 0
+      },
+      "provider_status": "completed",
+      "requested_model": "gpt-6-astra"
+    },
+    {
+      "answer_exact": true,
+      "cost_usd": null,
+      "elapsed_seconds": 5.374,
+      "error_type": null,
+      "gateway_reported_model": "gpt-5.6-sol",
+      "gateway_usage": {
+        "cached_input_tokens": 4224,
+        "input_tokens": 4394,
+        "output_tokens": 9,
+        "reasoning_tokens": 0
+      },
+      "provider_status": "completed",
+      "requested_model": "gpt-5.6-sol"
+    },
+    {
+      "answer_exact": true,
+      "cost_usd": null,
+      "elapsed_seconds": 2.66,
+      "error_type": null,
+      "gateway_reported_model": "gpt-6-sol",
+      "gateway_usage": {
+        "cached_input_tokens": 4224,
+        "input_tokens": 4394,
+        "output_tokens": 9,
+        "reasoning_tokens": 0
+      },
+      "provider_status": "completed",
+      "requested_model": "gpt-6-sol"
+    },
+    {
+      "answer_exact": true,
+      "cost_usd": null,
+      "elapsed_seconds": 1.987,
+      "error_type": null,
+      "gateway_reported_model": "gpt-6-luna",
+      "gateway_usage": {
+        "cached_input_tokens": 3840,
+        "input_tokens": 4394,
+        "output_tokens": 9,
+        "reasoning_tokens": 0
+      },
+      "provider_status": "completed",
+      "requested_model": "gpt-6-luna"
+    }
+  ],
+  "schema": "envloop-researcher-route-preflight-v1"
+}

@@ -1,0 +1,95 @@
+{
+  "admission": {
+    "official_final_task_admitted": false,
+    "qualification_scope": "one visible GUI navigation on an unseeded isolated GitLab CE instance",
+    "result": "quarantine_in_this_gitlab_18_5_clone_until_evaluator_version_or_task_variant_revalidated"
+  },
+  "environment": {
+    "application": "GitLab CE 18.5",
+    "container_id_sha256": "1b4fa2b3ddcfab1944e8c9d9e8687c59b96a764498f240fc57b76b970afc2201",
+    "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
+    "loopback_only": true,
+    "original_populated_webarena_snapshot": false
+  },
+  "independent_state": {
+    "after_positive_sha256": "1a5cd2d21bd23a9ea2fe9b9f7784fa04f8c0e242dc18c35959e97504599b4146",
+    "after_wrong_route_sha256": "1a5cd2d21bd23a9ea2fe9b9f7784fa04f8c0e242dc18c35959e97504599b4146",
+    "all_monitored_tables_unchanged": true,
+    "baseline_sha256": "1a5cd2d21bd23a9ea2fe9b9f7784fa04f8c0e242dc18c35959e97504599b4146",
+    "monitored_tables": [
+      "todos",
+      "projects",
+      "issues",
+      "merge_requests"
+    ]
+  },
+  "positive_gui": {
+    "blocked_external_requests": 9,
+    "network_entries": 81,
+    "official_error_present": false,
+    "official_evaluators": [
+      {
+        "name": "AgentResponseEvaluator",
+        "score": 1.0,
+        "status": "success"
+      },
+      {
+        "name": "NetworkEventEvaluator",
+        "score": 0.0,
+        "status": "failure"
+      }
+    ],
+    "official_score": 0.0,
+    "official_status": "failure",
+    "raw_and_sanitized_evaluator_equal": true,
+    "sanitized_trace_sha256": "9666cbf64830b196192604865ca7a9437c86411c8c17eccc145328be8bd6ae95",
+    "screenshot_sha256": "6712678a1c9774d45b82faa4b46e7f49b13843e658de3ed12663935429a62a42",
+    "visible_heading": "Explore projects"
+  },
+  "privacy": {
+    "credentials_or_auth_state_published": false,
+    "raw_har_retained": false
+  },
+  "private_probe_tool_sha256": "ef84897bd6a12bd98aa4ae4bbcd4a41362f884a59671a5791a74dc2a4dbc5328",
+  "private_result_sha256": "2821e80e39d2ea2268590e763fbecf95cba1a958b602ec9ff78ce8b16dfbe9cd",
+  "schema": "gitlab-public-projects-gui-probe-public-v1",
+  "source": {
+    "commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "task_sha256": "43c0114333de7df6be4dc52ce5cce7d62491da5076ae8886a2a210e2fcc20124"
+  },
+  "source_evaluator_mismatch": {
+    "exact_source_answer_fields_published": false,
+    "official_network_evaluator_score": 0.0,
+    "positive_gui_destination_visible": true,
+    "required_query_present_in_visible_gui_request": false
+  },
+  "task_id": 258,
+  "usage": {
+    "model_calls": 0,
+    "paid_provider_calls": 0
+  },
+  "wrong_route_gui": {
+    "blocked_external_requests": 5,
+    "network_entries": 72,
+    "official_error_present": false,
+    "official_evaluators": [
+      {
+        "name": "AgentResponseEvaluator",
+        "score": 1.0,
+        "status": "success"
+      },
+      {
+        "name": "NetworkEventEvaluator",
+        "score": 0.0,
+        "status": "failure"
+      }
+    ],
+    "official_score": 0.0,
+    "official_status": "failure",
+    "raw_and_sanitized_evaluator_equal": true,
+    "sanitized_trace_sha256": "12da4bf821032423e58800d1935a1b909ba9083c798eb8326977516d67ff5162",
+    "screenshot_sha256": "5b75a971b34946ac6c250720796dad1df2ddf642a7e6624b50120a17b2de563a",
+    "visible_heading": "Milestones"
+  }
+}

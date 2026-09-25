@@ -1,0 +1,415 @@
+{
+  "schema": "envloop-odoo-unsealed-development-gui-sweep-v1",
+  "date": "2026-09-25",
+  "status": "known_answer_environment_solvability_only",
+  "official_final_tasks_admitted": 0,
+  "attempted": 40,
+  "passed": 40,
+  "sales_passed": 20,
+  "crm_passed": 20,
+  "final_full_database_and_filestore_reset_exact": true,
+  "actor_interface": "native_odoo_browser_gui",
+  "evaluator_interface": "postgresql_select_only_plus_protected_source_filestore_sha256",
+  "cases": [
+    {
+      "case_id": "ELSQ-0001",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0002",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0003",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0004",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0005",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0006",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0007",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0008",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0009",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0010",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0011",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0012",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0013",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0014",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0015",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0016",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0017",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0018",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0019",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELSQ-0020",
+      "family": "sales",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0001",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0002",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0003",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0004",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0005",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0006",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0007",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0008",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0009",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0010",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0011",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0012",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0013",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0014",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0015",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0016",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0017",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0018",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0019",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    },
+    {
+      "case_id": "ELCRM-0020",
+      "family": "crm",
+      "cold_reset_before": true,
+      "source_pdf_visible_in_native_viewer": true,
+      "baseline_reward": 0.0,
+      "gui_oracle_reward": 1.0,
+      "difference_codes": [],
+      "protected_source_files_checked": 161
+    }
+  ]
+}

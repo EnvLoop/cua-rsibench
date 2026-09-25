@@ -19,7 +19,13 @@ SOURCE_SHA256 = 'd65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d3
 HARD_SHA256 = '3b0a4df231bb5a0c642215e521c3fa97701a384f52a734dc2db8f617ad0591a7'
 SOURCE_COMMIT = '6473f72db5dcefc97b5725b59e734504edc28a21'
 SEED = 'envloop-magento-v06-candidate-split-2026-09-24'
-QUARANTINED_TEMPLATES = {742: 'task 777 exposed a clone-dependent HAR false positive; one repaired-clone case later qualified, while template-wide save/reset coverage remains unverified'}
+QUARANTINED_TEMPLATES = {
+    742: 'task 777 supplied an accepted train-only GUI/SFT technical source after a prior clone-dependent HAR false positive; hold the full family out of candidate evaluation',
+    240: 'task 538 was a failed validated-action-contract training probe; retain the exposed development template outside candidate splits, but it is not admitted training data',
+    275: 'task 486 visually saved in a training probe but failed the unchanged network evaluator; retain this failed-contract development template outside candidate splits, not as accepted training data',
+}
+TRAIN_RESERVED_TASK_IDS = {777}
+EXPOSED_SOURCE_TASK_IDS = {486, 538, 777}
 QUARANTINED_TASKS = {
     423: 'published product-save network assertion expects unrelated report-filter fields; requires GUI, HAR, SQL, and reset qualification',
     491: 'published task expects ACTION_NOT_ALLOWED_ERROR, not a saved mutation; reserve for a separately scored policy-denial cohort',
@@ -92,13 +98,32 @@ def entity_hints(row: dict) -> list[str]:
     refer to entities indirectly or share underlying database records.
     """
     params = row.get('instantiation_dict') or {}
-    keys = ('order_id', 'order', 'id', 'product', 'config', 'brand', 'PhoneNum')
+    keys = ('order_id', 'order', 'id', 'product', 'product_id', 'config', 'brand', 'PhoneNum', 'page_id', 'cms_page_id')
     hints = []
     for key in keys:
         value = params.get(key)
         if isinstance(value, (str, int)) and str(value).strip():
             normalized = re.sub(r'\s+', ' ', str(value).strip().lower())
             hints.append(key.lower() + ':' + normalized)
+    # CMS page IDs can appear only in the published network assertion's form
+    # fields. Record the explicit entity ID without copying its desired title.
+    for evaluation in row.get('eval', [])[1:]:
+        expected = evaluation.get('expected', {})
+        post_data = expected.get('post_data', {})
+        if isinstance(post_data, dict):
+            value = post_data.get('page_id')
+            if isinstance(value, (str, int)) and re.fullmatch(r'\d+', str(value)):
+                hints.append('page_id:' + str(value))
+        urls = expected.get('url')
+        for value in ([urls] if isinstance(urls, str) else urls if isinstance(urls, list) else []):
+            if not isinstance(value, str):
+                continue
+            if '/cms/page/' in value:
+                for page_id in re.findall(r'/(?:page_id|id)/(\d+)(?:/|$)', value):
+                    hints.append('page_id:' + page_id)
+            if '/catalog/product/' in value:
+                for product_id in re.findall(r'/catalog/product/(?:save|edit)/id/(\d+)(?:/|$)', value):
+                    hints.append('product_id:' + product_id)
     return sorted(set(hints))
 
 
@@ -122,8 +147,19 @@ def choose(rows: list[dict], hard: set[int], *, selection_count: int = 20,
            final_count: int = 100) -> dict:
     if len(rows) != 182:
         raise ValueError('expected 182 Magento source tasks')
+    exposed_rows = [row for row in rows if row['task_id'] in EXPOSED_SOURCE_TASK_IDS]
+    if len(exposed_rows) != len(EXPOSED_SOURCE_TASK_IDS):
+        raise ValueError('development-exposed task identity missing from pinned source')
+    exposed_entity_hints = {hint for row in exposed_rows for hint in entity_hints(row)}
+    exposed_template_ids = {row['intent_template_id'] for row in exposed_rows}
+    if not exposed_template_ids.issubset(QUARANTINED_TEMPLATES):
+        raise ValueError('development-exposed template family is not quarantined')
+    if not TRAIN_RESERVED_TASK_IDS.issubset(EXPOSED_SOURCE_TASK_IDS):
+        raise ValueError('train reservation must also be marked as source exposure')
     allowed = [row for row in rows if row['intent_template_id'] not in QUARANTINED_TEMPLATES
-               and row['task_id'] not in QUARANTINED_TASKS]
+               and row['task_id'] not in QUARANTINED_TASKS
+               and evaluation_shape(row)['expected_status'] == 'SUCCESS'
+               and not exposed_entity_hints.intersection(entity_hints(row))]
     groups: dict[int, list[dict]] = defaultdict(list)
     for row in allowed:
         groups[row['intent_template_id']].append(task_record(row, hard))
@@ -173,6 +209,10 @@ def choose(rows: list[dict], hard: set[int], *, selection_count: int = 20,
         raise AssertionError('selection/final task ID reuse')
     return {'selection': selection, 'provisional_final': final,
             'selection_template_ids': sorted(selected_templates),
+            'exposed_entity_overlap_excluded_tasks': sum(
+                row['intent_template_id'] not in QUARANTINED_TEMPLATES
+                and row['task_id'] not in QUARANTINED_TASKS
+                and bool(exposed_entity_hints.intersection(entity_hints(row))) for row in rows),
             'reserved_selection_family_tasks': len(selected_pool) - len(selection),
             'obvious_source_entity_overlap_excluded_tasks': len(overlapping_hint_tasks),
             'unused_nonquarantined_tasks': len(final_pool) - len(final)}
@@ -192,6 +232,8 @@ def manifest(rows: list[dict], hard: set[int]) -> dict:
                    'url': 'https://github.com/ServiceNow/webarena-verified'},
         'quarantine': {'template_ids': sorted(QUARANTINED_TEMPLATES),
                        'task_ids': sorted(quarantined),
+                       'development_exposed_task_ids': sorted(EXPOSED_SOURCE_TASK_IDS),
+                       'train_reserved_task_ids': sorted(TRAIN_RESERVED_TASK_IDS),
                        'template_reasons': {str(key): value for key, value in QUARANTINED_TEMPLATES.items()},
                        'task_reasons': {str(key): value for key, value in QUARANTINED_TASKS.items()},
                        'scope': 'provisional qualification quarantine; not a global invalidity claim'},
@@ -199,7 +241,11 @@ def manifest(rows: list[dict], hard: set[int]) -> dict:
             'published_admin_task_ids': 182,
             'published_intent_templates': 41,
             'published_hard_subset_admin_ids': sum(row['task_id'] in hard for row in rows),
+            'source_non_success_outcomes_excluded': dict(sorted(Counter(
+                evaluation_shape(row)['expected_status'] for row in rows
+                if evaluation_shape(row)['expected_status'] != 'SUCCESS').items())),
             'quarantined_task_ids': len(quarantined),
+            'exposed_entity_overlap_excluded_tasks': sets['exposed_entity_overlap_excluded_tasks'],
             'selection_instances': len(sets['selection']),
             'selection_template_families': len({row['template_group'] for row in sets['selection']}),
             'selection_reserved_same_family_tasks': sets['reserved_selection_family_tasks'],
@@ -218,7 +264,7 @@ def manifest(rows: list[dict], hard: set[int]) -> dict:
             'Public task IDs, instructions, and evaluators are not a sealed official final set.',
             'Obvious extracted source-entity hints are disjoint, but full database-record overlap across templates is not proven absent.',
             'Hard-subset membership and evaluator count are selection priorities, not validated difficulty or saved-state proof.',
-            'Three individual source tasks are excluded pending policy-denial cohort design or evaluator repair, in addition to template 742.',
+            'Three individual source tasks are excluded pending policy-denial cohort design or evaluator repair; template 742 is held as accepted train-only technical data, while templates 240 and 275 are held as failed-contract development exposure.',
             'All 100 candidates still need GUI positive/negative, independent DB readback or answer provenance, full reset, and model observation/action gates.',
         ],
         'task_sets': {'selection': sets['selection'],

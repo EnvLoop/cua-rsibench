@@ -1,0 +1,25 @@
+{
+  "other_exposed_unadmitted_task_ids": [
+    486,
+    538
+  ],
+  "rule": "Quarantine task 777, full template 742 and overlapping products from final. Pre-training task 777 diagnostics are historical and never a post-training held-out score.",
+  "schema": "gui-sft-train-exclusion-v1",
+  "site": "shopping_admin",
+  "source": "WebArena-Verified",
+  "source_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "source_dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "train_only_entity_tags": [
+    "magento:product:111",
+    "magento:product:114",
+    "magento:product:117",
+    "magento:product:120",
+    "magento:product:123"
+  ],
+  "train_only_intent_template_ids": [
+    742
+  ],
+  "train_only_task_ids": [
+    777
+  ]
+}

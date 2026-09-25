@@ -43,6 +43,21 @@ def fake_rows() -> list[dict]:
                      'eval': [{'evaluator': 'AgentResponseEvaluator',
                                'expected': {'task_type': 'retrieve', 'status': 'SUCCESS'}}]})
         next_id += 1
+    # Reserve one development-exposed family and one train-source family.
+    for row in rows[:4]:
+        row['intent_template_id'] = 240
+    rows[0]['task_id'] = 538
+    rows[0]['instantiation_dict'] = {'order_id': '299'}
+    for row in rows[4:8]:
+        row['intent_template_id'] = 275
+        row['eval'] = [{'evaluator': 'AgentResponseEvaluator',
+                        'expected': {'task_type': 'mutate', 'status': 'SUCCESS'}},
+                       {'evaluator': 'NetworkEventEvaluator',
+                        'expected': {'url': '/cms/page/save/back/edit'}}]
+    rows[4]['task_id'] = 486
+    rows[4]['eval'][1]['expected']['post_data'] = {'page_id': '1'}
+    rows[160]['task_id'] = 777
+    rows[160]['eval'][1]['expected']['url'] = '/catalog/product/save/id/111/type/simple'
     assert len(rows) == 182
     return rows
 
@@ -60,6 +75,8 @@ class MagentoBacklogTests(unittest.TestCase):
         self.assertFalse(any(row['template_group'] == 'shopping_admin:742'
                              for row in selection + final))
         self.assertEqual(result['counts']['provisional_final_officially_admitted'], 0)
+        self.assertEqual(result['quarantine']['train_reserved_task_ids'], [777])
+        self.assertEqual(result['quarantine']['development_exposed_task_ids'], [486, 538, 777])
         self.assertEqual(result, plan.manifest(rows, hard))
         self.assertEqual({row['task_type'] for row in selection},
                          {'mutate', 'retrieve', 'navigate'})
@@ -73,7 +90,7 @@ class MagentoBacklogTests(unittest.TestCase):
         self.assertFalse(record['requires_no_state_change_oracle'])
         self.assertEqual(record['expected_status'], 'SUCCESS')
         self.assertTrue(record['official_hard_subset'])
-        self.assertEqual(record['source_entity_hints'], ['order_id:1000'])
+        self.assertEqual(record['source_entity_hints'], ['order_id:299'])
 
     def test_unexpected_evaluator_or_insufficient_pool_fails(self):
         row = fake_rows()[0]
@@ -106,13 +123,41 @@ class MagentoBacklogTests(unittest.TestCase):
 
     def test_pinned_problem_ids_are_excluded_but_other_family_members_remain(self):
         rows = fake_rows()
-        for row, task_id in zip(rows[:3], (423, 491, 790)):
+        for row, task_id in zip(rows[8:11], (423, 491, 790)):
             row['task_id'] = task_id
         result = plan.manifest(rows, set())
         all_ids = {row['task_id'] for name in ('selection', 'provisional_final')
                    for row in result['task_sets'][name]}
         self.assertFalse({423, 491, 790} & all_ids)
-        self.assertEqual(result['counts']['quarantined_task_ids'], 9)
+        self.assertEqual(result['counts']['quarantined_task_ids'], 17)
+
+    def test_exposed_templates_and_explicit_entity_are_absent_from_both_splits(self):
+        rows = fake_rows()
+        rows[12]['eval'][1]['expected']['post_data'] = {'page_id': '1'}
+        rows[12]['eval'][1]['expected']['url'] = '/catalog/product/save/id/111/type/simple'
+        result = plan.manifest(rows, set())
+        selected = result['task_sets']['selection'] + result['task_sets']['provisional_final']
+        self.assertFalse(any(row['template_group'] == 'shopping_admin:240' for row in selected))
+        self.assertFalse(any(row['template_group'] == 'shopping_admin:275' for row in selected))
+        self.assertFalse(any(row['template_group'] == 'shopping_admin:742' for row in selected))
+        self.assertFalse(any('page_id:1' in row['source_entity_hints'] for row in selected))
+        self.assertFalse(any('product_id:111' in row['source_entity_hints'] for row in selected))
+        self.assertEqual(result['counts']['exposed_entity_overlap_excluded_tasks'], 1)
+
+    def test_exposed_page_and_product_ids_are_extracted_from_network_assertions(self):
+        train = fake_rows()[4]
+        self.assertNotIn('page_id', train['instantiation_dict'])
+        self.assertEqual(plan.entity_hints(train), ['order_id:1004', 'page_id:1'])
+        self.assertIn('product_id:111', plan.entity_hints(fake_rows()[160]))
+
+    def test_non_success_retrieval_cannot_refill_success_final_queue(self):
+        rows = fake_rows()
+        rows[16]['eval'][0]['expected']['status'] = 'NOT_FOUND_ERROR'
+        result = plan.manifest(rows, set())
+        chosen = result['task_sets']['selection'] + result['task_sets']['provisional_final']
+        self.assertFalse(any(item['task_id'] == rows[16]['task_id'] for item in chosen))
+        self.assertEqual(result['counts']['source_non_success_outcomes_excluded'],
+                         {'NOT_FOUND_ERROR': 1})
 
 
 if __name__ == '__main__':

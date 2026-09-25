@@ -1,0 +1,163 @@
+{
+  "schema": "office-web-20-100-public-screen-v1",
+  "status": "offline_provisional_only_not_a_final_exam",
+  "cells": [
+    {
+      "cell_id": "powerpoint-web",
+      "source": {
+        "repository": "https://github.com/microsoft/ppteval",
+        "revision": "1b8b55a29e48fdc65d423689b6f2370ad91beeea",
+        "registry_sha256": "aef4fdba6c70ff30946c8391e82e673cf17efc81f078d3ec825bed279de4fa51",
+        "published_task_instances": 120,
+        "published_source_families": 12
+      },
+      "counts": {
+        "selection_candidate_tasks": 20,
+        "selection_source_families": 2,
+        "provisional_final_tasks": 100,
+        "provisional_final_source_families": 10,
+        "individually_gui_admitted_final_tasks": 0,
+        "official_hidden_final_tasks": 0,
+        "selection_scoring_dependencies": {
+          "LLM": 1,
+          "VLM": 10,
+          "programmatic": 9
+        },
+        "final_scoring_dependencies": {
+          "LLM": 1,
+          "VLM": 51,
+          "programmatic": 48
+        }
+      },
+      "cluster_quality": {
+        "source": "canonical deck path verified against the pinned registry",
+        "template": "conservatively co-clustered within each deck; cross-deck template similarity unreviewed",
+        "entity": "source-item identity unresolved; a deck-specific placeholder is not an entity de-duplication proof"
+      },
+      "candidate_identity_commitment_sha256": "a92e51beed18dc7def61b155282408a4b1220434d93db64d444567688768bff7",
+      "prior_gui_control": {
+        "task_id": "4._Pre-Colonial_Filipino_Culture-001",
+        "split": "selection",
+        "status": "one narrow human GUI control",
+        "official_final_credit": 0,
+        "public_receipt": "docs/evidence/ppt-eval-office-web-gate-2026-09-24.json",
+        "public_receipt_sha256": "d8f3450f43ea095a49c962d0a4f2d529c416066b140ddaaced536885c71a274b",
+        "evidence_kind": "ppt-eval-office-web-gate-public-receipt-v1"
+      },
+      "admission_state": "offline_provisional_candidates_only",
+      "public_answer_exposure": "Published upstream tasks and answers are discoverable; this split alone cannot be a sealed hidden exam."
+    },
+    {
+      "cell_id": "excel-web",
+      "source": {
+        "repository": "https://huggingface.co/datasets/KAKA22/SpreadsheetBench-v2",
+        "revision": "5a2215ed4121945ab09d8723df2995602090b042",
+        "archive_sha256": "17147ef9578cd57ce76c9a719d19da7821f3e5cb0d8f776c820f699fdcdb761c",
+        "published_task_instances": 200,
+        "published_source_families": 30,
+        "eligible_families_under_structural_triage": 22,
+        "license_conflict": "Paper CC-BY-SA-4.0; dataset card MIT; do not redistribute assets"
+      },
+      "counts": {
+        "selection_candidate_tasks": 20,
+        "selection_source_families": 3,
+        "provisional_final_tasks": 100,
+        "provisional_final_source_families": 15,
+        "individually_gui_admitted_final_tasks": 0,
+        "official_hidden_final_tasks": 0,
+        "selection_scoring_dependencies": {
+          "task_specific_oracle_pending": 20
+        },
+        "final_scoring_dependencies": {
+          "task_specific_oracle_pending": 100
+        }
+      },
+      "cluster_quality": {
+        "source": "identical golden-response workbook paths grouped as one family",
+        "template": "conservatively co-clustered within each golden workbook; cross-family template similarity unreviewed",
+        "entity": "issuer/project identity cannot be reliably inferred from all source paths; a family-specific placeholder is not an entity de-duplication proof"
+      },
+      "candidate_identity_commitment_sha256": "a9d13b4bcc65842210efa6d080d81098191f77592b58d929a25a0a660799fc82",
+      "prior_gui_control": {
+        "task_id": null,
+        "split": "separate authored SEC development task",
+        "status": "human GUI partial/full/manual-reset control on one distinct workbook",
+        "official_final_credit": 0,
+        "public_receipt": "docs/evidence/sec-retail-working-capital-excel-web-controls-2026-09-24.json",
+        "public_receipt_sha256": "10c2302909b999c6c2f882208fa7e8625c1b165f134be8b1856e6074fc5faac7",
+        "evidence_kind": "cua-sec-retail-working-capital-web-controls-v1"
+      },
+      "admission_state": "offline_provisional_candidates_only",
+      "public_answer_exposure": "Published upstream tasks and answers are discoverable; this split alone cannot be a sealed hidden exam."
+    }
+  ],
+  "contract": {
+    "schema": "office-web-task-admission-contract-v1",
+    "owner": "independent evaluator; actor cannot write contracts, reference files, or receipts",
+    "per_task_evidence_required": [
+      "pinned source and source-family lineage, including license review",
+      "fresh isolated Microsoft web document created from source input; immutable original file hash",
+      "untouched GUI open/edit-mode/save/reload/download and Office-normalized baseline hash",
+      "frozen task-specific oracle, allowlisted normalizations, and output path before candidate action",
+      "visible GUI known-positive action sequence with action/time budget and saved-file readback",
+      "task-specific target outcome plus unrelated-content/structure preservation",
+      "wrong-answer or partial-answer negative and unrelated-edit negative, both rejected",
+      "changed same-file state restored to initial semantic state and independently re-read, followed by a fresh-copy reset test",
+      "independent hidden input perturbation where a formula or data dependency is claimed",
+      "source/template/entity overlap review against train and selection and prior published task exposure"
+    ],
+    "strongly_separate": {
+      "actor_visible": [
+        "task instruction",
+        "source document in original Microsoft web app",
+        "visible UI observations"
+      ],
+      "evaluator_only": [
+        "reference answer and output ranges",
+        "original rubric and independent oracle",
+        "negative/perturbation cases",
+        "normalized baseline",
+        "save/readback/reset receipts",
+        "final candidate identities until task closure"
+      ],
+      "public": [
+        "source pins",
+        "aggregate cluster and dependency counts",
+        "admission criteria",
+        "redacted control receipts",
+        "final results after completed evaluation"
+      ]
+    },
+    "result_policy": "Infrastructure failures remain unscored; no score is assigned from a screenshot or upstream rubric alone. Candidate count never substitutes for individually audited GUI admission.",
+    "evidence_schema": "office-web-evaluator-task-evidence-v1",
+    "required_byte_bindings": [
+      "source_input",
+      "office_normalized_baseline",
+      "oracle_freeze",
+      "gui_action_trace",
+      "positive_saved",
+      "wrong_answer_saved",
+      "collateral_edit_saved",
+      "same_file_reset_saved",
+      "fresh_copy_reset_saved",
+      "oracle_receipt"
+    ],
+    "required_evaluator_checks": [
+      "original_software_gui_observed",
+      "isolated_attempt",
+      "saved_reloaded_and_downloaded",
+      "target_positive_pass",
+      "positive_no_regression_pass",
+      "wrong_answer_rejected",
+      "collateral_edit_rejected",
+      "same_file_reset_restored",
+      "fresh_copy_reset_restored",
+      "source_template_entity_overlap_reviewed",
+      "reference_hidden_from_actor"
+    ],
+    "preflight_policy": "Byte and declaration preflight remains pending independent origin and task-specific oracle audit; it cannot itself admit a task.",
+    "qualification_status": "not_qualified"
+  },
+  "no_source_document_or_answer_binaries_published": true,
+  "no_model_attempt_or_full_study_score": true
+}

@@ -1,0 +1,59 @@
+{
+  "admission": {
+    "100_task_cell_ready": false,
+    "development_workflow_qualified": true,
+    "official_final_identity_admitted": false,
+    "original_populated_seed_qualified": false
+  },
+  "control": {
+    "baseline_business_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+    "case_order": [
+      "positive",
+      "near_miss_wrong_due",
+      "repeat_positive"
+    ],
+    "final_business_sha256": "61f1f18a1b4f622754f29b367dbcd56d2805d470da50e62c4734f8d1e633189e",
+    "independent_postgresql_target_readback_each_case": true,
+    "monitored_scope": [
+      "project milestones",
+      "project events",
+      "project issues",
+      "milestone sequence"
+    ],
+    "official_scores": [
+      1.0,
+      0.0,
+      1.0
+    ],
+    "raw_and_sanitized_scores_equal": true,
+    "reset_to_monitored_baseline_after_each_case": true
+  },
+  "demo_recovery": {
+    "healthy_after_restart": true,
+    "post_restart_receipt_sha256": "337eaf672a1281f8949f5724224323ab43711310f894fa59310918243b12052d",
+    "pre_stop_receipt_sha256": "337eaf672a1281f8949f5724224323ab43711310f894fa59310918243b12052d",
+    "same_container_id_image_ports_and_mount_destinations": true
+  },
+  "environment": {
+    "application": "GitLab CE 18.5",
+    "clone_removed_after_run": true,
+    "container_id_sha256": "d17cc43d757de3d4c816e3acbf2ca83b4b51a40233b6ad84a84273784c23787b",
+    "fixture": "minimal_synthetic_project_not_original_webarena_seed",
+    "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
+    "loopback_only": true
+  },
+  "private_result_sha256": "997fc71eb4ec934fb7486886fd802d167ee316e6b0c04708064fe4e600673359",
+  "published_hard_subset": true,
+  "schema": "gitlab-hard-milestone-repeat-public-v1",
+  "source": {
+    "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "evaluator_source_sha256": "a2e6d2be96debd2bbaec36690d3e6c94b12be067a686998bbf58e2118f4605c5",
+    "git_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "task_sha256": "f2d2470d440643bb6d96ef2a71c0330eea3102c7678c9d907ba02a622d028ce0"
+  },
+  "task_id": 590,
+  "usage": {
+    "model_calls": 0,
+    "paid_provider_calls": 0
+  }
+}

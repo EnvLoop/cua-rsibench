@@ -1,0 +1,40 @@
+{
+  "schema": "envloop-osworld-calc-time-public-control-v1",
+  "checked_date": "2026-09-25",
+  "status": "development_control_not_official_final_admission",
+  "task_id": "357ef137-7eeb-4c80-a3bb-0951f26a8aff",
+  "source_commit": "b138d348256078fa634fc3b73567a7337c793e6b",
+  "task_config_sha256": "c7cb07720392d1fd5da5aa323e989d8e9d772de02b8317b0f05370d6ab896511",
+  "asset_dataset_commit": "1e112283c4ecb08d6fed8069bca7de74fa2f12aa",
+  "asset_sha256": "a6f792dd99a2251bf7f2ed1f55896e3588718a4a53d291ecc5db25a5b3ac8b17",
+  "upstream_evaluator_file_sha256": "f41cf46df90a764705bb85727b3a0a612e9ff7bfa2629cdf40d6feab76d6e5fe",
+  "native_application": "LibreOffice Calc 7.3.7.2 on E2B Desktop Linux",
+  "native_application_binary_sha256": "eb926ee03b6ba1b18e89b4a94cbb7a060ceac31f171b4bf9db5677e848451f86",
+  "sdk_versions": {
+    "e2b-desktop": "2.2.0",
+    "e2b": "2.10.2"
+  },
+  "control_pair": {
+    "distinct_fresh_sandboxes": true,
+    "same_baseline_asset_hash": true,
+    "same_native_application_probe": true,
+    "each_actor_workbook_ready_before_actions": true,
+    "each_saved_file_read_before_upstream_postconfig": true,
+    "each_sandbox_destroyed_and_confirmed_stopped": true,
+    "wrong_cell": {
+      "private_receipt_sha256": "97fd394d23021863a34ff1a4e341f2a8ec258843d1a9874a42adf954d57d17ef",
+      "saved_change": "E4 formula only",
+      "unchanged_upstream_compare_table_score": 0.0,
+      "independent_saved_state_accept": false
+    },
+    "known_positive": {
+      "private_receipt_sha256": "c392a5e8e7d8fcf3e61c0db6cc6cbce40c80b1dc0e164a192419bedc0e34af34",
+      "saved_change": "E3 formula only",
+      "unchanged_upstream_compare_table_score": 1.0,
+      "independent_saved_state_accept": true
+    }
+  },
+  "discarded_pre_readiness_attempts": 2,
+  "official_final_admitted_tasks": 0,
+  "official_model_scored_tasks": 0
+}

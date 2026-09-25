@@ -1,0 +1,36 @@
+{
+  "checkpoint_storage_and_credit_adjustments_known": false,
+  "event_count_by_type": {
+    "sampling_prefill_cached": 0,
+    "sampling_prefill_uncached": 1,
+    "sampling_sample": 1,
+    "training": 1
+  },
+  "hourly_billing_lag_possible": true,
+  "matched_hourly_event_count": 3,
+  "matched_session_count": 1,
+  "model": "Qwen/Qwen3.8-27B",
+  "official_final_results_added": 0,
+  "official_models_json_sha256": "1521db910e08c3f2cc052e9c4f831cdc7b9fbca74ca2d4d2f07c1b544530dcef",
+  "private_filtered_usage_sha256": "f0ebcd922300835e8ee9bdc9bbe81b8f5529c807dbab53d3fdc7adfffd049990",
+  "provider_invoice_usd": null,
+  "provider_reported_billed_tokens_by_type": {
+    "sampling_prefill_cached": 0,
+    "sampling_prefill_uncached": 2285,
+    "sampling_sample": 15,
+    "training": 2299
+  },
+  "published_rate_nominal_token_subtotal_usd": "0.013766822",
+  "published_rate_usd_per_million": {
+    "cached_prefill": "0.372",
+    "prefill": "1.86",
+    "sample": "5.595",
+    "train": "4.103"
+  },
+  "schema": "envloop-price777-tinker-billing-reconciliation-v1",
+  "source_task_id": 777,
+  "train_only_development": true,
+  "unpriced_event_count": 0,
+  "window_end": "2026-09-25T04:00:00Z",
+  "window_start": "2026-09-25T02:00:00Z"
+}

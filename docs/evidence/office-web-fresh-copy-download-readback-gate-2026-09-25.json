@@ -1,0 +1,31 @@
+{
+  "schema": "office-web-fresh-copy-download-readback-gate-v1",
+  "date": "2026-09-25",
+  "cell_id": "powerpoint-web",
+  "scope": "one public development selection control, not an official final task",
+  "live_operator_observation": {
+    "dedicated_benchmark_account_in_app_browser": true,
+    "fresh_online_copy_created": true,
+    "download_copy_final_button_clicks": 2,
+    "browser_download_event_observed": false,
+    "local_pptx_retrieved": false,
+    "saved_file_independent_readback": false,
+    "wrong_account_terms_accepted": false
+  },
+  "private_artifact_controller": {
+    "tool": "tools/audit_office_web_fresh_ppt.py",
+    "pre_actor_oracle_frozen_against_office_normalized_baseline": true,
+    "baseline_sha256": "71a06838dfe24595aa39ab6c0c7bdaeed127ea78079a94323de99c28b30029cd",
+    "required_download_slots": 5,
+    "actual_bound_downloads": 0,
+    "artifact_controls_pass": null,
+    "gui_provenance_independently_verified": false
+  },
+  "validation": {
+    "related_unit_tests_passed": 23,
+    "actual_cloud_artifact_controls_passed": 0
+  },
+  "new_gui_admissions": 0,
+  "official_final_task_credits": 0,
+  "model_calls": 0
+}
