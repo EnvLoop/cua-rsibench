@@ -39,6 +39,8 @@ The [proposed v0.6.5 train-only native model smoke](../../docs/evidence/odoo-qwe
 
 The later [proposed v0.6.6 train-only trusted-action smoke](../../docs/evidence/odoo-v066-native-train-smoke-2026-09-28.md) separately exercised the original GUI with eight validated actions, including native double click and focused insertion, then obtained a persisted positive from the independent scorer. It made no model/provider call and does not ratify the six-cell v0.6.6 profile or qualify any hidden-final task.
 
+The [v0.6.6 teacher episode worker](../../docs/FULL_STUDY_ODOO_TEACHER_EPISODE_WORKER_V066.md) implements the frozen campaign adapter's train-only API, independent saved-state scoring, source-bound private traces and exact reset. It is disabled for live execution until a private six-cell ratification and runtime/verifier bindings exist; tests use only a fake provider and fake environment. No historical trusted-action smoke is treated as teacher data.
+
 The [official v0.6.5 runner](official_runner_v065.py) and [freeze checklist](../../docs/FULL_STUDY_ODOO_V065_FREEZE_CHECKLIST_2026-09-27.md) make the missing six-cell ratification, common action bundle, private task-set binding and locked append-only budget authority explicit. The current absent-freeze entry fails before hidden model observation or provider use. A future ratified base-model execution also requires `--execute`, reserves its full upper bounds before provider dispatch and leaves verifier output provisional until billing and the global matrix ledger reconcile. The [public refusal proof](../../docs/evidence/odoo-v065-official-dispatch-guard-2026-09-27.md) uses a synthetic task ID and nonexistent worker; it creates no official outcome.
 
 ## Evaluator-private hidden causal rules
