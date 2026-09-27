@@ -36,6 +36,7 @@ def build() -> tuple[dict, str]:
     qwen = read("vision-actor-smoke-v064-summary.json")
     sft_split = read("gui-sft-split-summary.json")
     analysis = read("analysis-family-public-fields.json")
+    legacy = read("legacy-driver-failure-public-fields.json")
     restore = read("demo-restoration-v3-receipt.json")
     sweep_result = read("bounded-scoped-v3-sweep-summary.json")
     if not (acl.get("acl_gui_passed") and acl.get("own_project_gui_successes") == 3
@@ -61,6 +62,10 @@ def build() -> tuple[dict, str]:
             analysis.get("analysis_manifest_sha256") ==
             hashlib.sha256(family_path.read_bytes()).hexdigest()):
         raise RuntimeError("GitLab pre-result analysis-family binding invalid")
+    if not (legacy.get("partial_unscored_driver_failure_count") == 2 and
+            legacy.get("native_gui_screenshots_retained_private") >= 5 and
+            legacy.get("promoted_to_official_results") is False):
+        raise RuntimeError("early partial GUI selector failures were not retained")
     if not (restore.get("demo_identity_preserved") and restore.get("demo_healthy")
             and restore.get("world_removed")):
         raise RuntimeError("pre-existing GitLab demo restoration unverified")
@@ -120,6 +125,7 @@ def build() -> tuple[dict, str]:
         "development_gui_controls": development,
         "retained_failed_completed_development_trios": failed_completed,
         "retained_driver_failure_receipts": failed_drivers,
+        "retained_legacy_partial_unscored_failures": legacy,
         "shared_qwen_actor": {"student": "Qwen/Qwen3.8-27B",
                               "action_contract": qwen["shared_action_contract_version"],
                               "output_contract": qwen["shared_output_version"],
@@ -159,11 +165,11 @@ Four causally distinct workflows have scoped-operator development controls:
 | Contractor removal and time-bounded Reporter handoff versus overprivileged role | 1 / 0 / 1 | 3 |
 | CI gate and response-runbook edits versus partial change | 1 / 0 / 1 | 3 |
 
-The independent oracle caught a GitLab invitation-date discrepancy: the modal showed the policy date, while the saved member row and database initially held the preceding day. A visible saved-row correction was required. It also rejected a whole-file Monaco edit that reported a successful commit but changed unrelated YAML indentation. Those failed development attempts remain private and are counted in the machine receipt. A related historical [GitLab date display issue](https://gitlab.com/gitlab-org/gitlab/-/issues/24399) exists; the exact mechanism in this 18.5 container is an inference, while the one-day saved-state difference is directly observed.
+The independent oracle caught a GitLab invitation-date discrepancy: the modal showed the policy date, while the saved member row and database initially held the preceding day. A visible saved-row correction was required. It also rejected a whole-file Monaco edit that reported a successful commit but changed unrelated YAML indentation. Two early selector timeouts retain five private GUI screenshots but never reached an independent score; the public receipt counts them separately from completed failed trios and later scored outcomes. A related historical [GitLab date display issue](https://gitlab.com/gitlab-org/gitlab/-/issues/24399) exists; the exact mechanism in this 18.5 container is an inference, while the one-day saved-state difference is directly observed.
 
 The shared Qwen3.8 screenshot/action boundary was bound to the revised root action parser source hash `{vision_actor.SHARED_SOURCE_SHA256['scale_action_contract.py']}` and cell-neutral v0.6.4 output adapter hash `{vision_actor.SHARED_SOURCE_SHA256['scale_action_output_v064.py']}`. A scoped train operator produced a real GitLab screenshot frame with current visible controls, applied one read-only wait, rejected a stale frame, and left the business digest unchanged. The shared GUI SFT v2 split gate also accepted a private 20-selection/100-clean-final manifest with complete disjoint project/CVE/principal tags; its public receipt contains only hashes and counts. The earlier v0.6.3 read-only diagnostic remains historical and is not rewritten as a v0.6.4 run. **No Qwen model sampling or accepted training episode occurred in these controls.**
 
-The bounded evaluator-private sweep attempted **{attempted}/100 clean final candidates** across **{sweep_result['attempted_source_family_count']} source families**: **{passed} passed**, **{failed} failed or infrastructure-invalid**, and **{100-attempted} unattempted**. Earlier failed attempts on the same ID remain in the private index; the public JSON reports their count without identities. Each pass requires correct/wrong/correct saved-state scoring plus three cold resets under the scoped operator. These deterministic GUI checks still do not establish Qwen action-contract solvability, complete per-ID admission, or model discrimination. **Official final admitted: 0/100; researcher campaigns: 0/4 for GitLab.**
+The bounded evaluator-private sweep attempted **{attempted}/100 clean final candidates** across **{sweep_result['attempted_source_family_count']} source families**: **{passed} passed**, **{failed} failed or infrastructure-invalid**, and **{100-attempted} unattempted**. Its v3 private index retains {sweep_result['retained_prior_failed_attempts']} prior failed attempts on these same IDs; the earlier selector, date, YAML, and v2 repeat failures belong to separate development records. Each pass requires correct/wrong/correct saved-state scoring plus three cold resets under the scoped operator. These deterministic GUI checks still do not establish Qwen action-contract solvability, complete per-ID admission, or model discrimination. **Official final admitted: 0/100; researcher campaigns: 0/4 for GitLab.**
 
 The implementation and reset instructions are in the [GitLab world module](../../gitlab_world/README.md); the [dated source amendment](../FULL_STUDY_GITLAB_SOURCE_AMENDMENT_2026-09-25.md) preserves the pre-result source boundary. The next gate is individual admission for every clean ID under the frozen screenshot/action/runtime contract, an independent CI-runner check if that claim is retained, and the global pre-campaign freeze.
 """

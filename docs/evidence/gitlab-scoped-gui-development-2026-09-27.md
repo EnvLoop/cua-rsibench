@@ -1,0 +1,24 @@
+# Scoped GitLab GUI development controls — 2026-09-27
+
+**Pre-result evidence only.** The [aggregate machine receipt](gitlab-scoped-gui-development-2026-09-27.json) excludes task IDs, project names, screenshots, instructions, gold, credentials, and private action traces. These are original EnvLoop tasks in actual GitLab CE 18.5, not WebArena-Verified GitLab results. CISA's [CC0 KEV catalog](https://github.com/cisagov/kev-data/tree/203fa4633af39c6944608e30984996f04ccc4541) supplies advisory facts; internal operations, people, repos, issues, MRs, and deadlines are synthetic.
+
+The frozen v3 world contains 31 private projects, 186 issues, 62 competing MRs, 93 direct project memberships, and three separate non-admin group-owner actors. Real GUI checks let each actor open its own partition's project (3/3) and denied every cross-partition probe with a 404 (6/6). The independently read PostgreSQL/Git business baseline includes private groups, operator administrator flags, group roles, project members, issues, labels, milestones, MRs, and Git refs/blobs. Fresh overlayfs-backed containers reproduced the same v3 digest before each control. The pre-existing GitLab demo returned healthy with the same identity, image, mounts, and ports after the sweep.
+
+The train, selection, and clean final inventories remain 20/20/100. The first five-task development project family was quarantined; an unused CISA/vendor source family supplied five reserve candidates, restoring 100 unexposed final candidates in 20 correlated project families. A private candidate-level analysis mapping assigns exactly five tasks to each project family and is hash-bound before any official outcome. These are candidate identities, not admitted exam tasks.
+
+Four causally distinct workflows have scoped-operator development controls:
+
+| Saved workflow | Correct / plausible wrong / repeated correct | Cold resets |
+| --- | --- | ---: |
+| Release milestone plus two linked issues | 1 / 0 / 1 | 3 |
+| Approved MR versus stale workaround | 1 / 0 / 1 | 3 |
+| Contractor removal and time-bounded Reporter handoff versus overprivileged role | 1 / 0 / 1 | 3 |
+| CI gate and response-runbook edits versus partial change | 1 / 0 / 1 | 3 |
+
+The independent oracle caught a GitLab invitation-date discrepancy: the modal showed the policy date, while the saved member row and database initially held the preceding day. A visible saved-row correction was required. It also rejected a whole-file Monaco edit that reported a successful commit but changed unrelated YAML indentation. Two early selector timeouts retain five private GUI screenshots but never reached an independent score; the public receipt counts them separately from completed failed trios and later scored outcomes. A related historical [GitLab date display issue](https://gitlab.com/gitlab-org/gitlab/-/issues/24399) exists; the exact mechanism in this 18.5 container is an inference, while the one-day saved-state difference is directly observed.
+
+The shared Qwen3.8 screenshot/action boundary was bound to the revised root action parser source hash `8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a` and cell-neutral v0.6.4 output adapter hash `3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70`. A scoped train operator produced a real GitLab screenshot frame with current visible controls, applied one read-only wait, rejected a stale frame, and left the business digest unchanged. The shared GUI SFT v2 split gate also accepted a private 20-selection/100-clean-final manifest with complete disjoint project/CVE/principal tags; its public receipt contains only hashes and counts. The earlier v0.6.3 read-only diagnostic remains historical and is not rewritten as a v0.6.4 run. **No Qwen model sampling or accepted training episode occurred in these controls.**
+
+The bounded evaluator-private sweep attempted **5/100 clean final candidates** across **5 source families**: **5 passed**, **0 failed or infrastructure-invalid**, and **95 unattempted**. Its v3 private index retains 0 prior failed attempts on these same IDs; the earlier selector, date, YAML, and v2 repeat failures belong to separate development records. Each pass requires correct/wrong/correct saved-state scoring plus three cold resets under the scoped operator. These deterministic GUI checks still do not establish Qwen action-contract solvability, complete per-ID admission, or model discrimination. **Official final admitted: 0/100; researcher campaigns: 0/4 for GitLab.**
+
+The implementation and reset instructions are in the [GitLab world module](../../gitlab_world/README.md); the [dated source amendment](../FULL_STUDY_GITLAB_SOURCE_AMENDMENT_2026-09-25.md) preserves the pre-result source boundary. The next gate is individual admission for every clean ID under the frozen screenshot/action/runtime contract, an independent CI-runner check if that claim is retained, and the global pre-campaign freeze.
