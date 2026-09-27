@@ -132,6 +132,7 @@ async def _gui_issue_triage(page, project: dict, progress: dict,
             "visible_assignee": await assignee.locator('a[href$="/' + user + '"]').count() > 0,
             "visible_priority": await labels.locator('[data-testid="' + label + '"]').count() > 0,
             "visible_due_date": True,
+            "due_date_reload_verified": True,
             "screenshot_sha256": {name: hashlib.sha256((folder / name).read_bytes()).hexdigest()
                                   for name in ("policy.png", "issue-before.png", "issue-after.png")}}
 

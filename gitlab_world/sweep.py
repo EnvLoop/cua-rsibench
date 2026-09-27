@@ -166,9 +166,11 @@ async def run(max_tasks: int, *, family: str | None = None,
     if retry_failed:
         if requalification_plan is None:
             raise ValueError("retry requires a frozen private requalification plan")
-        resolution = pre_result_recovery.read_private_resolution(requalification_plan)
+        resolution = pre_result_recovery.read_private_resolution(
+            requalification_plan, private_root=runtime.PRIVATE)
         eligible = pre_result_recovery.eligible_requalification_rows(
-            candidates(), index, failure_ledger.private_entries(), resolution)
+            candidates(), index, failure_ledger.private_entries(), resolution,
+            world=bootstrap.world(), private_root=runtime.PRIVATE)
     else:
         if requalification_plan is not None:
             raise ValueError("requalification plan supplied without retry mode")

@@ -9,7 +9,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from gitlab_world import factory, pre_result_recovery as recovery, sweep
+from gitlab_world import (factory, gui_controls, gui_workflows,
+                          pre_result_recovery as recovery, sweep)
 
 
 SEED = "private-recovery-fixture-seed-2026-09-28"
@@ -61,7 +62,139 @@ def complete_first_attempt_index(failed: dict[str, tuple[str, list[float] | None
     return {"schema": "envloop-gitlab-development-sweep-v1", "items": items}, ledger
 
 
+def make_valid_train_receipt(tmp: str, workflow: str):
+    root = Path(tmp) / "private"
+    baseline_sha = "b" * 64
+    factory.write_private(root / "baseline-persisted-state.json",
+                          {"business_sha256": baseline_sha})
+    shape = recovery.TRAIN_RECEIPT_SHAPES[workflow]
+    folder = root / shape["directory"] / "run-test"
+    folder.parent.mkdir(mode=0o700)
+    folder.mkdir(mode=0o700)
+    case_refs = {}
+    for index, (label, score) in enumerate(zip(shape["labels"], (1.0, 0.0, 1.0))):
+        path = folder / label / "receipt.json"
+        path.parent.mkdir(mode=0o700)
+        factory.write_private(path, {"label": label, "score": score,
+                                     "before_business_sha256": baseline_sha,
+                                     "after_business_sha256": chr(ord("c") + index) * 64,
+                                     "post_reset_business_sha256": baseline_sha,
+                                     "cold_reset_verified": True,
+                                     "visible_reload_verified": True,
+                                     "independent_saved_state_checked": True,
+                                     "no_regression_checked": True})
+        case_refs[label] = {"path": label + "/receipt.json",
+                            "sha256": factory.sha256(path.read_bytes())}
+    operator = gui_controls if shape["operator_module"] == "gui_controls" else gui_workflows
+    script = Path(recovery.__file__).resolve().parents[1] / "tools" / shape["probe_script"]
+    train_project = next(p for p in WORLD["projects"] if p["partition"] == "train")
+    summary = {"schema": shape["schema"], "workflow": workflow,
+               "partition": "train", "project_path": train_project["full_path"],
+               "scores": [1.0, 0.0, 1.0], "cold_resets": [True] * 3,
+               "case_receipts": case_refs, "baseline_business_sha256": baseline_sha,
+               "generic_operator_sha256": factory.sha256(Path(operator.__file__).read_bytes()),
+               "probe_script_sha256": factory.sha256(script.read_bytes()),
+               "visible_reload_verified_all": True,
+               "independent_saved_state_checked": True,
+               "no_regression_checked": True, "passed": True,
+               "model_calls": 0, "official_final_admitted": 0}
+    summary_path = folder / "summary-private.json"
+    factory.write_private(summary_path, summary)
+    ref = {"path": str(summary_path.relative_to(root)),
+           "sha256": factory.sha256(summary_path.read_bytes())}
+    return root, ref, summary_path
+
+
 class GitLabProspectiveRecoveryTests(unittest.TestCase):
+    def test_both_deterministic_workflows_require_real_train_receipt_files(self):
+        for workflow in recovery.TRAIN_RECEIPT_SHAPES:
+            with self.subTest(workflow=workflow), tempfile.TemporaryDirectory() as tmp:
+                root, ref, _ = make_valid_train_receipt(tmp, workflow)
+                self.assertEqual(recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root),
+                    {workflow: ref["sha256"]})
+                with self.assertRaises(ValueError):
+                    recovery.validate_generic_fix_evidence(
+                        WORLD, {workflow: "a" * 64}, private_root=root)
+
+    def test_train_receipt_drift_wrong_partition_and_source_hash_fail_closed(self):
+        workflow = "release_milestone_coordination"
+        with tempfile.TemporaryDirectory() as tmp:
+            root, ref, summary_path = make_valid_train_receipt(tmp, workflow)
+            corrupted = copy.deepcopy(ref)
+            corrupted["sha256"] = "0" * 64
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: corrupted}, private_root=root)
+            summary = json.loads(summary_path.read_text())
+            summary["partition"] = "final_candidate_unsealed"
+            summary_path.write_text(json.dumps(summary, sort_keys=True))
+            ref["sha256"] = factory.sha256(summary_path.read_bytes())
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root)
+            summary["partition"] = "train"
+            summary["generic_operator_sha256"] = "0" * 64
+            summary_path.write_text(json.dumps(summary, sort_keys=True))
+            ref["sha256"] = factory.sha256(summary_path.read_bytes())
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root)
+
+    def test_legacy_probe_schema_and_permissive_private_root_rejected(self):
+        workflow = "release_milestone_coordination"
+        with tempfile.TemporaryDirectory() as tmp:
+            root, ref, summary_path = make_valid_train_receipt(tmp, workflow)
+            summary = json.loads(summary_path.read_text())
+            summary["schema"] = "envloop-gitlab-train-milestone-save-probe-v1"
+            summary_path.write_text(json.dumps(summary, sort_keys=True))
+            ref["sha256"] = factory.sha256(summary_path.read_bytes())
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root)
+            summary["schema"] = recovery.TRAIN_RECEIPT_SHAPES[workflow]["schema"]
+            summary_path.write_text(json.dumps(summary, sort_keys=True))
+            ref["sha256"] = factory.sha256(summary_path.read_bytes())
+            root.chmod(0o755)
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root)
+
+    def test_train_case_reset_or_no_regression_drift_blocks_freeze(self):
+        workflow = "cross_record_issue_triage"
+        with tempfile.TemporaryDirectory() as tmp:
+            root, ref, summary_path = make_valid_train_receipt(tmp, workflow)
+            summary = json.loads(summary_path.read_text())
+            case_path = summary_path.parent / "positive-2" / "receipt.json"
+            case = json.loads(case_path.read_text())
+            case["post_reset_business_sha256"] = "0" * 64
+            case["no_regression_checked"] = False
+            case_path.write_text(json.dumps(case, sort_keys=True))
+            summary["case_receipts"]["positive-2"]["sha256"] = factory.sha256(
+                case_path.read_bytes())
+            summary_path.write_text(json.dumps(summary, sort_keys=True))
+            ref["sha256"] = factory.sha256(summary_path.read_bytes())
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: ref}, private_root=root)
+
+    def test_train_receipt_symlink_and_path_escape_are_rejected(self):
+        workflow = "release_milestone_coordination"
+        with tempfile.TemporaryDirectory() as tmp:
+            root, ref, summary_path = make_valid_train_receipt(tmp, workflow)
+            link = root / "train-milestone-save-probe" / "run-link" / "summary-private.json"
+            link.parent.mkdir(mode=0o700)
+            link.symlink_to(summary_path)
+            linked = {"path": str(link.relative_to(root)),
+                      "sha256": factory.sha256(summary_path.read_bytes())}
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: linked}, private_root=root)
+            escaped = {"path": "../" + ref["path"], "sha256": ref["sha256"]}
+            with self.assertRaises(ValueError):
+                recovery.validate_generic_fix_evidence(
+                    WORLD, {workflow: escaped}, private_root=root)
+
     def test_queue_is_ordered_disjoint_and_public_commitment_contains_no_gold(self):
         first = recovery.ordered_queue(SEED, WORLD, synthetic_catalog())
         second = recovery.ordered_queue(SEED, WORLD, list(reversed(synthetic_catalog())))
@@ -117,9 +250,13 @@ class GitLabProspectiveRecoveryTests(unittest.TestCase):
         self.assertEqual(no_fix["immediate_whole_family_retirement_task_ids"],
                          [deterministic["task_id"]])
         self.assertEqual(len(no_fix["eligible_one_time_requalifications"]), 1)
-        with_fix = recovery.first_attempt_resolution(
-            WORLD, index, ledger, excluded_task_ids=EXCLUDED,
-            generic_fix_evidence={deterministic["template_group"]: "a" * 64})
+        with tempfile.TemporaryDirectory() as tmp:
+            root, ref, _ = make_valid_train_receipt(
+                tmp, deterministic["template_group"])
+            with_fix = recovery.first_attempt_resolution(
+                WORLD, index, ledger, excluded_task_ids=EXCLUDED,
+                generic_fix_evidence={deterministic["template_group"]: ref},
+                private_root=root)
         self.assertEqual(len(with_fix["eligible_one_time_requalifications"]), 2)
         self.assertEqual(with_fix["immediate_whole_family_retirement_task_ids"], [])
         self.assertNotIn(deterministic["task_id"],
@@ -152,17 +289,22 @@ class GitLabProspectiveRecoveryTests(unittest.TestCase):
             deterministic["task_id"]: ("development_gui_trio_failed", [0.0, 0.0, 1.0]),
             infra["task_id"]: ("driver_or_environment_failed", None),
         })
-        resolution = recovery.first_attempt_resolution(
-            WORLD, index, ledger, excluded_task_ids=EXCLUDED,
-            generic_fix_evidence={deterministic["template_group"]: "a" * 64})
-        eligible = recovery.eligible_requalification_rows(ACTIVE, index, ledger, resolution)
-        self.assertEqual({row["task_id"] for row in eligible},
-                         {deterministic["task_id"], infra["task_id"]})
         with tempfile.TemporaryDirectory() as tmp:
+            root, ref, _ = make_valid_train_receipt(
+                tmp, deterministic["template_group"])
+            resolution = recovery.first_attempt_resolution(
+                WORLD, index, ledger, excluded_task_ids=EXCLUDED,
+                generic_fix_evidence={deterministic["template_group"]: ref},
+                private_root=root)
+            eligible = recovery.eligible_requalification_rows(
+                ACTIVE, index, ledger, resolution, world=WORLD, private_root=root)
+            self.assertEqual({row["task_id"] for row in eligible},
+                             {deterministic["task_id"], infra["task_id"]})
             private = Path(tmp) / "resolution.json"
             recovery.freeze_private_resolution(resolution, private)
             self.assertEqual(private.stat().st_mode & 0o777, 0o600)
-            self.assertEqual(recovery.read_private_resolution(private), resolution)
+            self.assertEqual(recovery.read_private_resolution(
+                private, private_root=Path(tmp)), resolution)
 
         good = {"status": recovery.PASS_STATUS, "scores": [1.0, 0.0, 1.0],
                 "cold_resets": 3}
@@ -197,7 +339,8 @@ class GitLabProspectiveRecoveryTests(unittest.TestCase):
             WORLD, index, ledger, excluded_task_ids=EXCLUDED, generic_fix_evidence={})
         index["items"][failed["task_id"]]["attempts"][0]["error_type"] = "rewritten"
         with self.assertRaises(ValueError):
-            recovery.eligible_requalification_rows(ACTIVE, index, ledger, resolution)
+            recovery.eligible_requalification_rows(
+                ACTIVE, index, ledger, resolution, world=WORLD)
 
 
 class GitLabRecoverySweepGuardTests(unittest.IsolatedAsyncioTestCase):
