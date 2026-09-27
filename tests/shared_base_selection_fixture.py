@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import io
 from pathlib import Path
 
@@ -10,6 +11,8 @@ from PIL import Image
 from cursibench import full_study_shared_base_selection_v1 as shared
 from cursibench import full_study_selection_environment_v1 as environment
 from cursibench import full_study_selection_paid_coverage_v1 as paid_coverage
+from cursibench.scale_vision_proxy import MODEL
+from cursibench import full_study_shared_base_execution_v1 as execution
 
 
 def _write(path: Path, raw: bytes) -> dict:
@@ -52,6 +55,21 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
     def add_paid(attempt_id: str, category: str, *, task_id=None,
                  package_sha256=None, frame_sha256=None,
                  selection_tasks=None) -> None:
+        worker_request = {
+            "cell_id": cell_id,
+            "selection_attempt": selection_attempt,
+            "selection_tasks": selection_tasks,
+            "task_id": task_id,
+            "package_sha256": package_sha256,
+            "checkpoint_path_sha256": checkpoint,
+            "frame_sha256": frame_sha256,
+        }
+        if category == "tinker" and task_id is not None:
+            worker_request["image_base64"] = base64.b64encode(image).decode()
+        worker_request_ref = _json(root / "paid" /
+                                   f"{attempt_id}.worker-request.json",
+                                   worker_request)
+        worker_request_ref["path"] = "paid/" + worker_request_ref["path"]
         request = {
             "schema": "cua-full-study-shared-base-paid-request-v1",
             "cell_id": cell_id,
@@ -61,25 +79,35 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
             "task_id": task_id,
             "package_sha256": package_sha256,
             "checkpoint_path_sha256": checkpoint,
+            "base_model": MODEL,
             "split": "selection", "category": category,
             "frame_sha256": frame_sha256,
             "runtime_sha256": cell["matched_bindings"]["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
+            "worker_request_ref": worker_request_ref,
         }
         request_ref = _json(root / "paid" /
                             f"{attempt_id}.request.json", request)
         request_ref["path"] = "paid/" + request_ref["path"]
+        result_status = ("completed" if category == "tinker" and
+                         task_id is not None else
+                         "ready" if category == "tinker" else "active")
+        worker_result_ref = _json(root / "paid" /
+                                  f"{attempt_id}.worker-result.json", {
+            "status": result_status,
+            "synthetic_fake_provider": True,
+        })
+        worker_result_ref["path"] = "paid/" + worker_result_ref["path"]
         result_ref = _json(root / "paid" /
                            f"{attempt_id}.result.json", {
             "schema": shared.PAID_RESULT_SCHEMA,
             "attempt_id": attempt_id,
             "category": category,
-            "status": ("completed" if category == "tinker" and
-                       task_id is not None else
-                       "ready" if category == "tinker" else "active"),
+            "status": result_status,
             "selection_attempt": selection_attempt,
             "task_id": task_id,
             "checkpoint_path_sha256": checkpoint,
+            "worker_result_ref": worker_result_ref,
         })
         result_ref["path"] = "paid/" + result_ref["path"]
         source_ref = _json(root / "paid" /
@@ -116,10 +144,7 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
                            "category": category,
                            "request": request,
                            "result_present": True,
-                           "result_status": ("completed" if category ==
-                                             "tinker" and task_id is not None
-                                             else "ready" if category ==
-                                             "tinker" else "active")})
+                           "result_status": result_status})
     for index, identity in enumerate(identities):
         task_id = identity["task_id"]
         package = identity["package_sha256"]
@@ -181,6 +206,14 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
         })
         for reference in (saved, verifier, reset, trace):
             reference["path"] = folder.name + "/" + reference["path"]
+        native = _json(folder / "native-worker.json", {
+            **common, "score": score,
+            "saved_state_sha256": artifact["sha256"],
+            "baseline_semantic_sha256": baseline["sha256"],
+            "restored_semantic_sha256": restored["sha256"],
+            "synthetic_worker_evidence_only": True,
+        })
+        native["path"] = folder.name + "/" + native["path"]
         tinker_id = selection_attempt + f"-sample-{index + 1:03d}"
         env_id = (selection_attempt + "-env-batch" if environment_batch else
                   selection_attempt + f"-env-{index + 1:03d}")
@@ -188,7 +221,7 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
             **common, "checkpoint_sha256": checkpoint,
             "score": score, "saved_state_ref": saved,
             "verifier_ref": verifier, "reset_ref": reset,
-            "gui_trace_ref": trace,
+            "gui_trace_ref": trace, "native_worker_ref": native,
             "tinker_paid_attempt_ids": [tinker_id],
             "environment_paid_attempt_id": env_id,
         })
@@ -220,6 +253,31 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
             cell["selection_identities_sha256"],
         "task_count": 20, "tasks": task_rows,
     })
+    fake_native_ledger = _json(root / "native-task-ledger.json", {
+        "cell_id": cell_id, "rows": [
+            {"task_id": row["task_id"],
+             "package_sha256": row["package_sha256"],
+             "score": row["score"]} for row in task_rows],
+        "synthetic_worker_evidence_only": True,
+    })
+    native_sources = {"native_task_ledger_ref": fake_native_ledger}
+    if cell_id == "gitlab":
+        native_sources["native_batch_ref"] = _json(
+            root / "native-gitlab-batch.json", {
+                "cell_id": cell_id, "task_count": 20,
+                "synthetic_worker_evidence_only": True})
+    if cell_id == "odoo-community":
+        native_sources["native_runtime_ref"] = _json(
+            root / "native-odoo-runtime.json", {
+                "services_restored_to_initial_state": True,
+                "final_database_snapshot_equal": True,
+                "final_physical_filestore_equal": True,
+                "synthetic_worker_evidence_only": True})
+    native_batch_ref = _json(root / "native-batch.private.json", {
+        "schema": "cua-full-study-shared-base-native-batch-v1",
+        "cell_id": cell_id, "checkpoint_sha256": checkpoint,
+        "task_count": 20, "native_source_refs": native_sources,
+    })
     coverage = paid_coverage.validate(
         cell_id=cell_id, attempt_id=selection_attempt,
         checkpoint_sha256=checkpoint,
@@ -234,6 +292,9 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
         "plan_sha256": study.plan_sha256,
         "base_manifest_sha256": cell["base_manifest_sha256"],
         "base_checkpoint_sha256": checkpoint,
+        "base_model": MODEL,
+        "base_freeze_receipt_sha256": execution._verify_base_freeze(
+            study, cell)["freeze_receipt_sha256"],
         "selection_identities_sha256":
             cell["selection_identities_sha256"],
         "action_profile": "scale-action-profile-v0.6.6",
@@ -242,6 +303,10 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
         "evaluator_isolated": True,
         "result_ref": result_ref,
         "task_ledger_ref": ledger_ref,
+        "native_batch_ref": native_batch_ref,
+        "executor_source_sha256": shared._sha(
+            Path(shared.__file__).with_name(
+                "full_study_shared_base_execution_v1.py").read_bytes()),
         "paid_attempt_refs": paid_refs,
         "paid_attempt_ids": paid_ids,
         "environment_category": environment_category,

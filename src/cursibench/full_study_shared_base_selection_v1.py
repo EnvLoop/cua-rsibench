@@ -8,6 +8,8 @@ not a model, browser, or billing dispatcher. It never opens a final package.
 from __future__ import annotations
 
 from decimal import Decimal, InvalidOperation
+import base64
+import binascii
 import fcntl
 import hashlib
 import json
@@ -18,6 +20,7 @@ from . import full_study_matrix_v1 as matrix
 from . import full_study_selection_environment_v1 as environment
 from . import full_study_selection_paid_coverage_v1 as paid_coverage
 from . import scale_final_v06 as cell_final
+from .scale_vision_proxy import MODEL
 
 
 RECEIPT_SCHEMA = "cua-full-study-shared-base-selection-receipt-v1"
@@ -137,7 +140,8 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
                    bindings: dict) -> tuple[list[str], str]:
     fields = {"task_id", "package_sha256", "checkpoint_sha256", "score",
               "saved_state_ref", "verifier_ref", "reset_ref",
-              "gui_trace_ref", "tinker_paid_attempt_ids",
+              "gui_trace_ref", "native_worker_ref",
+              "tinker_paid_attempt_ids",
               "environment_paid_attempt_id"}
     _require(type(row) is dict and set(row) == fields and
              row["task_id"] == identity["task_id"] and
@@ -159,7 +163,24 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
              "base_selection_task_or_saved_result_unbound")
     common = {"task_id": row["task_id"],
               "package_sha256": row["package_sha256"]}
+    native, _ = _json_ref(root, row["native_worker_ref"])
+    native_task = native
+    if type(native.get("rows")) is list:
+        matches = [item for item in native["rows"]
+                   if type(item) is dict and
+                   item.get("task_id") == row["task_id"]]
+        _require(len(matches) == 1,
+                 "base_selection_native_worker_task_unbound")
+        native_task = matches[0]
+    _require(native_task.get("task_id") == row["task_id"] and
+             native_task.get("package_sha256") == row["package_sha256"] and
+             native_task.get("score") == row["score"],
+             "base_selection_native_worker_task_unbound")
     saved, _ = _json_ref(root, row["saved_state_ref"])
+    native_saved_sha = native_task.get("saved_state_sha256")
+    if native_saved_sha is None and type(native_task.get(
+            "saved_state_ref")) is dict:
+        native_saved_sha = native_task["saved_state_ref"].get("sha256")
     _require(type(saved.get("saved_artifact_ref")) is dict and
              set(saved["saved_artifact_ref"]) == {"path", "sha256"} and
              _hash(saved.get("saved_artifact_sha256")) and
@@ -172,7 +193,8 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
         "saved_artifact_sha256": saved.get("saved_artifact_sha256"),
     } and (row["score"] == 0 or saved["native_save_observed"] is True) and
              saved["saved_artifact_ref"]["sha256"] ==
-             saved["saved_artifact_sha256"],
+             saved["saved_artifact_sha256"] and
+             saved["saved_artifact_sha256"] == native_saved_sha,
              "base_selection_saved_state_not_independent")
     _reference(root, saved["saved_artifact_ref"])
     verifier, _ = _json_ref(root, row["verifier_ref"])
@@ -206,6 +228,23 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
     _, restored = _reference(root, reset["restored_state_ref"])
     _require(baseline == restored and bool(baseline),
              "base_selection_reset_bytes_differ")
+    if type(native_task.get("baseline_semantic_sha256")) is str:
+        _require(native_task["baseline_semantic_sha256"] ==
+                 reset["baseline_state_ref"]["sha256"] and
+                 native_task.get("restored_semantic_sha256") ==
+                 reset["restored_state_ref"]["sha256"],
+                 "base_selection_native_reset_source_changed")
+    elif type(native_task.get("reset_ref")) is dict:
+        native_parent = Path(row["native_worker_ref"]["path"]).parent
+        native_reset_ref = native_task["reset_ref"]
+        native_reset, _ = _json_ref(root, {
+            "path": (native_parent / native_reset_ref["path"]).as_posix(),
+            "sha256": native_reset_ref["sha256"]})
+        _require(native_reset.get("baseline_state_ref", {}).get("sha256") ==
+                 reset["baseline_state_ref"]["sha256"] and
+                 native_reset.get("restored_state_ref", {}).get("sha256") ==
+                 reset["restored_state_ref"]["sha256"],
+                 "base_selection_native_reset_source_changed")
     trace, _ = _json_ref(root, row["gui_trace_ref"])
     _require(type(trace) is dict and set(trace) == {
         "schema", "task_id", "package_sha256", "checkpoint_sha256",
@@ -281,9 +320,11 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
     cell = _cell(study, cell_id)
     expected = {"schema", "study_id", "cell_id", "plan_sha256",
                 "base_manifest_sha256", "base_checkpoint_sha256",
+                "base_model", "base_freeze_receipt_sha256",
                 "selection_identities_sha256", "action_profile",
                 "source_bindings", "original_software_gui",
                 "evaluator_isolated", "result_ref", "task_ledger_ref",
+                "native_batch_ref", "executor_source_sha256",
                 "paid_attempt_refs", "paid_attempt_ids",
                 "environment_category", "selection_attempt",
                 "paid_coverage_sha256", "official_final_tasks_observed"}
@@ -291,6 +332,12 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
     profile = study.ratification["cell_profiles"][cell_id]
     source_bindings = {**bindings,
                        "adapter": profile["adapter_sha256"]}
+    executor_path = Path(__file__).with_name(
+        "full_study_shared_base_execution_v1.py")
+    _require(executor_path.is_file() and not executor_path.is_symlink(),
+             "base_selection_executor_source_missing")
+    from . import full_study_shared_base_execution_v1 as execution
+    freeze = execution._verify_base_freeze(study, cell)
     _require(type(receipt) is dict and set(receipt) == expected and
              receipt["schema"] == RECEIPT_SCHEMA and
              receipt["study_id"] == study.plan["study_id"] and
@@ -300,11 +347,16 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
              cell["base_manifest_sha256"] and
              receipt["base_checkpoint_sha256"] ==
              cell["base_checkpoint_sha256"] and
+             receipt["base_model"] == MODEL and
+             receipt["base_freeze_receipt_sha256"] ==
+             freeze["freeze_receipt_sha256"] and
              receipt["selection_identities_sha256"] ==
              cell["selection_identities_sha256"] and
              receipt["action_profile"] ==
              "scale-action-profile-v0.6.6" and
              receipt["source_bindings"] == source_bindings and
+             receipt["executor_source_sha256"] ==
+             _sha(executor_path.read_bytes()) and
              receipt["original_software_gui"] is True and
              receipt["evaluator_isolated"] is True and
              receipt["environment_category"] ==
@@ -314,6 +366,36 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
              _hash(receipt["paid_coverage_sha256"]) and
              receipt["official_final_tasks_observed"] == 0,
              "base_selection_frozen_source_or_original_gui_unbound")
+    native_batch, _ = _json_ref(root, receipt["native_batch_ref"])
+    _require(set(native_batch) == {
+                 "schema", "cell_id", "checkpoint_sha256",
+                 "task_count", "native_source_refs"} and
+             native_batch["schema"] ==
+             "cua-full-study-shared-base-native-batch-v1" and
+             type(native_batch["native_source_refs"]) is dict and
+             "native_task_ledger_ref" in native_batch[
+                 "native_source_refs"] and
+             native_batch.get("cell_id") == cell_id and
+             native_batch.get("checkpoint_sha256") ==
+             cell["base_checkpoint_sha256"] and
+             native_batch.get("task_count") == matrix.SELECTION_PER_CELL,
+             "base_selection_native_batch_unbound")
+    for native_ref in native_batch["native_source_refs"].values():
+        _json_ref(root, native_ref)
+    if cell_id == "gitlab":
+        _require(set(native_batch["native_source_refs"]) == {
+            "native_batch_ref", "native_task_ledger_ref"},
+            "base_selection_native_batch_unbound")
+    elif cell_id == "odoo-community":
+        _require(set(native_batch["native_source_refs"]) == {
+            "native_task_ledger_ref", "native_runtime_ref"},
+            "base_selection_native_batch_unbound")
+        runtime, _ = _json_ref(
+            root, native_batch["native_source_refs"]["native_runtime_ref"])
+        _require(runtime.get("services_restored_to_initial_state") is True and
+                 runtime.get("final_database_snapshot_equal") is True and
+                 runtime.get("final_physical_filestore_equal") is True,
+                 "base_selection_native_batch_cold_reset_changed")
     selection = list(study.task_views(cell_id)["selection"])
     _require(len(selection) == matrix.SELECTION_PER_CELL and
              _sha(cell_final.json_bytes(selection)) ==
@@ -396,6 +478,10 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
         category = paid["category"]
         task_id = request.get("task_id")
         task = task_by_id.get(task_id) if task_id is not None else None
+        worker_request, _ = _json_ref(
+            root, request.get("worker_request_ref"))
+        worker_result, _ = _json_ref(
+            root, paid_result.get("worker_result_ref"))
         result_status = paid_result.get("status")
         _require(paid_result == {
             "schema": PAID_RESULT_SCHEMA,
@@ -405,8 +491,10 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
             "selection_attempt": receipt["selection_attempt"],
             "task_id": task_id,
             "checkpoint_path_sha256": cell["base_checkpoint_sha256"],
+            "worker_result_ref": paid_result["worker_result_ref"],
         } and (result_status is None or
                (type(result_status) is str and bool(result_status))) and
+            worker_result.get("status") == result_status and
             (category != "tinker" or task_id is None or
              result_status == "completed"),
             "base_selection_paid_result_not_completed")
@@ -419,11 +507,37 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
             "task_id": task_id,
             "package_sha256": request.get("package_sha256"),
             "checkpoint_path_sha256": cell["base_checkpoint_sha256"],
+            "base_model": MODEL,
             "split": "selection", "category": category,
             "frame_sha256": request.get("frame_sha256"),
             "runtime_sha256": bindings["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
+            "worker_request_ref": request.get("worker_request_ref"),
         }
+        _require(
+            (worker_request.get("task_id") in (None, task_id) and
+             worker_request.get("package_sha256") in
+             (None, request.get("package_sha256")) and
+             worker_request.get("checkpoint_path_sha256") in
+             (None, cell["base_checkpoint_sha256"]) and
+             worker_request.get("frame_sha256") in
+             (None, request.get("frame_sha256")) and
+             (category != "tinker" or task_id is None or
+              worker_request.get("frame_sha256") ==
+              request.get("frame_sha256")) and
+             (worker_request.get("selection_tasks") is None or
+              worker_request["selection_tasks"] == selection)),
+            "base_selection_worker_request_identity_changed")
+        if category == "tinker" and task_id is not None and \
+                "image_base64" in worker_request:
+            try:
+                image = base64.b64decode(
+                    worker_request["image_base64"], validate=True)
+            except (TypeError, ValueError, binascii.Error):
+                raise SharedBaseSelectionError(
+                    "base_selection_worker_image_invalid") from None
+            _require(_sha(image) == request["frame_sha256"],
+                     "base_selection_worker_image_frame_changed")
         if task is not None:
             row = task["row"]
             bound = (request.get("package_sha256") ==
