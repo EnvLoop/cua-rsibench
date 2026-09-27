@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from hashlib import sha256
+import base64
+import csv
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -43,6 +46,83 @@ class RuntimeSpecTests(unittest.TestCase):
                 with self.assertRaisesRegex(runtime.RuntimeErrorCode,
                                             "snapshot_or_render_changed"):
                     runtime.verify(path, Path(directory))
+
+    def test_relocation_normalizes_only_verified_console_shebang(self):
+        class Distribution:
+            metadata = {"Name": "fakepkg"}
+            version = "1.0"
+
+            def __init__(self, site, record):
+                self.site = site
+                self.record = record
+
+            def read_text(self, name):
+                return ("Name: fakepkg\nVersion: 1.0\n" if
+                        name == "METADATA" else self.record)
+
+            def locate_file(self, relative):
+                return self.site / relative
+
+        def one(prefix):
+            site = prefix / "lib/python3.14/site-packages"
+            package = site / "fakepkg/__init__.py"
+            launcher = prefix / "bin/fakepkg"
+            package.parent.mkdir(parents=True)
+            launcher.parent.mkdir(parents=True)
+            package.write_bytes(b"version = 1\n")
+            launcher.write_bytes(
+                ("#!" + str(prefix / "bin/python") + "\n").encode() +
+                b"print('ok')\n")
+            def row(relative, path):
+                raw = path.read_bytes()
+                digest = base64.urlsafe_b64encode(
+                    sha256(raw).digest()).rstrip(b"=").decode()
+                return [relative, "sha256=" + digest, str(len(raw))]
+            stream = io.StringIO()
+            writer = csv.writer(stream)
+            writer.writerow(row("fakepkg/__init__.py", package))
+            writer.writerow(row("../../../bin/fakepkg", launcher))
+            writer.writerow(["fakepkg-1.0.dist-info/RECORD", "", ""])
+            dist = Distribution(site, stream.getvalue())
+            with patch.object(runtime, "EXPECTED_VERSIONS", {
+                    "fakepkg": "1.0"}), \
+                 patch.object(runtime.importlib.metadata,
+                              "distributions", return_value=[dist]), \
+                 patch.object(runtime.sys, "prefix", str(prefix)):
+                first = runtime._distribution_snapshot()
+            return first, launcher, dist
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first, _, _ = one(root / "short")
+            second, launcher, dist = one(root / "a-much-longer-venv-name")
+            self.assertEqual(first, second)
+            launcher.write_bytes(launcher.read_bytes() + b"# tampered\n")
+            with patch.object(runtime, "EXPECTED_VERSIONS", {
+                    "fakepkg": "1.0"}), \
+                 patch.object(runtime.importlib.metadata,
+                              "distributions", return_value=[dist]), \
+                 patch.object(runtime.sys, "prefix",
+                              str(root / "a-much-longer-venv-name")):
+                with self.assertRaisesRegex(runtime.RuntimeErrorCode,
+                                            "file_missing_or_changed"):
+                    runtime._distribution_snapshot()
+            rows = list(csv.reader(io.StringIO(dist.record)))
+            changed = launcher.read_bytes()
+            rows[1][1] = "sha256=" + base64.urlsafe_b64encode(
+                sha256(changed).digest()).rstrip(b"=").decode()
+            rows[1][2] = str(len(changed))
+            stream = io.StringIO()
+            csv.writer(stream).writerows(rows)
+            dist.record = stream.getvalue()
+            with patch.object(runtime, "EXPECTED_VERSIONS", {
+                    "fakepkg": "1.0"}), \
+                 patch.object(runtime.importlib.metadata,
+                              "distributions", return_value=[dist]), \
+                 patch.object(runtime.sys, "prefix",
+                              str(root / "a-much-longer-venv-name")):
+                self.assertNotEqual(first,
+                                    runtime._distribution_snapshot())
 
 
 class CheckpointBaseReadbackTests(unittest.TestCase):

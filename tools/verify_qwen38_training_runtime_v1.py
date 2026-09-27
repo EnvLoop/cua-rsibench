@@ -8,9 +8,12 @@ its packages, cookbook, renderer, processor, or toy SFT rendering drift.
 from __future__ import annotations
 
 import argparse
+import base64
+import csv
 import hashlib
 import importlib
 import importlib.metadata
+import io
 import json
 import os
 from pathlib import Path
@@ -98,6 +101,9 @@ def _tree_sha(root: Path) -> str:
 
 def _distribution_snapshot() -> dict:
     result = {}
+    prefix = Path(sys.prefix).resolve()
+    expected_shebang = ("#!" + str(Path(sys.prefix) /
+                                   "bin/python")).encode()
     for distribution in importlib.metadata.distributions():
         name = distribution.metadata.get("Name", "").lower().replace("_", "-")
         _require(bool(name) and name not in result,
@@ -106,10 +112,64 @@ def _distribution_snapshot() -> dict:
         record = distribution.read_text("RECORD")
         _require(type(metadata) is str and type(record) is str,
                  "runtime_distribution_record_missing")
+        normalized_rows = []
+        hashed_count = 0
+        hashed_bytes = 0
+        for row in csv.reader(io.StringIO(record)):
+            _require(len(row) == 3 and type(row[0]) is str and row[0],
+                     "runtime_distribution_record_invalid")
+            relative, recorded_hash, recorded_size = row
+            if not recorded_hash:
+                _require(relative.endswith(".dist-info/RECORD") and
+                         recorded_size == "",
+                         "runtime_distribution_unhashed_file")
+                normalized_rows.append(row)
+                continue
+            _require(recorded_hash.startswith("sha256=") and
+                     recorded_size.isdigit(),
+                     "runtime_distribution_record_invalid")
+            path = Path(distribution.locate_file(relative))
+            _require(path.is_file() and not path.is_symlink() and
+                     path.resolve().is_relative_to(prefix) and
+                     path.stat().st_size == int(recorded_size),
+                     "runtime_distribution_file_missing_or_changed")
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                while chunk := stream.read(1024 * 1024):
+                    digest.update(chunk)
+            encoded = base64.urlsafe_b64encode(digest.digest()).rstrip(
+                b"=").decode()
+            _require(recorded_hash == "sha256=" + encoded,
+                     "runtime_distribution_file_missing_or_changed")
+            hashed_count += 1
+            if relative.startswith("../../../bin/"):
+                raw = path.read_bytes()
+                shebang, separator, body = raw.partition(b"\n")
+                _require(separator == b"\n" and
+                         shebang == expected_shebang,
+                         "runtime_console_script_shebang_changed")
+                portable = b"#!/__PINNED_VENV_PYTHON__\n" + body
+                portable_hash = base64.urlsafe_b64encode(
+                    hashlib.sha256(portable).digest()).rstrip(b"=").decode()
+                normalized_rows.append([
+                    relative, "sha256=" + portable_hash,
+                    str(len(portable))])
+                hashed_bytes += len(portable)
+            else:
+                normalized_rows.append(row)
+                hashed_bytes += path.stat().st_size
+        _require(hashed_count > 0,
+                 "runtime_distribution_record_empty")
         result[name] = {
             "version": distribution.version,
             "metadata_sha256": _sha(metadata.encode()),
-            "record_sha256": _sha(record.encode()),
+            # uv rewrites console-script shebangs to the venv's absolute path.
+            # Verify every installed file against its original RECORD hash,
+            # then replace only those checked shebangs for a portable digest.
+            "relocation_normalized_record_sha256": _sha(_canonical(
+                sorted(normalized_rows, key=lambda item: item[0]))),
+            "recorded_file_count": hashed_count,
+            "recorded_file_bytes": hashed_bytes,
         }
     _require(set(EXPECTED_VERSIONS) <= set(result) and
              all(result[name]["version"] == version for name, version in
