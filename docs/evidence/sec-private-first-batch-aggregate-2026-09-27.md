@@ -8,4 +8,6 @@ An evaluator-only ledger reserves **20 train / 20 selection / 100 final slots**,
 
 The paragraph above records the first-batch **offline snapshot**. A later [Excel-web GUI development-control addendum](sec-private-excel-web-development-triad-2026-09-27.md) documents one positive/near-miss/reset triad with downloaded-artifact readback; it does not change the official final count.
 
+A subsequent [second source/workflow batch](sec-private-second-batch-aggregate-2026-09-27.md) advances the private train/selection reservations to eight offline candidates and leaves 132 slots unfilled. The first-batch figures above remain the original snapshot rather than current cumulative counts.
+
 Public source methodology is documented by the [SEC EDGAR APIs](https://www.sec.gov/search-filings/edgar-application-programming-interfaces). The aggregate JSON publishes cryptographic commitments to the evaluator-held source controls, allocation ledger, workbook builder, and independent verifier without publishing hidden issuers, workbook answers, case IDs, task text, or credentials.
