@@ -208,6 +208,10 @@ def execute(*, candidate_root: Path, attempts_root: Path, private_map: Path,
     storage = storage_audit(attempts_root)
     if not storage["dispatch_storage_ready"]:
         raise ValueError("Raw-frame storage cap or 8-GiB free-space floor blocks dispatch")
+    try:
+        import e2b_desktop  # noqa: F401 - require the child's SDK before any create intent.
+    except ImportError:
+        raise ValueError("The complete E2B Desktop SDK is unavailable in this runner") from None
     active, active_count = active_hashes()
     if active_count or active:
         raise ValueError("Provider has active E2B sandboxes; reconcile before dispatch")
