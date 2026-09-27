@@ -134,11 +134,12 @@ class FullStudyDispatchTests(unittest.TestCase):
             public_commit_sha1=self.commit,
             witness_fetcher=lambda _url: cell_final.json_bytes(witness))
 
-    def campaign(self):
+    def campaign(self, cell_id=matrix.CELLS[0]):
         frozen = self.frozen()
         session = frozen.open_campaign(
-            self.root / 'work' / 'campaign-astra',
-            cell_id=matrix.CELLS[0], researcher_id='astra',
+            self.root / 'work' / ('campaign-astra' if cell_id == matrix.CELLS[0]
+                                  else 'campaign-astra-' + cell_id),
+            cell_id=cell_id, researcher_id='astra',
             now=lambda: self.clock[0])
         return frozen, session
 
@@ -508,6 +509,47 @@ class FullStudyDispatchTests(unittest.TestCase):
                 work={'round': 2}, request={'prompt': 'forbidden'},
                 reserve_usd='1', resource_reservation={'researcher_calls': '1'},
                 provider=lambda _: {'text': 'must not run'})
+
+    def test_self_hosted_odoo_selection_uses_local_application_cost(self):
+        _, session = self.campaign('odoo-community')
+        trained = self.trained_candidate(session)
+        started = session.start_selection_attempt(
+            round_index=1, attempt_id='odoo-selection-001')
+        self.assertEqual(len(started['selection_tasks']), 20)
+        session.dispatch_paid(
+            attempt_id='odoo-selection-001-sample-001', category='tinker',
+            work={'selection_attempt': 'odoo-selection-001',
+                  'kind': 'sampling'},
+            request={'schema': 'cua-full-study-selection-sampling-request-v1',
+                     'selection_attempt': 'odoo-selection-001'},
+            reserve_usd='0.01', resource_reservation={},
+            provider=lambda _: {'usage': {'input_tokens': 100,
+                                           'output_tokens': 10}})
+        session.dispatch_paid(
+            attempt_id='odoo-selection-001-local-env-001',
+            category='storage_application',
+            work={'selection_attempt': 'odoo-selection-001',
+                  'kind': 'actual_local_environment'},
+            request={'schema': 'cua-full-study-original-software-local-lease-v1',
+                     'selection_attempt': 'odoo-selection-001',
+                     'software': 'Odoo Community 18.0'},
+            reserve_usd='0.01', resource_reservation={},
+            provider=lambda _: {'allocated': True,
+                                'provider_invoice_usd': None,
+                                'cost_basis': 'nominal local runtime envelope'})
+        base = json.loads((session.directory / 'base-selection.private.json').read_bytes())
+        candidate = dict(base, checkpoint_sha256=trained['checkpoint_path_sha256'])
+        candidate['tasks'] = [dict(row) for row in base['tasks']]
+        scored = session.record_selection_scored(
+            attempt_id='odoo-selection-001', result=candidate,
+            paid_attempt_ids=['odoo-selection-001-sample-001',
+                              'odoo-selection-001-local-env-001'])
+        self.assertEqual(scored['score_wins'], 0)
+        self.assertFalse(scored['promoted'])
+        event = session._events('selection_scored')[-1]
+        self.assertEqual(event['data']['paid_attempt_ids'], [
+            'odoo-selection-001-sample-001',
+            'odoo-selection-001-local-env-001'])
 
     def test_selection_rejects_evaluation_identity_or_missing_cost_category(self):
         _, session = self.campaign()

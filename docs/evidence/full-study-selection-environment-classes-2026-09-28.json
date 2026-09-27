@@ -1,0 +1,19 @@
+{
+  "actual_provider_invoices_observed": 0,
+  "by_cell": {
+    "desktop-native": "e2b",
+    "excel-web": "e2b",
+    "gitlab": "storage_application",
+    "magento-admin": "storage_application",
+    "odoo-community": "storage_application",
+    "powerpoint-web": "e2b"
+  },
+  "checked_date": "2026-09-28",
+  "dispatcher_source_sha256": "51645037b80c89077204e2a5cc84f83d7ed05a2492880fbbb947b66ace025ebd",
+  "mapping_sha256": "0f3544bff4f20c4e18d749c8bd4b79c9cb627ea007c90079b7a59fd49ec89978",
+  "mapping_source_sha256": "94f68fe14dd96162bc0f0aba953e250e37e50b2f3241c0bda9a97f589f05229b",
+  "official_final_model_results": 0,
+  "official_selection_attempts": 0,
+  "schema": "cua-full-study-selection-environment-classes-public-v1",
+  "status": "pre_result_source_binding_not_live_cost_evidence"
+}

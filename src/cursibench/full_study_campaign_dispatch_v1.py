@@ -29,6 +29,7 @@ import urllib.request
 from . import full_study_budget_v1 as dollars
 from . import full_study_matrix_v1 as matrix
 from . import full_study_pre_campaign_v1 as pre_campaign
+from . import full_study_selection_environment_v1 as selection_environment
 from . import scale_final_v06 as cell_final
 
 
@@ -1216,8 +1217,9 @@ class CampaignSession:
         scores = self._selection_result(
             result, checkpoint_sha256=started['checkpoint_path_sha256'])
         # All provider work used by the cell worker must be retained in this
-        # campaign's paid ledger. Both the Qwen sampler and original-software
-        # execution environment are required. Billing settles before freeze.
+        # campaign's paid ledger. Qwen sampling and the actual original-
+        # software environment class are required; self-hosted applications
+        # must not fabricate E2B leases. Billing settles before freeze.
         paid = {row['data']['attempt_id']: row['data']
                 for row in self._events('paid_intent')}
         selection_started_sequence = starts[0]['sequence']
@@ -1231,8 +1233,10 @@ class CampaignSession:
                  set(paid_attempt_ids) <= {
                      row['data']['attempt_id'] for row in
                      self._events('paid_result')} and
-                 {'tinker', 'e2b'} <= {
-                     paid[paid_id]['category'] for paid_id in paid_attempt_ids},
+                 selection_environment.paid_categories_valid(
+                     self.intent['cell_id'],
+                     {paid[paid_id]['category']
+                      for paid_id in paid_attempt_ids}),
                  'selection_sampler_or_environment_cost_missing')
         current_checkpoint, incumbent = self._incumbent()
         regressions = sum(scores[key] < incumbent[key] for key in scores)
