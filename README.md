@@ -35,6 +35,8 @@ One v12 candidate passed an [individual PowerPoint-web V5 GUI control](docs/evid
 
 The [Magento 25-case checkpoint](docs/evidence/magento-original-gui-progress-25-2026-09-27.md) independently binds real-admin saved positive, wrong-variant negative and fresh-clone material reset for 25 distinct private final candidates. The serial evaluator continues through the untouched queue; no Magento candidate has become an official final result.
 
+The dated [six-cell preparation figure](docs/evidence/full-study-readiness-2026-09-27.md) visualizes offline candidate construction, non-comparable evaluator GUI controls and zero official admissions directly from public aggregate receipts. It is a methods-progress snapshot, not a model-result chart.
+
 A separate [Qwen3.8-27B base-model Magento price-task pilot](docs/evidence/magento-price777-qwen-base-pilot-2026-09-24.md) records one runner failure and one 40-sample budget-censored retry. Neither completed a product save or entered an official final-task denominator; both attempts' monitored SQL and search state were restored. This protocol-development evidence is not a checkpoint or training-gain result.
 
 The later [v3 scored development diagnostic](docs/evidence/magento-price777-qwen-scored-v3-2026-09-25.md) completed one valid model-driven GUI attempt on the same public task. Qwen saved one of five target prices, then chose `finish`; the unchanged evaluator and independent saved-state check scored the full task **0.0**. Two intervening v2 attempts remain unscored infrastructure/protocol failures. Monitored SQL and all 181 search documents were restored after every attempt. This public task adds no hidden final identity or researcher campaign.

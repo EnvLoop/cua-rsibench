@@ -1,0 +1,7 @@
+# Six-cell preparation snapshot — 2026-09-27
+
+The [SVG chart](../site/figures/full-study-readiness-2026-09-27.svg) and [source-bound data](full-study-readiness-2026-09-27.json) are generated from the latest committed aggregate receipts available at this checkpoint. They show **offline final candidates / development GUI controls / official final admissions**, with 100 proposed final tasks in each of six cells. The source-receipt hashes allow this snapshot to be regenerated with [`build_full_study_readiness_figure_v1.py`](../../tools/build_full_study_readiness_figure_v1.py).
+
+Development GUI controls have different scopes across applications. Some are train or evaluator qualification actions, and a previously passed candidate may later be quarantined with its source family. The blue bars are therefore **work completed on environments and evaluators**, not comparable model success rates or a claim that tasks have entered a sealed exam. The PowerPoint bar uses only active-pool controls; its earlier one-case pass is historical and excluded. Excel's 77 final candidates are original SEC-filing offline packages, not Microsoft Excel-web admissions.
+
+At this snapshot, every cell has **zero officially admitted final identities**, all 24 researcher campaigns are unstarted, and the matched 3,000 slot-task outcome matrix does not exist. The figure is a methods-progress artifact and cannot be used as the result chart of a published full-scale benchmark.
