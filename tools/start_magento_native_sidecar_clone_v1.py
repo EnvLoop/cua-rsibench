@@ -90,6 +90,32 @@ def stop_embedded_search() -> None:
         docker('exec', APP, 'kill', '-KILL', *stale, timeout=15)
 
 
+def stop_cron_for_train_probe() -> dict:
+    """Freeze scheduled indexers before any setup mutation in one train probe."""
+    stopped = docker('exec', APP, 'supervisorctl', 'stop', 'cron', timeout=30)
+    status = subprocess.run(
+        ['docker', '--context', 'colima-cua-scale', 'exec', APP,
+         'supervisorctl', 'status', 'cron'], capture_output=True, text=True,
+        timeout=15, check=False)
+    require('cron' in status.stdout and 'STOPPED' in status.stdout,
+            'cron did not remain stopped for train-only probe')
+    return {'stop_stdout_sha256': hashlib.sha256(stopped.encode()).hexdigest(),
+            'status_stdout_sha256': hashlib.sha256(status.stdout.encode()).hexdigest(),
+            'policy': 'cron_stopped_before_config_and_search_reindex'}
+
+
+def read_price_index_shape() -> dict:
+    """Read derived index hashes without exposing any product or task value."""
+    from tools.reconcile_magento_unseeded_search_drift_v1 import SQL_READ
+    sql = json.loads(docker('exec', APP, 'php', '-r', SQL_READ, timeout=90))
+    return {'price_rows': sql['price_rows'],
+            'live_price_sha256': sql['hashes']['catalog_product_index_price'],
+            'replica_price_sha256': sql['hashes']['catalog_product_index_price_replica'],
+            'price_key_sets_equal': sql['price_key_sets_equal'],
+            'price_changed_rows': sql['price_changed_rows'],
+            'price_changed_fields': sql['price_changed_fields']}
+
+
 def http_ready() -> bool:
     try:
         return docker('exec', APP, 'curl', '-sS', '-o', '/dev/null',
@@ -171,11 +197,14 @@ def reconcile_indexer_result(expected_search_sha256: str,
 
 
 def prepare(expected_search_sha256: str,
-            *, adopt_existing: bool = False) -> dict:
+            *, adopt_existing: bool = False,
+            train_probe_freeze_cron: bool = False) -> dict:
     require(len(expected_search_sha256) == 64 and
             all(char in '0123456789abcdef' for char in expected_search_sha256),
             'frozen source search digest required')
     if adopt_existing:
+        require(not train_probe_freeze_cron,
+                'cron probe cannot adopt a prior container')
         return audit_existing(expected_search_sha256,
                               'read_only_adoption_after_reindex_retry')
     require_absent(APP)
@@ -200,6 +229,9 @@ def prepare(expected_search_sha256: str,
            '-p', f'127.0.0.1:{CONTROL_PORT}:8877',
            IMAGE, timeout=120)
     check_clone(APP, HTTP_PORT, CONTROL_PORT)
+    cron = stop_cron_for_train_probe() if train_probe_freeze_cron else None
+    stages = ({'after_cron_stop': read_price_index_shape()}
+              if train_probe_freeze_cron else None)
     stop_embedded_search()
     wait_ready(http_ready, 'Magento HTTP')
     settings = (
@@ -215,6 +247,8 @@ def prepare(expected_search_sha256: str,
                'config:set', key, value, timeout=180)
     docker('exec', APP, 'php', '/var/www/magento2/bin/magento',
            'cache:clean', 'config', timeout=180)
+    if stages is not None:
+        stages['after_config_cache'] = read_price_index_shape()
     # Magento's indexer has occasionally returned nonzero after writing the
     # complete index. Preserve that process result, then reconcile the actual
     # unseeded catalog by read-only hash before deciding readiness. No second
@@ -223,7 +257,18 @@ def prepare(expected_search_sha256: str,
         ['docker', '--context', 'colima-cua-scale', 'exec', APP, 'php',
          '/var/www/magento2/bin/magento', 'indexer:reindex',
          'catalogsearch_fulltext'], capture_output=True, timeout=180)
-    return reconcile_indexer_result(expected_search_sha256, indexer)
+    result = reconcile_indexer_result(expected_search_sha256, indexer)
+    if stages is not None:
+        stages['after_search_reindex'] = read_price_index_shape()
+        require(all(row['price_rows'] == 8156 and
+                    row['price_key_sets_equal'] is True and
+                    row['price_changed_rows'] == 0
+                    for row in stages.values()),
+                'cron-frozen training probe changed source price index')
+        result['train_probe_cron'] = cron
+        result['train_probe_price_stages'] = stages
+        result['official_final_tasks_admitted'] = 0
+    return result
 
 
 def main() -> None:
