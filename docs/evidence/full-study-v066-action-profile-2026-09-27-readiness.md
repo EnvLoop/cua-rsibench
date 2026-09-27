@@ -11,10 +11,10 @@ Shared candidate bundle SHA-256: `60f1fc50990118da44c11df3d54b05e0ddf70946440130
 | powerpoint-web | passed | No | Not verified | 0 |
 | excel-web | passed | No | Not verified | 0 |
 | desktop-native | passed | No | Not verified | 0 |
-| odoo-community | passed | No | Not verified | 0 |
+| odoo-community | passed | No | [One trusted train GUI positive; no model](odoo-v066-native-train-smoke-2026-09-28.md) | 0 |
 | gitlab | not_implemented_in_this_branch | No | Not verified | 0 |
 | magento-admin | passed | No | Not verified | 0 |
 
-The PowerPoint-web and Excel-web modules are bounded train-only E2B mappings; neither historical runner selects them. Odoo's v0.6.5 official gate remains closed and unchanged. Magento's older pinned pilot remains unchanged. The Desktop module has a prospective grammar plan, but no fresh v0.6.6 per-ID GUI trios. GitLab has no adapter mapping in this branch and is being audited separately.
+The PowerPoint-web and Excel-web modules are bounded train-only E2B mappings; neither historical runner selects them. Odoo's later one-case, no-model v0.6.6 train GUI smoke verifies two new primitives and independent persisted-state success, while its v0.6.5 official gate remains closed and unchanged. Magento's older pinned pilot remains unchanged. The Desktop module has a prospective grammar plan, but no fresh v0.6.6 per-ID GUI trios. GitLab has no adapter mapping in this branch and is being audited separately.
 
 Before ratification, each application needs a source-bound live train/selection smoke under the same prompt, parser and physical-frame checks; source/runtime and budget freezes remain separate gates. All 600 official identities, 24 researcher campaigns and final model outcomes remain unstarted.

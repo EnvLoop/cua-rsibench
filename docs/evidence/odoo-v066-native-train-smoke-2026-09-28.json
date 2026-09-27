@@ -1,0 +1,70 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "all_attempts_exact_pre_post_database_filestore_restore": true,
+  "all_attempts_restored_worker_service_state": true,
+  "attempts_are_iterative_debugging_not_repeated_identical_trials": true,
+  "checked_date": "2026-09-28",
+  "development_attempt_status_counts": {
+    "failed": 4,
+    "passed": 1,
+    "verifier_failed": 1
+  },
+  "development_attempts": 6,
+  "development_failure_class_counts": {
+    "business_state": 1,
+    "infrastructure_or_controller": 4
+  },
+  "minimal_output_version": "scale-action-output-v0.6.6",
+  "model_calls": 0,
+  "official_final_tasks_admitted": 0,
+  "official_final_tasks_observed": 0,
+  "private_receipt_sha256_by_development_attempt": [
+    "c32296f17cafca674d9ff267556f556bb8ada55168189479a8c0b58a1707e56d",
+    "cd45b5b89fbc80f688b1686c60511eedfce4253d1d1aa7643b795d072c712f6e",
+    "d4ecad5a39fa369a8958873d8535343eb109cd52031f277da2d5eb3aefb7b436",
+    "67b623f41f2fc6489587b4b96253292c271ecd6237c2d66dbdbccbd1760c747b",
+    "eb53e623c5e6bd3fe234049df564dd2e51be678ac8d6c44afdbebb2c24238720",
+    "69f96a3d3266c62480538e2c95b93a0d9622b6c1bfa95f6eedd1ce68c55d9c1b"
+  ],
+  "provider_calls": 0,
+  "researcher_campaigns": 0,
+  "schema": "envloop-odoo-v066-native-train-public-v1",
+  "scope": "One original Odoo Community 18 train-only trusted-action GUI control; no provider or model call, no hidden-final observation or official result.",
+  "source_binding_sha256": {
+    "base_contract": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+    "checkpoint_restore": "8fcf06f28f83928dece44aa376a9d5abaf716c8e089fb60835092477dbca3883",
+    "full_validator_v066": "68569a1ed06984985600d367975d3e5c1e6935ec9571b24e3d3ba637174dc24b",
+    "independent_verifier": "5f7339fe5bca27bca68daaf33362375a7459fdc9a616dd80373e494e39569a55",
+    "minimal_output_v066": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+    "odoo_native_adapter": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+    "odoo_v066_adapter": "bec076a3d8baff1e763734b774582ff5f5ae5d3a56225dadf68bfdb3702e34d6",
+    "pinned_compose": "b68c4907d640d61c199893dd26fd065b8fdc3123d0e85fc5ae374b23aae4ba58",
+    "smoke": "4741b5e0a34076b2deec5a112154db68c18badcdf3858116aa299f1d8c2785c8"
+  },
+  "successful_attempt_action_types": [
+    "type",
+    "key",
+    "click",
+    "click",
+    "double_click",
+    "key",
+    "type",
+    "key"
+  ],
+  "successful_attempt_frame_rejections": 0,
+  "successful_attempt_gui_edit_persisted_after_reload": true,
+  "successful_attempt_independent_business_and_source_reward": 1.0,
+  "successful_attempt_independent_no_regression_checks_passed": true,
+  "successful_attempt_observed_frames": 8,
+  "successful_attempt_target_kinds": [
+    "ref",
+    null,
+    "ref",
+    "coordinate",
+    "coordinate",
+    null,
+    null,
+    null
+  ],
+  "successful_attempt_validated_gui_actions": 8
+}
