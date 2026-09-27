@@ -1,0 +1,38 @@
+{
+  "controller_v5_sha256": "f5b90e5c2254131f1a21b50e07543255594b4dcfffa1b892e67322625c66f4ae",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "preservation_by_control": {
+    "collateral": false,
+    "first_positive": true,
+    "fresh_positive": true,
+    "fresh_reset": true,
+    "near_miss": true,
+    "neutral_stability": true,
+    "second_positive": true
+  },
+  "private_receipt_sha256": "3488323dc9be12dd9c703a247defe4e374a05e4789651399eba6bcb29aa88ed2",
+  "schema": "envloop-ppt-web-v5-train-persisted-positive-public-v1",
+  "score_by_control": {
+    "collateral": 0,
+    "first_positive": 1,
+    "fresh_positive": 1,
+    "fresh_reset": 0,
+    "near_miss": 0,
+    "neutral_stability": 0,
+    "second_positive": 1
+  },
+  "status": "training_source_two_phase_gui_controls_verified",
+  "target_changes_by_control": {
+    "collateral": 0,
+    "first_positive": 4,
+    "fresh_positive": 4,
+    "fresh_reset": 0,
+    "near_miss": 3,
+    "neutral_stability": 0,
+    "second_positive": 4
+  },
+  "two_downloads_byte_identical_per_phase_or_role": 8,
+  "two_successive_neutral_baselines_source_semantics_preserved": true,
+  "verifier_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9"
+}
