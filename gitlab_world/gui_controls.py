@@ -57,6 +57,18 @@ async def _wait_assignee_visible(assignee, username: str) -> None:
     await assignee.locator('a[href$="/' + username + '"]').wait_for(timeout=30000)
 
 
+async def _wait_due_date_persisted(page, expected_date: str) -> None:
+    # GitLab can render the new date while the save spinner is still active.
+    # Wait for the visible sidebars to settle, then confirm a full reload kept it.
+    for test_id in ("work-item-assignees", "work-item-labels", "work-item-due-dates"):
+        await page.locator(f'[data-testid="{test_id}"] .gl-spinner').wait_for(
+            state="hidden", timeout=30000)
+    await page.reload(wait_until="domcontentloaded", timeout=90000)
+    await page.locator('[data-testid="work-item-due-dates"] '
+                       '[data-testid="due-date-value"]').filter(
+                           has_text=expected_date).wait_for(timeout=30000)
+
+
 async def _gui_issue_triage(page, project: dict, progress: dict,
                             task: dict, issue_key: str, folder: Path) -> dict:
     repo = project["full_path"]
@@ -111,6 +123,9 @@ async def _gui_issue_triage(page, project: dict, progress: dict,
         await dates.locator('[data-testid="edit-button"]').click()
     if visible_date != expected_date:
         raise RuntimeError("GitLab visible due date differs from policy after bounded retries")
+    await _wait_due_date_persisted(page, expected_date)
+    await _wait_assignee_visible(assignee, user)
+    await labels.locator('[data-testid="' + label + '"]').wait_for(timeout=30000)
     await page.screenshot(path=str(folder / "issue-after.png"), full_page=True)
     return {"policy_rendered": True, "issue_iid": issue_iid,
             "saved_visible": True,
