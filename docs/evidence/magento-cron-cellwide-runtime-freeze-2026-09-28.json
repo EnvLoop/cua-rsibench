@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-28",
+  "failed_train_attempt_preserved": true,
+  "final_candidate_plan_sha256": "1df41f027b5f284c7ff7ed162f42f075259960242a295e0a430bff1c8b479ae1",
+  "fresh_gui_controls_required": 100,
+  "historical_controls_reused_under_revised_runtime": 0,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "prior_historical_controls": 35,
+  "private_freeze_sha256": "f0096622c214cca4f3ce1e377fb93199ec98182bd5918de97181a40e9608a74c",
+  "runtime_fingerprint_sha256": "7f47aaa47abcb83a9874ff17f52b4fa6c44269b3d74c71127592774206aaa03f",
+  "schema": "envloop-magento-cellwide-cron-runtime-freeze-public-v1",
+  "status": "qualified_for_100_fresh_evaluator_gui_controls_only",
+  "train_calibration_sha256": "87c0ad94b23c659d79652100d916fd18e52cd06bf7c508a371de1d6d02da233c",
+  "train_fresh_reset_passed": true,
+  "train_gui_positive_score": 1.0,
+  "train_gui_wrong_variant_score": 0.0,
+  "training_plan_sha256": "5c5085b671c7f6ad6459907382420bbda2efef6923033b087664d4a8a2fb9994"
+}
