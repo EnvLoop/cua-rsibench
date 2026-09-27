@@ -131,6 +131,46 @@ def cleanup_pair(runtime_path: Path) -> None:
     assert_absent()
 
 
+def validate_preseed_search_drift_recovery(previous: Path,
+                                           events: list[dict],
+                                           last: dict) -> None:
+    """Accept only the one case-31 unseeded pair retired by its exact audit."""
+    case_dir = previous.parent / 'case-031/positive'
+    cleanup = case_dir / 'index-drift-cleanup.private.json'
+    audit = case_dir / 'index-drift-audit.private.json'
+    require(cleanup.is_file() and audit.is_file() and
+            sha(cleanup.read_bytes()) == last.get('cleanup_receipt_sha256') and
+            sha(audit.read_bytes()) == last.get('audit_sha256'),
+            'unseeded search-drift audit/cleanup receipt changed')
+    record = json.loads(cleanup.read_bytes())
+    witness = json.loads(audit.read_bytes())
+    require(record.get('schema') ==
+            'envloop-magento-preseed-search-drift-cleanup-private-v1' and
+            witness.get('schema') ==
+            'envloop-magento-preseed-search-drift-private-audit-v1' and
+            record.get('case_index') == witness.get('case_index') == 31 and
+            record.get('original_journal_sha256') ==
+            witness.get('original_journal_sha256') ==
+            '4fea2b8ca9d9edb53db21dd6dd6493613e95bc44e2fe73fab9664f37cdacd196' and
+            record.get('audit_sha256') == last.get('audit_sha256') and
+            record.get('task_seeded') is False and
+            record.get('both_containers_cleaned') is True and
+            record.get('model_calls') ==
+            record.get('official_final_admitted') == 0 and
+            witness.get('observed_search_sha256') ==
+            '4bd64ae0b2032f221f8c2e56c1dd243f09677ce386860a6f4eb6d582e36ddc20' and
+            witness.get('frozen_search_sha256') == SEARCH_SHA and
+            witness.get('quote_pages') == 0 and
+            any(row.get('event') == 'step_finished' and
+                row.get('index') == 31 and
+                row.get('step') == 'positive-prepare' and
+                row.get('exit_code') != 0 for row in events) and
+            not any(row.get('index') == 31 and
+                    row.get('step', '').endswith('-seed')
+                    for row in events),
+            'only the exact unseeded case-31 drift may be retried once')
+
+
 def task(index: int, case: dict, plan: Path, plan_sha: str,
          source: Path, root: Path, journal: Path) -> dict:
     case_dir = root / f'case-{index:03d}'
@@ -288,6 +328,13 @@ def main() -> None:
                 'operator_reconciled_pre_task_prepare_failure' and
                 last.get('task_seeded') is False):
             recovery_kind = 'unseeded_prepare_failure'
+        elif (last.get('event') ==
+              'operator_reconciled_pre_task_search_index_drift' and
+              args.start_index == 31 and
+              last.get('task_seeded') is False and
+              last.get('both_containers_cleaned') is True):
+            validate_preseed_search_drift_recovery(previous, events, last)
+            recovery_kind = 'unseeded_search_index_drift_case31'
         elif (last.get('event') ==
               'operator_reconciled_postpositive_volatile' and
               last.get('task_seeded') is True):
