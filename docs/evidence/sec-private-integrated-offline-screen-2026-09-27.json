@@ -1,0 +1,33 @@
+{
+  "schema": "sec-private-integrated-offline-screen-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "evaluator-private offline candidate screen passes; 20/20/100 study and original-software hidden final remain unqualified",
+  "original_filing_disjoint_offline_actor_reference_pairs": 36,
+  "new_private_issuer_families_disjoint_from_public_development": 28,
+  "selected_original_sec_numeric_cells_checked": 525,
+  "evaluator_private_semantic_workflow_families": 13,
+  "evaluator_private_final_semantic_workflow_families": 10,
+  "maximum_offline_candidates_per_issuer_family": 5,
+  "independent_ooxml_positive_reference_passes": 36,
+  "independent_ooxml_unrepaired_seed_rejections": 36,
+  "checked_formula_targets": 2552,
+  "unmarked_faults_individually_detected": 324,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "private_slot_reservations": {"train": 20, "selection": 20, "final": 100},
+  "offline_candidates": {"train": 4, "selection": 4, "final": 28},
+  "empty_slots": {"train": 16, "selection": 16, "final": 72},
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_development_control_triads": 1,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "private_evidence_sha256": {
+    "integrated_offline_audit_receipt": "4c084a0c2888140e63c7f28a0ae377f0617cad309510d68f5ceab118e44648b9",
+    "integrated_offline_auditor": "3a61f953a5129ea713d16ce88ed2efc5599447fe01bc2381677b0cf8073f84dd",
+    "candidate_slot_reservations": "9a15219b54370c2c0fae509cf244b9cb2f6e233a6045593ca760fcd4e697f3d6"
+  },
+  "limits_of_evidence": [
+    "The integrated auditor reruns the independent saved-OOXML positive/negative verifiers for all 36 candidates and checks unique original filing accessions, issuer disjointness across splits and against public development, final workflow diversity, and the maximum five candidate tasks per issuer.",
+    "The auditor also binds and reconciles the twelve evaluator-private stage receipts; the 525 numeric cells are task-specific selected facts, not authentication of complete proxy companyfacts payloads.",
+    "All 36 workbooks are offline candidates, not structurally qualified benchmark tasks. Another 104 source/filing/task instances and per-ID original Microsoft Excel web save/download/readback/fresh-copy reset are required.",
+    "The sole real Microsoft Excel web evidence is one positive, near-miss, and reset development-control triad; it is not hidden-final admission or model-performance evidence."
+  ]
+}
