@@ -16,6 +16,7 @@ from PIL import Image
 
 from tools import excel_web_e2b_train_runner_v1 as runner
 from tools import office_web_e2b_login_bridge_v1 as bridge
+from tests.office_actor_scope_fixture import write_scope_fixture
 
 
 def png(color='white'):
@@ -192,6 +193,19 @@ class ExcelWebTrainRunnerTests(unittest.TestCase):
             if path.exists():
                 path.unlink()
             bridge.write_new(path, value)
+        write_scope_fixture(self.session, self.session_data,
+                            self.config_data['workbook_url'], 'excel',
+                            self.task_data['actor_xlsx_sha256'], png())
+
+    def test_missing_actor_scope_denies_before_provider_connect(self):
+        (self.session.parent / 'actor-scope.private.json').unlink()
+        factory = FakeFactory()
+        with self.assertRaisesRegex(runner.RunnerError,
+                                    'actor_scope_unverified'):
+            runner.run(self.session, self.task, self.config,
+                       self.out, factory)
+        self.assertEqual(factory.connect_calls, [])
+        self.assertFalse(self.out.exists())
 
     def invoke(self, actions, *, factory=None, retriever=None):
         factory = factory or FakeFactory()

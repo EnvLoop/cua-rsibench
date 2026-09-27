@@ -31,6 +31,7 @@ from cursibench.scale_vision_proxy import (
     VisionSamplingAdapter, campaign_metadata, public_receipt,
 )
 from tools import office_web_e2b_login_bridge_v1 as bridge
+from tools import office_web_actor_scope_gate_v1 as actor_scope
 
 
 VERSION = 'office-web-e2b-train-runner-v1'
@@ -138,6 +139,7 @@ class Admission:
     max_steps: int
     wall_seconds: int
     lease_end_unix: int
+    actor_scope_receipt_sha256: str
 
 
 def admit(session_path: Path, task_path: Path, config_path: Path,
@@ -210,10 +212,20 @@ def admit(session_path: Path, task_path: Path, config_path: Path,
             type(task.get('actor_task')) is str and
             0 < len(task['actor_task'].encode()) <= 8192,
             'invalid_train_package')
+    try:
+        scope = actor_scope.validate(
+            session_path.parent / 'actor-scope.private.json',
+            session_raw=session_raw, sandbox_id=session['sandbox_id'],
+            item_url=url, app='powerpoint',
+            lease_started_at_unix=session['lease_started_at_unix'],
+            lease_end_unix=lease_end, now=now)
+    except actor_scope.ScopeError:
+        raise RunnerError('actor_scope_unverified') from None
     return Admission(session_path, digest(session_raw), session['sandbox_id'],
                      bridge.EXPECTED_TEMPLATE_ID, task['task_id'],
                      task['actor_task'], digest(task_raw), url, digest(url),
-                     config['max_steps'], config['wall_seconds'], lease_end)
+                     config['max_steps'], config['wall_seconds'], lease_end,
+                     scope['receipt_sha256'])
 
 
 class EventJournal:
@@ -384,6 +396,7 @@ def run(session_path: Path, task_path: Path, config_path: Path, out: Path,
         'task_package_sha256': admission.task_sha256,
         'deck_url_sha256': admission.deck_url_sha256,
         'login_receipt_sha256': admission.session_sha256,
+        'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
         'model': MODEL, 'action_version': 'scale-action-output-v0.6.5',
         'max_steps': admission.max_steps,
         'wall_seconds': admission.wall_seconds,
@@ -526,6 +539,7 @@ def run(session_path: Path, task_path: Path, config_path: Path, out: Path,
                    'teardown': teardown, 'task_id_sha256': digest(admission.task_id),
                    'task_package_sha256': admission.task_sha256,
                    'deck_url_sha256': admission.deck_url_sha256,
+                   'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
                    'model': MODEL, 'samples': samples, 'gui_actions': actions,
                    'artifact': artifact, 'official_final_admitted': 0,
                    'provider_billed_usd': None}
@@ -548,6 +562,7 @@ def main() -> None:
         print(json.dumps({'version': VERSION, 'status': 'admitted_no_provider_call',
                           'task_id_sha256': digest(admission.task_id),
                           'deck_url_sha256': admission.deck_url_sha256,
+                          'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
                           'max_steps': admission.max_steps,
                           'wall_seconds': admission.wall_seconds,
                           'official_final_admitted': 0}, sort_keys=True))

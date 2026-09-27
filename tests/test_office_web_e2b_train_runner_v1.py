@@ -16,6 +16,7 @@ from PIL import Image
 
 from tools import office_web_e2b_login_bridge_v1 as bridge
 from tools import office_web_e2b_train_runner_v1 as runner
+from tests.office_actor_scope_fixture import write_scope_fixture
 
 
 def png(color='white'):
@@ -179,6 +180,9 @@ class OfficeWebTrainRunnerTests(unittest.TestCase):
             if path.exists():
                 path.unlink()
             bridge.write_new(path, data)
+        write_scope_fixture(self.session, self.session_data,
+                            self.config_data['deck_url'], 'powerpoint',
+                            runner.digest(b'synthetic-train-seed'), png())
 
     def invoke(self, actions, *, factory=None, retriever=None):
         factory = factory or FakeFactory()
@@ -228,6 +232,16 @@ class OfficeWebTrainRunnerTests(unittest.TestCase):
         self.assertEqual(events_path.stat().st_mode & 0o777, 0o600)
         self.assertTrue((self.session.parent / 'stop.private.json').exists())
         self.assertNotIn('PrivateTestKey1234', events_path.read_text())
+
+    def test_missing_actor_scope_denies_before_provider_connect(self):
+        (self.session.parent / 'actor-scope.private.json').unlink()
+        factory = FakeFactory()
+        with self.assertRaisesRegex(runner.RunnerError,
+                                    'actor_scope_unverified'):
+            runner.run(self.session, self.task, self.config,
+                       self.out, factory)
+        self.assertEqual(factory.connect_calls, [])
+        self.assertFalse(self.out.exists())
 
     def test_final_package_path_and_split_rejected_before_connect(self):
         final = self.root / 'packages' / 'final' / self.task_id / 'task.private.json'

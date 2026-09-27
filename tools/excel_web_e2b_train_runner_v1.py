@@ -36,6 +36,7 @@ from cursibench.scale_vision_proxy import (
 )
 from tools import office_web_e2b_login_bridge_v1 as bridge
 from tools import office_web_e2b_train_runner_v1 as office
+from tools import office_web_actor_scope_gate_v1 as actor_scope
 from tools.excel_web_ooxml import read_workbook
 
 
@@ -177,6 +178,7 @@ class Admission:
     max_steps: int
     wall_seconds: int
     lease_end_unix: int
+    actor_scope_receipt_sha256: str
 
 
 @dataclass(frozen=True)
@@ -279,11 +281,22 @@ def admit(session_path: Path, task_path: Path, config_path: Path,
             config['wall_seconds'] + MIN_LEASE_REMAINDER <= lease_end - now,
             'invalid_run_config')
     url = validate_train_workbook_url(config['workbook_url'])
+    try:
+        scope = actor_scope.validate(
+            session_path.parent / 'actor-scope.private.json',
+            session_raw=session_raw, sandbox_id=session['sandbox_id'],
+            item_url=url, app='excel',
+            lease_started_at_unix=session['lease_started_at_unix'],
+            lease_end_unix=lease_end, actor_seed_sha256=task.actor_sha256,
+            now=now)
+    except actor_scope.ScopeError:
+        raise RunnerError('actor_scope_unverified') from None
     return Admission(session_path, digest(session_raw), session['sandbox_id'],
                      bridge.EXPECTED_TEMPLATE_ID, task.task_id,
                      task.instruction, task.task_sha256, task.actor_sha256,
                      url, digest(url), config['max_steps'],
-                     config['wall_seconds'], lease_end)
+                     config['wall_seconds'], lease_end,
+                     scope['receipt_sha256'])
 
 
 class EventJournal:
@@ -413,6 +426,7 @@ def run(session_path: Path, task_path: Path, config_path: Path, out: Path,
         'actor_seed_sha256': admission.actor_sha256,
         'workbook_url_sha256': admission.workbook_url_sha256,
         'login_receipt_sha256': admission.session_sha256,
+        'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
         'model': MODEL, 'action_version': 'scale-action-output-v0.6.5',
         'max_steps': admission.max_steps,
         'wall_seconds': admission.wall_seconds,
@@ -540,6 +554,7 @@ def run(session_path: Path, task_path: Path, config_path: Path, out: Path,
             'task_package_sha256': admission.task_sha256,
             'actor_seed_sha256': admission.actor_sha256,
             'workbook_url_sha256': admission.workbook_url_sha256,
+            'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
             'model': MODEL, 'samples': samples,
             'gui_actions': actions, 'artifact': artifact,
             'cloud_seed_binding_qualified': False,
@@ -580,6 +595,7 @@ def main() -> None:
             'task_id_sha256': digest(admission.task_id),
             'actor_seed_sha256': admission.actor_sha256,
             'workbook_url_sha256': admission.workbook_url_sha256,
+            'actor_scope_receipt_sha256': admission.actor_scope_receipt_sha256,
             'max_steps': admission.max_steps,
             'wall_seconds': admission.wall_seconds,
             'cloud_seed_binding_qualified': False,
