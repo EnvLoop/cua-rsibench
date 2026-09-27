@@ -1,0 +1,13 @@
+{
+  "distinct_final_candidate_ids_gui_calibrated": 25,
+  "fresh_clone_material_reset_pass": 25,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "positive_saved_state_pass": 25,
+  "receipt_list_sha256": "4352a52a55cf39923d8c069a4a235f3c6dbbc4b16b68c2df62c4f261a7242d6a",
+  "reset_clock_only_exception_count": 1,
+  "schema": "envloop-magento-original-gui-progress-public-v1",
+  "status": "gui_candidate_controls_not_official_final_admission",
+  "total_final_candidate_ids": 100,
+  "wrong_variant_saved_state_rejected": 25
+}
