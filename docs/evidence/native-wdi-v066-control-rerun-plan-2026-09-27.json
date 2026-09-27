@@ -1,0 +1,40 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "actual_provider_billed_usd": null,
+  "candidate_final_tasks": 100,
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-27",
+  "historical_gui_trios_retained": 100,
+  "max_prospective_actions_by_application": {
+    "Calc": 25,
+    "Impress": 25,
+    "Writer": 53
+  },
+  "new_e2b_sandboxes_created_by_this_audit": 0,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "private_control_plan_sha256": "c5d42931f8f1b3da26ce32389137d8da37b4200d2b98511ed3f1a6b429eaf2c1",
+  "prospective_action_totals_both_polarities": {
+    "click": 1400,
+    "double_click": 150,
+    "key": 1300,
+    "type": 750,
+    "wait": 2800
+  },
+  "prospective_near_miss_scripts_grammar_valid": 100,
+  "prospective_positive_scripts_grammar_valid": 100,
+  "qualified_under_v066": 0,
+  "schema": "cua-native-wdi-v066-control-rerun-plan-public-v1",
+  "status": "grammar_only_no_gui_or_guest_proof",
+  "trusted_guard_totals_both_polarities": {
+    "evaluator_screenshots": 350,
+    "saved_artifact_readbacks": 200,
+    "teardown_requests": 200,
+    "visible_window_assertions": 750
+  },
+  "v065_public_preflight_sha256": "2eef7ba653a008937784c3184267e446e758525bef6ad30f7673c2eab4e1f623",
+  "v066_full_action_validator_sha256": "68569a1ed06984985600d367975d3e5c1e6935ec9571b24e3d3ba637174dc24b",
+  "v066_live_gui_trios_with_guest_attestation": 0,
+  "v066_minimal_output_adapter_sha256": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+  "v066_native_dispatch_adapter_sha256": "03ae9e2e84caed09a4c36738f6aed2bdd840b4250927ca264d01a302dffe09a3"
+}
