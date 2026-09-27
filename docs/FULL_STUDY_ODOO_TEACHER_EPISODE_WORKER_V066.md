@@ -2,6 +2,15 @@
 
 **Status: implemented interface, fake-provider validation only.** The [Odoo worker](../enterprise_fallback/odoo18/teacher_episode_worker_v066.py) implements `run_episode(task, out_dir, sample_teacher, dispatch_e2b)` for the original Odoo Community 18.0 browser. Its [offline source-bound receipt](evidence/odoo-v066-teacher-worker-offline-2026-09-28.json) records implementation and test status. No live teacher episode, Docker worker, paid model, selection task, hidden-final task, or official campaign was run for this implementation. The earlier [no-model Odoo v0.6.6 GUI smoke](evidence/odoo-v066-native-train-smoke-2026-09-28.md) is separate solvability evidence; its trusted actions are **not** relabeled teacher data.
 
+The offline worker was subsequently exercised from the repository root without
+an Odoo-specific `PYTHONPATH`. Its first version could not locate Odoo's
+historical top-level `factory` module in that process layout. The current
+revision inserts only the pinned Odoo source directory after rejecting any
+already loaded foreign module of the same name, so the native browser/login
+and reset code share one worker-lease registry. The updated receipt binds the
+new source/runtime hashes and the passing root-path tests. The earlier hash
+remains in Git history; neither version is claimed as a live teacher run.
+
 The campaign [teacher adapter](../src/cursibench/full_study_teacher_adapter_v1.py) admits only a hash-bound training context after the six-cell action-profile freeze, reserves each multimodal teacher request before calling the provider, normalizes one v0.6.6 action, and returns it to the worker. The Odoo worker additionally defaults to `enable_live=False` and verifies a private six-cell ratification, the exact Odoo adapter hash, and the frozen runtime/verifier hashes before opening the local environment. The real backend checks that its worker directory is the isolated `train` partition, that the requested package and visible instruction occur exactly once in its private 20-task train manifest, and that no selection or final identity overlaps it. The process must set `ENVLOOP_ODOO_WORKER_DIR` before importing Odoo modules.
 
 The real backend acquires the Odoo worker lease, starts only the pinned train Compose project if needed, and cold-restores PostgreSQL plus the physical filestore. It requires an unsolved independent baseline. It logs in with the restricted browser actor, opens the appropriate original Odoo application, and observes only a current screenshot and visible controls. The worker stores each mode-0600 raw frame before calling `sample_teacher`; after the paid callback, it checks the frame again and dispatches the validated action through the v0.6.6 Playwright adapter. A stale frame aborts the episode; the worker does not replay a paid call. A final `finish` triggers a fresh GUI reload and independent SELECT-only business/source-file scoring. The saved SQL snapshot and scoring receipt are evaluator-private and never model-visible.

@@ -15,7 +15,8 @@
   "private_episode_receipt_accepted_by_upstream_validator": true,
   "requires_real_six_cell_ratification_before_live_execution": true,
   "researcher_campaigns": 0,
-  "runtime_bundle_sha256": "90dcc415e0cd3ee5f91e36d0174ffec559734f0e3bee6f4fb60ad3ebb065bcdb",
+  "runtime_bundle_sha256": "f47bf120d6edf3ed913879c324c52814812d94aef2b74768e4530c83fb6bda90",
+  "runtime_import_identity_checked_from_repo_root": true,
   "runtime_source_sha256s": {
     "enterprise_fallback/odoo18/compose.yaml": "b68c4907d640d61c199893dd26fd065b8fdc3123d0e85fc5ae374b23aae4ba58",
     "enterprise_fallback/odoo18/factory.py": "49ce5d3747c257d6e40c52a352f560efe7af3ea9229f9686a45c4bf9379ce008",
@@ -24,7 +25,7 @@
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py": "bec076a3d8baff1e763734b774582ff5f5ae5d3a56225dadf68bfdb3702e34d6",
     "enterprise_fallback/odoo18/partition_factory.py": "7e5aa6f5b53949eec77e6e263be9e458c6e903665af9baf5b6b8c5f5c112162e",
     "enterprise_fallback/odoo18/reset.py": "8fcf06f28f83928dece44aa376a9d5abaf716c8e089fb60835092477dbca3883",
-    "enterprise_fallback/odoo18/teacher_episode_worker_v066.py": "2d9a75b8f8f07656f56322543340ac04b2fe43b2248113a46241a559a25ca78f",
+    "enterprise_fallback/odoo18/teacher_episode_worker_v066.py": "23235eb5c3b6c71225164f86330ffef6af2bae71628a187c1602b094831d9c73",
     "enterprise_fallback/odoo18/verify.py": "5f7339fe5bca27bca68daaf33362375a7459fdc9a616dd80373e494e39569a55",
     "enterprise_fallback/odoo18/worker_lease.py": "e9bddf8dd07d799c529d8cf75765abaa921e9a7360b6ed1db1d92686321dd9be"
   },

@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import time
 from typing import Callable, Iterator
 
@@ -247,6 +248,17 @@ class RealOdooTrainBackend:
         # Import them through that same identity: a package-qualified second
         # worker_lease module would hold a different in-process lease registry
         # and native browser_login would reject a legitimately held lease.
+        # Insert only the pinned Odoo source directory and reject an already
+        # loaded foreign top-level module. Each campaign worker hosts one cell.
+        module_dir = Path(__file__).resolve().parent
+        for module_name in ("factory", "gui_controls", "reset", "verify",
+                            "worker_lease"):
+            loaded = sys.modules.get(module_name)
+            if loaded is not None and Path(loaded.__file__).resolve() != (
+                    module_dir / (module_name + ".py")):
+                raise OdooEpisodeError("odoo_module_identity_conflict")
+        if str(module_dir) not in sys.path:
+            sys.path.insert(0, str(module_dir))
         import factory
         import gui_controls
         import reset
