@@ -138,6 +138,22 @@ def audit_existing(expected_search_sha256: str, mode: str) -> dict:
             'official_final_tasks_admitted': 0}
 
 
+def reconcile_indexer_result(expected_search_sha256: str,
+                             indexer: subprocess.CompletedProcess) -> dict:
+    reported_success = (b'Catalog Search index has been rebuilt successfully'
+                        in indexer.stdout)
+    mode = ('new_clone' if indexer.returncode == 0 and reported_success else
+            'read_only_state_reconciled_after_indexer_process_error')
+    audited = audit_existing(expected_search_sha256, mode)
+    audited['indexer_process'] = {
+        'exit_code': indexer.returncode,
+        'reported_success': reported_success,
+        'stdout_sha256': hashlib.sha256(indexer.stdout).hexdigest(),
+        'stderr_sha256': hashlib.sha256(indexer.stderr).hexdigest(),
+    }
+    return audited
+
+
 def prepare(expected_search_sha256: str,
             *, adopt_existing: bool = False) -> dict:
     require(len(expected_search_sha256) == 64 and
@@ -183,11 +199,15 @@ def prepare(expected_search_sha256: str,
                'config:set', key, value, timeout=180)
     docker('exec', APP, 'php', '/var/www/magento2/bin/magento',
            'cache:clean', 'config', timeout=180)
-    output = docker('exec', APP, 'php', '/var/www/magento2/bin/magento',
-                    'indexer:reindex', 'catalogsearch_fulltext', timeout=180)
-    require('Catalog Search index has been rebuilt successfully' in output,
-            'native-sidecar reindex did not complete')
-    return audit_existing(expected_search_sha256, 'new_clone')
+    # Magento's indexer has occasionally returned nonzero after writing the
+    # complete index. Preserve that process result, then reconcile the actual
+    # unseeded catalog by read-only hash before deciding readiness. No second
+    # indexer or new container is dispatched automatically.
+    indexer = subprocess.run(
+        ['docker', '--context', 'colima-cua-scale', 'exec', APP, 'php',
+         '/var/www/magento2/bin/magento', 'indexer:reindex',
+         'catalogsearch_fulltext'], capture_output=True, timeout=180)
+    return reconcile_indexer_result(expected_search_sha256, indexer)
 
 
 def main() -> None:
