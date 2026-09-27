@@ -66,6 +66,21 @@ def local_origin(value: str) -> bool:
             and parsed.port == 8014 and not parsed.username and not parsed.password)
 
 
+async def install_local_guard(context) -> list[str]:
+    """Block model-session requests outside the dedicated loopback GitLab."""
+    blocked = []
+    async def guard(route):
+        address = route.request.url
+        parsed = urlsplit(address)
+        if local_origin(address) or parsed.scheme in ("about", "blob", "data"):
+            await route.continue_()
+        else:
+            blocked.append(parsed.hostname or "non-http")
+            await route.abort()
+    await context.route("**/*", guard)
+    return blocked
+
+
 def short(value: str | None, limit: int) -> str:
     return " ".join((value or "").split())[:limit]
 

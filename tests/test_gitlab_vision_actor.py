@@ -41,6 +41,24 @@ class FakePage:
         return self._screenshot
 
 
+class FakeRoute:
+    def __init__(self, url):
+        self.request = type("Request", (), {"url": url})()
+        self.disposition = None
+
+    async def continue_(self):
+        self.disposition = "continued"
+
+    async def abort(self):
+        self.disposition = "aborted"
+
+
+class FakeContext:
+    async def route(self, pattern, handler):
+        self.pattern = pattern
+        self.handler = handler
+
+
 class GitLabVisionActorTests(unittest.IsolatedAsyncioTestCase):
     def frame(self):
         image = png()
@@ -101,6 +119,17 @@ class GitLabVisionActorTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(vision_actor.local_origin("http://127.0.0.1:8012/project"))
         self.assertFalse(vision_actor.local_origin("https://gitlab.com/project"))
         self.assertFalse(vision_actor.local_origin("http://a:b@127.0.0.1:8014/project"))
+
+    async def test_model_session_guard_blocks_external_requests(self):
+        context = FakeContext()
+        blocked = await vision_actor.install_local_guard(context)
+        local = FakeRoute("http://127.0.0.1:8014/project")
+        remote = FakeRoute("https://gitlab.com/project")
+        await context.handler(local)
+        await context.handler(remote)
+        self.assertEqual((local.disposition, remote.disposition),
+                         ("continued", "aborted"))
+        self.assertEqual(blocked, ["gitlab.com"])
 
 
 if __name__ == "__main__":

@@ -7,7 +7,6 @@ import asyncio
 import hashlib
 import json
 from pathlib import Path
-from urllib.parse import urlsplit
 
 from cursibench.scale_action_contract import ContractError
 
@@ -32,19 +31,11 @@ async def run() -> dict:
     task = next(row for row in world["tasks"]
                 if row["project_family"] == project["full_path"])
     credential = json.loads(operators.CREDENTIALS.read_text())["train"]
-    blocked = []
     async with async_playwright() as playwright:
         browser = await playwright.chromium.launch(headless=True)
         try:
             context = await browser.new_context(viewport={"width": 1440, "height": 1000})
-            async def guard(route):
-                if (vision_actor.local_origin(route.request.url) or
-                        urlsplit(route.request.url).scheme in ("about", "blob", "data")):
-                    await route.continue_()
-                else:
-                    blocked.append(urlsplit(route.request.url).hostname or "non-http")
-                    await route.abort()
-            await context.route("**/*", guard)
+            blocked = await vision_actor.install_local_guard(context)
             page = await context.new_page()
             try:
                 if await context.cookies():
