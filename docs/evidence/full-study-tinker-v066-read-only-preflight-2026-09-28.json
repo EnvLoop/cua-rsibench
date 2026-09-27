@@ -1,0 +1,17 @@
+{
+  "action_profile_version": "scale-action-profile-v0.6.6",
+  "available_balance_usd": null,
+  "exact_model_sampleable": true,
+  "exact_model_trainable": true,
+  "model": "Qwen/Qwen3.8-27B",
+  "official_final_results": 0,
+  "output_version": "scale-action-output-v0.6.6",
+  "private_receipt_sha256": "fe846216885c2a8d6501d9fb5d12826048e1ba8fd1cfec7049c32cafca4d2d49",
+  "published_model_catalog_sha256": "1521db910e08c3f2cc052e9c4f831cdc7b9fbca74ca2d4d2f07c1b544530dcef",
+  "schema": "cua-full-study-tinker-v066-public-preflight-v1",
+  "six_cell_action_bundle_sha256": "60f1fc50990118da44c11df3d54b05e0ddf709464401308d9d8c9fa61cd43041",
+  "six_cell_ratification_verified": false,
+  "status": "read_only_capabilities_verified_no_campaign_authority",
+  "tinker_sdk_version": "0.30.0",
+  "training_or_sampling_provider_calls": 0
+}
