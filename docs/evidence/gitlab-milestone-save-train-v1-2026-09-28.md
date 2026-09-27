@@ -2,7 +2,8 @@
 
 The [field-limited receipt](gitlab-milestone-save-train-v1-2026-09-28.json)
 binds one original GitLab CE **training project**, the source hash of the
-generic milestone operator, three fresh browser/clone episodes and the
+generic milestone operator, three fresh browser episodes separated by cold
+reset calls, and the
 private result bytes. Its independently read saved-state scores were
 **1 / 0 / 1** for positive, wrong-due-date near miss, and repeated positive.
 The operator waited for the native save spinner, reloaded the issue pages,
