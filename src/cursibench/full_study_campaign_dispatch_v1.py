@@ -14,6 +14,8 @@ hashes and allowlisted metadata; request/response bodies remain private files.
 from __future__ import annotations
 
 from decimal import Decimal
+from decimal import ROUND_CEILING
+from contextlib import contextmanager
 import fcntl
 import hashlib
 import json
@@ -37,6 +39,8 @@ HEX40 = re.compile(r'[0-9a-f]{40}\Z')
 PAID_KIND = re.compile(r'[a-z][a-z0-9_]{1,40}\Z')
 PUBLIC_PATH = 'docs/evidence/full-study-pre-campaign-freeze.json'
 MAX_PRIVATE_JSON_BYTES = 8_000_000
+TINKER_MODEL = 'Qwen/Qwen3.8-27B'
+TINKER_PATH = re.compile(r'tinker://[^\s/]+/sampler_weights/[^\s/]+\Z')
 COUNTER_CAP_FIELDS = {
     'researcher_calls': 'researcher_calls_per_campaign',
     'teacher_rollout_calls': 'teacher_rollout_calls_per_campaign',
@@ -77,6 +81,17 @@ def _json(path: Path, label: str) -> tuple[dict, bytes]:
         raise DispatchError(f'{label}_invalid_json') from None
     _require(type(value) is dict, f'{label}_object_required')
     return value, raw
+
+
+def _private_input(path: Path, repo_root: Path, label: str) -> Path:
+    original = Path(path)
+    _require(not original.is_symlink(), f'{label}_private_work_file_required')
+    target = original.resolve()
+    _require(target.is_file() and
+             target.is_relative_to(repo_root / 'work') and
+             target.stat().st_mode & 0o077 == 0,
+             f'{label}_private_work_file_required')
+    return target
 
 
 def _private_write_new(path: Path, raw: bytes) -> None:
@@ -187,6 +202,101 @@ class FrozenStudy:
         return {'train': tuple(base['train']),
                 'selection': tuple(base['selection'])}
 
+    def researcher_configuration(self, researcher_id: str) -> dict:
+        _require(researcher_id in matrix.RESEARCHERS, 'unknown_researcher')
+        reference = self.manifest['configurations']['researchers'][researcher_id]
+        path, raw = cell_final.evidence_file(
+            self.manifest_path.parent, reference, 'researcher configuration')
+        config = json.loads(raw)
+        _require(config['model'] == matrix.RESEARCHERS[researcher_id] and
+                 _sha(raw) == self.plan['configuration_bindings']
+                 ['researchers'][researcher_id]['config_sha256'],
+                 'researcher_configuration_drift')
+        assets = {}
+        for name in ('prompt', 'harness', 'tool_grammar', 'decoding',
+                     'provider_route'):
+            _, data = cell_final.evidence_file(
+                path.parent, config['assets'][name], f'researcher/{name}')
+            assets[name] = data
+        return {'settings': config['settings'], 'model': config['model'],
+                'snapshot_id': config['snapshot_id'],
+                'config_sha256': _sha(raw), 'assets': assets}
+
+    def teacher_configuration(self) -> dict:
+        reference = self.manifest['configurations']['teacher']
+        path, raw = cell_final.evidence_file(
+            self.manifest_path.parent, reference, 'teacher configuration')
+        config = json.loads(raw)
+        _require(config['model'] == matrix.TEACHER and
+                 _sha(raw) == self.plan['configuration_bindings']
+                 ['teacher']['config_sha256'],
+                 'teacher_configuration_drift')
+        assets = {}
+        for name in ('prompt', 'harness', 'tool_grammar', 'decoding',
+                     'provider_route'):
+            _, data = cell_final.evidence_file(
+                path.parent, config['assets'][name], f'teacher/{name}')
+            assets[name] = data
+        return {'settings': config['settings'], 'model': config['model'],
+                'snapshot_id': config['snapshot_id'],
+                'config_sha256': _sha(raw), 'assets': assets}
+
+    def student_training_configuration(self) -> tuple[dict, str]:
+        reference = self.manifest['configurations']['student']
+        config_path, raw = cell_final.evidence_file(
+            self.manifest_path.parent, reference, 'student configuration')
+        config = json.loads(raw)
+        _require(config['model'] == TINKER_MODEL and
+                 _sha(raw) == self.plan['configuration_bindings']
+                 ['student']['config_sha256'],
+                 'student_training_configuration_drift')
+        _, data = cell_final.evidence_file(
+            config_path.parent, config['assets']['training'],
+            'student training asset')
+        try:
+            training = json.loads(data)
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise DispatchError('frozen_qwen_training_asset_not_json') from None
+        needed = {'schema', 'model', 'action_profile', 'lora_rank', 'seed',
+                  'batch_size', 'optimizer_steps', 'learning_rate',
+                  'max_supervised_tokens', 'max_scheduled_tokens',
+                  'sample_max_tokens', 'train_usd_per_million_tokens',
+                  'prefill_usd_per_million_tokens',
+                  'sample_usd_per_million_tokens',
+                  'billing_multiplier_upper'}
+        _require(type(training) is dict and set(training) == needed and
+                 training['schema'] == 'cua-full-study-qwen-sft-training-v1' and
+                 training['model'] == TINKER_MODEL and
+                 training['action_profile'] == 'scale-action-profile-v0.6.6',
+                 'frozen_qwen_training_asset_invalid')
+        for name, maximum in (('lora_rank', 256), ('batch_size', 128),
+                              ('optimizer_steps', 10000),
+                              ('max_supervised_tokens', 32768),
+                              ('max_scheduled_tokens', 100_000_000),
+                              ('sample_max_tokens', 4096)):
+            _require(type(training[name]) is int and
+                     0 < training[name] <= maximum,
+                     'frozen_qwen_training_asset_invalid')
+        _require(type(training['seed']) is int and
+                 0 <= training['seed'] < 2**31 and
+                 training['batch_size'] * training['optimizer_steps'] <=
+                 training['max_scheduled_tokens'],
+                 'frozen_qwen_training_asset_invalid')
+        for name in ('learning_rate', 'train_usd_per_million_tokens',
+                     'prefill_usd_per_million_tokens',
+                     'sample_usd_per_million_tokens',
+                     'billing_multiplier_upper'):
+            _require(type(training[name]) is str,
+                     'frozen_qwen_training_asset_invalid')
+            try:
+                amount = Decimal(training[name])
+            except Exception:
+                raise DispatchError('frozen_qwen_training_asset_invalid') from None
+            _require(amount.is_finite() and amount > 0 and
+                     (name != 'billing_multiplier_upper' or amount >= 1),
+                     'frozen_qwen_training_asset_invalid')
+        return training, _sha(data)
+
     def open_campaign(self, private_dir: Path, *, cell_id: str,
                       researcher_id: str, now: Callable[[], float] = time.time):
         owner = (cell_id, researcher_id)
@@ -290,11 +400,21 @@ class CampaignSession:
         if len(self.journal.rows()) == 1:
             self.journal.append('campaign_started',
                                 {'epoch_seconds': int(self.now())})
-        self._check_time()
+        # Expired campaigns remain readable for reconciliation and audit.
+        self._audit_paid_files()
 
     def _events(self, kind: str | None = None) -> list[dict]:
         rows = self.journal.rows()[1:]
         return [row for row in rows if kind is None or row['kind'] == kind]
+
+    @contextmanager
+    def _operation_lock(self):
+        path = self.directory / '.campaign-operation.lock'
+        _require(not path.is_symlink(), 'campaign_operation_lock_symlink')
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT, 0o600)
+        with os.fdopen(descriptor, 'w') as stream:
+            fcntl.flock(stream, fcntl.LOCK_EX)
+            yield
 
     def _check_time(self) -> None:
         starts = self._events('campaign_started')
@@ -314,9 +434,11 @@ class CampaignSession:
                     totals[name] = max(totals[name], Decimal(value))
                 else:
                     totals[name] += Decimal(value)
+        totals['selection_evaluations'] += len(self._events('selection_started'))
         return totals
 
-    def _check_resources(self, category: str, reservation: dict) -> dict[str, str]:
+    def _check_resources(self, category: str, reservation: dict,
+                         request: object) -> dict[str, str]:
         _require(type(reservation) is dict and
                  set(reservation) <= RESOURCE_FIELDS,
                  'resource_reservation_invalid')
@@ -348,7 +470,16 @@ class CampaignSession:
                      Decimal(normalized['e2b_peak_concurrency']) > 0,
                      'e2b_hours_and_concurrency_required')
         elif category == 'tinker':
-            _require(not normalized, 'tinker_resource_counter_must_be_metered_separately')
+            request_schema = (request.get('schema') if type(request) is dict
+                              else None)
+            if request_schema == 'cua-full-study-tinker-sft-request-v1':
+                _require(normalized == {'candidate_submissions': '1'},
+                         'tinker_candidate_submission_counter_required')
+            elif request_schema == 'cua-full-study-selection-sampling-request-v1':
+                _require(not normalized,
+                         'selection_sampler_cannot_submit_training_candidate')
+            else:
+                raise DispatchError('tinker_request_schema_unbound')
         elif category == 'storage_application':
             _require(not normalized, 'storage_application_has_no_count_counter')
         totals = self._counter_totals()
@@ -383,6 +514,810 @@ class CampaignSession:
                      self._events('orphan_reconciled')}
         return set(self.budget.owner_attempts(self.owner)) - journaled
 
+    def _audit_paid_files(self) -> None:
+        state = self.budget.owner_attempts(self.owner)
+        intents = self._events('paid_intent')
+        results = self._events('paid_result')
+        _require(len({row['data']['attempt_id'] for row in intents}) ==
+                 len(intents) and
+                 len({row['data']['attempt_id'] for row in results}) ==
+                 len(results), 'paid_attempt_event_repeated')
+        for row in intents:
+            info = row['data']
+            attempt_id = info['attempt_id']
+            record = state.get(attempt_id)
+            _require(record is not None and
+                     record['category'] == info['category'] and
+                     record['work_sha256'] == info['work_sha256'] and
+                     Decimal(record['reserved_usd']) ==
+                     Decimal(info['reserved_usd']),
+                     'paid_intent_differs_from_budget_ledger')
+            request_path = (self.directory /
+                            f'{attempt_id}.request.private.json')
+            _require(request_path.is_file() and
+                     not request_path.is_symlink() and
+                     request_path.stat().st_mode & 0o077 == 0 and
+                     _sha(request_path.read_bytes()) == info['request_sha256'],
+                     'paid_request_bytes_changed_or_missing')
+            if record['status'] != 'pending':
+                _require(record.get('request_sha256') ==
+                         info['request_sha256'],
+                         'paid_request_hash_differs_from_budget_ledger')
+        for row in results:
+            info = row['data']
+            _require(info['attempt_id'] in state,
+                     'paid_result_missing_budget_attempt')
+            result_path = (self.directory /
+                           f"{info['attempt_id']}.result.private.json")
+            _require(result_path.is_file() and
+                     not result_path.is_symlink() and
+                     result_path.stat().st_mode & 0o077 == 0 and
+                     _sha(result_path.read_bytes()) == info['result_sha256'],
+                     'paid_result_bytes_changed_or_missing')
+
+    def _selection_result(self, result: object, *, checkpoint_sha256: str) -> dict:
+        _require(type(result) is dict and set(result) == {
+            'schema', 'cell_id', 'checkpoint_sha256', 'evaluator_isolated',
+            'tasks'}, 'selection_result_shape_invalid')
+        _require(result['schema'] == 'cua-full-study-selection-saved-result-v1' and
+                 result['cell_id'] == self.intent['cell_id'] and
+                 result['checkpoint_sha256'] == checkpoint_sha256 and
+                 result['evaluator_isolated'] is True and
+                 type(result['tasks']) is list and
+                 len(result['tasks']) == matrix.SELECTION_PER_CELL,
+                 'selection_result_binding_invalid')
+        expected = {row['task_id']: row['package_sha256']
+                    for row in self.views['selection']}
+        scores = {}
+        for row in result['tasks']:
+            _require(type(row) is dict and set(row) == {
+                'task_id', 'package_sha256', 'score', 'saved_state_sha256',
+                'verifier_receipt_sha256', 'reset_receipt_sha256'},
+                'selection_task_result_shape_invalid')
+            task_id = row['task_id']
+            _require(task_id in expected and task_id not in scores and
+                     row['package_sha256'] == expected[task_id] and
+                     type(row['score']) is int and row['score'] in (0, 1) and
+                     all(cell_final.is_hash(row[name]) for name in (
+                         'saved_state_sha256', 'verifier_receipt_sha256',
+                         'reset_receipt_sha256')),
+                     'selection_result_contains_unbound_or_unscored_task')
+            scores[task_id] = row['score']
+        _require(set(scores) == set(expected), 'selection_task_coverage_incomplete')
+        return scores
+
+    def record_base_selection(self, result: dict) -> dict:
+        """Import evaluator-owned 20-task base feedback; never a final task."""
+        self._check_time()
+        _require(not self._events('base_selection') and
+                 not self._events('researcher_proposal'),
+                 'base_selection_already_recorded_or_research_started')
+        scores = self._selection_result(
+            result, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
+        raw = _canonical(result)
+        _private_write_new(self.directory / 'base-selection.private.json', raw)
+        self.journal.append('base_selection', {
+            'result_sha256': _sha(raw), 'wins': sum(scores.values()),
+            'epoch_seconds': int(self.now()),
+        })
+        return {'wins': sum(scores.values()), 'task_count': len(scores),
+                'result_sha256': _sha(raw)}
+
+    def _train_context(self, path: Path) -> tuple[list[dict], str]:
+        target = _private_input(path, self.study.repo_root, 'train_context')
+        value, raw = _json(target, 'train_context')
+        _require(set(value) == {'schema', 'cell_id', 'tasks'} and
+                 value['schema'] == 'cua-full-study-researcher-train-view-v1' and
+                 value['cell_id'] == self.intent['cell_id'] and
+                 type(value['tasks']) is list and
+                 len(value['tasks']) == len(self.views['train']),
+                 'train_context_shape_or_cell_invalid')
+        expected = {row['task_id']: row['package_sha256']
+                    for row in self.views['train']}
+        seen = set()
+        for row in value['tasks']:
+            _require(type(row) is dict and set(row) == {
+                'task_id', 'package_sha256', 'visible_instruction'},
+                'train_context_task_shape_invalid')
+            task_id = row['task_id']
+            _require(task_id in expected and task_id not in seen and
+                     row['package_sha256'] == expected[task_id] and
+                     type(row['visible_instruction']) is str and
+                     1 <= len(row['visible_instruction'].encode()) <= 8192,
+                     'train_context_has_unbound_or_oversized_task')
+            seen.add(task_id)
+        _require(seen == set(expected), 'train_context_coverage_incomplete')
+        return value['tasks'], _sha(raw)
+
+    def _selection_feedback(self) -> list[dict]:
+        base = self.directory / 'base-selection.private.json'
+        result, raw = _json(base, 'base_selection')
+        events = self._events('base_selection')
+        _require(len(events) == 1 and
+                 events[0]['data']['result_sha256'] == _sha(raw),
+                 'base_selection_receipt_changed')
+        self._selection_result(
+            result, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
+        feedback = [{'round_index': 0, 'role': 'shared_base',
+                     'score_wins': sum(row['score'] for row in result['tasks']),
+                     'tasks': [{'task_id': row['task_id'],
+                                'score': row['score']}
+                               for row in result['tasks']]}]
+        for event in self._events('selection_scored'):
+            selection, selection_raw = _json(
+                self.directory /
+                f"selection-{event['data']['attempt_id']}.private.json",
+                'prior_selection')
+            _require(_sha(selection_raw) == event['data']['result_sha256'],
+                     'prior_selection_receipt_changed')
+            self._selection_result(
+                selection,
+                checkpoint_sha256=event['data']['checkpoint_path_sha256'])
+            feedback.append({
+                'round_index': event['data']['round_index'],
+                'role': 'candidate',
+                'score_wins': event['data']['score_wins'],
+                'promoted': event['data']['promoted'],
+                'regressions_vs_incumbent': event['data']
+                ['regressions_vs_incumbent'],
+                'tasks': [{'task_id': row['task_id'],
+                           'score': row['score']}
+                          for row in selection['tasks']],
+            })
+        return feedback
+
+    def _research_history(self) -> list[dict]:
+        history = []
+        scored = {row['data']['round_index']: row['data']
+                  for row in self._events('selection_scored')}
+        for event in self._events('researcher_proposal')[-4:]:
+            round_index = event['data']['round_index']
+            proposal, raw = _json(
+                self.directory / f'proposal-{round_index:03d}.private.json',
+                'prior_researcher_proposal')
+            _require(_sha(raw) == event['data']['proposal_sha256'],
+                     'prior_researcher_proposal_changed')
+            outcome = scored.get(round_index)
+            history.append({
+                'round_index': round_index,
+                'hypothesis_excerpt': proposal['hypothesis'][:1024],
+                'hypothesis_sha256': event['data']['hypothesis_sha256'],
+                'train_task_ids': proposal['train_task_ids'],
+                'selection_wins': outcome['score_wins'] if outcome else None,
+                'promoted': outcome['promoted'] if outcome else None,
+            })
+        return history
+
+    def _researcher_quote(self, config: dict, prompt: str) -> str:
+        try:
+            rate = json.loads(config['assets']['provider_route'])
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise DispatchError('frozen_researcher_rate_card_missing') from None
+        _require(type(rate) is dict and set(rate) == {
+            'schema', 'model', 'base_url', 'input_usd_per_million_tokens',
+            'output_usd_per_million_tokens', 'fixed_usd_per_call',
+            'billing_multiplier_upper'},
+            'frozen_researcher_rate_card_invalid')
+        _require(rate['schema'] == 'cua-agentrouterhub-rate-upper-v1' and
+                 rate['model'] == config['model'] and
+                 rate['base_url'] == 'https://sub2api.agentrouterhub.com' and
+                 os.environ.get('OPENAI_BASE_URL', rate['base_url']).rstrip('/') ==
+                 rate['base_url'], 'frozen_researcher_route_mismatch')
+        input_bytes = len(prompt.encode())
+        _require(0 < input_bytes <= 65_536, 'researcher_prompt_byte_limit')
+        try:
+            input_rate = Decimal(rate['input_usd_per_million_tokens'])
+            output_rate = Decimal(rate['output_usd_per_million_tokens'])
+            fixed = Decimal(rate['fixed_usd_per_call'])
+            multiplier = Decimal(rate['billing_multiplier_upper'])
+        except Exception:
+            raise DispatchError('frozen_researcher_rate_card_invalid') from None
+        _require(all(value.is_finite() and value >= 0 for value in
+                     (input_rate, output_rate, fixed)) and
+                 multiplier.is_finite() and multiplier >= 1 and
+                 input_rate > 0 and output_rate > 0,
+                 'frozen_researcher_rate_card_invalid')
+        output_bound = config['settings']['max_output_tokens']
+        # A deliberately conservative text-only upper envelope: UTF-8 bytes
+        # plus 2,048 provider framing tokens, then the frozen account markup.
+        amount = (fixed + (Decimal(input_bytes + 2048) * input_rate +
+                           Decimal(output_bound) * output_rate) /
+                  Decimal(1_000_000)) * multiplier
+        return str(amount.quantize(Decimal('0.000000001'),
+                                   rounding=ROUND_CEILING))
+
+    def quote_responses_upper(self, config: dict, prompt: str) -> str:
+        """Frozen AgentRouterHub text-call upper envelope for either role."""
+        return self._researcher_quote(config, prompt)
+
+    def dispatch_researcher(self, *, round_index: int, train_context_path: Path,
+                            provider: Callable[[str, dict], tuple[str, dict]] | None = None) -> dict:
+        """One real Responses request, or one fake-provider test request.
+
+        The provider receives no official-final identity, package, instruction,
+        or gold. Invalid model JSON spends its call but cannot create a dataset.
+        """
+        self._check_time()
+        _require(type(round_index) is int and round_index > 0 and
+                 round_index <= self.intent['matched_count_caps']
+                 ['candidate_submissions_per_campaign'] and
+                 len(self._events('base_selection')) == 1 and
+                 not self._events('selection_frozen'),
+                 'researcher_round_or_baseline_invalid')
+        _require(round_index == len(self._events('researcher_proposal')) +
+                 len(self._events('researcher_invalid_output')) + 1,
+                 'researcher_round_not_sequential')
+        config = self.study.researcher_configuration(
+            self.intent['researcher_id'])
+        train_tasks, context_sha = self._train_context(train_context_path)
+        feedback = self._selection_feedback()
+        history = self._research_history()
+        prompt = (config['assets']['prompt'].decode('utf-8') + '\n' +
+                  json.dumps({
+                      'schema': 'cua-full-study-researcher-input-v1',
+                      'cell_id': self.intent['cell_id'],
+                      'round_index': round_index,
+                      'train_tasks': train_tasks,
+                      'selection_feedback': feedback,
+                      'research_history': history,
+                      'instruction': ('Propose one training-data hypothesis using '
+                                      'only the listed train tasks. Return a JSON '
+                                      'object with schema, hypothesis, '
+                                      'train_task_ids, and teacher_request. '
+                                      'Never request final task content.'),
+                  }, sort_keys=True, ensure_ascii=False,
+                     separators=(',', ':')))
+        quote = self._researcher_quote(config, prompt)
+        settings = config['settings']
+        attempt_id = f'researcher-{round_index:03d}'
+        request = {'prompt': prompt, 'model': config['model'],
+                   'max_output_tokens': settings['max_output_tokens'],
+                   'reasoning_effort': settings['reasoning_effort'],
+                   'reasoning_mode': settings['reasoning_mode']}
+        if provider is None:
+            from .agentrouter import response_receipt
+            def provider(text, frozen):
+                return response_receipt(
+                    text, model=frozen['model'],
+                    max_output_tokens=frozen['max_output_tokens'],
+                    timeout=180,
+                    reasoning_effort=frozen['reasoning_effort'],
+                    reasoning_mode=frozen['reasoning_mode'])
+        def call(_request):
+            text, receipt = provider(prompt, request)
+            usage = receipt.get('usage') if type(receipt) is dict else None
+            _require(type(text) is str and 0 < len(text.encode()) <= 131_072 and
+                     type(receipt) is dict and
+                     receipt.get('reported_model') == config['model'] and
+                     receipt.get('status') == 'completed' and
+                     type(usage) is dict and
+                     type(usage.get('input_tokens')) is int and
+                     0 <= usage['input_tokens'] <=
+                     len(prompt.encode()) + 2048 and
+                     type(usage.get('output_tokens')) is int and
+                     0 <= usage['output_tokens'] <=
+                     settings['max_output_tokens'],
+                     'researcher_provider_model_or_body_invalid')
+            return {'text': text, 'receipt': receipt}
+        paid = self.dispatch_paid(
+            attempt_id=attempt_id, category='researcher_inference',
+            work={'round_index': round_index,
+                  'train_context_sha256': context_sha,
+                  'base_selection_sha256': self._events('base_selection')[0]
+                  ['data']['result_sha256'],
+                  'configuration_sha256': config['config_sha256']},
+            request=request, reserve_usd=quote,
+            resource_reservation={'researcher_calls': '1'}, provider=call)
+        raw = paid['result']['text']
+        try:
+            proposal = json.loads(raw)
+            _require(type(proposal) is dict and set(proposal) == {
+                'schema', 'hypothesis', 'train_task_ids', 'teacher_request'} and
+                proposal['schema'] == 'cua-full-study-researcher-proposal-v1' and
+                type(proposal['hypothesis']) is str and
+                1 <= len(proposal['hypothesis'].encode()) <= 8192 and
+                type(proposal['teacher_request']) is str and
+                1 <= len(proposal['teacher_request'].encode()) <= 8192 and
+                type(proposal['train_task_ids']) is list and
+                proposal['train_task_ids'] and
+                len(proposal['train_task_ids']) == len(set(proposal['train_task_ids'])) and
+                set(proposal['train_task_ids']) <= {
+                    row['task_id'] for row in self.views['train']},
+                'researcher_proposal_not_train_only')
+        except (DispatchError, TypeError, ValueError, json.JSONDecodeError):
+            self.journal.append('researcher_invalid_output', {
+                'round_index': round_index,
+                'paid_attempt_id': attempt_id,
+                'model_text_sha256': _sha(raw.encode()),
+                'epoch_seconds': int(self.now()),
+            })
+            raise DispatchError('researcher_output_invalid_call_preserved') from None
+        proposal_raw = _canonical(proposal)
+        _private_write_new(self.directory /
+                           f'proposal-{round_index:03d}.private.json',
+                           proposal_raw)
+        self.journal.append('researcher_proposal', {
+            'round_index': round_index, 'paid_attempt_id': attempt_id,
+            'train_context_sha256': context_sha,
+            'proposal_sha256': _sha(proposal_raw),
+            'hypothesis_sha256': _sha(proposal['hypothesis'].encode()),
+            'epoch_seconds': int(self.now()),
+        })
+        return {'round_index': round_index,
+                'proposal_sha256': _sha(proposal_raw),
+                'train_task_count': len(proposal['train_task_ids']),
+                'paid_attempt_id': attempt_id,
+                'billing_state': paid['billing_state']}
+
+    def _rendered_train_batch(self, *, round_index: int,
+                              rendered_batch: object,
+                              dataset_manifest_path: Path,
+                              training: dict) -> tuple[dict, list[int], list[int], str]:
+        proposal_path = self.directory / f'proposal-{round_index:03d}.private.json'
+        proposal, proposal_raw = _json(proposal_path, 'researcher_proposal')
+        matching = [row for row in self._events('researcher_proposal')
+                    if row['data']['round_index'] == round_index]
+        _require(len(matching) == 1 and
+                 matching[0]['data']['proposal_sha256'] == _sha(proposal_raw),
+                 'researcher_proposal_not_frozen')
+        dataset_path = _private_input(dataset_manifest_path,
+                                      self.study.repo_root, 'train_dataset')
+        dataset, dataset_raw = _json(dataset_path, 'train_dataset')
+        _require(type(dataset) is dict and set(dataset) == {
+            'schema', 'cell_id', 'action_profile', 'model',
+            'train_task_ids', 'train_package_sha256_by_id',
+            'episode_receipt_sha256s', 'rendered_batch_sha256',
+            'admitted_train_only', 'selection_task_count',
+            'final_task_count'},
+            'train_dataset_shape_invalid')
+        allowed = {row['task_id']: row['package_sha256']
+                   for row in self.views['train']}
+        task_ids = dataset['train_task_ids']
+        _require(dataset['schema'] == 'cua-full-study-rendered-train-batch-v1' and
+                 dataset['cell_id'] == self.intent['cell_id'] and
+                 dataset['action_profile'] == 'scale-action-profile-v0.6.6' and
+                 dataset['model'] == TINKER_MODEL and
+                 dataset['admitted_train_only'] is True and
+                 dataset['selection_task_count'] == 0 and
+                 dataset['final_task_count'] == 0 and
+                 type(task_ids) is list and task_ids and
+                 len(task_ids) == len(set(task_ids)) and
+                 set(task_ids) <= set(proposal['train_task_ids']) and
+                 dataset['train_package_sha256_by_id'] == {
+                     task_id: allowed[task_id] for task_id in task_ids
+                 } and
+                 type(dataset['episode_receipt_sha256s']) is list and
+                 dataset['episode_receipt_sha256s'] and
+                 all(cell_final.is_hash(value) for value in
+                     dataset['episode_receipt_sha256s']) and
+                 cell_final.is_hash(dataset['rendered_batch_sha256']),
+                 'train_dataset_contains_unbound_or_evaluation_source')
+        receipt = getattr(rendered_batch, 'receipt', None)
+        datums = getattr(rendered_batch, 'datums', None)
+        prompts = getattr(rendered_batch, 'prompts', None)
+        _require(type(receipt) is dict and
+                 receipt.get('schema') == 'cua-full-study-qwen-render-v066-v1' and
+                 receipt.get('cell_id') == self.intent['cell_id'] and
+                 receipt.get('action_profile') == 'scale-action-profile-v0.6.6' and
+                 receipt.get('model') == TINKER_MODEL and
+                 receipt.get('train_task_ids') == task_ids and
+                 receipt.get('episode_receipt_sha256s') ==
+                 dataset['episode_receipt_sha256s'] and
+                 _sha(_canonical(receipt)) == dataset['rendered_batch_sha256'] and
+                 type(datums) is list and type(prompts) is list and
+                 datums and prompts and len(datums) == len(prompts) and
+                 len(datums) <= training['batch_size'] *
+                 training['optimizer_steps'],
+                 'rendered_qwen_batch_not_bound_to_train_dataset')
+        datum_lengths = receipt.get('datum_token_lengths')
+        prompt_lengths = receipt.get('prompt_token_lengths')
+        _require(type(datum_lengths) is list and
+                 type(prompt_lengths) is list and
+                 len(datum_lengths) == len(datums) and
+                 len(prompt_lengths) == len(prompts),
+                 'rendered_qwen_token_lengths_missing')
+        for datum, prompt, datum_length, prompt_length in zip(
+                datums, prompts, datum_lengths, prompt_lengths):
+            _require(type(datum_length) is int and
+                     type(prompt_length) is int and
+                     0 < prompt_length < datum_length <=
+                     training['max_supervised_tokens'] and
+                     getattr(getattr(datum, 'model_input', None),
+                             'length', None) == datum_length and
+                     getattr(prompt, 'length', None) == prompt_length,
+                     'rendered_qwen_datum_length_mismatch')
+        return dataset, datum_lengths, prompt_lengths, _sha(dataset_raw)
+
+    def dispatch_tinker_sft(self, *, round_index: int,
+                            dataset_manifest_path: Path,
+                            rendered_batch: object,
+                            provider: Callable[[object, dict, list[list[int]]], dict] | None = None) -> dict:
+        """Fresh-base Qwen LoRA SFT; only validated v0.6.6 train episodes.
+
+        The caller supplies datums from an evaluator-bound renderer. The
+        default provider calls the pinned Tinker SDK; tests inject a fake.
+        Checkpoint paths stay in the mode-0600 private result file.
+        """
+        self._check_time()
+        _require(type(round_index) is int and round_index > 0 and
+                 not self._events('selection_frozen'),
+                 'tinker_round_or_selection_freeze_invalid')
+        training, training_sha = self.study.student_training_configuration()
+        dataset, lengths, prompt_lengths, dataset_sha = self._rendered_train_batch(
+            round_index=round_index, rendered_batch=rendered_batch,
+            dataset_manifest_path=dataset_manifest_path, training=training)
+        indices = [[(step * training['batch_size'] + offset) % len(lengths)
+                    for offset in range(training['batch_size'])]
+                   for step in range(training['optimizer_steps'])]
+        _require(set(index for batch in indices for index in batch) ==
+                 set(range(len(lengths))), 'training_schedule_omits_submitted_datum')
+        scheduled_tokens = sum(lengths[index] for batch in indices
+                               for index in batch)
+        _require(scheduled_tokens <= training['max_scheduled_tokens'],
+                 'frozen_training_token_cap_exceeded')
+        quote = ((Decimal(scheduled_tokens) *
+                  Decimal(training['train_usd_per_million_tokens']) +
+                  Decimal(prompt_lengths[0]) *
+                  Decimal(training['prefill_usd_per_million_tokens']) +
+                  Decimal(training['sample_max_tokens']) *
+                  Decimal(training['sample_usd_per_million_tokens'])) /
+                 Decimal(1_000_000) *
+                 Decimal(training['billing_multiplier_upper']))
+        reserve = str(quote.quantize(Decimal('0.000000001'),
+                                     rounding=ROUND_CEILING))
+        _require(Decimal(reserve) > 0 and Decimal(reserve) <=
+                 Decimal(self.intent['tinker_usd_cap']),
+                 'tinker_worst_case_reservation_exceeds_campaign_cap')
+        if provider is None:
+            _require(bool(os.environ.get('TINKER_API_KEY')),
+                     'tinker_key_missing_before_paid_reservation')
+            provider = self._real_tinker_train
+        attempt_id = f'tinker-{round_index:03d}'
+        request = {
+            'schema': 'cua-full-study-tinker-sft-request-v1',
+            'model': TINKER_MODEL,
+            'cell_id': self.intent['cell_id'],
+            'researcher_id': self.intent['researcher_id'],
+            'round_index': round_index,
+            'dataset_manifest_sha256': dataset_sha,
+            'rendered_batch_sha256': dataset['rendered_batch_sha256'],
+            'training_config_sha256': training_sha,
+            'optimizer_steps': training['optimizer_steps'],
+            'batch_size': training['batch_size'],
+            'scheduled_tokens': scheduled_tokens,
+            'max_sample_tokens': training['sample_max_tokens'],
+        }
+        def call(_request):
+            result = provider(rendered_batch, training, indices)
+            _require(type(result) is dict and set(result) == {
+                'checkpoint_path', 'observed_base_model',
+                'optimizer_steps_completed', 'sample_token_count',
+                'sample_token_sha256', 'sdk_operation_count'} and
+                type(result['checkpoint_path']) is str and
+                TINKER_PATH.fullmatch(result['checkpoint_path']) is not None and
+                result['observed_base_model'] == TINKER_MODEL and
+                result['optimizer_steps_completed'] ==
+                training['optimizer_steps'] and
+                type(result['sample_token_count']) is int and
+                0 < result['sample_token_count'] <=
+                training['sample_max_tokens'] and
+                cell_final.is_hash(result['sample_token_sha256']) and
+                type(result['sdk_operation_count']) is int and
+                result['sdk_operation_count'] >=
+                training['optimizer_steps'] * 2 + 2,
+                'tinker_result_checkpoint_or_sample_invalid')
+            return result
+        paid = self.dispatch_paid(
+            attempt_id=attempt_id, category='tinker',
+            work=request, request=request,
+            reserve_usd=reserve,
+            resource_reservation={'candidate_submissions': '1'}, provider=call)
+        checkpoint_sha = _sha(paid['result']['checkpoint_path'].encode())
+        self.journal.append('tinker_checkpoint', {
+            'round_index': round_index, 'paid_attempt_id': attempt_id,
+            'dataset_manifest_sha256': dataset_sha,
+            'training_config_sha256': training_sha,
+            'checkpoint_path_sha256': checkpoint_sha,
+            'optimizer_steps': training['optimizer_steps'],
+            'scheduled_tokens': scheduled_tokens,
+            'epoch_seconds': int(self.now()),
+        })
+        return {'round_index': round_index,
+                'checkpoint_path_sha256': checkpoint_sha,
+                'optimizer_steps': training['optimizer_steps'],
+                'scheduled_tokens': scheduled_tokens,
+                'billing_state': paid['billing_state']}
+
+    def _real_tinker_train(self, rendered_batch: object,
+                           training: dict, indices: list[list[int]]) -> dict:
+        import tinker
+        from tinker import types
+        service = tinker.ServiceClient(user_metadata={
+            'purpose': 'envloop-full-study-train-only-v1',
+            'study_id': self.study.plan['study_id'],
+            'cell_id': self.intent['cell_id'],
+            'researcher_id': self.intent['researcher_id'],
+            'split': 'train',
+        })
+        status = 'errored'
+        calls = 0
+        try:
+            client = service.create_lora_training_client(
+                base_model=TINKER_MODEL, rank=training['lora_rank'],
+                seed=training['seed'])
+            calls += 1
+            for batch_indices in indices:
+                batch = [rendered_batch.datums[index] for index in batch_indices]
+                client.forward_backward(batch, 'cross_entropy').result(timeout=300)
+                calls += 1
+                client.optim_step(types.AdamParams(
+                    learning_rate=float(training['learning_rate']))).result(timeout=300)
+                calls += 1
+            name = ('envloop-' + self.intent['cell_id'] + '-' +
+                    self.intent['researcher_id'] + '-train')
+            checkpoint = client.save_weights_for_sampler(name).result(timeout=300)
+            calls += 1
+            sampler = service.create_sampling_client(model_path=checkpoint.path)
+            calls += 1
+            observed_base = sampler.get_base_model()
+            sample = sampler.sample(
+                prompt=rendered_batch.prompts[0], num_samples=1,
+                sampling_params=types.SamplingParams(
+                    max_tokens=training['sample_max_tokens'],
+                    temperature=0, seed=training['seed'])).result(timeout=300)
+            calls += 1
+            tokens = sample.sequences[0].tokens
+            status = 'success'
+            return {
+                'checkpoint_path': checkpoint.path,
+                'observed_base_model': observed_base,
+                'optimizer_steps_completed': len(indices),
+                'sample_token_count': len(tokens),
+                'sample_token_sha256': _sha(str(tokens).encode()),
+                'sdk_operation_count': calls,
+            }
+        finally:
+            service.close(status).result(timeout=30)
+
+    def _selection_attempts(self, round_index: int) -> list[dict]:
+        return [row for row in self._events('selection_started')
+                if row['data']['round_index'] == round_index]
+
+    def _selection_completion(self, attempt_id: str) -> dict | None:
+        matches = [row for row in self._events()
+                   if row['kind'] in {'selection_scored', 'selection_invalid'} and
+                   row['data']['attempt_id'] == attempt_id]
+        _require(len(matches) <= 1, 'selection_attempt_completed_twice')
+        return matches[0] if matches else None
+
+    def start_selection_attempt(self, *, round_index: int, attempt_id: str,
+                                retry_rule_sha256: str | None = None) -> dict:
+        """Reserve one complete 20-task original-software selection execution.
+
+        A cell-owned GUI worker takes the returned selection-only identities,
+        calls providers through ``dispatch_paid`` and later registers one
+        saved-state result. No final package can enter this view.
+        """
+        self._check_time()
+        _require(type(round_index) is int and round_index > 0 and
+                 type(attempt_id) is str and
+                 dollars.ATTEMPT.fullmatch(attempt_id) is not None and
+                 not self._events('selection_frozen'),
+                 'selection_start_contract_invalid')
+        checkpoint_rows = [row for row in self._events('tinker_checkpoint')
+                           if row['data']['round_index'] == round_index]
+        _require(len(checkpoint_rows) == 1,
+                 'selection_requires_one_trained_checkpoint')
+        prior = self._selection_attempts(round_index)
+        _require(len(prior) < 2 and
+                 not any(row['data']['attempt_id'] == attempt_id
+                         for row in self._events('selection_started')),
+                 'selection_attempt_limit_or_duplicate')
+        if prior:
+            previous = self._selection_completion(prior[0]['data']['attempt_id'])
+            _require(previous is not None and
+                     previous['kind'] == 'selection_invalid' and
+                     cell_final.is_hash(retry_rule_sha256) and
+                     not self._unresolved_failure() and
+                     not self._inflight_attempts(),
+                     'selection_retry_requires_preserved_invalid_and_rule')
+        else:
+            _require(retry_rule_sha256 is None,
+                     'first_selection_attempt_cannot_claim_retry_rule')
+        _require(self._counter_totals()['selection_evaluations'] + 1 <=
+                 Decimal(self.intent['matched_count_caps']
+                         ['selection_evaluations_per_campaign']),
+                 'selection_evaluation_cap_exhausted')
+        selection_view = list(self.views['selection'])
+        view_sha = _sha(_canonical(selection_view))
+        checkpoint_sha = checkpoint_rows[0]['data']['checkpoint_path_sha256']
+        self.journal.append('selection_started', {
+            'round_index': round_index, 'attempt_id': attempt_id,
+            'checkpoint_path_sha256': checkpoint_sha,
+            'selection_identities_sha256': view_sha,
+            'task_count': matrix.SELECTION_PER_CELL,
+            'retry_rule_sha256': retry_rule_sha256,
+            'epoch_seconds': int(self.now()),
+        })
+        return {'attempt_id': attempt_id,
+                'checkpoint_path_sha256': checkpoint_sha,
+                'selection_tasks': selection_view,
+                'selection_identities_sha256': view_sha,
+                'task_count': matrix.SELECTION_PER_CELL}
+
+    def record_selection_invalid(self, *, attempt_id: str,
+                                 failure_type: str,
+                                 evaluator_receipt_sha256: str) -> dict:
+        """Keep an invalid GUI/provider attempt visible, never score it zero."""
+        starts = [row for row in self._events('selection_started')
+                  if row['data']['attempt_id'] == attempt_id]
+        _require(len(starts) == 1 and
+                 self._selection_completion(attempt_id) is None and
+                 failure_type in {'provider', 'transport', 'environment',
+                                  'verifier'} and
+                 cell_final.is_hash(evaluator_receipt_sha256),
+                 'selection_invalid_receipt_or_attempt_missing')
+        row = self.journal.append('selection_invalid', {
+            'attempt_id': attempt_id,
+            'round_index': starts[0]['data']['round_index'],
+            'failure_type': failure_type,
+            'evaluator_receipt_sha256': evaluator_receipt_sha256,
+            'epoch_seconds': int(self.now()),
+        })
+        return row['data']
+
+    def _incumbent(self) -> tuple[str, dict[str, int]]:
+        base, base_raw = _json(self.directory / 'base-selection.private.json',
+                               'base_selection')
+        base_events = self._events('base_selection')
+        _require(len(base_events) == 1 and
+                 base_events[0]['data']['result_sha256'] == _sha(base_raw),
+                 'base_selection_receipt_changed')
+        scores = self._selection_result(
+            base, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
+        checkpoint = self.intent['base_checkpoint_sha256']
+        for event in self._events('selection_scored'):
+            result, raw = _json(
+                self.directory /
+                f"selection-{event['data']['attempt_id']}.private.json",
+                'selection_scored')
+            _require(_sha(raw) == event['data']['result_sha256'],
+                     'selection_result_changed_after_scoring')
+            candidate = self._selection_result(
+                result,
+                checkpoint_sha256=event['data']['checkpoint_path_sha256'])
+            regressions = sum(candidate[key] < scores[key] for key in scores)
+            promoted = sum(candidate.values()) > sum(scores.values()) and\
+                regressions == 0
+            _require(promoted == event['data']['promoted'] and
+                     regressions == event['data']['regressions_vs_incumbent'] and
+                     sum(candidate.values()) == event['data']['score_wins'] and
+                     checkpoint == event['data']
+                     ['incumbent_before_checkpoint_sha256'] and
+                     (result['checkpoint_sha256'] if promoted else checkpoint) ==
+                     event['data']['incumbent_after_checkpoint_sha256'],
+                     'selection_promotion_rule_or_scores_changed')
+            if promoted:
+                checkpoint, scores = result['checkpoint_sha256'], candidate
+        return checkpoint, scores
+
+    def record_selection_scored(self, *, attempt_id: str, result: dict,
+                                paid_attempt_ids: list[str]) -> dict:
+        self._check_time()
+        starts = [row for row in self._events('selection_started')
+                  if row['data']['attempt_id'] == attempt_id]
+        _require(len(starts) == 1 and
+                 self._selection_completion(attempt_id) is None and
+                 type(paid_attempt_ids) is list and
+                 len(paid_attempt_ids) == len(set(paid_attempt_ids)) and
+                 paid_attempt_ids,
+                 'selection_scored_attempt_or_cost_calls_invalid')
+        started = starts[0]['data']
+        scores = self._selection_result(
+            result, checkpoint_sha256=started['checkpoint_path_sha256'])
+        # All provider work used by the cell worker must be retained in this
+        # campaign's paid ledger. Both the Qwen sampler and original-software
+        # execution environment are required. Billing settles before freeze.
+        paid = {row['data']['attempt_id']: row['data']
+                for row in self._events('paid_intent')}
+        selection_started_sequence = starts[0]['sequence']
+        selection_paid = [row for row in self._events('paid_intent')
+                          if row['data']['attempt_id'] in paid_attempt_ids]
+        _require(set(paid_attempt_ids) <= set(paid) and
+                 all(paid_id.startswith(attempt_id + '-')
+                     for paid_id in paid_attempt_ids) and
+                 all(row['sequence'] > selection_started_sequence for row in
+                     selection_paid) and
+                 set(paid_attempt_ids) <= {
+                     row['data']['attempt_id'] for row in
+                     self._events('paid_result')} and
+                 {'tinker', 'e2b'} <= {
+                     paid[paid_id]['category'] for paid_id in paid_attempt_ids},
+                 'selection_sampler_or_environment_cost_missing')
+        current_checkpoint, incumbent = self._incumbent()
+        regressions = sum(scores[key] < incumbent[key] for key in scores)
+        promoted = sum(scores.values()) > sum(incumbent.values()) and\
+            regressions == 0
+        raw = _canonical(result)
+        _private_write_new(self.directory /
+                           f'selection-{attempt_id}.private.json', raw)
+        self.journal.append('selection_scored', {
+            'attempt_id': attempt_id,
+            'round_index': started['round_index'],
+            'checkpoint_path_sha256': started['checkpoint_path_sha256'],
+            'result_sha256': _sha(raw),
+            'score_wins': sum(scores.values()),
+            'regressions_vs_incumbent': regressions,
+            'promoted': promoted,
+            'incumbent_before_checkpoint_sha256': current_checkpoint,
+            'incumbent_after_checkpoint_sha256': (
+                started['checkpoint_path_sha256'] if promoted else
+                current_checkpoint),
+            'paid_attempt_ids': paid_attempt_ids,
+            'epoch_seconds': int(self.now()),
+        })
+        return {'attempt_id': attempt_id,
+                'score_wins': sum(scores.values()),
+                'regressions_vs_incumbent': regressions,
+                'promoted': promoted,
+                'selected_checkpoint_path_sha256': (
+                    started['checkpoint_path_sha256'] if promoted else
+                    current_checkpoint)}
+
+    def freeze_selection(self) -> dict:
+        """Freeze selected checkpoint before any hidden final evaluation."""
+        self._check_time()
+        self._audit_paid_files()
+        _require(not self._events('selection_frozen') and
+                 self._events('tinker_checkpoint') and
+                 self._events('selection_scored') and
+                 not self._inflight_attempts() and
+                 not self._orphan_budget_attempts() and
+                 not self._unresolved_failure(),
+                 'selection_freeze_requires_complete_reconciled_search')
+        for start in self._events('selection_started'):
+            _require(self._selection_completion(start['data']['attempt_id'])
+                     is not None,
+                     'selection_attempt_unresolved')
+        state = self.budget.owner_attempts(self.owner)
+        _require(all(row['status'] in {'settled', 'cancelled'} for row in
+                     state.values()),
+                 'provider_usage_not_reconciled_before_selection_freeze')
+        checkpoint, scores = self._incumbent()
+        started = self._events('campaign_started')[0]['data']['epoch_seconds']
+        frozen_at = int(self.now())
+        checkpoints = [row['data'] for row in self._events('tinker_checkpoint')]
+        selections = [row['data'] for row in self._events('selection_scored')]
+        receipt = {
+            'schema': 'cua-full-study-selection-freeze-v1',
+            'cell_id': self.intent['cell_id'],
+            'researcher_id': self.intent['researcher_id'],
+            'base_checkpoint_sha256': self.intent['base_checkpoint_sha256'],
+            'selected_checkpoint_sha256': checkpoint,
+            'training_lineage_sha256': _sha(_canonical(checkpoints)),
+            'selection_results_sha256': _sha(_canonical(selections)),
+            'selection_frozen_at': frozen_at,
+            'campaign_started_at': started,
+            'campaign_finished_at': frozen_at,
+            'candidate_count': int(
+                self._counter_totals()['candidate_submissions']),
+            'selection_evaluations': int(
+                self._counter_totals()['selection_evaluations']),
+        }
+        raw = _canonical(receipt)
+        _private_write_new(self.directory / 'selection-freeze.private.json', raw)
+        self.journal.append('selection_frozen', {
+            'freeze_sha256': _sha(raw),
+            'selected_checkpoint_sha256': checkpoint,
+            'selected_selection_wins': sum(scores.values()),
+            'epoch_seconds': frozen_at,
+        })
+        return {'selection_freeze_sha256': _sha(raw),
+                'selected_checkpoint_sha256': checkpoint,
+                'selected_selection_wins': sum(scores.values()),
+                'candidate_count': receipt['candidate_count'],
+                'selection_evaluations': receipt['selection_evaluations']}
+
     def dispatch_paid(self, *, attempt_id: str, category: str,
                       work: object, request: object, reserve_usd: str,
                       resource_reservation: dict[str, str],
@@ -393,7 +1328,20 @@ class CampaignSession:
         the existing intent/dispatched dollar reservation blocks replay. The
         caller must reconcile actual provider usage independently.
         """
+        with self._operation_lock():
+            return self._dispatch_paid_locked(
+                attempt_id=attempt_id, category=category, work=work,
+                request=request, reserve_usd=reserve_usd,
+                resource_reservation=resource_reservation,
+                provider=provider)
+
+    def _dispatch_paid_locked(self, *, attempt_id: str, category: str,
+                              work: object, request: object,
+                              reserve_usd: str,
+                              resource_reservation: dict[str, str],
+                              provider: Callable[[object], object]) -> dict:
         self._check_time()
+        self._audit_paid_files()
         _require(not self._events('selection_frozen') and
                  not self._unresolved_failure() and
                  not self._inflight_attempts() and
@@ -407,7 +1355,7 @@ class CampaignSession:
         _require(not any(row['data']['attempt_id'] == attempt_id for row in
                          self._events('paid_intent')),
                  'attempt_already_recorded_no_automatic_replay')
-        units = self._check_resources(category, resource_reservation)
+        units = self._check_resources(category, resource_reservation, request)
         request_raw = _canonical(request)
         _require(len(request_raw) <= MAX_PRIVATE_JSON_BYTES,
                  'paid_request_too_large')
@@ -438,17 +1386,33 @@ class CampaignSession:
             _require(len(result_raw) <= MAX_PRIVATE_JSON_BYTES,
                      'paid_result_too_large')
             _private_write_new(result_path, result_raw)
+            provider_receipt = (result.get('receipt') if
+                                type(result) is dict else None)
+            usage = (provider_receipt.get('usage') if
+                     type(provider_receipt) is dict else
+                     result.get('usage') if type(result) is dict else None)
+            usage_counts = None
+            if (type(usage) is dict and
+                    type(usage.get('input_tokens')) is int and
+                    type(usage.get('output_tokens')) is int and
+                    usage['input_tokens'] >= 0 and
+                    usage['output_tokens'] >= 0):
+                usage_counts = {'input_tokens': usage['input_tokens'],
+                                'output_tokens': usage['output_tokens']}
             self.journal.append('paid_result', {
                 'attempt_id': attempt_id,
                 'result_sha256': _sha(result_raw),
+                'provider_token_usage': usage_counts,
                 'epoch_seconds': int(self.now()),
             })
             return {'attempt_id': attempt_id, 'result': result,
                     'result_sha256': _sha(result_raw),
                     'billing_state': 'awaiting_provider_usage_reconciliation'}
         except Exception as exc:
-            failure_type = ('provider' if type(exc).__name__ in
-                            {'ProviderFailure', 'APIStatusError'} else 'transport')
+            failure_type = ('verifier' if isinstance(exc, DispatchError) else
+                            'provider' if type(exc).__name__ in
+                            {'ProviderFailure', 'APIStatusError'} else
+                            'transport')
             self.budget.mark_uncertain(attempt_id, failure_type)
             self.journal.append('paid_uncertain', {
                 'attempt_id': attempt_id, 'failure_type': failure_type,
@@ -460,6 +1424,7 @@ class CampaignSession:
     def reconcile_paid(self, attempt_id: str, *, actual_usd: str | None,
                        provider_usage_sha256: str | None = None,
                        provider_no_charge_sha256: str | None = None) -> dict:
+        self._audit_paid_files()
         _require(any(row['data']['attempt_id'] == attempt_id for row in
                      self._events('paid_intent')) and
                  not any(row['data']['attempt_id'] == attempt_id for row in
@@ -503,8 +1468,39 @@ class CampaignSession:
         return record
 
     def snapshot(self) -> dict:
+        self._audit_paid_files()
         events = self._events()
         counters = self._counter_totals()
+        tokens = {'provider_input_tokens': 0,
+                  'provider_output_tokens': 0,
+                  'tinker_scheduled_train_tokens': 0,
+                  'provider_results_without_token_usage': 0}
+        for event in self._events('paid_result'):
+            usage = event['data'].get('provider_token_usage')
+            if usage is None:
+                tokens['provider_results_without_token_usage'] += 1
+            else:
+                tokens['provider_input_tokens'] += usage['input_tokens']
+                tokens['provider_output_tokens'] += usage['output_tokens']
+        tokens['tinker_scheduled_train_tokens'] = sum(
+            event['data']['scheduled_tokens'] for event in
+            self._events('tinker_checkpoint'))
+        cost = {name: {'reserved_or_reconciled_usd': Decimal(0),
+                       'reconciled_usd': Decimal(0),
+                       'unreconciled_reserve_usd': Decimal(0)}
+                for name in dollars.CAMPAIGN_CATEGORIES if
+                name != 'selected_final'}
+        for record in self.budget.owner_attempts(self.owner).values():
+            item = cost[record['category']]
+            if record['status'] == 'cancelled':
+                continue
+            if record['status'] in {'settled', 'overrun'}:
+                amount = Decimal(record['actual_usd'])
+                item['reconciled_usd'] += amount
+            else:
+                amount = Decimal(record['reserved_usd'])
+                item['unreconciled_reserve_usd'] += amount
+            item['reserved_or_reconciled_usd'] += amount
         return {'schema': SCHEMA, 'owner': self.owner,
                 'plan_sha256': self.study.plan_sha256,
                 'public_witness_sha256': self.study.public_witness_sha256,
@@ -516,6 +1512,10 @@ class CampaignSession:
                 'orphan_budget_attempts': sorted(self._orphan_budget_attempts()),
                 'resource_reserved': {key: str(value)
                                       for key, value in counters.items()},
+                'token_telemetry': tokens,
+                'cost_accounting_usd': {
+                    name: {key: str(value) for key, value in row.items()}
+                    for name, row in cost.items()},
                 'selection_frozen': bool(self._events('selection_frozen')),
                 'journal_head_sha256': events[-1]['hash'] if events else
                     self.journal.rows()[0]['hash']}
