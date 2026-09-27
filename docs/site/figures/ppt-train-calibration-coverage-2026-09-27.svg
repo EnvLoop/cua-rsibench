@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="670" viewBox="0 0 1180 670" role="img" aria-labelledby="title desc">
+<title id="title">PowerPoint training calibration coverage</title>
+<desc id="desc">Ten workflows each have eight four-target training analogues from eight source families. All eighty pass offline controls; model difficulty and Office web behavior remain unmeasured.</desc>
+<rect width="1180" height="670" fill="#f6f8fb"/>
+<rect x="20" y="18" width="1140" height="632" rx="20" fill="#ffffff" stroke="#dce4ec"/>
+<text x="48" y="70" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#102a43">PowerPoint training calibration coverage</text>
+<text x="48" y="101" font-family="Arial,sans-serif" font-size="15" fill="#52677a">Four-target, seven-slide analogues on train-only WDI sources · offline evidence</text>
+<rect x="901" y="49" width="223" height="42" rx="21" fill="#e5f5ee"/>
+<text x="1012" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#116446">80 / 80 offline QA</text>
+<text x="48" y="142" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1" fill="#60768b">CAUSAL WORKFLOW</text>
+<text x="428" y="142" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1" fill="#60768b">TRAIN-ONLY SOURCE FAMILIES</text>
+<rect x="36" y="143" width="1108" height="37" rx="7" fill="#f7f9fc"/>
+<text x="48" y="166" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Nominal output growth</text>
+<rect x="428" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="148" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="166" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<text x="48" y="206" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Per-capita growth</text>
+<rect x="428" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="188" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="206" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<rect x="36" y="223" width="1108" height="37" rx="7" fill="#f7f9fc"/>
+<text x="48" y="246" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Inflation acceleration</text>
+<rect x="428" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="228" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="246" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<text x="48" y="286" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Labor-rate change</text>
+<rect x="428" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="268" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="286" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<rect x="36" y="303" width="1108" height="37" rx="7" fill="#f7f9fc"/>
+<text x="48" y="326" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Population growth</text>
+<rect x="428" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="308" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="326" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<text x="48" y="366" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Output/person divergence</text>
+<rect x="428" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="348" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="366" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<rect x="36" y="383" width="1108" height="37" rx="7" fill="#f7f9fc"/>
+<text x="48" y="406" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Price–labor spread</text>
+<rect x="428" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="508" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="588" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="668" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="748" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="828" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="908" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<rect x="988" y="388" width="64" height="26" rx="6" fill="#2f7ba6"/>
+<text x="1118" y="406" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<text x="48" y="446" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Dual-threshold review</text>
+<rect x="428" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="508" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="588" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="668" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="748" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="828" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="908" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="988" y="428" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<text x="1118" y="446" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<rect x="36" y="463" width="1108" height="37" rx="7" fill="#f7f9fc"/>
+<text x="48" y="486" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Source-year reconciliation</text>
+<rect x="428" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="508" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="588" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="668" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="748" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="828" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="908" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="988" y="468" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<text x="1118" y="486" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<text x="48" y="526" font-family="Arial,sans-serif" font-size="15" fill="#1d3448">Chart-caption reconciliation</text>
+<rect x="428" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="508" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="588" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="668" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="748" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="828" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="908" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<rect x="988" y="508" width="64" height="26" rx="6" fill="#2c8c7f"/>
+<text x="1118" y="526" text-anchor="end" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#23445f">8 / 8</text>
+<line x1="48" y1="568" x2="1132" y2="568" stroke="#dce4ec"/>
+<text x="48" y="598" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#102a43">Train-only structural coverage is complete.</text>
+<text x="48" y="624" font-family="Arial,sans-serif" font-size="14" fill="#52677a">Paired Qwen vs Astra/Sol saved-state scores: 0 · Office-web GUI admissions: 0 · Official final admissions: 0</text>
+</svg>
