@@ -17,6 +17,7 @@ from unittest.mock import AsyncMock, patch
 from PIL import Image
 
 from cursibench import full_study_campaign_dispatch_v1 as campaign
+from cursibench import full_study_selection_paid_coverage_v1 as paid_coverage
 from cursibench.scale_action_contract import make_observation
 from gitlab_world import (bootstrap, factory, operators, reset, runtime,
                           selection_worker_v066 as selection)
@@ -233,6 +234,20 @@ class SelectionWorkerTests(unittest.TestCase):
                          [task["task_id"] for task in self.tasks])
         self.assertEqual(sum(row["score"] for row in rows), 20)
         self.assertEqual(len(result["paid_attempt_ids"]), 40)
+        paid_projection = paid_coverage.validate(
+            cell_id="gitlab", attempt_id=self.started["attempt_id"],
+            checkpoint_sha256=self.started["checkpoint_path_sha256"],
+            selection_tasks=self.started["selection_tasks"],
+            selection_identities_sha256=self.started[
+                "selection_identities_sha256"],
+            paid_calls=[{
+                "attempt_id": call["attempt_id"],
+                "category": call["category"],
+                "request": call["request"],
+                "result_present": True,
+            } for call in self.session.calls],
+            related_paid_attempt_ids=set(result["paid_attempt_ids"]))
+        self.assertEqual(paid_projection["sample_paid_attempt_count"], 20)
         self.assertEqual({row["category"] for row in self.session.calls},
                          {"tinker", "storage_application"})
         self.assertEqual(sum(row["category"] == "storage_application"

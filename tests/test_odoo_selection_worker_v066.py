@@ -15,6 +15,7 @@ from unittest.mock import patch
 from PIL import Image
 
 from cursibench import full_study_campaign_dispatch_v1 as campaign
+from cursibench import full_study_selection_paid_coverage_v1 as paid_coverage
 from cursibench import scale_final_v06 as final
 from cursibench.scale_action_contract import make_observation
 from enterprise_fallback.odoo18 import selection_worker_v066 as selection
@@ -279,6 +280,21 @@ class SelectionWorkerTests(unittest.TestCase):
         self.assertEqual(len(self.environment.cases), 20)
         self.assertEqual(self.sampler.calls, 20)
         self.assertEqual(len(outcome["paid_attempt_ids"]), 22)
+        paid_projection = paid_coverage.validate(
+            cell_id="odoo-community",
+            attempt_id=self.started["attempt_id"],
+            checkpoint_sha256=self.started["checkpoint_path_sha256"],
+            selection_tasks=self.started["selection_tasks"],
+            selection_identities_sha256=self.started[
+                "selection_identities_sha256"],
+            paid_calls=[{
+                "attempt_id": call["attempt_id"],
+                "category": call["category"],
+                "request": call["request"],
+                "result_present": "result" in call,
+            } for call in self.paid.calls],
+            related_paid_attempt_ids=set(outcome["paid_attempt_ids"]))
+        self.assertEqual(paid_projection["sample_paid_attempt_count"], 20)
         self.assertEqual(outcome["task_ledger_path"], str(self.out /
                          "task-ledger.private.json"))
         self.assertEqual(outcome["task_ledger_sha256"], digest((self.out /
