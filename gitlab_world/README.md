@@ -32,4 +32,6 @@ The deterministic Playwright qualification drivers use visible UI controls but a
 
 The [visible-save calibration](../docs/evidence/gitlab-visible-save-calibration-2026-09-27.md) records a training-partition probe of GitLab's assignee and due-date display timing. The operator waits for visible saved state and confirms due-date persistence after a reload. Earlier failed evaluator-private controls remain in the append-only ledger and are not silently retried.
 
+The [pre-result control resolution plan](../docs/evidence/gitlab-pre-result-control-resolution-2026-09-27.md) keeps those failures in the denominator, limits any later fresh-clone requalification to one audited attempt per failed ID, and requires whole-source-family quarantine and replacement if an unstable control cannot qualify before model execution.
+
 GitLab fixture setup follows the official [projects](https://docs.gitlab.com/api/projects/), [issues](https://docs.gitlab.com/api/issues/), [milestones](https://docs.gitlab.com/api/milestones/), [members](https://docs.gitlab.com/api/project_members/), [repository commits](https://docs.gitlab.com/api/commits/), and [merge requests](https://docs.gitlab.com/api/merge_requests/) API documentation. Context7 documentation lookup reached its monthly quota during development; these primary docs and the running 18.5 instance were used for API verification.
