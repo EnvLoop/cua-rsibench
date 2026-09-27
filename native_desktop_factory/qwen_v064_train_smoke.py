@@ -23,13 +23,17 @@ if __package__:
     from .budget_ledger import audit as audit_budget
     from .gui_control_shell import wait_for_document_ready
     from . import qwen_v064_adapter
-    from .qwen_v064_adapter import dispatch, observe, parse_current_action, render_for_model
+    from . import runtime_fingerprint_probe, profile_canonical
+    from .qwen_v064_adapter import (PhysicalFrameDrift, dispatch, observe,
+                                    parse_current_action, render_for_model)
     from .verify import verify
 else:
     from budget_ledger import audit as audit_budget
     from gui_control_shell import wait_for_document_ready
     import qwen_v064_adapter
-    from qwen_v064_adapter import dispatch, observe, parse_current_action, render_for_model
+    import runtime_fingerprint_probe, profile_canonical
+    from qwen_v064_adapter import (PhysicalFrameDrift, dispatch, observe,
+                                   parse_current_action, render_for_model)
     from verify import verify
 
 from cursibench import scale_action_contract, scale_action_output_v064, scale_vision_proxy
@@ -78,6 +82,8 @@ def main() -> int:
     parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--work-root", type=Path, required=True)
+    parser.add_argument("--guest-identity-manifest", type=Path, required=True)
+    parser.add_argument("--expected-profile-manifest", type=Path, required=True)
     parser.add_argument("--max-actions", type=int, default=3)
     parser.add_argument("--max-samples", type=int, default=4)
     parser.add_argument("--lease-seconds", type=int, default=600)
@@ -92,6 +98,19 @@ def main() -> int:
     if not args.out.resolve().is_relative_to((args.work_root / "gui-diagnostics").resolve()):
         raise ValueError("Output must be inside ledger-visible gui-diagnostics")
     package, baseline, instruction, oracle, filename = preflight(args.package, args.candidate_root)
+    identity_raw = args.guest_identity_manifest.read_bytes()
+    identity = json.loads(identity_raw)
+    if (identity.get("schema") != "cua-native-wdi-guest-content-identity-public-v1"
+            or identity.get("scoped_guest_content_identity_passed") is not True
+            or identity.get("guest_content_probe_script_sha256") !=
+            digest(runtime_fingerprint_probe.GUEST_CONTENT_PROBE.encode())):
+        raise ValueError("Guest-content identity manifest is not bound to this probe")
+    profile_raw = args.expected_profile_manifest.read_bytes()
+    profile_expected = json.loads(profile_raw)
+    if (profile_expected.get("schema") != "cua-native-wdi-profile-drift-analysis-public-v1"
+            or profile_expected.get("canonical_profile_stable_across_two_probes") is not True
+            or profile_expected.get("canonicalizer_sha256") != source_digest(profile_canonical)):
+        raise ValueError("Canonical profile manifest is not bound to this parser")
     budget = audit_budget(args.work_root, proposed_new_sandboxes=1,
                           proposed_lease_seconds=args.lease_seconds,
                           max_lane_reserved_usd=args.max_lane_reserved_usd)
@@ -113,11 +132,15 @@ def main() -> int:
         "shared_action_parser_sha256": source_digest(scale_action_contract),
         "shared_v064_adapter_sha256": source_digest(scale_action_output_v064),
         "shared_vision_proxy_sha256": source_digest(scale_vision_proxy),
+        "expected_guest_identity_manifest_sha256": digest(identity_raw),
+        "expected_profile_manifest_sha256": digest(profile_raw),
         "e2b_lane_budget_before": {k: budget[k] for k in (
             "past_conservative_reserved_usd", "proposed_reserved_usd",
             "combined_reserved_usd", "lane_usd_cap")},
         "sampling": [], "actions": [], "frame_screenshots": [],
+        "stale_recheck_screenshots": [],
         "provider_billed_usd": None,
+        "stage": "pre_provider",
     }
 
     def persist():
@@ -141,6 +164,7 @@ def main() -> int:
         receipt["renderer_identity"] = renderer.identity
         receipt["sampling_binding_sha256"] = sampler.binding_sha256
         persist()
+        receipt["stage"] = "create_desktop"
         sandbox = Sandbox.create(template="desktop", resolution=(1280, 800),
                                  timeout=args.lease_seconds, allow_internet_access=False)
         receipt["sandbox_id_sha256"] = digest(sandbox.sandbox_id.encode())
@@ -152,10 +176,35 @@ def main() -> int:
         if (info.template_id != args.expected_template_id
                 or info.cpu_count > 8 or info.memory_mb > 8192):
             raise ValueError("E2B Desktop image or resource shape drifted")
+        receipt["stage"] = "guest_content_attestation"
+        sandbox.files.write("/tmp/native-guest-content-probe.py",
+                            runtime_fingerprint_probe.GUEST_CONTENT_PROBE.encode())
+        guest_result = sandbox.commands.run(
+            "sudo -n python3 /tmp/native-guest-content-probe.py",
+            timeout=450, request_timeout=480)
+        if guest_result.exit_code != 0:
+            raise ValueError("Fresh guest content probe failed")
+        guest_content = json.loads(guest_result.stdout)
+        if (guest_content.get("content_tree_sha256") != identity["static_content_sha256"]
+                or guest_content.get("counts") != identity["static_content_counts"]
+                or guest_content.get("kernel") != identity["kernel_identity"]
+                or guest_content.get("excluded_paths") != identity["static_content_excluded_paths"]
+                or info.template_id != identity["provider_template_id"]):
+            raise ValueError("Guest content differs from independent frozen identity")
+        receipt["guest_content_attested"] = True
+        receipt["guest_content_sha256"] = guest_content["content_tree_sha256"]
+        initial_profile = sandbox.commands.run(
+            "test ! -e /home/user/.config/libreoffice/4/user")
+        if initial_profile.exit_code != 0:
+            raise ValueError("Fresh LibreOffice profile was already present")
+        receipt["fresh_libreoffice_profile_absent"] = True
+        persist()
+        receipt["stage"] = "stage_public_training_input"
         remote = "/home/user/" + filename
         sandbox.files.write(remote, baseline)
         if bytes(sandbox.files.read(remote, format="bytes")) != baseline:
             raise ValueError("Trusted staged input differs from bound baseline")
+        receipt["stage"] = "open_training_document"
         sandbox.open(remote)
         receipt["trusted_setup_ready"] = wait_for_document_ready(sandbox, filename)
         # The stock LibreOffice first-run Tip may appear after the window title
@@ -166,6 +215,36 @@ def main() -> int:
         time.sleep(1)
         receipt["trusted_setup_late_tip_guard"] = True
         persist()
+
+        sandbox.files.write("/tmp/native-profile-file-probe.py",
+                            runtime_fingerprint_probe.PROFILE_FILE_PROBE.encode())
+
+        def canonical_profile() -> str:
+            profile_result = sandbox.commands.run("python3 /tmp/native-profile-file-probe.py")
+            if profile_result.exit_code != 0:
+                raise ValueError("Neutral profile-file manifest failed")
+            rows = json.loads(profile_result.stdout)
+            registry = bytes(sandbox.files.read(
+                "/home/user/.config/libreoffice/4/user/registrymodifications.xcu",
+                format="bytes"))
+            return profile_canonical.canonical_profile_tree(rows, registry)
+
+        receipt["stage"] = "first_task_bound_profile_snapshot"
+        persist()
+        profile_digest_1 = canonical_profile()
+        receipt["task_bound_profile_first_sha256"] = profile_digest_1
+        persist()
+        time.sleep(1)
+        receipt["stage"] = "second_task_bound_profile_snapshot"
+        persist()
+        profile_digest_2 = canonical_profile()
+        if (profile_digest_1 != profile_digest_2
+                or profile_digest_1 != profile_expected["canonical_profile_tree_sha256"]):
+            raise ValueError("Task-bound LibreOffice profile differs from canonical neutral baseline")
+        receipt["task_bound_canonical_profile_sha256"] = profile_digest_1
+        receipt["task_bound_profile_attested"] = True
+        persist()
+        receipt["stage"] = "qwen_actor_sampling"
         previous = None
         memory = ""
         step = 0
@@ -189,13 +268,21 @@ def main() -> int:
             if result["status"] != "completed":
                 receipt["status"] = "provider_sampling_error"
                 break
+            def save_stale_frame(raw: bytes) -> None:
+                (args.out / f"stale-recheck-{sample_index}.png").write_bytes(raw)
+                receipt["stale_recheck_screenshots"].append({
+                    "sample_index": sample_index, "sha256": digest(raw),
+                    "bytes": len(raw),
+                })
+                persist()
             try:
-                action = parse_current_action(result["text"], frame, sandbox)
+                action = parse_current_action(result["text"], frame, sandbox,
+                                              on_stale_frame=save_stale_frame)
             except scale_action_contract.ContractError as exc:
                 receipt["actions"].append({"step": step, "status": "rejected",
                                            "error_code": exc.code})
                 persist()
-                if exc.code == "stale_frame" and sample_index + 1 < args.max_samples:
+                if isinstance(exc, PhysicalFrameDrift) and sample_index + 1 < args.max_samples:
                     continue
                 receipt["status"] = "model_output_or_frame_rejected"
                 break
@@ -231,6 +318,7 @@ def main() -> int:
     except Exception as exc:
         receipt["status"] = "infrastructure_or_runner_error"
         receipt["error_type"] = type(exc).__name__
+        receipt["error_message_private"] = str(exc)[:500]
         persist()
     finally:
         if sandbox is not None:

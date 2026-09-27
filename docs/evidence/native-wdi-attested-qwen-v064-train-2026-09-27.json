@@ -1,0 +1,59 @@
+{
+  "actual_billed_usd": null,
+  "all_sandbox_terminations_verified": true,
+  "all_tinker_sessions_closed": true,
+  "applied_gui_actions": 2,
+  "attempt_count": 6,
+  "checked_date": "2026-09-27",
+  "completed_multimodal_samples": 10,
+  "expected_guest_identity_manifest_sha256": "1173ec245897bfc1d50919212c01736d67f128229231d57344e522e5a15ef911",
+  "expected_profile_manifest_sha256": "8e71a81d7961907755ada9e6d40814ca69ec69b2e0bf4f9e0432ca54e10e837b",
+  "fresh_profile_absence_pass_count": 6,
+  "guest_content_attestation_pass_count": 6,
+  "latest_native_adapter_source_sha256": "b0e7d2ba360c47bfcd08f656c91db7894a7266f1e4eb1ffd68aa03ea43cca3a2",
+  "latest_runner_source_sha256": "8133088ac74a38188eb89debaf926e9b998df28d99343931acc8d42b5934c2b4",
+  "latest_shared_action_parser_sha256": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+  "latest_shared_v064_adapter_sha256": "3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70",
+  "native_lane_cap_usd": "40",
+  "native_lane_full_server_lease_reserve_usd": "35.22777777777777777777777778",
+  "official_full_study_desktop_admissions": 0,
+  "official_full_study_desktop_model_results": 0,
+  "physical_stale_recheck_screenshot_count": 0,
+  "private_receipt_sha256s": [
+    "c32a909d8848ffa16d0b5ba4120478aa20fcda8f46ad575fdcb3532011119ce8",
+    "16849efb680a90b240ecb6ce8a39203c9d70909d0e234c4a7c10d790b0ab6f2a",
+    "eddcb551c7722f5e157a5f0196fee620f2094163ea35e89cb8d4357ee013d8cb",
+    "f3898cde6309d7b8823d6f9f4581b066b1fb69e4e9044b2c6ee1c48af484431d",
+    "b0eb124cc680641db412df530b5b1eae00ce83ade34eb6fb07de74517bf06eba",
+    "45cdea811072e67b2a5b9e59e248d2a2095df6bee50538988e6667b464759345"
+  ],
+  "private_setup_error_type_counts": {
+    "SandboxException": 2
+  },
+  "provider_envd_version": "0.9.0",
+  "provider_template_id": "k0wmnzir0zuzye6dndlw",
+  "rejected_action_code_counts": {
+    "invalid_action": 2,
+    "stale_frame": 6
+  },
+  "returned_image_token_counts": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ],
+  "saved_training_artifact_changed_count": 0,
+  "schema": "cua-native-wdi-attested-qwen-v064-train-public-v1",
+  "scope": "Six bounded Qwen3.8-27B development attempts on one training-only native Calc package after independent guest-content and task-bound profile checks. No final-candidate model attempt or official result.",
+  "status_counts": {
+    "infrastructure_or_runner_error": 2,
+    "model_output_or_frame_rejected": 4
+  },
+  "task_bound_canonical_profile_pass_count": 4
+}

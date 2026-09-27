@@ -1,0 +1,69 @@
+{
+  "actual_billed_usd": null,
+  "checked_date": "2026-09-27",
+  "distinct_guest_probes": 4,
+  "fresh_libreoffice_profile_absent_in_both_static_probes": true,
+  "full_six_cell_pre_campaign_gate_passed": false,
+  "guest_content_probe_script_sha256": "b100506021bfe575ceefec9dc818b83821cfd02873098002658f782f433b5418",
+  "kernel_identity": {
+    "machine": "x86_64",
+    "release": "6.1.158+",
+    "system": "Linux",
+    "version": "#1 SMP PREEMPT_DYNAMIC Tue Jul 28 15:38:05 UTC 2026"
+  },
+  "native_lane_cap_usd": "40",
+  "native_lane_full_server_lease_reserve_usd": "34.22777777777777777777777778",
+  "official_desktop_final_admissions": 0,
+  "official_desktop_model_results": 0,
+  "personalized_ca_byte_sizes_equal": [
+    true,
+    true
+  ],
+  "private_compressed_manifest_sha256s": [
+    "129a69fa6cbaf03bcb86499f670cfe2dd6c5d56090afbb39c99451debaa56991",
+    "32b37df7a6872bd38f16b44e0ef5b616c204b71c4b55284689fb2fa644aa933e",
+    "82d536d651f74d05a203afc284c1c8460fa62b2866c0c585e931ed433a80b6a1",
+    "82d536d651f74d05a203afc284c1c8460fa62b2866c0c585e931ed433a80b6a1"
+  ],
+  "private_receipt_sha256s": [
+    "ce1b7bd6228dcdd2a855cd026af6df7282d58b0fc9615b0b4b34744d86c4fee1",
+    "949fe2426ed16ae3fc10194e7d5f0e40ce3dfb1557d4adffb8d2292612c1f210",
+    "22b273bce7103a5a6c0b6e971c94d66da4f487b2cea0b1c16fee6373d14b9922",
+    "dbdaffb1e3d8ba2bfb31c597081cf501eb7f424da0ff8a31eaeec3dec34b1f57"
+  ],
+  "provider_envd_version": "0.9.0",
+  "provider_image_digest_available": false,
+  "provider_shape": {
+    "memory_mb": 8192,
+    "vcpu": 8
+  },
+  "provider_template_id": "k0wmnzir0zuzye6dndlw",
+  "schema": "cua-native-wdi-guest-content-identity-public-v1",
+  "scope": "Four distinct neutral E2B Desktop sandboxes; no model or final package. Two unrestricted manifests isolated dynamic CA files, and two new manifests proved exact static-content equality after excluding only those files plus five sandbox network/identity paths.",
+  "scoped_guest_content_identity_passed": true,
+  "static_content_counts": {
+    "directory": 8006,
+    "missing": 0,
+    "regular_file": 64636,
+    "special": 0,
+    "symlink": 28019
+  },
+  "static_content_entry_count": 100661,
+  "static_content_excluded_paths": [
+    "/etc/hostname",
+    "/etc/hosts",
+    "/etc/machine-id",
+    "/etc/mtab",
+    "/etc/resolv.conf",
+    "/etc/ssl/certs/ca-certificates.crt",
+    "/usr/local/share/ca-certificates/e2b-ca.crt"
+  ],
+  "static_content_sha256": "337e2d85f50731054ae8c23b6fd3e84383bd03a66cd74b20baf5d0c14d2223a0",
+  "static_regular_file_bytes_hashed": 5089062802,
+  "unexcluded_changed_entry_count": 2,
+  "unexcluded_changed_paths": [
+    "/etc/ssl/certs/ca-certificates.crt",
+    "/usr/local/share/ca-certificates/e2b-ca.crt"
+  ],
+  "unexcluded_guest_entry_count": 100663
+}

@@ -56,6 +56,8 @@ A separate [two-sandbox runtime fingerprint](../docs/evidence/native-wdi-runtime
 
 The later [profile drift analysis](../docs/evidence/native-wdi-profile-drift-2026-09-27.md) traced the cross-sandbox raw profile mismatch to two numeric prompt-timing properties in `registrymodifications.xcu`. A strict audit-only canonicalization matched the two detailed profile snapshots; it is **not** applied to live sandboxes and does not pass the image/profile freeze gate. The profile continued to write during neutral open, and image identity is still unavailable.
 
+The [scoped guest-content identity candidate](../docs/evidence/native-wdi-guest-content-identity-2026-09-27.md) now hashes system paths, file bytes, ownership/modes and symlinks before document staging. Four neutral sandboxes proved that two personalized E2B CA files are the only differences among 100,663 otherwise comparable records; after seven explicitly listed exclusions, two new sandboxes matched on 100,661 entries and kernel identity. A [train-only Qwen v0.6.4 attestation smoke](../docs/evidence/native-wdi-attested-qwen-v064-train-2026-09-27.md) exercised the fail-closed guest and task-bound canonical profile checks before model sampling. This is an auditable substitute **proposal**, not a provider image digest or official admission. Every final task still needs a task-specific neutral profile baseline, and the shared Qwen model-output interface needs pre-result review.
+
 ## Remaining work before a publishable final cell
 
 - Bind the **completed** 100/100 native-GUI and 25/25 Impress-normalization evidence, plus the v2 fair saved-artifact scorer bundle SHA-256, into the six-cell pre-campaign freeze before any official Qwen attempt. Preserve screenshots and actual file bytes privately.

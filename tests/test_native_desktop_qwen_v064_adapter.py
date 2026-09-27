@@ -12,7 +12,8 @@ from PIL import Image
 
 from cursibench.scale_action_contract import ContractError
 from native_desktop_factory.qwen_v064_adapter import (
-    application_frame_digest, dispatch, observe, parse_current_action, render_for_model,
+    PhysicalFrameDrift, application_frame_digest, dispatch, observe,
+    parse_current_action, render_for_model,
 )
 from native_desktop_factory.qwen_v064_train_smoke import preflight
 
@@ -62,11 +63,18 @@ class DesktopV064AdapterTests(unittest.TestCase):
 
     def test_drift_and_nongui_outputs_do_not_dispatch(self):
         self.sandbox.image = png("black")
-        with self.assertRaisesRegex(ContractError, "stale_frame"):
+        stale_frames = []
+        with self.assertRaises(PhysicalFrameDrift):
             parse_current_action('{"type":"click","target":{"x":91,"y":242}}',
-                                 self.frame, self.sandbox)
+                                 self.frame, self.sandbox,
+                                 on_stale_frame=stale_frames.append)
+        self.assertEqual(stale_frames, [self.sandbox.image])
         self.assertEqual(self.sandbox.calls, [])
         self.sandbox.image = png()
+        with self.assertRaisesRegex(ContractError, "stale_frame") as error:
+            parse_current_action('{"type":"click","target":{"ref":"visible-ref"}}',
+                                 self.frame, self.sandbox)
+        self.assertNotIsInstance(error.exception, PhysicalFrameDrift)
         with self.assertRaisesRegex(ContractError, "invalid_action"):
             parse_current_action('{"type":"shell","command":"ls"}',
                                  self.frame, self.sandbox)

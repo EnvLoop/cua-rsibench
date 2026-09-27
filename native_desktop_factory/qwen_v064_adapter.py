@@ -16,6 +16,14 @@ from cursibench.scale_action_contract import ContractError, ContractLimits, make
 from cursibench.scale_action_output_v064 import normalize_model_action, render_for_model
 
 
+class PhysicalFrameDrift(ContractError):
+    """The current screenshot changed; unlike a model's nonexistent ref."""
+
+    def __init__(self):
+        super().__init__("stale_frame")
+
+
+
 def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
@@ -53,11 +61,14 @@ def observe(sandbox, *, task_id: str, task_binding_sha256: str,
     )
 
 
-def parse_current_action(raw: str, observation, sandbox):
+def parse_current_action(raw: str, observation, sandbox, *, on_stale_frame=None):
     """Recheck the physical screen and current frame before returning action."""
-    if application_frame_digest(bytes(sandbox.screenshot())) != application_frame_digest(
+    current = bytes(sandbox.screenshot())
+    if application_frame_digest(current) != application_frame_digest(
             observation.screenshot_bytes):
-        raise ContractError("stale_frame")
+        if on_stale_frame is not None:
+            on_stale_frame(current)
+        raise PhysicalFrameDrift()
     return normalize_model_action(raw, observation,
                                   current_frame_id=observation.frame_id)
 

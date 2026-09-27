@@ -62,6 +62,54 @@ for path in sorted(root.rglob('*')) if root.exists() else []:
 print(json.dumps(rows,sort_keys=True))
 '''
 
+GUEST_CONTENT_PROBE = r'''import gzip,hashlib,json,os,platform,stat
+ROOTS=['/bin','/etc','/lib','/lib64','/opt','/sbin','/usr']
+PERSONALIZED_CA={'/etc/ssl/certs/ca-certificates.crt','/usr/local/share/ca-certificates/e2b-ca.crt'}
+EXCLUDE={'/etc/hostname','/etc/hosts','/etc/resolv.conf','/etc/machine-id','/etc/mtab'}|PERSONALIZED_CA
+summary=hashlib.sha256();counts={'directory':0,'regular_file':0,'symlink':0,'special':0,'missing':0};size=0
+manifest=gzip.GzipFile(filename='/tmp/native-guest-content-files.jsonl.gz',mode='wb',mtime=0)
+def emit(path):
+ global size
+ if path in EXCLUDE:return
+ try: metadata=os.lstat(path)
+ except FileNotFoundError:
+  row=[path,'missing'];counts['missing']+=1
+ else:
+  mode=metadata.st_mode
+  if stat.S_ISDIR(mode): kind='directory'; detail=None
+  elif stat.S_ISLNK(mode): kind='symlink'; detail=os.readlink(path)
+  elif stat.S_ISREG(mode):
+   kind='regular_file';content=hashlib.sha256()
+   with open(path,'rb') as stream:
+    for chunk in iter(lambda:stream.read(1024*1024),b''):content.update(chunk)
+   detail=[metadata.st_size,content.hexdigest()];size+=metadata.st_size
+  else:kind='special';detail=stat.S_IFMT(mode)
+  counts[kind]+=1;row=[path,kind,stat.S_IMODE(mode),metadata.st_uid,metadata.st_gid,detail]
+ encoded=json.dumps(row,sort_keys=True,separators=(',',':')).encode()+b'\n'
+ summary.update(encoded);manifest.write(encoded)
+for root in ROOTS:
+ emit(root)
+ if not os.path.isdir(root) or os.path.islink(root):continue
+ for base,dirs,files in os.walk(root,topdown=True,followlinks=False):
+  dirs.sort();files.sort()
+  for name in list(dirs):
+   path=os.path.join(base,name)
+   emit(path)
+   if os.path.islink(path) or path in EXCLUDE:dirs.remove(name)
+  for name in files:emit(os.path.join(base,name))
+manifest.close()
+personalized=[]
+for path in sorted(PERSONALIZED_CA):
+ with open(path,'rb') as stream:raw=stream.read()
+ personalized.append({'path':path,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
+release=platform.uname()
+print(json.dumps({'schema':'native-guest-content-manifest-v1','roots':ROOTS,
+ 'excluded_paths':sorted(EXCLUDE),'counts':counts,'regular_file_bytes':size,
+ 'content_tree_sha256':summary.hexdigest(),'personalized_ca_files':personalized,
+ 'kernel':{'system':release.system,'release':release.release,
+           'version':release.version,'machine':release.machine}},sort_keys=True))
+'''
+
 
 def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
@@ -128,6 +176,20 @@ def main() -> int:
                 or info.cpu_count > 8 or info.memory_mb > 8192):
             raise ValueError("E2B provider template or resource shape drifted")
         sandbox.files.write("/tmp/native-runtime-probe.py", GUEST_PROBE.encode())
+
+        sandbox.files.write("/tmp/native-guest-content-probe.py", GUEST_CONTENT_PROBE.encode())
+        content_probe = sandbox.commands.run(
+            "sudo -n python3 /tmp/native-guest-content-probe.py",
+            timeout=450, request_timeout=480)
+        if content_probe.exit_code != 0:
+            raise ValueError("Privileged guest-content manifest probe failed")
+        receipt["guest_content_probe_script_sha256"] = digest(GUEST_CONTENT_PROBE.encode())
+        receipt["fresh_guest_content_manifest"] = json.loads(content_probe.stdout)
+        private_manifest = bytes(sandbox.files.read(
+            "/tmp/native-guest-content-files.jsonl.gz", format="bytes"))
+        (args.out.parent / "guest-content-files.jsonl.gz").write_bytes(private_manifest)
+        receipt["private_guest_content_files_gzip_sha256"] = digest(private_manifest)
+        receipt["private_guest_content_files_gzip_bytes"] = len(private_manifest)
 
         def guest_probe() -> dict:
             result = sandbox.commands.run("python3 /tmp/native-runtime-probe.py")
