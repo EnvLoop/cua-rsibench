@@ -63,13 +63,21 @@ class SweepBudgetTests(unittest.TestCase):
                 "status": "healthy_and_terminated", "lease_seconds": 120,
                 "sandbox_id_sha256": "diagnostic-health",
             }))
+            runtime_probe = root / "gui-diagnostics" / "runtime-fingerprint-01" / "receipt.json"
+            runtime_probe.parent.mkdir(parents=True)
+            runtime_probe.write_text(json.dumps({
+                "schema": "cua-native-wdi-runtime-fingerprint-v1",
+                "status": "fingerprinted_and_terminated", "lease_seconds": 120,
+                "sandbox_id_sha256": "runtime-fingerprint-01",
+            }))
             result = budget_ledger.audit(root, proposed_new_sandboxes=2,
                                          proposed_lease_seconds=300,
                                          max_lane_reserved_usd=Decimal("40"))
             self.assertEqual(result["past_by_kind"], {"gui_attempt": 1,
                                                         "health_probe": 3,
-                                                        "neutral_batch": 2})
-            self.assertEqual(result["past_full_server_lease_seconds"], 1840)
+                                                        "neutral_batch": 2,
+                                                        "runtime_probe": 1})
+            self.assertEqual(result["past_full_server_lease_seconds"], 1960)
             self.assertTrue(result["within_cap"])
 
     def test_noid_transport_waits_for_full_lease_and_health_list(self):

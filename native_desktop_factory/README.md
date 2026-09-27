@@ -52,6 +52,8 @@ The [2026-09-27 full GUI audit](../docs/evidence/native-wdi-100-gui-calibration-
 
 The [nonfinal Qwen v0.6.4 live smoke](../docs/evidence/native-wdi-qwen-v064-nonfinal-smoke-2026-09-27.md) independently exercised **training** screenshots, real multimodal Qwen3.8 samples, the shared action parser, and two native GUI clicks in its latest bounded attempt. The two-action smoke made no saved-file change and did not touch a final task. The [adapter](qwen_v064_adapter.py) refuses stale application frames and exposes no document, shell, or oracle action to the model; the [bounded runner](qwen_v064_train_smoke.py) rejects final packages before either provider is created. It is a compatibility check, not an official model result.
 
+A separate [two-sandbox runtime fingerprint](../docs/evidence/native-wdi-runtime-fingerprint-2026-09-27.md) found matching LibreOffice binary, OS/package manifest, installed font-tree and fontconfig hashes, while LibreOffice's 27-file profile after a neutral open differed bytewise. The installed E2B SDK did not expose a provider image digest. The image/profile freeze gate therefore remains open; do not infer full runtime identity from a template ID alone.
+
 ## Remaining work before a publishable final cell
 
 - Bind the **completed** 100/100 native-GUI and 25/25 Impress-normalization evidence, plus the v2 fair saved-artifact scorer bundle SHA-256, into the six-cell pre-campaign freeze before any official Qwen attempt. Preserve screenshots and actual file bytes privately.

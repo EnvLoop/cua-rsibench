@@ -1,0 +1,60 @@
+{
+  "actual_billed_usd": null,
+  "after_open_agreement": {
+    "font_tree": true,
+    "fontconfig_catalog_sha256": true,
+    "fontconfig_entry_count": true,
+    "libreoffice_executable_sha256": true,
+    "libreoffice_profile_tree": false,
+    "libreoffice_version": true,
+    "os_release_sha256": true,
+    "package_count": true,
+    "package_manifest_sha256": true
+  },
+  "after_open_font_file_count": 2616,
+  "after_open_font_tree_sha256": "9b7c3813b5368bdd34a08d56ae6baf12e110da52cdce1c2e830d1dff4d2666a7",
+  "after_open_fontconfig_catalog_sha256": "c144b06aadb6c775fe7fd5dc0df0bb38d2448ccd348120775b9908274d213d62",
+  "after_open_fontconfig_entry_count": 2027,
+  "after_open_libreoffice_executable_sha256": "eb926ee03b6ba1b18e89b4a94cbb7a060ceac31f171b4bf9db5677e848451f86",
+  "after_open_libreoffice_version": "LibreOffice 7.3.7.2 30(Build:2)",
+  "after_open_os_release_sha256": "594d5ddd35aedb47f00d9c34d140017907a5b9f93c975aba125fc924daac5c07",
+  "after_open_package_count": 1176,
+  "after_open_package_manifest_sha256": "8384b079115044967332850ee04e8fc069004dc31d858602988bbeaee28aca90",
+  "after_open_profile_file_count_each": [
+    27,
+    27
+  ],
+  "after_open_profile_tree_sha256s": [
+    "a5117077190b1bb0fab5fcf78298c1daa16b85a24c92cc5c68a46098ec7cd890",
+    "aab54c42d617fa1e9df90ca21cf5a52954d13a38726142e0b0dc1b97abcd3adb"
+  ],
+  "checked_date": "2026-09-27",
+  "distinct_sandboxes": 2,
+  "e2b_desktop_sdk_version": "2.2.0",
+  "e2b_sdk_version_checked_locally": "2.51.0",
+  "fresh_profile_absent_in_both": true,
+  "full_study_official_desktop_admissions": 0,
+  "full_study_official_model_results": 0,
+  "guest_probe_script_sha256": "b387efd6f5f7ad468577a3e66724d95f973a8688e4dcb70bb4b637541b0c9c9c",
+  "image_and_profile_freeze_gate_passed": false,
+  "lane_cap_usd": "40",
+  "lane_full_server_lease_reserve_usd_after_probes": "32.86111111111111111111111111",
+  "neutral_fixture_sha256": "8edcfd3fdbe099830596642c765413a709ae99acaf2dae3970aa307a1369f228",
+  "private_receipt_sha256s": [
+    "163077d0e8a36ce5dcd2410440a836473beec2d3e1f5a66afe31f1bf46eb3520",
+    "144291ded0a0b5389a5c8bc2881b65ab9ea3b8913c25427bbb6e51fb8ee96124"
+  ],
+  "probe_full_server_lease_reserve_usd_each": [
+    "0.0500",
+    "0.0500"
+  ],
+  "provider_envd_version": "0.9.0",
+  "provider_image_digest_exposed_by_installed_sdk": false,
+  "provider_resource_shape": {
+    "memory_mb": 8192,
+    "vcpu": 8
+  },
+  "provider_template_id": "k0wmnzir0zuzye6dndlw",
+  "schema": "cua-native-wdi-desktop-runtime-fingerprint-public-v1",
+  "scope": "Two independent neutral E2B Desktop sandboxes opened the same public training fixture; no model or final package was used."
+}

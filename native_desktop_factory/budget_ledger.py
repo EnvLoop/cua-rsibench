@@ -67,6 +67,17 @@ def audit(work_root: Path, *, proposed_new_sandboxes: int,
         records.append({"kind": "neutral_single", "receipt_sha256": digest(raw),
                         "lease_seconds": 600, "status": receipt["status"],
                         "has_sandbox_id": bool(receipt.get("sandbox_id_sha256"))})
+    for path in sorted((work_root / "gui-diagnostics").glob("runtime-fingerprint-*/receipt.json")):
+        raw = path.read_bytes()
+        receipt = json.loads(raw)
+        if receipt.get("schema") != "cua-native-wdi-runtime-fingerprint-v1":
+            raise ValueError("Runtime fingerprint receipt changed")
+        lease = receipt.get("lease_seconds")
+        if type(lease) is not int or not 120 <= lease <= 600:
+            raise ValueError("Runtime fingerprint server lease is invalid")
+        records.append({"kind": "runtime_probe", "receipt_sha256": digest(raw),
+                        "lease_seconds": lease, "status": receipt.get("status"),
+                        "has_sandbox_id": bool(receipt.get("sandbox_id_sha256"))})
     health_paths = [*(work_root / "sweep-runs").glob("**/health-probe*.json"),
                     *(work_root / "gui-diagnostics").glob("**/health-probe*.json")]
     for health_path in sorted(health_paths):
