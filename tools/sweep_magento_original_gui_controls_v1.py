@@ -300,9 +300,51 @@ def main() -> None:
                     cases[args.start_index]['task_id'],
                     'postpositive scorer/cleanup receipt binding changed')
             recovery_kind = 'postpositive_volatile_metadata_only'
+        elif (last.get('event') ==
+              'operator_reconciled_negative_neutral_ui_unstable' and
+              last.get('task_seeded') is True and
+              last.get('negative_gui_attempted') is False):
+            case_dir = previous.parent / f'case-{args.start_index:03d}'
+            cleanup = case_dir / 'negative/recovery-cleanup.private.json'
+            require(cleanup.is_file() and
+                    sha(cleanup.read_bytes()) ==
+                    last.get('cleanup_receipt_sha256'),
+                    'stopped negative-neutral cleanup receipt changed')
+            record = json.loads(cleanup.read_bytes())
+            require(record.get('schema') ==
+                    'envloop-magento-negative-neutral-ui-cleanup-private-v1' and
+                    record.get('task_id') ==
+                    cases[args.start_index]['task_id'] and
+                    record.get('plan_sha256') == args.plan_sha256 and
+                    record.get('material_state_unchanged') is True and
+                    record.get('saved_positive_score') == 1.0 and
+                    record.get('negative_gui_attempted') is False and
+                    record.get('both_containers_cleaned') is True and
+                    record.get('model_calls') ==
+                    record.get('official_final_admitted') == 0 and
+                    any(row.get('event') == 'step_finished' and
+                        row.get('index') == args.start_index and
+                        row.get('step') == 'negative-neutral' and
+                        row.get('exit_code') != 0 for row in events) and
+                    not any(row.get('event') == 'step_intent' and
+                            row.get('index') == args.start_index and
+                            row.get('step') == 'negative-gui'
+                            for row in events),
+                    'one incomplete negative-neutral control required')
+            recovery_kind = 'postpositive_negative_neutral_ui_unstable'
         else:
             raise ValueError('prior failure type has no approved one-case recovery')
         recovery_sha = sha(previous_raw)
+        for candidate in (ROOT / 'work/magento-original').glob('sweep-*/events.private.jsonl'):
+            if candidate.resolve() == previous:
+                continue
+            lines = candidate.read_bytes().splitlines()
+            if not lines:
+                continue
+            initial = json.loads(lines[0])
+            require(initial.get('recovery_of_private_journal_sha256') !=
+                    recovery_sha,
+                    'one-case recovery already dispatched for this stopped journal')
     out.mkdir(parents=True, mode=0o700)
     lock_path = ROOT / 'work/magento-original/exclusive-worker.lock'
     lock_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
