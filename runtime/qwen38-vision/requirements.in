@@ -1,0 +1,26 @@
+# macOS arm64 / CPython 3.14 full-study training host.
+# The cookbook source is installed separately from the exact audited Git
+# checkout after this hash-locked wheel sync. Its declared dependencies follow.
+tinker==0.30.0
+transformers==5.5.4
+tokenizers==0.22.2
+tml-renderers==0.1.0
+torch==2.13.0
+pillow==12.3.0
+blobfile==3.3.0
+chz==0.4.0
+aiohttp>=3.9.0
+anyio>=4.0.0
+cloudpickle>=3.0.0
+datasets>=2.14.0
+huggingface-hub>=0.20.0
+numpy>=1.24.0
+pydantic>=2.0.0
+rich>=13.0.0
+safetensors>=0.4.0
+termcolor>=2.0.0
+tiktoken>=0.12.0
+tqdm>=4.60.0
+# Pinned in the resolved lock for a non-isolated build of the fixed checkout.
+hatchling>=1.0.0
+hatch-vcs>=0.4.0
