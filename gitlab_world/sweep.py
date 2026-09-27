@@ -86,6 +86,17 @@ def _save(index: dict) -> None:
     temporary.replace(INDEX)
 
 
+def reconcile_failure_ledger(index: dict) -> None:
+    """Never silently retry a failure appended just before an index crash."""
+    ledger = Counter(item["entry_sha256"] for item in failure_ledger.private_entries())
+    recorded = Counter(attempt["failure_ledger_entry_sha256"]
+                       for item in index["items"].values()
+                       for attempt in item.get("attempts", [])
+                       if attempt.get("failure_ledger_entry_sha256"))
+    if ledger != recorded:
+        raise RuntimeError("GitLab failure ledger and mutable sweep index are unreconciled")
+
+
 def public_summary(index: dict) -> dict:
     rows = candidates()
     counts = Counter(index["items"].get(row["task_id"], {}).get("status", "not_attempted")
@@ -148,6 +159,7 @@ async def run(max_tasks: int, *, family: str | None = None,
     if max_tasks < 0 or max_tasks > 100:
         raise ValueError("max_tasks must be 0..100")
     index = _load()
+    reconcile_failure_ledger(index)
     excluded = quarantine.excluded_task_ids()
     eligible = [row for row in candidates()
                 if row["template_group"] in IMPLEMENTED_GUI_FAMILIES

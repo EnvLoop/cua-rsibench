@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from gitlab_world import failure_ledger
+from gitlab_world import failure_ledger, sweep
 
 
 class GitLabFailureLedgerTests(unittest.TestCase):
@@ -28,6 +28,13 @@ class GitLabFailureLedgerTests(unittest.TestCase):
                 self.assertEqual(public["entry_count"], 2)
                 self.assertEqual(public["head_sha256"], second["entry_sha256"])
                 self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+                with self.assertRaises(RuntimeError):
+                    sweep.reconcile_failure_ledger({"items": {}})
+                sweep.reconcile_failure_ledger({"items": {"private-1": {
+                    "attempts": [
+                        {"failure_ledger_entry_sha256": first["entry_sha256"]},
+                        {"failure_ledger_entry_sha256": second["entry_sha256"]},
+                    ]}}})
                 raw = path.read_text()
                 path.write_text(raw.replace("TimeoutError", "FakeError"))
                 with self.assertRaises(RuntimeError):

@@ -105,5 +105,19 @@ def audit() -> dict:
             "all_records_hash_chained": True}
 
 
+def private_entries() -> list[dict]:
+    """Read verified full entries for fail-closed index reconciliation only."""
+    if not PATH.exists():
+        return []
+    descriptor = os.open(PATH, os.O_RDONLY)
+    try:
+        fcntl.flock(descriptor, fcntl.LOCK_SH)
+        with os.fdopen(os.dup(descriptor), "rb", closefd=True) as stream:
+            return _read_locked(stream)
+    finally:
+        fcntl.flock(descriptor, fcntl.LOCK_UN)
+        os.close(descriptor)
+
+
 if __name__ == "__main__":
     print(json.dumps(audit(), indent=2, sort_keys=True))
