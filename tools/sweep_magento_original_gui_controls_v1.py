@@ -20,6 +20,7 @@ import time
 
 from magento_catalog_factory.plan import ROOT, require
 from magento_catalog_factory.seed import load_case
+from tools import magento_cron_runtime_contract_v1 as cron_contract
 
 
 IMAGE_SOURCE_COMMIT = '6473f72db5dcefc97b5725b59e734504edc28a21'
@@ -173,7 +174,8 @@ def validate_preseed_search_drift_recovery(previous: Path,
 
 def task(index: int, case: dict, plan: Path, plan_sha: str,
          source: Path, root: Path, journal: Path,
-         train_cron_never_autostart: bool = False) -> dict:
+         train_cron_never_autostart: bool = False,
+         cellwide_freeze: dict | None = None) -> dict:
     case_dir = root / f'case-{index:03d}'
     require(not case_dir.exists(),
             'existing case attempt must not be silently retried')
@@ -189,11 +191,15 @@ def task(index: int, case: dict, plan: Path, plan_sha: str,
         prepare_command = [str(sys.executable),
                            str(ROOT / 'tools/start_magento_native_sidecar_clone_v1.py'),
                            '--expected-search-sha256', SEARCH_SHA, '--out', str(prep)]
-        if train_cron_never_autostart:
+        if train_cron_never_autostart or cellwide_freeze is not None:
             prepare_command.append('--train-probe-disable-cron-autostart')
         run_step(out, journal, index, f'{pair}-prepare',
                  prepare_command,
                  timeout=TIMEOUT['prepare'])
+        if cellwide_freeze is not None:
+            cron_contract.validate_prepared(
+                json.loads(prep.read_bytes()),
+                config_sha256=cellwide_freeze['runtime']['cron_config_sha256'])
         seed = out / 'seed.private.json'
         run_step(out, journal, index, f'{pair}-seed',
                  [str(sys.executable), '-m', 'magento_catalog_factory.seed',
@@ -261,7 +267,7 @@ def task(index: int, case: dict, plan: Path, plan_sha: str,
                   '--mode', 'wrong-variant', '--out', str(control_dir)],
                  timeout=TIMEOUT['wrong_variant'])
             require(result['score'] == 0.0, 'wrong-variant negative did not fail')
-        receipts[pair] = {'seed': seed, 'baseline': baseline,
+        receipts[pair] = {'prepare': prep, 'seed': seed, 'baseline': baseline,
                           'finalization': finalization, 'runtime': runtime,
                           'control': control_dir}
         cleanup_pair(runtime)
@@ -277,6 +283,9 @@ def task(index: int, case: dict, plan: Path, plan_sha: str,
                'receipt_sha256': {f'{pair}_{key}': sha(Path(path).read_bytes())
                                   for pair, row in zip(('positive', 'negative'), values)
                                   for key, path in row.items() if key != 'control'}}
+    if cellwide_freeze is not None:
+        summary['cellwide_cron_runtime_fingerprint_sha256'] = (
+            cellwide_freeze['runtime_fingerprint_sha256'])
     digest = write_new(case_dir / 'calibration.private.json', summary)
     append_event(journal, {'event': 'task_gui_calibrated',
                            'index': index, 'task_id': case['task_id'],
@@ -297,10 +306,20 @@ def main() -> None:
                         help='private stopped sweep journal for one controlled retry')
     parser.add_argument('--train-cron-never-autostart', action='store_true',
                         help='train-policy GUI control under proposed revised startup')
+    parser.add_argument('--cellwide-cron-freeze', type=Path,
+                        help='private post-train freeze required for 100 fresh official-candidate controls')
     args = parser.parse_args()
     require(not args.train_cron_never_autostart or
             args.split == 'train_policy_development',
             'cron startup probe is train-only until cell-wide runtime freeze')
+    require(args.split != 'official_candidate' or args.cellwide_cron_freeze is not None,
+            'historical Magento runtime stopped; cell-wide cron freeze required')
+    require(args.cellwide_cron_freeze is None or
+            (args.split == 'official_candidate' and
+             args.start_index == 0 and args.limit == 100 and
+             args.recovery_of is None and
+             not args.train_cron_never_autostart),
+            'revised Magento cell requires one fresh 0..99 sweep with no per-case recovery')
     private = (ROOT / 'work').resolve()
     plan, source, out = args.plan.resolve(), args.source.resolve(), args.out_dir.resolve()
     require(plan.is_relative_to(private) and source.is_relative_to(private)
@@ -312,6 +331,18 @@ def main() -> None:
     require(commit == IMAGE_SOURCE_COMMIT, 'Magento login source revision changed')
     raw_plan = plan.read_bytes()
     require(sha(raw_plan) == args.plan_sha256, 'private task plan changed')
+    cellwide_freeze = None
+    freeze_sha = None
+    if args.cellwide_cron_freeze is not None:
+        freeze_path = args.cellwide_cron_freeze.resolve()
+        require(freeze_path.is_relative_to(private) and freeze_path.is_file(),
+                'private cell-wide runtime freeze under work/ required')
+        probe_dir = ROOT / 'work/magento-original/cron-never-autostart-train-probe-20260927-v2'
+        train_dir = ROOT / 'work/magento-original/train-cron-never-autostart-gui-v1'
+        cellwide_freeze, freeze_sha = cron_contract.validate_freeze(
+            freeze_path, ROOT, probe_dir, train_dir)
+        require(cellwide_freeze['final_candidate_plan_sha256'] == args.plan_sha256,
+                'cell-wide freeze belongs to a different candidate plan')
     manifest = json.loads(raw_plan)
     cases = manifest['cases'][args.split]
     require(len(cases) == PLAN_CELLS[args.split] and
@@ -338,6 +369,49 @@ def main() -> None:
                 'operator_reconciled_pre_task_prepare_failure' and
                 last.get('task_seeded') is False):
             recovery_kind = 'unseeded_prepare_failure'
+        elif (last.get('event') ==
+              'operator_reconciled_cron_train_gui_interruption' and
+              args.split == 'train_policy_development' and
+              args.start_index == 0 and args.limit == 1 and
+              args.train_cron_never_autostart and
+              last.get('task_seeded') is True and
+              last.get('negative_gui_attempted') is False):
+            public_path = (ROOT / 'docs/evidence/'
+                           'magento-cron-train-gui-interruption-2026-09-28.json')
+            public = json.loads(public_path.read_bytes())
+            original_lines = previous_raw.splitlines(keepends=True)
+            require(len(original_lines) >= 3 and
+                    sha(b''.join(original_lines[:-2])) ==
+                    public['stopped_journal_sha256'] and
+                    events[-3].get('event') == 'sweep_stopped' and
+                    events[-2].get('event') ==
+                    'operator_cron_train_gui_cleanup_intent' and
+                    not any(row.get('index') == 0 and
+                            row.get('step') == 'negative-gui'
+                            for row in events[:-2]),
+                    'original stopped train journal or edit boundary changed')
+            cleanup = previous.parent / (
+                'case-000/negative/train-interruption-cleanup.private.json')
+            require(cleanup.is_file() and
+                    sha(cleanup.read_bytes()) ==
+                    last.get('cleanup_receipt_sha256'),
+                    'train-only interruption cleanup receipt changed')
+            record = json.loads(cleanup.read_bytes())
+            require(record.get('schema') ==
+                    'envloop-magento-cron-train-gui-cleanup-private-v1' and
+                    record.get('original_stopped_journal_sha256') ==
+                    public['stopped_journal_sha256'] and
+                    record.get('plan_sha256') == args.plan_sha256 ==
+                    public['train_plan_sha256'] and
+                    record.get('audit_sha256') == last.get('audit_sha256') and
+                    record.get('material_state_unchanged') is True and
+                    record.get('saved_positive_score') == 1.0 and
+                    record.get('negative_gui_attempted') is False and
+                    record.get('both_containers_cleaned') is True and
+                    record.get('model_calls') ==
+                    record.get('official_final_admitted') == 0,
+                    'only the exact cleaned train GUI interruption may retry')
+            recovery_kind = 'cron_train_negative_neutral_once'
         elif (last.get('event') ==
               'operator_reconciled_pre_task_search_index_drift' and
               args.start_index == 31 and
@@ -392,7 +466,7 @@ def main() -> None:
         else:
             raise ValueError('prior failure type has no approved one-case recovery')
         recovery_sha = sha(previous_raw)
-        for candidate in (ROOT / 'work/magento-original').glob('sweep-*/events.private.jsonl'):
+        for candidate in (ROOT / 'work/magento-original').glob('*/events.private.jsonl'):
             if candidate.resolve() == previous:
                 continue
             lines = candidate.read_bytes().splitlines()
@@ -418,13 +492,19 @@ def main() -> None:
                            'limit': args.limit, 'max_concurrent_pairs': 1,
                            'recovery_of_private_journal_sha256': recovery_sha,
                            'recovery_kind': recovery_kind,
+                           'train_cron_never_autostart': args.train_cron_never_autostart,
+                           'cellwide_cron_freeze_sha256': freeze_sha,
+                           'runtime_fingerprint_sha256': (
+                               cellwide_freeze['runtime_fingerprint_sha256']
+                               if cellwide_freeze is not None else None),
                            'model_calls': 0, 'official_final_admitted': False})
     passed = 0
     try:
         for index in range(args.start_index, args.start_index + args.limit):
             result = task(index, cases[index], plan, args.plan_sha256,
                           source, out, journal,
-                          train_cron_never_autostart=args.train_cron_never_autostart)
+                          train_cron_never_autostart=args.train_cron_never_autostart,
+                          cellwide_freeze=cellwide_freeze)
             passed += 1
             print(json.dumps({'status': 'candidate_gui_calibrated',
                               'completed_in_run': passed,
