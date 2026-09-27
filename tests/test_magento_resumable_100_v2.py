@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 import stat
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from unittest.mock import patch
 import unittest
@@ -194,6 +196,48 @@ class MagentoResumable100Tests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'exact normalized baseline'):
                     v2._material_witness({'task_id': 'opaque'}, pair, intents,
                                          exact_pre_gui=True)
+
+    def test_live_unreceipted_preseed_can_be_audited_but_exited_pair_fails(self):
+        now = time.time()
+        created = datetime.fromtimestamp(now, timezone.utc).isoformat()
+        app = {'Name': '/' + v2.old_sweep.APP, 'Id': 'app-id',
+               'Created': created, 'Image': v2.IMAGE, 'Mounts': [],
+               'State': {'Running': True}}
+        search = {'Name': '/' + v2.old_sweep.SEARCH, 'Id': 'search-id',
+                  'Created': created, 'Image': v2.NATIVE_SEARCH_IMAGE,
+                  'Mounts': [], 'State': {'Running': True}}
+        events = [{'event': 'step_intent', 'step': 'positive-prepare',
+                   'time': now - 1},
+                  {'event': 'step_finished', 'step': 'positive-prepare',
+                   'exit_code': 1},
+                  {'event': 'attempt_stopped', 'time': now + 1}]
+        app_sha, search_sha = v2.sha(b'app-id'), v2.sha(b'search-id')
+        catalog = {'application_clone': {'container_id_sha256': app_sha},
+                   'search_sidecar_id_sha256': search_sha,
+                   'search_documents_sha256': v2.old_sweep.SEARCH_SHA,
+                   'search_document_count': 181}
+        price = {'price_rows': 8156, 'price_key_sets_equal': True,
+                 'price_changed_rows': 0, 'live_price_sha256': 'p',
+                 'replica_price_sha256': 'p'}
+        with (patch.object(v2, '_docker_inspect', side_effect=[app, search]),
+              patch.object(v2.subprocess, 'run', return_value=
+                           subprocess.CompletedProcess(['docker'], 0,
+                                                       b'logs', b'')),
+              patch.object(v2.clone, 'audit_existing', return_value=catalog),
+              patch.object(v2.clone, 'verify_cron_never_autostarted',
+                           return_value={'config_sha256': 'c'}),
+              patch.object(v2.clone, 'read_price_index_shape',
+                           return_value=price)):
+            witness = v2._unreceipted_preseed_witness(
+                'positive', events, {'runtime': {'cron_config_sha256': 'c'}})
+        self.assertEqual(witness['state'],
+                         'unreceipted_live_preseed_equivalent')
+        self.assertEqual(len(witness['containers']), 2)
+        search['State']['Running'] = False
+        with patch.object(v2, '_docker_inspect', side_effect=[app, search]):
+            with self.assertRaisesRegex(ValueError, 'exited/unreceipted'):
+                v2._unreceipted_preseed_witness(
+                    'positive', events, {'runtime': {'cron_config_sha256': 'c'}})
 
     def test_exact_cleanup_can_resume_after_removal_intent(self):
         with tempfile.TemporaryDirectory() as temporary:

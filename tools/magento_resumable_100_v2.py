@@ -8,6 +8,7 @@ trains a model, admits a final task, or converts an interrupted run into zero.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import fcntl
 import hashlib
 import json
@@ -514,12 +515,91 @@ def _live_pair(prepared: dict) -> list[dict]:
     for container, name, expected_id, expected_image in values:
         require(sha(container['Id'].encode()) == expected_id and
                 container['Image'] == expected_image and
-                container.get('Mounts') == [] and
-                container['State']['Running'] is True,
-                'live disposable pair differs from prepared IDs/images/mounts')
+                container.get('Mounts') == [],
+                'disposable pair differs from prepared IDs/images/mounts')
+        require(container['State']['Running'] is True,
+                'exited pair has no live SQL/search equivalence; new cell decision required')
         result.append({'name': name, 'container_id_sha256': expected_id,
                        'image_sha256': expected_image, 'mount_count': 0})
     return result
+
+
+def _unreceipted_preseed_witness(pair: str, scoped: list[dict],
+                                old: dict) -> dict:
+    """Read-only adopt a live, unseeded prepare pair; never start an exited one."""
+    step = f'{pair}-prepare'
+    intents = [row for row in scoped if row.get('event') == 'step_intent'
+               and row.get('step') == step]
+    require(len(intents) == 1 and
+            not any(row.get('event') == 'step_intent' and
+                    row.get('step') == f'{pair}-seed' for row in scoped),
+            'unreceipted pair crossed the task-seed boundary')
+    app = _docker_inspect(old_sweep.APP)
+    search = _docker_inspect(old_sweep.SEARCH)
+    require(app is not None and search is not None,
+            'an exited/partial prepare pair has no complete live material proof')
+    observed = ((app, old_sweep.APP, IMAGE),
+                (search, old_sweep.SEARCH, NATIVE_SEARCH_IMAGE))
+    upper = next((row['time'] for row in reversed(scoped)
+                  if row.get('event') == 'attempt_stopped'), time.time())
+    identities = []
+    for container, name, image in observed:
+        created = datetime.fromisoformat(container['Created'].replace(
+            'Z', '+00:00')).timestamp()
+        require(container['Image'] == image and
+                container.get('Mounts') == [] and
+                container['State']['Running'] is True and
+                intents[0]['time'] - 2 <= created <= upper + 2,
+                'exited/unreceipted pair cannot prove exact creation window and material')
+        identity = sha(container['Id'].encode())
+        identities.append({'name': name, 'container_id_sha256': identity,
+                           'image_sha256': image, 'mount_count': 0,
+                           'created': container['Created']})
+    diagnostics = {}
+    for container, name, _ in observed:
+        logs = subprocess.run(['docker', '--context', 'colima-cua-scale',
+                               'logs', name], capture_output=True, timeout=30)
+        require(logs.returncode == 0,
+                'unreceipted container diagnostics unavailable')
+        diagnostics[name] = {
+            'inspect_sha256': sha(encode(container)),
+            'stdout_log_sha256': sha(logs.stdout),
+            'stderr_log_sha256': sha(logs.stderr),
+        }
+    current = clone.audit_existing(old_sweep.SEARCH_SHA,
+                                   'read_only_v2_unreceipted_preseed_adoption')
+    cron = clone.verify_cron_never_autostarted()
+    price = clone.read_price_index_shape()
+    require(current['application_clone']['container_id_sha256'] ==
+            identities[0]['container_id_sha256'] and
+            current['search_sidecar_id_sha256'] ==
+            identities[1]['container_id_sha256'] and
+            cron['config_sha256'] == old['runtime']['cron_config_sha256'] and
+            price['price_rows'] == 8156 and
+            price['price_key_sets_equal'] is True and
+            price['price_changed_rows'] == 0 and
+            price['live_price_sha256'] == price['replica_price_sha256'],
+            'unreceipted pair has no equivalent cron/source/price state')
+    material = {
+        'app_id_sha256': identities[0]['container_id_sha256'],
+        'search_id_sha256': identities[1]['container_id_sha256'],
+        'source_search_sha256': current['search_documents_sha256'],
+        'search_documents': current['search_document_count'],
+        'cron_config_sha256': cron['config_sha256'],
+        'price_rows': price['price_rows'],
+        'price_changed_rows': price['price_changed_rows'],
+        'price_key_sets_equal': price['price_key_sets_equal'],
+        'live_price_sha256': price['live_price_sha256'],
+        'replica_price_sha256': price['replica_price_sha256'],
+        'quote_pages': 0,
+    }
+    return {'state': 'unreceipted_live_preseed_equivalent',
+            'containers': identities,
+            'material_current_sha256': sha(encode(material)),
+            'material_current_fields': material,
+            'material_equal_exact': True,
+            'task_seeded': False,
+            'diagnostic_hashes': diagnostics}
 
 
 def _active_pair(scoped: list[dict]) -> str | None:
@@ -541,7 +621,8 @@ def _active_pair(scoped: list[dict]) -> str | None:
 
 def _retryable_interruption(scoped: list[dict],
                             *, known_neutral_timeout: bool = False,
-                            abandoned_gui_terminal: bool = False) -> None:
+                            abandoned_gui_terminal: bool = False,
+                            unreceipted_preseed_equivalent: bool = False) -> None:
     require(not any(row.get('event') in ('task_gui_calibrated',
                                         'attempt_reconciled', 'case_completed')
                     for row in scoped),
@@ -550,7 +631,10 @@ def _retryable_interruption(scoped: list[dict],
               row.get('exit_code') != 0]
     require(not failed or (known_neutral_timeout and len(failed) == 1 and
                           failed[0].get('step') in
-                          ('positive-neutral', 'negative-neutral')),
+                          ('positive-neutral', 'negative-neutral')) or
+            (unreceipted_preseed_equivalent and len(failed) == 1 and
+             failed[0].get('step') in ('positive-prepare',
+                                      'negative-prepare')),
             'nonzero GUI/setup/verifier process is a deterministic failure, not infrastructure')
     intents = [row for row in scoped if row.get('event') == 'step_intent']
     finishes = [row for row in scoped if row.get('event') == 'step_finished']
@@ -570,6 +654,7 @@ def _retryable_interruption(scoped: list[dict],
                               timeouts[0].get('step') == pending[0].get('step'))),
             'timeout does not bind the unfinished non-GUI step')
     require(bool(pending) or known_neutral_timeout or
+            unreceipted_preseed_equivalent or
             not any(row.get('event') == 'attempt_stopped' for row in scoped),
             'completed step followed by an exception is not host loss')
 
@@ -770,12 +855,9 @@ def inspect_interruption(run_dir: Path, journal: Path, cases: list[dict],
     driver_terminal = _gui_driver_terminal() if pending_gui else False
     require(not pending_gui or driver_terminal,
             'original GUI driver is still running; no reconciliation')
-    _retryable_interruption(scoped,
-                            known_neutral_timeout=bool(known_timeout),
-                            abandoned_gui_terminal=bool(pending_gui and
-                                                        driver_terminal))
     pair = _active_pair(scoped)
     witness = None
+    unreceipted = False
     if pair == 'negative':
         positive_cleanups = [row for row in scoped if row.get('event') ==
                              'pair_cleanup_verified' and
@@ -801,12 +883,21 @@ def inspect_interruption(run_dir: Path, journal: Path, cases: list[dict],
             witness = _material_witness(case, pair_dir, scoped,
                                         exact_pre_gui=bool(pending_gui))
         else:
-            require(not any(row.get('event') == 'step_intent' and
-                            row.get('step') == f'{pair}-seed'
-                            for row in scoped) and
-                    _docker_inspect(old_sweep.APP) is None and
-                    _docker_inspect(old_sweep.SEARCH) is None,
-                    'unreceipted or partial prepare pair needs a new cell decision')
+            app = _docker_inspect(old_sweep.APP)
+            search = _docker_inspect(old_sweep.SEARCH)
+            if app is None and search is None:
+                require(not any(row.get('event') == 'step_intent' and
+                                row.get('step') == f'{pair}-seed'
+                                for row in scoped),
+                        'unreceipted seed may have mutated an absent pair')
+            else:
+                witness = _unreceipted_preseed_witness(pair, scoped, old)
+                unreceipted = True
+    _retryable_interruption(scoped,
+                            known_neutral_timeout=bool(known_timeout),
+                            abandoned_gui_terminal=bool(pending_gui and
+                                                        driver_terminal),
+                            unreceipted_preseed_equivalent=unreceipted)
     return {'schema': 'envloop-magento-resumable-attempt-audit-private-v2',
             'status': 'invalid_infrastructure_attempt_before_gui_mutation',
             'case_index': index, 'attempt': 0,
@@ -816,14 +907,87 @@ def inspect_interruption(run_dir: Path, journal: Path, cases: list[dict],
             'freeze_v2_sha256': sha((json.dumps(frozen, indent=2,
                                                sort_keys=True) + '\n').encode()),
             'journal_sha256_before_audit': sha(journal.read_bytes()),
+            'audit_observed_time': time.time(),
             'active_pair': pair, 'material_witness': witness,
             'classification': (known_timeout if known_timeout else
                                'abandoned_gui_no_material_change' if pending_gui else
+                               'unreceipted_live_preseed_equivalent' if unreceipted else
                                'host_or_step_timeout_pre_gui_no_process_failure'),
             'gui_driver_terminal_at_audit': driver_terminal,
             'whole_case_retry_cap_per_id': 1,
             'study_wide_retry_cap': RETRY_CAP,
             'model_calls': 0, 'official_final_admitted': 0}
+
+
+def _stable_audit(record: dict) -> dict:
+    result = json.loads(json.dumps(record))
+    result.pop('audit_observed_time', None)
+    witness = result.get('material_witness')
+    if isinstance(witness, dict) and witness.get('state') == (
+            'unreceipted_live_preseed_equivalent'):
+        # Container logs are retained by hash at the first audit; they may
+        # grow while the read-only material state stays unchanged.
+        witness.pop('diagnostic_hashes', None)
+    return result
+
+
+def _verify_unreceipted_receipt(previous: Path, index: int,
+                               scoped: list[dict], audit: dict,
+                               old: dict) -> None:
+    pair = audit.get('active_pair')
+    witness = audit.get('material_witness', {})
+    path = previous / f'case-{index:03d}' / str(pair)
+    starts = [row for row in scoped if row.get('event') == 'step_intent' and
+              row.get('step') == f'{pair}-prepare']
+    require(pair in ('positive', 'negative') and
+            len(starts) == 1 and
+            not (path / 'prepare.private.json').exists() and
+            not any(row.get('event') == 'step_intent' and
+                    row.get('step') == f'{pair}-seed' for row in scoped) and
+            witness.get('state') == 'unreceipted_live_preseed_equivalent' and
+            witness.get('task_seeded') is False and
+            witness.get('material_equal_exact') is True,
+            'unreceipted retry crossed seed or lacks live adoption proof')
+    fields = witness['material_current_fields']
+    require(fields.get('source_search_sha256') == old_sweep.SEARCH_SHA and
+            fields.get('search_documents') == 181 and
+            fields.get('cron_config_sha256') ==
+            old['runtime']['cron_config_sha256'] and
+            fields.get('price_rows') == 8156 and
+            fields.get('price_changed_rows') == 0 and
+            fields.get('price_key_sets_equal') is True and
+            fields.get('live_price_sha256') ==
+            fields.get('replica_price_sha256') and
+            fields.get('quote_pages') == 0 and
+            sha(encode(fields)) == witness['material_current_sha256'],
+            'unreceipted pair source/cron/price/quote proof changed')
+    identities = witness['containers']
+    require(len(identities) == 2 and
+            [row['name'] for row in identities] ==
+            [old_sweep.APP, old_sweep.SEARCH] and
+            [row['image_sha256'] for row in identities] ==
+            [IMAGE, NATIVE_SEARCH_IMAGE] and
+            all(row.get('mount_count') == 0 for row in identities) and
+            fields['app_id_sha256'] == identities[0]['container_id_sha256'] and
+            fields['search_id_sha256'] == identities[1]['container_id_sha256'],
+            'unreceipted pair exact no-mount identities changed')
+    upper = next((row['time'] for row in reversed(scoped)
+                  if row.get('event') == 'attempt_stopped'),
+                 audit['audit_observed_time'])
+    for row in identities:
+        created = datetime.fromisoformat(row['created'].replace(
+            'Z', '+00:00')).timestamp()
+        require(starts[0]['time'] - 2 <= created <= upper + 2,
+                'unreceipted pair creation escaped prepare intent window')
+    diagnostic = witness.get('diagnostic_hashes', {})
+    require(set(diagnostic) == {old_sweep.APP, old_sweep.SEARCH} and
+            all(len(value) == 64 and
+                all(char in '0123456789abcdef' for char in value)
+                for record in diagnostic.values() for value in record.values()) and
+            all(set(record) == {'inspect_sha256', 'stdout_log_sha256',
+                                'stderr_log_sha256'}
+                for record in diagnostic.values()),
+            'unreceipted Docker inspect/log diagnostics missing')
 
 
 def _cleanup_step(journal: Path, case_index: int, container: dict,
@@ -963,7 +1127,7 @@ def reconcile_attempt(plan: Path, plan_sha256: str, source: Path,
             current = inspect_interruption(run_dir, journal, cases,
                                            frozen, old)
             current['freeze_v2_sha256'] = freeze_sha
-            require(current == audited,
+            require(_stable_audit(current) == _stable_audit(audited),
                     'live pair or material state changed after read-only audit')
             intent = {'schema': 'envloop-magento-resumable-cleanup-intent-private-v2',
                       'case_index': index, 'attempt': 0,
@@ -992,7 +1156,7 @@ def reconcile_attempt(plan: Path, plan_sha256: str, source: Path,
                 current = inspect_interruption(run_dir, journal, cases,
                                                frozen, old)
                 current['freeze_v2_sha256'] = freeze_sha
-                require(current == audited,
+                require(_stable_audit(current) == _stable_audit(audited),
                         'material state changed before cleanup intent recovery')
                 append_event(journal, {
                     'event': 'reconciliation_cleanup_intent',
@@ -1132,7 +1296,8 @@ def audit_campaign(plan: Path, plan_sha256: str, source: Path,
                         'host_or_step_timeout_pre_gui_no_process_failure',
                         'known_neutral_cms_menu_timeout_before_edit',
                         'known_neutral_page_title_timeout_before_edit',
-                        'abandoned_gui_no_material_change') and
+                        'abandoned_gui_no_material_change',
+                        'unreceipted_live_preseed_equivalent') and
                     intent['material_witness'] ==
                     audit['material_witness'] == cleanup['material_witness'],
                     'whole-case retry lacks the exact invalid-attempt evidence')
@@ -1143,8 +1308,11 @@ def audit_campaign(plan: Path, plan_sha256: str, source: Path,
                          'attempt_reconciled')]
             known = _known_neutral_timeout(previous, index, prior)
             pending_gui = _pending_gui_step(previous, index, prior)
+            unreceipted = (audit['classification'] ==
+                           'unreceipted_live_preseed_equivalent')
             expected_class = (known if known else
                               'abandoned_gui_no_material_change' if pending_gui else
+                              'unreceipted_live_preseed_equivalent' if unreceipted else
                               'host_or_step_timeout_pre_gui_no_process_failure')
             require(audit['classification'] == expected_class,
                 'original failure classification changed')
@@ -1174,8 +1342,12 @@ def audit_campaign(plan: Path, plan_sha256: str, source: Path,
                             'replica_price_sha256') and
                         witness.get('allowed_volatile_fields') == [],
                         'abandoned GUI did not preserve exact saved baseline')
+            if unreceipted:
+                _verify_unreceipted_receipt(previous, index, prior,
+                                            audit, old)
             _retryable_interruption(prior, known_neutral_timeout=bool(known),
-                                    abandoned_gui_terminal=bool(pending_gui))
+                                    abandoned_gui_terminal=bool(pending_gui),
+                                    unreceipted_preseed_equivalent=unreceipted)
         receipts.append(digest)
     require(len([row for row in events if row.get('event') ==
                  'case_attempt_started']) == 100 + len(reconciled),
