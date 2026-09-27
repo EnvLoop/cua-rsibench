@@ -18,7 +18,7 @@
     "Impress": 1,
     "Writer": 1
   },
-  "offline_regression_tests_passed": 71,
+  "offline_regression_tests_passed": 89,
   "offline_shared_collector_fake_desktop_episode_count": 1,
   "raw_observation_and_predispatch_frame_pairs_per_synthetic_success": 2,
   "real_train_episodes": 0,
