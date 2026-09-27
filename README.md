@@ -39,6 +39,8 @@ The dated [six-cell preparation figure](docs/evidence/full-study-readiness-2026-
 
 The [PowerPoint split-shape audit](docs/evidence/ppt-wdi-split-difficulty-shape-2026-09-27.md) discloses the actual one/three/four target-field train/selection/final progression, disjoint source families and intentional causal-workflow overlap. It supports a harder cross-slide final design without claiming measured difficulty or unseen-workflow transfer.
 
+After seven evaluator-only PowerPoint family quarantines, a [pre-result ordered reserve commitment and attrition cap](docs/evidence/ppt-wdi-future-reserve-queue-2026-09-27.md) limits further replacements to three families. A source failure beyond that bound fails the cell and requires a newly registered study instead of selectively replenishing the exam.
+
 A [train-only E2B Office-web login bridge design](docs/plans/2026-09-27-office-web-e2b-login-design.md) and bounded launcher are available for a later manual-login pilot. The launcher has passed dry-run and fake-provider cleanup tests; it has **not** created a logged-in sandbox or executed an Office model task. Microsoft credentials and browser cookies are neither accepted nor published by this bridge.
 
 A separate [Qwen3.8-27B base-model Magento price-task pilot](docs/evidence/magento-price777-qwen-base-pilot-2026-09-24.md) records one runner failure and one 40-sample budget-censored retry. Neither completed a product save or entered an official final-task denominator; both attempts' monitored SQL and search state were restored. This protocol-development evidence is not a checkpoint or training-gain result.
