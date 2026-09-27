@@ -1,0 +1,25 @@
+{
+  "checked_date": "2026-09-27",
+  "hidden_candidate_counts": {
+    "official_hidden": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "hidden_candidate_gui_controls_passed": 100,
+  "hidden_task_model_observations": 0,
+  "official_entry_reason_code": "six_cell_freeze_missing",
+  "official_entry_status": "blocked_before_provider_or_model_dispatch",
+  "official_final_tasks_admitted": 0,
+  "official_model_results": 0,
+  "output_directory_created": false,
+  "provider_calls": 0,
+  "runner_sha256": "722a19bce9bcf05fe621d3562071c695b1e3c871a76321e3e7ab2ab14d55addc",
+  "schema": "envloop-odoo-v065-official-dispatch-guard-public-v1",
+  "scope": "Explicit --execute with an absent six-cell freeze, synthetic nonfinal task ID, nonexistent worker and output path; no hidden task, provider call, browser or official result.",
+  "source_evidence_sha256s": {
+    "hidden_boundary": "e50e64e1a3d84e065f5883758b67c5276375ae36adb171f0da6356e0d7b4c05d",
+    "hidden_gui": "63824cf042c8244750fff2254bd40ab80ab5b50cf8a54b6dfd5561ada82d5903",
+    "train_v065_smoke": "0bcc7137ef3a47644a6d4ad8ee25068126c5a6119c1145fcd22f66bce3ad59a2"
+  },
+  "train_only_v065_applied_gui_actions": 2
+}
