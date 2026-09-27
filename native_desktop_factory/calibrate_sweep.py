@@ -49,21 +49,24 @@ def actor_script(package_dir: Path, oracle: dict, attempt: str) -> str:
     if attempt not in ("positive", "near-miss"):
         raise ValueError("Unknown GUI control polarity")
     workflow = oracle["workflow"]
-    lines = ["wait 7", "press esc"]
+    lines = ["wait 7", "press esc", "wait 1"]
     if workflow.startswith("calc-"):
         raw = next(package_dir.glob("*.xlsx")).read_bytes()
         before = xlsx_cells(raw)
         targets = list(oracle["targets"].items())
         if len(targets) != 3 or any(not addr.startswith("Decision ledger!") for addr, _ in targets):
             raise ValueError("Calc v2 must have three decision-ledger targets")
-        lines += ["click 325,767", "wait 1"]  # Let the visible second sheet become active.
+        lines += ["click 325,767", "wait 2"]  # Let the visible second sheet become active.
         for i, (address, rule) in enumerate(targets):
             cell = address.split("!", 1)[1]
             formula = rule["formula"]
             if attempt == "near-miss" and i == len(targets) - 1:
                 formula = "=" + before["Decision ledger"][cell]["formula"].lstrip("=")
-            lines += ["click 51,171", "press ctrl,a", f"write {cell}", "press enter",
-                      "wait 1",  # Name Box must return focus to the grid before a formula.
+            if cell != f"B{i+6}":
+                raise ValueError("Unexpected final Calc target cell layout")
+            # Visible B6/B7/B8 cells at 1280x800. Direct grid clicks avoid a
+            # race where the Name Box consumes a formula as an invalid range.
+            lines += [f"click 360,{373 + i*20}", "wait 1",
                       f"write {_formula_for_calc(formula)}", "press enter"]
     elif workflow.startswith("impress-"):
         raw = next(package_dir.glob("*.pptx")).read_bytes()
@@ -85,14 +88,20 @@ def actor_script(package_dir: Path, oracle: dict, attempt: str) -> str:
         target_order = [text for text in old_paragraphs if text in oracle["targets"]]
         if len(target_order) != 3:
             raise ValueError("Writer target paragraphs not found exactly three times")
+        # A focused native Find-and-Replace dialog is more stable than replacing
+        # a Ctrl+F selection: when the search bar loses focus, typed replacement
+        # text can be inserted into a non-target paragraph without an API error.
         for i, old in enumerate(target_order):
             replacement = oracle["targets"][old]
             if attempt == "near-miss" and i == 2:
                 replacement = old
-            # Writer's native Find selects the full matching sentence across
-            # page positions; Escape closes the bar while keeping selection.
-            lines += ["press ctrl,f", f"write {old}", "press enter", "press esc",
-                      f"write {replacement}"]
+            lines += ["assert_window LibreOffice Writer",
+                      "press ctrl,h", "wait 1", "assert_window Find and Replace",
+                      "click 570,253", "wait 1", "press ctrl,a", f"write {old}",
+                      "click 570,340", "wait 1", "press ctrl,a", f"write {replacement}",
+                      "assert_window Find and Replace", "click 877,390", "wait 1",
+                      "assert_window Find and Replace", f"screen replace-step-{i+1}",
+                      "click 892,656", "wait 1", "assert_window LibreOffice Writer"]
     else:
         raise ValueError("Unsupported final desktop workflow")
     lines += ["screen edited", "press ctrl,s", "wait 2", "click 789,519",

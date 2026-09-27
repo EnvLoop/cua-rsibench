@@ -27,6 +27,34 @@ def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def wait_for_document_ready(sandbox, filename: str, *, seconds: int = 45) -> dict:
+    """Trusted setup clears the stock first-run Tip before actor actions begin."""
+    start = time.monotonic()
+    dismissals = 0
+    stable = 0
+    last = ""
+    for _ in range(seconds):
+        result = sandbox.commands.run("xdotool getactivewindow getwindowname 2>/dev/null || true")
+        last = result.stdout.strip()
+        if last.startswith("Tip of the Day"):
+            sandbox.press("esc")  # GUI-only dismissal of a setup modal.
+            dismissals += 1
+            stable = 0
+            time.sleep(1)
+            continue
+        if filename in last and "LibreOffice" in last:
+            stable += 1
+            # If this image did not show its usual Tip, allow it time to appear.
+            if stable >= 2 and (dismissals or time.monotonic() - start >= 12):
+                return {"ready_window_title": last,
+                        "first_run_tip_dismissals": dismissals,
+                        "ready_after_seconds": round(time.monotonic() - start, 3)}
+        else:
+            stable = 0
+        time.sleep(1)
+    raise TimeoutError("Native Office document never became ready after modal dismissal")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--package", type=Path, required=True)
@@ -60,7 +88,8 @@ def main() -> int:
                "task_id": oracle["task_id"], "input_sha256": digest(baseline),
                "sdk_version": importlib.metadata.version("e2b-desktop"),
                "status": "started", "screenshots": {}, "actor_actions": [],
-               "command_errors": [], "sandbox_timeout_seconds": args.sandbox_timeout_seconds}
+               "command_errors": [], "ui_guards": [],
+               "sandbox_timeout_seconds": args.sandbox_timeout_seconds}
     sandbox = None
 
     def persist() -> None:
@@ -137,9 +166,9 @@ def main() -> int:
         persist()
         if args.attempt != "cold-reset":
             sandbox.open(remote)
-            time.sleep(4)
+            receipt["trusted_setup_ready"] = wait_for_document_ready(sandbox, artifact.name)
         screen("initial")
-        print("READY: screen LABEL | press KEY[,KEY] | write TEXT | click X,Y | double X,Y | wait N | status | readback | stop", flush=True)
+        print("READY: screen LABEL | press KEY[,KEY] | write TEXT | click X,Y | double X,Y | wait N | assert_window TITLE | status | readback | stop", flush=True)
         for line in sys.stdin:
             name, _, value = line.strip().partition(" ")
             try:
@@ -152,6 +181,20 @@ def main() -> int:
                 elif name == "status":
                     result = sandbox.commands.run("xdotool getactivewindow getwindowname")
                     print(json.dumps({"window_title": result.stdout.strip(), "exit_code": result.exit_code}), flush=True)
+                elif name == "assert_window":
+                    actual, passed = "", False
+                    for _ in range(8):
+                        result = sandbox.commands.run("xdotool getactivewindow getwindowname 2>/dev/null || true")
+                        actual = result.stdout.strip()
+                        if value in actual:
+                            passed = True
+                            break
+                        time.sleep(0.4)
+                    receipt["ui_guards"].append({"expected": value, "observed": actual,
+                                                 "passed": passed})
+                    persist()
+                    if not passed:
+                        raise ValueError("Expected visible GUI dialog/window is not active")
                 elif name == "readback":
                     readback()
                 elif name == "stop":
@@ -162,6 +205,10 @@ def main() -> int:
                 receipt["command_errors"].append({"command": name, "error_type": type(exc).__name__})
                 persist()
                 print(json.dumps({"error_type": type(exc).__name__, "error": str(exc)[:180]}), flush=True)
+                if name == "assert_window":
+                    receipt["fatal_ui_guard"] = True
+                    persist()
+                    break
         if args.attempt == "cold-reset":
             latest = bytes(sandbox.files.read(remote, format="bytes"))
             receipt["restored_state_sha256"] = digest(latest)

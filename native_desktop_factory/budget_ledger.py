@@ -29,7 +29,7 @@ def audit(work_root: Path, *, proposed_new_sandboxes: int,
     if max_lane_reserved_usd <= 0:
         raise ValueError("Positive lane-wide USD cap required")
     records = []
-    for root_name in ("gui", "final-v2-gui"):
+    for root_name in ("gui", "final-v2-gui", "gui-diagnostics"):
         root = work_root / root_name
         if not root.exists():
             continue
@@ -67,8 +67,9 @@ def audit(work_root: Path, *, proposed_new_sandboxes: int,
         records.append({"kind": "neutral_single", "receipt_sha256": digest(raw),
                         "lease_seconds": 600, "status": receipt["status"],
                         "has_sandbox_id": bool(receipt.get("sandbox_id_sha256"))})
-    health_path = work_root / "sweep-runs" / "full-remaining-001" / "health-probe-001.json"
-    if health_path.is_file():
+    health_paths = [*(work_root / "sweep-runs").glob("**/health-probe*.json"),
+                    *(work_root / "gui-diagnostics").glob("**/health-probe*.json")]
+    for health_path in sorted(health_paths):
         raw = health_path.read_bytes()
         receipt = json.loads(raw)
         if receipt.get("schema") != "cua-native-wdi-e2b-recovery-health-probe-v1":

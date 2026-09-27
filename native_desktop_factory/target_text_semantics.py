@@ -17,6 +17,8 @@ YEAR = re.compile(r"20(?:19|2[0-4])\Z")
 
 
 def _measurements(text: str) -> list[Decimal]:
+    text = re.sub(r"^\s*(?:finding|signal)\s+\d+\s*[:.\-]\s*", "", text,
+                  flags=re.IGNORECASE)
     values = []
     for match in NUMBERS.finditer(text):
         raw = match.group()

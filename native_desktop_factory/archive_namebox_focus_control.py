@@ -46,8 +46,8 @@ def plan(candidate_root: Path, attempts_root: Path, task_id: str,
            for sheet, cell in (address.split("!", 1) for address in targets)):
         raise ValueError("Target formula changed despite focus-failure classification")
     patched = patched_sweeper.read_bytes()
-    if b'Name Box must return focus to the grid' not in patched:
-        raise ValueError("Corrected Name Box focus wait is absent")
+    if b'Direct grid clicks avoid a' not in patched:
+        raise ValueError("Corrected direct-grid Calc action is absent")
     archive = attempts_root / task_id / "_calibration_invalid" / ("positive-" + digest(receipt_raw)[:12])
     if archive.exists():
         raise ValueError("Failed control already archived")
@@ -55,7 +55,7 @@ def plan(candidate_root: Path, attempts_root: Path, task_id: str,
             "original_receipt_sha256": digest(receipt_raw),
             "original_saved_sha256": digest(saved),
             "patched_sweeper_sha256": digest(patched),
-            "reason": "all_three_target_formulas_untouched; screenshot shows LibreOffice invalid-reference modal and formula text in Name Box; focus timing fix requires fresh validation"}
+            "reason": "all_three_target_formulas_untouched; screenshot shows LibreOffice invalid-reference modal and formula text in Name Box; direct-grid action requires fresh validation"}
 
 
 def apply(item: dict, out: Path) -> dict:

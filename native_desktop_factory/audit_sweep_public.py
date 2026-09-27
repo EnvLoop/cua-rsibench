@@ -35,7 +35,8 @@ def _normalization_index(root: Path) -> dict[str, dict]:
 
 
 def summarize(candidate_root: Path, attempts_root: Path,
-              normalization_root: Path, run_receipts: list[Path]) -> dict:
+              normalization_root: Path, run_receipts: list[Path],
+              budget_snapshot: Path | None = None) -> dict:
     inventory_raw = (candidate_root / "candidate-inventory.json").read_bytes()
     inventory = json.loads(inventory_raw)
     if inventory.get("design_revision") != "v2-distinct-structures" or inventory.get("source_sha256") != EXPECTED_SHA256:
@@ -107,7 +108,7 @@ def summarize(candidate_root: Path, attempts_root: Path,
         raise ValueError("Provider Desktop template/envd identity changed across calibrated tasks")
     template_counts = dict(sorted(Counter(row["template_group"] for row in final).items()))
     invalid_types = dict(sorted(Counter(row["error_type"] for row in gate["invalid"]).items()))
-    return {
+    result = {
         "schema": "cua-native-wdi-private-gui-sweep-aggregate-v1",
         "checked_date": "2026-09-25", "candidate_inventory_sha256": digest(inventory_raw),
         "source_snapshot_sha256": EXPECTED_SHA256,
@@ -136,6 +137,21 @@ def summarize(candidate_root: Path, attempts_root: Path,
         "status": ("gui_controls_complete_official_gates_pending" if gate["qualified_final_count"] == 100 and gate["invalid_receipt_count"] == 0
                    else "gui_controls_incomplete_official_gates_pending"),
     }
+    if budget_snapshot is not None:
+        raw = budget_snapshot.read_bytes()
+        budget = json.loads(raw)
+        if budget.get("schema") != "cua-native-wdi-e2b-lane-budget-ledger-v1" or budget.get("within_cap") is not True:
+            raise ValueError("Lane-wide budget snapshot is missing or exceeds its cap")
+        if budget.get("proposed_new_sandboxes") != 0 or budget.get("actual_billed_usd") is not None:
+            raise ValueError("Final lane budget snapshot is not a completed reservation audit")
+        result.update({"lane_budget_snapshot_sha256": digest(raw),
+                       "lane_full_server_lease_reserve_usd": budget["past_conservative_reserved_usd"],
+                       "lane_budget_cap_usd": budget["lane_usd_cap"],
+                       "lane_recorded_sandbox_or_batch_attempt_count": budget["past_attempt_or_batch_count"],
+                       "lane_records_by_kind": budget["past_by_kind"],
+                       "lane_historical_attempt_status_counts": budget["past_status_counts"],
+                       "lane_no_acknowledged_sandbox_id_count": budget["past_no_acknowledged_sandbox_id_count"]})
+    return result
 
 
 def main() -> None:
@@ -144,10 +160,12 @@ def main() -> None:
     parser.add_argument("--attempts-root", type=Path, required=True)
     parser.add_argument("--normalization-root", type=Path, required=True)
     parser.add_argument("--run-receipt", type=Path, action="append", default=[])
+    parser.add_argument("--budget-snapshot", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     result = summarize(args.candidate_root, args.attempts_root,
-                       args.normalization_root, args.run_receipt)
+                       args.normalization_root, args.run_receipt,
+                       args.budget_snapshot)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"status": result["status"],
