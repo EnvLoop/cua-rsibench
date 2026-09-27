@@ -1,0 +1,18 @@
+# Full-study Qwen/Tinker read-only preflight — 2026-09-27
+
+The [aggregate receipt](full-study-tinker-read-only-preflight-2026-09-27.json) records a real authenticated, read-only Tinker `get_server_capabilities()` call. This account listed exactly one `Qwen/Qwen3.8-27B` entry with training and sampling enabled and a 65,536-token maximum context. The SDK version was 0.30.0, and the service session closed. The call did not create a training client, sampler, checkpoint, researcher campaign, or final-task observation. Account balance, billable usage for the read-only session, provider weight revision, and actual invoice amounts remain unknown.
+
+The exact model is also present as a vision-capable 64K entry in Tinker's [machine-readable model catalog](https://tinker-docs.thinkingmachines.ai/tinker/models.json), with current published rates per million tokens of $1.86 prefill, $0.372 cached prefill, $5.595 sampling, and $4.103 training. The catalog bytes are retained privately under a 0600 file and bound by SHA-256 in the public receipt. These are published nominal rates, not an account balance, invoice, or permission to spend $500 per campaign. Future campaign events must preserve local rendered/scheduled tokens, provider billing events, credits, wall time, and uncertain attempts as different quantities. The existing [dollar ledger](../FULL_STUDY_BUDGET_LEDGER.md) reserves worst-case service costs before dispatch; the new private hash-chained training telemetry records sequential local token/time events without replacing that ledger or claiming billed USD.
+
+The preflight hashes the exact proposed v0.6.5 action/prompt closure: the trusted GUI action contract, v0.6.2 validator, v0.6.4 prompt, v0.6.5 alias/prompt adapter, and vision proxy source. It also hashes the actual v0.6.5 model instruction and records the renderer/preprocessor identities. This is a reproducible **candidate bundle**, not a six-cell freeze. Each admitted cell must bind these bytes and its cell-specific GUI dispatcher/observer into the validated pre-campaign manifest, and the same student contract must govern base, selected, supervision, selection, and final executions. No qualified six-cell manifest or cross-cell bundle commitment exists yet.
+
+The Desktop snapshot distinguishes the independently matched, scoped 100,661-entry guest content and canonicalized LibreOffice profile from a full provider image/profile attestation. The provider exposes no image digest, the raw profile varied, and the existing 100 GUI controls did not record the later scoped attestation. The desktop image/profile freeze remains open. The new checkpoint helper can, **after a future admitted training run**, validate a sampler path and its sampling client's observed base model, save the account-specific path only in a private 0600 binding, and expose hashes of the path and the plan/data/action/usage bindings. No full-study checkpoint has been bound by this helper.
+
+Run the read-only check with an existing Tinker credential loaded into the environment:
+
+```bash
+PYTHONPATH=.:src python tools/preflight_full_study_tinker_v1.py \
+  --out work/full-study/tinker-preflight-unique-run
+```
+
+The output path must be fresh and under ignored `work/`. The command has no train or sample option and always reports `campaign_dispatch_authorized=false`. Training still requires 600 independently admitted final identities, the six-cell pre-campaign hash freeze, provider/account budget proof, and the per-attempt dollar ledger. **Official admissions remain 0/600, researcher campaigns 0/24, and official final model results 0.**
