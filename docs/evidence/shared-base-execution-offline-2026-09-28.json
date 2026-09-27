@@ -6,7 +6,7 @@
     "odoo-community"
   ],
   "date": "2026-09-28",
-  "focused_unittest_count": 11,
+  "focused_unittest_count": 13,
   "focused_unittest_status": "passed",
   "gitlab_fake_original_worker_task_count": 20,
   "gitlab_fake_paid_attempt_count": 40,
@@ -25,9 +25,10 @@
   "schema": "cua-full-study-shared-base-execution-offline-v1",
   "source_sha256s": {
     "src/cursibench/full_study_shared_base_execution_v1.py": "370a6eed01efe0831d65cfea709f3ca3b551518f6851a5d33d8943ab2a442c5c",
-    "src/cursibench/full_study_shared_base_selection_v1.py": "8e6a9675459ba9171b7f32b16ca9f081b101d0220ce83887f307bd729ace575b",
-    "tests/shared_base_selection_fixture.py": "0f6ca39960b8c409729e58528d29df9c3d726818830e47290b3f04e7385cad09",
-    "tests/test_full_study_shared_base_execution_v1.py": "030e9d3f19b0906c0f86a2f6edb0bc278c7121515f4e388b20996f848d2bb5cb"
+    "src/cursibench/full_study_shared_base_selection_v1.py": "9ef6a397f7a537a48b5aa241d2e09239ec270264807385654045cf199cdcb030",
+    "tests/shared_base_selection_fixture.py": "27b384b0bf8e69e4fb795edf179c60e4751ef1db4d6f0d0946fd59a97f8b8321",
+    "tests/test_full_study_shared_base_execution_v1.py": "030e9d3f19b0906c0f86a2f6edb0bc278c7121515f4e388b20996f848d2bb5cb",
+    "tests/test_full_study_shared_base_selection_v1.py": "9fe238c342635038cba1ab077ea72523ae9f00885b6c9e9b74de9c991987a2fa"
   },
   "status": "fake_provider_and_original_worker_offline_only"
 }

@@ -124,6 +124,54 @@ class SharedBaseSelectionGateTests(unittest.TestCase):
                 self.study, self.budget, self.cell_id, self.path,
                 require_registry=False)
 
+    def test_gitlab_raw_provider_model_must_match_frozen_base(self):
+        cell_id = "gitlab"
+        source = fixture.build(self.study, self.budget, cell_id)
+        receipt = json.loads(source.read_bytes())
+        paid = next(item for item in receipt["paid_attempt_refs"]
+                    if item["category"] == "tinker")
+        result_path = source.parent / paid["result_ref"]["path"]
+        result = json.loads(result_path.read_bytes())
+        worker_path = source.parent / result["worker_result_ref"]["path"]
+        worker_result = json.loads(worker_path.read_bytes())
+        worker_result["reported_model"] = "wrong-model"
+        raw = shared._canonical(worker_result)
+        worker_path.write_bytes(raw)
+        result["worker_result_ref"]["sha256"] = shared._sha(raw)
+        raw = shared._canonical(result)
+        result_path.write_bytes(raw)
+        paid["result_ref"]["sha256"] = shared._sha(raw)
+        source.write_bytes(shared._canonical(receipt))
+        with self.assertRaisesRegex(shared.SharedBaseSelectionError,
+                                    "gitlab_provider_model_changed"):
+            shared.verify_receipt(self.study, self.budget, cell_id, source,
+                                  require_registry=False)
+
+    def test_odoo_raw_sampler_kind_must_be_base(self):
+        cell_id = "odoo-community"
+        source = fixture.build(
+            self.study, self.budget, cell_id,
+            environment_batch=True, tinker_setup=True)
+        receipt = json.loads(source.read_bytes())
+        paid = next(item for item in receipt["paid_attempt_refs"]
+                    if item["category"] == "tinker")
+        request_path = source.parent / paid["request_ref"]["path"]
+        request = json.loads(request_path.read_bytes())
+        worker_path = source.parent / request["worker_request_ref"]["path"]
+        worker = json.loads(worker_path.read_bytes())
+        worker["sampling_kind"] = "checkpoint"
+        raw = shared._canonical(worker)
+        worker_path.write_bytes(raw)
+        request["worker_request_ref"]["sha256"] = shared._sha(raw)
+        raw = shared._canonical(request)
+        request_path.write_bytes(raw)
+        paid["request_ref"]["sha256"] = shared._sha(raw)
+        source.write_bytes(shared._canonical(receipt))
+        with self.assertRaisesRegex(shared.SharedBaseSelectionError,
+                                    "odoo_base_sampler_changed"):
+            shared.verify_receipt(self.study, self.budget, cell_id, source,
+                                  require_registry=False)
+
     def test_registered_bytes_cannot_change_between_four_campaigns(self):
         admitted = shared.admit_receipt(
             self.study, self.budget, self.cell_id, self.path)

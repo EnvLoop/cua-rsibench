@@ -498,6 +498,15 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
             (category != "tinker" or task_id is None or
              result_status == "completed"),
             "base_selection_paid_result_not_completed")
+        if category == "tinker":
+            if cell_id == "gitlab" and task_id is not None:
+                _require(worker_result.get("reported_model") == MODEL,
+                         "base_selection_gitlab_provider_model_changed")
+            if cell_id == "odoo-community":
+                _require(worker_request.get("sampling_kind") == "base" and
+                         (task_id is not None or
+                          worker_request.get("model") == MODEL),
+                         "base_selection_odoo_base_sampler_changed")
         expected_request = {
             "schema": "cua-full-study-shared-base-paid-request-v1",
             "cell_id": cell_id,

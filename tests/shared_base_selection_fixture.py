@@ -66,6 +66,10 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
         }
         if category == "tinker" and task_id is not None:
             worker_request["image_base64"] = base64.b64encode(image).decode()
+        if category == "tinker" and cell_id == "odoo-community":
+            worker_request["sampling_kind"] = "base"
+            if task_id is None:
+                worker_request["model"] = MODEL
         worker_request_ref = _json(root / "paid" /
                                    f"{attempt_id}.worker-request.json",
                                    worker_request)
@@ -95,6 +99,9 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
         worker_result_ref = _json(root / "paid" /
                                   f"{attempt_id}.worker-result.json", {
             "status": result_status,
+            **({"reported_model": MODEL} if
+               category == "tinker" and cell_id == "gitlab" and
+               task_id is not None else {}),
             "synthetic_fake_provider": True,
         })
         worker_result_ref["path"] = "paid/" + worker_result_ref["path"]
