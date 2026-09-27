@@ -391,7 +391,8 @@ def _verify_episode(directory: Path, result: object, *, cell_id: str,
                     task: dict, runtime_sha: str, adapter_sha: str,
                     verifier_sha: str,
                     turns: list[dict], e2b_attempt_ids: list[str],
-                    requires_e2b: bool) -> str:
+                    requires_e2b: bool,
+                    requires_fresh_e2b_reset: bool = False) -> str:
     _require(type(result) is dict and set(result) ==
              {'episode_receipt_path', 'episode_receipt_sha256'},
              'worker_episode_result_invalid')
@@ -420,7 +421,8 @@ def _verify_episode(directory: Path, result: object, *, cell_id: str,
              receipt['runtime_sha256'] == runtime_sha and
              receipt['adapter_sha256'] == adapter_sha and
              receipt['e2b_attempt_ids'] == e2b_attempt_ids and
-             bool(e2b_attempt_ids) == requires_e2b and
+             len(e2b_attempt_ids) == (2 if requires_fresh_e2b_reset else
+                                      1 if requires_e2b else 0) and
              type(receipt['frame_refs']) is list and
              len(receipt['frame_refs']) == len(turns) and turns and
              receipt['teacher_result_sha256s'] ==
@@ -512,6 +514,9 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
              getattr(cell_worker, 'original_software_gui', None) is True and
              getattr(cell_worker, 'original_surface', None) in {'native', 'web'} and
              type(getattr(cell_worker, 'requires_e2b', None)) is bool and
+             type(getattr(cell_worker, 'requires_fresh_e2b_reset', False)) is bool and
+             (not getattr(cell_worker, 'requires_fresh_e2b_reset', False) or
+              cell_worker.requires_e2b) and
              callable(getattr(cell_worker, 'run_episode', None)) and
              getattr(cell_worker, 'adapter_sha256', None) ==
              ratification['cell_profiles'][cell_id]['adapter_sha256'],
@@ -554,6 +559,7 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
         (episode_dir / 'frames').mkdir(mode=0o700)
         turns: list[dict] = []
         e2b_attempt_ids: list[str] = []
+        e2b_sandbox_ids: list[str] = []
 
         def sample_teacher(observation: Observation,
                            current_frame_id: Callable[[], str]) -> dict:
@@ -685,9 +691,16 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
                     'teacher_result_sha256': paid['result_sha256']}
 
         def dispatch_e2b(*, lease_seconds: int, reserve_usd: str,
-                         provider: Callable[[dict], dict]) -> dict:
-            _require(cell_worker.requires_e2b and not e2b_attempt_ids and
-                     not turns and type(lease_seconds) is int and
+                         provider: Callable[[dict], dict],
+                         phase: str = 'actor') -> dict:
+            _require(cell_worker.requires_e2b and
+                     type(phase) is str and phase in {'actor', 'reset'} and
+                     ((phase == 'actor' and not e2b_attempt_ids and not turns) or
+                      (phase == 'reset' and
+                       getattr(cell_worker, 'requires_fresh_e2b_reset', False) is True and
+                       len(e2b_attempt_ids) == 1 and bool(turns) and
+                       turns[-1]['action']['type'] == 'finish')) and
+                     type(lease_seconds) is int and
                      0 < lease_seconds <= 3600 and
                      callable(provider),
                      'e2b_lease_contract_invalid')
@@ -716,7 +729,11 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
                        'episode_index': episode_index,
                        'lease_seconds': lease_seconds,
                        'purpose': 'teacher_original_gui_train'}
-            attempt_id = f'e2b-teacher-r{round_index:03d}-e{episode_index:03d}'
+            if phase == 'reset':
+                request['phase'] = 'reset'
+                request['purpose'] = 'teacher_original_gui_fresh_reset'
+            attempt_id = (f'e2b-teacher-r{round_index:03d}-e{episode_index:03d}' +
+                          ('-reset' if phase == 'reset' else ''))
 
             def create(paid_request: dict) -> dict:
                 result = provider(paid_request)
@@ -738,7 +755,11 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
                 resource_reservation={
                     'e2b_sandbox_hours': str(hours),
                     'e2b_peak_concurrency': '1'}, provider=create)
+            sandbox_id = paid['result']['sandbox_id']
+            _require(sandbox_id not in e2b_sandbox_ids,
+                     'fresh_reset_e2b_sandbox_reused')
             e2b_attempt_ids.append(attempt_id)
+            e2b_sandbox_ids.append(sandbox_id)
             return paid
 
         result = cell_worker.run_episode(
@@ -750,7 +771,9 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
             adapter_sha=cell_worker.adapter_sha256,
             verifier_sha=verifier_sha,
             turns=turns, e2b_attempt_ids=e2b_attempt_ids,
-            requires_e2b=cell_worker.requires_e2b)
+            requires_e2b=cell_worker.requires_e2b,
+            requires_fresh_e2b_reset=getattr(
+                cell_worker, 'requires_fresh_e2b_reset', False))
         result_shas.append(receipt_sha)
         all_turns.extend(turns)
         _require(len(all_turns) <=

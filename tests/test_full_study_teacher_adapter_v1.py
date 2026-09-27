@@ -150,6 +150,7 @@ class FakeWorker:
     original_software_gui = True
     original_surface = 'web'
     requires_e2b = False
+    requires_fresh_e2b_reset = False
 
     def __init__(self, adapter_sha256: str, *,
                  cell_id='magento-admin', runtime_sha='d' * 64,
@@ -160,6 +161,9 @@ class FakeWorker:
         self.verifier_sha = verifier_sha
         self.tamper = None
         self.calls = 0
+        self.reset_sandbox_id = 'fake-reset-train'
+        self.reset_before_finish = False
+        self.third_reset = False
 
     def run_episode(self, *, task, out_dir, sample_teacher, dispatch_e2b):
         self.calls += 1
@@ -169,6 +173,14 @@ class FakeWorker:
                              'schema': teacher.E2B_RESULT_SCHEMA,
                              'sandbox_id': 'fake-train',
                              'lease_seconds': 600, 'created': True})
+        if self.reset_before_finish:
+            dispatch_e2b(
+                phase='reset', lease_seconds=600,
+                reserve_usd='0.500000000',
+                provider=lambda _request: {
+                    'schema': teacher.E2B_RESULT_SCHEMA,
+                    'sandbox_id': self.reset_sandbox_id,
+                    'lease_seconds': 600, 'created': True})
         frame_refs = []
         trace = []
         memory = ''
@@ -195,6 +207,22 @@ class FakeWorker:
             trace.append(sampled['trace_row'])
             memory = sampled['action']['memory']
             previous = {'status': 'applied', 'code': 'ok'}
+        if self.requires_fresh_e2b_reset:
+            dispatch_e2b(
+                phase='reset', lease_seconds=600,
+                reserve_usd='0.500000000',
+                provider=lambda _request: {
+                    'schema': teacher.E2B_RESULT_SCHEMA,
+                    'sandbox_id': self.reset_sandbox_id,
+                    'lease_seconds': 600, 'created': True})
+        if self.third_reset:
+            dispatch_e2b(
+                phase='reset', lease_seconds=600,
+                reserve_usd='0.500000000',
+                provider=lambda _request: {
+                    'schema': teacher.E2B_RESULT_SCHEMA,
+                    'sandbox_id': 'fake-third-train',
+                    'lease_seconds': 600, 'created': True})
         if self.tamper == 'frame':
             (out_dir / 'frames/step-000.png').write_bytes(b'tampered')
         if self.tamper == 'trace':
@@ -267,8 +295,10 @@ class FakeWorker:
                           'sha256': reset_sha},
             'teacher_result_sha256s': [
                 row['teacher_result_sha256'] for row in trace],
-            'e2b_attempt_ids': (['e2b-teacher-r001-e001']
-                                if self.requires_e2b else []),
+            'e2b_attempt_ids': (
+                ['e2b-teacher-r001-e001', 'e2b-teacher-r001-e001-reset']
+                if self.requires_fresh_e2b_reset else
+                ['e2b-teacher-r001-e001'] if self.requires_e2b else []),
         }
         if self.tamper == 'split':
             receipt['split'] = 'final'
@@ -438,6 +468,47 @@ class TeacherAdapterTests(unittest.TestCase):
         self.assertEqual(self.session.calls[0]['resource_reservation'], {
             'e2b_sandbox_hours': '0.166666667',
             'e2b_peak_concurrency': '1'})
+
+    def test_fresh_reset_has_second_reserved_lease_after_finish(self):
+        self.worker.requires_e2b = True
+        self.worker.requires_fresh_e2b_reset = True
+        self.collect()
+        self.assertEqual([row['category'] for row in self.session.calls],
+                         ['e2b', 'teacher_rollout', 'teacher_rollout', 'e2b'])
+        self.assertEqual(self.session.calls[-1]['attempt_id'],
+                         'e2b-teacher-r001-e001-reset')
+        self.assertEqual(self.session.calls[-1]['request']['phase'], 'reset')
+        self.assertEqual(self.session.calls[-1]['resource_reservation'], {
+            'e2b_sandbox_hours': '0.166666667',
+            'e2b_peak_concurrency': '1'})
+
+    def test_fresh_reset_refuses_reused_e2b_sandbox_identity(self):
+        self.worker.requires_e2b = True
+        self.worker.requires_fresh_e2b_reset = True
+        self.worker.reset_sandbox_id = 'fake-train'
+        with self.assertRaisesRegex(teacher.TeacherAdapterError,
+                                    'fresh_reset_e2b_sandbox_reused'):
+            self.collect()
+        self.assertFalse((self.root / 'work' / 'teacher-round-001' /
+                          'dataset.private.json').exists())
+
+    def test_reset_before_finish_or_third_lease_fails_before_extra_provider_call(self):
+        for fault in ('reset_before_finish', 'third_reset'):
+            self.worker.requires_e2b = True
+            self.worker.requires_fresh_e2b_reset = True
+            setattr(self.worker, fault, True)
+            with self.subTest(fault=fault), self.assertRaisesRegex(
+                    teacher.TeacherAdapterError, 'e2b_lease_contract_invalid'):
+                self.collect()
+            self.assertEqual(sum(row['category'] == 'e2b'
+                                 for row in self.session.calls),
+                             1 if fault == 'reset_before_finish' else 2)
+            self.assertFalse((self.root / 'work' / 'teacher-round-001' /
+                              'dataset.private.json').exists())
+            setattr(self.worker, fault, False)
+            self.session.calls.clear()
+            import shutil
+            shutil.rmtree(self.root / 'work' / 'teacher-round-001')
 
     def test_model_or_usage_ambiguity_has_no_dataset(self):
         def bad_provider(request):
