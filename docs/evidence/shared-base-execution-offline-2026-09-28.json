@@ -1,0 +1,33 @@
+{
+  "broad_unittest_count": 908,
+  "broad_unittest_status": "passed_20_skipped_before_final_source_hardening",
+  "cells_exercised": [
+    "gitlab",
+    "odoo-community"
+  ],
+  "date": "2026-09-28",
+  "focused_unittest_count": 11,
+  "focused_unittest_status": "passed",
+  "gitlab_fake_original_worker_task_count": 20,
+  "gitlab_fake_paid_attempt_count": 40,
+  "limitations": [
+    "No live shared-base cell run",
+    "Actual Tinker per-call provider invoice reconciliation unavailable until a trusted usage source is supplied",
+    "No source-bound shared-base runners yet for PowerPoint, Excel, Desktop, or Magento"
+  ],
+  "odoo_fake_paid_attempt_count": 22,
+  "odoo_synthetic_native_projection_task_count": 20,
+  "official_final_tasks_observed": 0,
+  "real_docker_calls": 0,
+  "real_e2b_calls": 0,
+  "real_tinker_calls": 0,
+  "same_shared_receipt_sha_imported_by_four_campaigns": true,
+  "schema": "cua-full-study-shared-base-execution-offline-v1",
+  "source_sha256s": {
+    "src/cursibench/full_study_shared_base_execution_v1.py": "370a6eed01efe0831d65cfea709f3ca3b551518f6851a5d33d8943ab2a442c5c",
+    "src/cursibench/full_study_shared_base_selection_v1.py": "8e6a9675459ba9171b7f32b16ca9f081b101d0220ce83887f307bd729ace575b",
+    "tests/shared_base_selection_fixture.py": "0f6ca39960b8c409729e58528d29df9c3d726818830e47290b3f04e7385cad09",
+    "tests/test_full_study_shared_base_execution_v1.py": "030e9d3f19b0906c0f86a2f6edb0bc278c7121515f4e388b20996f848d2bb5cb"
+  },
+  "status": "fake_provider_and_original_worker_offline_only"
+}
