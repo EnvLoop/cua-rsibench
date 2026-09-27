@@ -565,7 +565,7 @@ class FinalController:
                 value['wall_time_ms'] <= elapsed_ms + 1000 and
                 value['provider_latency_ms'] <= value['wall_time_ms'],
                 'worker_outcome_policy_or_time_invalid')
-        cost = evidence.amount(value['cost_usd'], 'final task cost')
+        cost = results.actual_usd(value['cost_usd'], 'final task cost')
         usage_path, usage_raw = private_reference(attempt_dir, value['usage'],
                                                    'provider_usage')
         usage = json.loads(usage_raw)
@@ -659,7 +659,8 @@ class FinalController:
                     verifier['gold_withheld_from_actor'] is True,
                     'independent_saved_state_verifier_invalid')
             state_sha, verifier_sha = sha(state_raw), sha(verifier_raw)
-        require(cost <= evidence.amount(command['reserve_usd'], 'reserved final cost'),
+        require(cost <= results.actual_usd(command['reserve_usd'],
+                                           'reserved final cost'),
                 'final_provider_cost_exceeds_reserved_envelope')
         metric = {
             'attempt_id': command['attempt_id'],
@@ -935,7 +936,8 @@ class FinalController:
                             attempt_dir, artifact, name)
                         require(sha(artifact_raw) == receipt[digest_name],
                                 'final_attempt_artifact_changed')
-            cost = sum((Decimal(row['cost_usd']) for row in costs), Decimal(0))
+            cost = sum((results.actual_usd(row['cost_usd'], 'attempt cost')
+                        for row in costs), Decimal(0))
             basis = ('provider_billed' if all(row['cost_basis'] == 'provider_billed'
                                               for row in costs) else
                      'published_rate_nominal')

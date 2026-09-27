@@ -257,10 +257,12 @@ def _usage_aggregates(index: dict, root: Path, summary: dict) -> dict:
         usage = read_reference(root, row['usage'],
                                f'{row["cell_id"]}/{row["researcher_id"]} usage')
         for key in USAGE_FIELDS:
-            amounts[key] += evidence.amount(usage[key], key)
+            amounts[key] += results.actual_usd(usage[key], key)
         failures.update(usage['failure_counts'])
     campaign_total = sum(amounts.values(), Decimal(0))
-    require(campaign_total == Decimal(summary['reported_campaign_cost_subtotal_usd']),
+    require(campaign_total == results.actual_usd(
+                summary['reported_campaign_cost_subtotal_usd'],
+                'reported campaign cost subtotal'),
             'campaign cost components differ from audited result')
     return {
         'cost_components_usd': {key: str(amounts[key]) for key in USAGE_FIELDS},
@@ -416,7 +418,7 @@ def _trajectory_bundle(trajectory: dict, root: Path, index: dict,
                     row['cost_basis'] == usage['cost_basis'],
                     f'{label}: round ordering, hypothesis, or cost basis invalid')
             previous_finished = row['finished_at']
-            round_cost = evidence.amount(row['cost_usd'], f'{label} cost')
+            round_cost = results.actual_usd(row['cost_usd'], f'{label} cost')
             cost += round_cost
             round_cost_total += round_cost
             round_wall_times.append(row['finished_at'] - row['started_at'])
@@ -500,8 +502,9 @@ def _trajectory_bundle(trajectory: dict, root: Path, index: dict,
                 previous_finished <= freeze['selection_frozen_at'] and
                 incumbent_checkpoint == freeze['selected_checkpoint_sha256'] and
                 scored_rows and
-                cost <= (evidence.amount(usage['all_in_usd'], 'all_in_usd') -
-                         evidence.amount(usage['selected_final_usd'], 'selected_final_usd')),
+                cost <= (results.actual_usd(usage['all_in_usd'], 'all_in_usd') -
+                         results.actual_usd(usage['selected_final_usd'],
+                                            'selected_final_usd')),
                 f'{cell_id}/{researcher_id}: trajectory differs from frozen selection or usage')
         search_metrics = _search_metrics(scored_rows)
         total_rounds += len(rounds)

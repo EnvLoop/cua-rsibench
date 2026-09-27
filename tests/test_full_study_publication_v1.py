@@ -194,6 +194,31 @@ class PublicationGateTests(unittest.TestCase):
         self.assertEqual((trajectory['campaign_count'], trajectory['round_count'],
                           trajectory['scored_round_count']), (24, 24, 24))
 
+    def test_publication_aggregates_nine_decimal_usage_and_round_cost(self):
+        index = copy.deepcopy(self.index)
+        summary = copy.deepcopy(self.summary)
+        usage_entry = index['campaigns'][0]
+        usage = publication.read_reference(self.root, usage_entry['usage'],
+                                           'fixture usage')
+        usage['selected_final_usd'] = '3.000000009'
+        usage['all_in_usd'] = '17.000000009'
+        usage_entry['usage'] = self.ref('micro/usage.json', usage)
+        summary['reported_campaign_cost_subtotal_usd'] = '408.000000009'
+        summary['reported_all_in_cost_subtotal_usd'] = '420.000000009'
+        aggregate = publication._usage_aggregates(index, self.root, summary)
+        self.assertEqual(aggregate['cost_components_usd']['selected_final_usd'],
+                         '72.000000009')
+        trajectory = copy.deepcopy(self.trajectory)
+        first = trajectory['campaigns'][0]
+        receipt = publication.read_reference(self.root, first['receipt'],
+                                             'fixture trajectory')
+        receipt['usage_receipt_sha256'] = usage_entry['usage']['sha256']
+        receipt['rounds'][0]['cost_usd'] = '1.000000009'
+        first['receipt'] = self.ref('micro/trajectory.json', receipt)
+        observed = publication._trajectory_bundle(
+            trajectory, self.root, index, self.root, summary)
+        self.assertEqual(observed['round_cost_subtotal_usd'], '24.000000009')
+
     def test_missing_execution_or_attempt_fails_closed(self):
         bad = copy.deepcopy(self.telemetry)
         bad['executions'].pop()
