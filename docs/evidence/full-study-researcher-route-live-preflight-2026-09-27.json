@@ -1,0 +1,25 @@
+{
+  "base_host": "sub2api.agentrouterhub.com",
+  "catalog_model_count": 26,
+  "catalog_sha256": "df465cbc3832c0a579884414f618d024c730ec3be88b5de5a8880dd329226431",
+  "official_final_tasks_observed": 0,
+  "requested_model_ids_present": {
+    "gpt-5.6-sol": true,
+    "gpt-6-astra": true,
+    "gpt-6-luna": true,
+    "gpt-6-sol": true
+  },
+  "researcher_campaigns_started": 0,
+  "schema": "envloop-researcher-route-preflight-v1",
+  "tiny_sol_sample": {
+    "benchmark_task_sent": false,
+    "input_tokens": 4390,
+    "model": "gpt-6-sol",
+    "output_tokens": 6,
+    "request_sha256": "acab50793be6978eea7bb69927687de18e02c6e130c8d1149605559ca327df2a",
+    "response_sha256": "f583d139fbc01a765e0011071b4e08cb2ae307f02cd001048901f491aedf4659",
+    "status": "completed",
+    "total_tokens": 4396
+  },
+  "verified_utc": "2026-09-27T13:14:25Z"
+}
