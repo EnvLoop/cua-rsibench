@@ -1,0 +1,19 @@
+{
+  "schema": "envloop-magento-preseed-search-drift-retry-public-v1",
+  "status": "one_bounded_full_task_gui_retry_passed_development_only",
+  "original_stopped_journal_private_sha256": "4fea2b8ca9d9edb53db21dd6dd6493613e95bc44e2fe73fab9664f37cdacd196",
+  "original_reconciled_journal_private_sha256": "21ec4efe735d2327fae9c31c2471b76f7123ae019f8fc1f0cabdd610e58d36b4",
+  "private_read_only_audit_sha256": "84c9d0ff2ca78f9c5a09976ffc4186cfa79985c7ee8017df1b0d9e40a7a8a19a",
+  "private_exact_pair_cleanup_sha256": "303b5578d1eb4f48f4bd4c99f0cbf35a3f86e19ce77cca4143c652d6c4d111d0",
+  "fresh_full_task_retries_allowed": 1,
+  "fresh_full_task_retries_dispatched": 1,
+  "fresh_retry_app_search_pairs_cleaned": 2,
+  "fresh_retry_positive_score": 1,
+  "fresh_retry_wrong_variant_score": 0,
+  "fresh_retry_cold_reset_passed": true,
+  "fresh_retry_journal_private_sha256": "0fe72a305c30c756911f90b3c68cab279d481b0dfa705ef1ab7e401b99dc5a3f",
+  "fresh_retry_calibration_private_sha256": "b1d9e24d961324c0200f7a84207171664a5267d519027aeac3c953d609f77f09",
+  "original_failed_attempts_retained": 1,
+  "model_calls": 0,
+  "official_final_admitted": 0
+}
