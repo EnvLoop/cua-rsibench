@@ -1,0 +1,42 @@
+{
+  "schema": "sec-private-award-explanation-correction-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "one older offline final workbook pair corrected and reaudited; no new source, task, model result or official Excel-web admission",
+  "problem": "A source explanation called restricted-award forfeitures absent although the frozen original SEC source included a filed signed forfeiture. Two neighboring labels were ambiguous about the same scope.",
+  "corrected_explanatory_cells_per_workbook": 3,
+  "corrected_actor_reference_pairs": 1,
+  "old_actor_and_reference_bytes_preserved_privately": true,
+  "exact_private_cell_diff_audited": true,
+  "source_numeric_facts_changed": 0,
+  "formula_targets_changed": 0,
+  "task_text_and_private_oracle_byte_identical": true,
+  "sheet_table_and_other_cell_semantics_preserved": true,
+  "corrected_award_stage_reference_passes": 2,
+  "corrected_award_stage_unrepaired_seed_rejections": 2,
+  "corrected_award_stage_individually_detected_faults": 18,
+  "corrected_award_stage_checked_formula_targets": 154,
+  "newer_dual_award_scale_case_regression_passes": 1,
+  "integrated_original_filing_disjoint_candidate_pairs_repassed": 50,
+  "offline_candidates_by_split_after_correction": {"train": 6, "selection": 6, "final": 38},
+  "remaining_empty_reservations": 90,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "private_evidence_sha256": {
+    "exact_three_cell_diff_receipt": "f56b97b68dbd112a9881a29f406a4d5a2bea1a2df408321243cdd331519162b9",
+    "old_actor_package": "5c5f4a8af717acfa9bc2b7af76af7a21ab26b8408eb3101b38fbf32cb7839221",
+    "corrected_actor_package": "3f80f5959f3308b670cb54c4bcfad42a14900e0ca2e69be653e3c1c3f33ae285",
+    "old_reference_package": "3d38e34cffc8d54173aedf809d90f846d3fc994a95dcfc36366cc9665472992f",
+    "corrected_reference_package": "ab4d0eca1c55a0863fc5497c6cf2550f694b78b44e9669add44106eb9d349043",
+    "old_award_stage_audit": "7d772880f81c06c04e23e394a1e0b274ab3c8db4a8189bbab45f24d807f0ccdc",
+    "corrected_award_stage_audit": "ce08b0b05d3f7a649d3f51553856022cc781f2c67b63b865dfbf7e8e33b8556e",
+    "corrected_award_builder": "63708434df1c67d652abb262628365e90f967242a5e77e4b99a75cbde8e07ccd",
+    "newer_dual_award_scale_audit": "5b5308249038a55a3d0e8bda7fac337db20597e0db2d7ddaeed58c3d023db889",
+    "old_integrated_offline_audit": "ac7c97306ca0167cd63c54ce1ad74adb98a735eeb35bb705b3ee7689ff4060fa",
+    "corrected_integrated_offline_audit": "1d162655686b69b0580247625aba5251312d0095f221be2400856f03b317feff"
+  },
+  "limitations": [
+    "This fixes inaccurate text in one evaluator-private offline candidate. It does not change the actual filed forfeiture, any numeric source row, the independent gold, or a model score.",
+    "The corrected actor and reference both use the new baseline; the old bytes remain privately archived to make the correction auditable.",
+    "All 50 candidates remain offline. No hidden-final ID has passed its own original Excel-web save/download readback and fresh-copy reset."
+  ]
+}
