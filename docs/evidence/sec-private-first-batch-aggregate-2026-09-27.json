@@ -1,0 +1,43 @@
+{
+  "schema": "sec-private-first-batch-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "evaluator-held source-verified offline calibration candidates; no complete private split or Excel-web admission",
+  "new_issuer_families_reviewed_against_original_sec_10k_html": 4,
+  "new_issuer_families_accepted_for_selected_task_facts": 4,
+  "new_issuer_families_rejected_in_reviewed_batch": 0,
+  "other_proxy_candidate_issuer_families_not_yet_reviewed": 36,
+  "canonical_two_period_usd_fact_rows_checked_in_original_filings": 44,
+  "complete_proxy_companyfacts_payloads_authenticated": 0,
+  "evaluator_private_semantic_workflow_families": 2,
+  "evaluator_private_offline_actor_reference_pairs": 4,
+  "workbook_sheets_per_case": 10,
+  "checked_formula_targets_total": 232,
+  "unmarked_formula_faults_individually_detected": 36,
+  "independent_ooxml_positive_reference_passes": 4,
+  "independent_ooxml_unrepaired_seed_rejections": 4,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcode_and_non_target_source_edit_control_workflow_families": 2,
+  "representative_templates_with_every_sheet_rendered_and_visually_checked": 2,
+  "private_allocation_slot_reservations": {"train": 20, "selection": 20, "final": 100},
+  "reserved_distinct_private_issuer_families": 28,
+  "reserved_final_semantic_workflow_families": 10,
+  "offline_candidates_assigned_to_reservations": 4,
+  "unfilled_reservation_slots": 136,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_final_admissions": 0,
+  "private_evidence_sha256": {
+    "original_filing_numeric_controls": "fa4a66992d09dff458e495b0481faed97fb188544796775621a0fb18d5209e56",
+    "source_acceptance_receipt": "e8530e8fe86f7f47f90a744bb6cb03a81bcd7addb30ca2489400f8bc0db5a55a",
+    "case_manifest": "e2b3d8bcb02e87ee4051c6c17a9d59d103c14d359c5280f01394bf17c741c6f9",
+    "offline_workbook_audit": "9a4dd3ba0b50d94e2de46cbad5680adb54a8226a99e59334e88c510192f5cc60",
+    "split_slot_reservations": "4eb402c1c0c4f3b97721865314b064aed6879653071c1acc89eecbeb50002d1e",
+    "private_workbook_builder": "ad9a1094834fb461437d292a90fa44da96fc6add7659331b3d5bf9aee1db3013",
+    "independent_private_ooxml_verifier": "4aba11cc78f512263ad63dee8b676c4b009723ca8d86b58f2dd5bbe25d61464b"
+  },
+  "limitations": [
+    "Only the 44 selected task-relevant numeric facts were cross-checked in nonproxy original SEC filings; the wider proxy payloads remain unauthenticated.",
+    "Twenty/train, twenty/selection, and one hundred/final are slot reservations, not generated or admitted benchmark cases.",
+    "The four offline candidates have not completed dedicated-account Microsoft Excel web save, download, independent readback, negative GUI control, or fresh-copy reset.",
+    "No model result or publishable official final score is claimed."
+  ]
+}
