@@ -39,6 +39,8 @@ A later [Magento CMS-menu infrastructure stop](docs/evidence/magento-original-ne
 
 The dated [six-cell preparation figure](docs/evidence/full-study-readiness-2026-09-27.md) visualizes offline candidate construction, non-comparable evaluator GUI controls and zero official admissions directly from public aggregate receipts. It is a methods-progress snapshot, not a model-result chart.
 
+The later [offline-complete snapshot](docs/evidence/full-study-readiness-offline-complete-2026-09-27.md) records 600 constructed final-candidate identities across the six cells after the original-SEC Excel split reached 20/20/100. The unchanged official-admission count is zero in every cell; the blue bars remain evaluator development evidence only.
+
 The [PowerPoint split-shape audit](docs/evidence/ppt-wdi-split-difficulty-shape-2026-09-27.md) discloses the actual one/three/four target-field train/selection/final progression, disjoint source families and intentional causal-workflow overlap. It supports a harder cross-slide final design without claiming measured difficulty or unseen-workflow transfer.
 
 After seven evaluator-only PowerPoint family quarantines, a [pre-result ordered reserve commitment and attrition cap](docs/evidence/ppt-wdi-future-reserve-queue-2026-09-27.md) limits further replacements to three families. A source failure beyond that bound fails the cell and requires a newly registered study instead of selectively replenishing the exam.
