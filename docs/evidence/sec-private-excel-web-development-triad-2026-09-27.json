@@ -1,0 +1,34 @@
+{
+  "schema": "sec-private-excel-web-development-triad-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "one dedicated-account Microsoft Excel for the web development control triad; zero official hidden-final admissions",
+  "distinct_cloud_items": 3,
+  "original_format_xlsx_downloads_independently_read_back": 3,
+  "positive_manually_repaired_downloads_passing_saved_ooxml_oracle": 1,
+  "near_miss_downloads_correctly_rejected": 1,
+  "near_miss_target_formula_differences_from_positive": 1,
+  "fresh_copy_downloads_semantically_equivalent_to_actor_seed": 1,
+  "formula_targets_checked_in_positive": 57,
+  "source_and_scenario_counterfactual_profiles_in_positive": 2,
+  "non_target_sheet_table_structure_regressions_in_positive": 0,
+  "cloud_item_url_sha256_by_control": {
+    "positive": "0d5df752cc729db13b8c895bf2d91c02725d59af5481ad1b02eed17362c47409",
+    "near-miss": "85e01bda4ee2ba669ff828574f217fc8960bd98f505c914ff89a1d754efb8d4b",
+    "fresh-reset": "cfcacb7591183b4afef98db8a770f1380a85993dcec02b8a4002f018f8758495"
+  },
+  "downloaded_xlsx_sha256_by_control": {
+    "positive": "72158b0a60137805393ba39cabaa2533a2aed62d40b3d008aac9fd48ec85587b",
+    "near-miss": "c3085c901dc045a994a8bfd75ac3649cbc06c7657af7a6d7c10a66c55eb2815f",
+    "fresh-reset": "ad651a37a59528ad7cde718cebfd24535e47b2dfbb288a1cb880c648c6462c73"
+  },
+  "evaluator_only_triad_receipt_sha256": "5e660e44523413433dff97a3b978d5be97a8274c2149367b435b4696e52b7bf1",
+  "model_scored_attempts_from_this_triad": 0,
+  "qualified_hidden_final_tasks_from_this_triad": 0,
+  "microsoft_excel_web_official_final_admissions": 0,
+  "limitations": [
+    "The positive workbook was repaired by an operator for GUI transport calibration, not by a benchmarked model.",
+    "The three controls share one evaluator-private development case and do not constitute three independent tasks.",
+    "Cloud item identities, source issuer, task instructions, formulas and gold remain evaluator-held.",
+    "Every future final task still needs its own source/template isolation, saved/downloaded readback, negative control and fresh-copy reset."
+  ]
+}
