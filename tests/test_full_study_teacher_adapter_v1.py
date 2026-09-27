@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 
 from cursibench import full_study_teacher_adapter_v1 as teacher  # noqa: E402
+from cursibench import http_transport  # noqa: E402
 from cursibench import full_study_matrix_v1 as matrix  # noqa: E402
 from cursibench.scale_action_contract import make_observation  # noqa: E402
 from cursibench.scale_action_output_v066 import MODEL_ACTION_CONTRACT  # noqa: E402
@@ -57,7 +58,10 @@ class FakeStudy:
 
     def student_training_configuration(self):
         return {'model': teacher.MODEL,
-                'action_profile': teacher.ACTION_PROFILE_VERSION}, 'b' * 64
+                'action_profile': teacher.ACTION_PROFILE_VERSION,
+                'batch_size': 2, 'optimizer_steps': 1,
+                'max_supervised_tokens': 32768,
+                'max_scheduled_tokens': 10_000}, 'b' * 64
 
     def teacher_configuration(self):
         harness = {
@@ -122,8 +126,7 @@ class FakeSession:
                               'proposal_sha256': self.proposal_sha,
                               'hypothesis_sha256': sha(
                                   self.proposal['hypothesis'].encode()),
-                              'train_context_sha256': sha(
-                                  self.context_path.read_bytes())}}]
+                              'train_context_sha256': self.context_sha}}]
         return []
 
     def _check_time(self):
@@ -148,8 +151,13 @@ class FakeWorker:
     original_surface = 'web'
     requires_e2b = False
 
-    def __init__(self, adapter_sha256: str):
+    def __init__(self, adapter_sha256: str, *,
+                 cell_id='magento-admin', runtime_sha='d' * 64,
+                 verifier_sha='5' * 64):
+        self.cell_id = cell_id
         self.adapter_sha256 = adapter_sha256
+        self.runtime_sha = runtime_sha
+        self.verifier_sha = verifier_sha
         self.tamper = None
         self.calls = 0
 
@@ -204,7 +212,7 @@ class FakeWorker:
                  'target_state_pass': True,
                  'no_regression_pass': True,
                  'saved_artifact_sha256': 'f' * 64,
-                 'verifier_sha256': '5' * 64,
+                 'verifier_sha256': self.verifier_sha,
                  'evaluator_result': 'pass'}
         reset = {**common, 'schema': teacher.RESET_SCHEMA,
                  'independent_of_actor': True,
@@ -233,6 +241,8 @@ class FakeWorker:
             'sha256': restored_sha}
         if self.tamper == 'saved_state':
             saved['no_regression_pass'] = False
+        if self.tamper == 'artifact':
+            saved_artifact.write_bytes(b'changed after save')
         if self.tamper == 'reset':
             reset['restored_semantic_sha256'] = '2' * 64
         saved_path = out_dir / 'saved-state.private.json'
@@ -246,7 +256,7 @@ class FakeWorker:
             'teacher_model': matrix.TEACHER,
             'original_software_gui': True,
             'original_surface': self.original_surface,
-            'runtime_sha256': 'd' * 64,
+            'runtime_sha256': self.runtime_sha,
             'adapter_sha256': self.adapter_sha256,
             'frame_refs': frame_refs,
             'action_trace_ref': {'path': trace_path.name,
@@ -303,6 +313,7 @@ class TeacherAdapterTests(unittest.TestCase):
                        'visible_instruction': 'Save the train item.'}],
         })
         self.session.context_path = self.context
+        self.session.context_sha = sha(self.context.read_bytes())
         self.teacher_calls = 0
 
     def tearDown(self):
@@ -405,6 +416,7 @@ class TeacherAdapterTests(unittest.TestCase):
             ('frame', 'episode_reference_hash_mismatch'),
             ('trace', 'episode_trace_differs_from_paid_actions'),
             ('saved_state', 'episode_independent_saved_state_missing'),
+            ('artifact', 'episode_reference_hash_mismatch'),
             ('reset', 'episode_fresh_reset_missing'),
             ('split', 'worker_episode_identity_or_split_invalid'),
         ):
@@ -438,6 +450,57 @@ class TeacherAdapterTests(unittest.TestCase):
                 self.collect()
         self.assertFalse((self.root / 'work' / 'teacher-round-001' /
                           'dataset.private.json').exists())
+
+    def test_changed_train_context_or_missing_renderer_stops_before_paid_work(self):
+        self.session.context_sha = '0' * 64
+        with self.assertRaisesRegex(teacher.TeacherAdapterError,
+                                    'researcher_proposal_context_changed'):
+            self.collect()
+        self.assertEqual(self.session.calls, [])
+        self.session.context_sha = sha(self.context.read_bytes())
+        with patch.object(teacher, '_load_renderer',
+                          side_effect=teacher.TeacherAdapterError(
+                              'qwen_renderer_not_available')):
+            with self.assertRaisesRegex(teacher.TeacherAdapterError,
+                                        'qwen_renderer_not_available'):
+                teacher.collect_train_batch(
+                    self.session, 1, self.context,
+                    self.root / 'work' / 'teacher-round-001',
+                    self.worker, teacher_provider=self.provider)
+        self.assertEqual(self.session.calls, [])
+        self.assertFalse((self.root / 'work' / 'teacher-round-001').exists())
+
+    def test_multimodal_responses_transport_has_image_and_no_text_fallback(self):
+        request = {'model': matrix.TEACHER,
+                   'reasoning_effort': 'low', 'reasoning_mode': 'standard',
+                   'max_output_tokens': 128,
+                   'system_prompt': 'Use the visible GUI.',
+                   'user_text': 'Click Save.',
+                   'image_data_url': 'data:image/png;base64,AAAA',
+                   'image_detail': 'high'}
+        captured = []
+
+        def post(url, payload, headers, timeout):
+            captured.append((url, payload, headers, timeout))
+            return {'id': 'synthetic-response', 'model': matrix.TEACHER,
+                    'status': 'completed',
+                    'usage': {'input_tokens': 100, 'output_tokens': 10},
+                    'output': [{'type': 'message', 'content': [
+                        {'type': 'output_text', 'text': '{"type":"finish"}'}]}]}
+
+        with patch.dict('os.environ', {'OPENAI_API_KEY': 'synthetic-test-key'}), \
+             patch.object(http_transport, 'post_json', side_effect=post):
+            result = teacher._real_teacher_provider(request, 180)
+        self.assertEqual(result['receipt']['reported_model'], matrix.TEACHER)
+        self.assertEqual(len(captured), 1)
+        url, payload, headers, timeout = captured[0]
+        self.assertEqual(url, 'https://sub2api.agentrouterhub.com/v1/responses')
+        self.assertEqual(timeout, 180)
+        self.assertEqual(payload['input'][1]['content'][1], {
+            'type': 'input_image', 'image_url': request['image_data_url'],
+            'detail': 'high'})
+        self.assertEqual(payload['store'], False)
+        self.assertEqual(headers['Authorization'], 'Bearer synthetic-test-key')
 
 
 if __name__ == '__main__':

@@ -235,6 +235,8 @@ def _teacher_configuration(session: object) -> tuple[dict, dict, dict, str]:
              os.environ.get('OPENAI_BASE_URL', rate['base_url']).rstrip('/') ==
              rate['base_url'], 'frozen_teacher_route_invalid')
     for name in rate_fields - {'schema', 'model', 'base_url'}:
+        _require(type(rate[name]) is str,
+                 'frozen_teacher_rate_invalid')
         try:
             value = Decimal(rate[name])
         except Exception:
@@ -363,10 +365,18 @@ def _render_turns(cell_id: str, task_ids: list[str],
                  type(prompt.length) is int and
                  0 < prompt.length < model_input.length <= 32768,
                  'qwen_render_missing_image_or_assistant_loss')
-        datums.append(datum_from_model_input_weights(
-            model_input, weights, max_length=32768, reduction='none'))
+        datum = datum_from_model_input_weights(
+            model_input, weights, max_length=32768, reduction='none')
+        actual_length = getattr(getattr(datum, 'model_input', None),
+                                'length', None)
+        _require(type(actual_length) is int and
+                 prompt.length < actual_length <= model_input.length and
+                 any(type(chunk).__name__ == 'ImageChunk'
+                     for chunk in datum.model_input.chunks),
+                 'qwen_shifted_datum_length_or_image_invalid')
+        datums.append(datum)
         prompts.append(prompt)
-        datum_lengths.append(model_input.length)
+        datum_lengths.append(actual_length)
         prompt_lengths.append(prompt.length)
     receipt = {'schema': RENDER_SCHEMA, 'cell_id': cell_id,
                'action_profile': ACTION_PROFILE_VERSION, 'model': MODEL,
@@ -417,7 +427,8 @@ def _verify_episode(directory: Path, result: object, *, cell_id: str,
              [turn['teacher_result_sha256'] for turn in turns],
              'worker_episode_identity_or_split_invalid')
     for index, (reference, turn) in enumerate(zip(receipt['frame_refs'], turns)):
-        _require(reference.get('path') == f'frames/step-{index:03d}.png',
+        _require(type(reference) is dict and
+                 reference.get('path') == f'frames/step-{index:03d}.png',
                  'episode_frame_order_invalid')
         _, image = _reference(directory, reference, suffix='.png')
         _require(image == turn['observation'].screenshot_bytes,
@@ -520,7 +531,13 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
              'frozen_cell_runtime_or_verifier_missing')
     training, _ = session.study.student_training_configuration()
     _require(training['action_profile'] == ACTION_PROFILE_VERSION and
-             training['model'] == MODEL,
+             training['model'] == MODEL and
+             type(training.get('batch_size')) is int and
+             type(training.get('optimizer_steps')) is int and
+             type(training.get('max_supervised_tokens')) is int and
+             type(training.get('max_scheduled_tokens')) is int and
+             0 < training['batch_size'] * training['optimizer_steps'] and
+             len(tasks) <= training['batch_size'] * training['optimizer_steps'],
              'frozen_qwen_training_profile_mismatch')
     vision = _load_renderer()
     reserve_usd = _teacher_quote(
@@ -736,8 +753,19 @@ def collect_train_batch(session, round_index, train_context_path, out_dir,
             requires_e2b=cell_worker.requires_e2b)
         result_shas.append(receipt_sha)
         all_turns.extend(turns)
+        _require(len(all_turns) <=
+                 training['batch_size'] * training['optimizer_steps'],
+                 'teacher_episode_exceeds_frozen_training_capacity')
     rendered_batch = _render_turns(cell_id, [task['task_id'] for task in tasks],
                                    result_shas, all_turns, vision)
+    lengths = rendered_batch.receipt['datum_token_lengths']
+    scheduled_tokens = sum(
+        lengths[(step * training['batch_size'] + offset) % len(lengths)]
+        for step in range(training['optimizer_steps'])
+        for offset in range(training['batch_size']))
+    _require(max(lengths) <= training['max_supervised_tokens'] and
+             scheduled_tokens <= training['max_scheduled_tokens'],
+             'teacher_batch_exceeds_frozen_qwen_token_capacity')
     manifest = {
         'schema': DATASET_SCHEMA, 'cell_id': cell_id,
         'action_profile': ACTION_PROFILE_VERSION, 'model': MODEL,
