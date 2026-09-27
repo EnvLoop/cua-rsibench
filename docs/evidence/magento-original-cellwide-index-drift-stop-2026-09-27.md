@@ -12,6 +12,12 @@ price-index rows differing from the unchanged price-index replica, with the
 same three derived price fields affected. The original journal, process error,
 SQL scan and search response are preserved privately and hash-bound here.
 
+The [cell-halt reconciliation controller](../../tools/reconcile_magento_cellwide_halt_v1.py)
+can retire only this exact pinned, no-mount, unseeded pair after a second
+read-only identity and source-state audit. That cleanup merely frees the
+dedicated container names for the training-only startup probe; it does not
+authorize another per-case retry or change this stopped result.
+
 The [pre-seed drift rule](../FULL_STUDY_MAGENTO_PRESEED_INDEX_DRIFT_RULE_2026-09-27.md)
 allows one complete retry of its first exact ordinal and explicitly stops the
 cell on a second source-hash mismatch. Therefore **no further per-case retry
