@@ -87,6 +87,39 @@ class MagentoCatalogSavedStateTests(unittest.TestCase):
             'other_catalog_changed', 'business_changed',
             'unrelated_search_documents_changed'})
 
+    def test_only_system_low_stock_clock_on_target_is_allowed(self):
+        before = baseline()
+        before['database']['target_rows'] = {
+            'cataloginventory_stock_item': [
+                {'product_id': '111', 'qty': '1.0000', 'is_in_stock': '1',
+                 'low_stock_date': '2026-09-27 04:31:40'},
+                {'product_id': '114', 'qty': '9.0000', 'is_in_stock': '1',
+                 'low_stock_date': None},
+            ]}
+        before['database']['hashes']['target_nonprice'][
+            'cataloginventory_stock_item'] = 'prior-stock'
+        after = copy.deepcopy(before)
+        for row in CASE['target_variants']:
+            after['database']['prices'][str(row['entity_id'])]['price'] = row['target_price']
+        after['database']['target_rows']['cataloginventory_stock_item'][0][
+            'low_stock_date'] = '2026-09-27 04:33:29'
+        after['database']['hashes']['target_nonprice'][
+            'cataloginventory_stock_item'] = 'later-stock'
+        result = verify.score_saved_state(CASE, before, after)
+        self.assertEqual(result['score'], 1.0)
+        self.assertEqual(result['allowed_volatile_fields'],
+                         ['target_stock_low_stock_date_clock'])
+        after['database']['target_rows']['cataloginventory_stock_item'][0][
+            'qty'] = '0.0000'
+        self.assertIn('target_nonprice_changed',
+                      verify.score_saved_state(CASE, before, after)['failure_codes'])
+        after['database']['target_rows']['cataloginventory_stock_item'][0][
+            'qty'] = '1.0000'
+        after['database']['target_rows']['cataloginventory_stock_item'][0][
+            'low_stock_date'] = '2026-09-27 04:29:00'
+        self.assertIn('target_nonprice_changed',
+                      verify.score_saved_state(CASE, before, after)['failure_codes'])
+
     def test_starting_price_drift_and_reset_require_exact_identity(self):
         before = baseline()
         before['database']['prices']['111']['price'] = '46.00'

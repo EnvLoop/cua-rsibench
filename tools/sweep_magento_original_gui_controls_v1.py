@@ -271,6 +271,7 @@ def main() -> None:
     require(all(load_case(plan, args.plan_sha256, case['task_id']) == case
                 for case in cases), 'task package binding changed')
     recovery_sha = None
+    recovery_kind = None
     if args.recovery_of is not None:
         previous = args.recovery_of.resolve()
         require(previous.is_relative_to(private) and previous.is_file() and
@@ -278,13 +279,29 @@ def main() -> None:
                 'single-case private recovery journal required')
         previous_raw = previous.read_bytes()
         events = [json.loads(line) for line in previous_raw.splitlines()]
+        last = events[-1]
         require(any(row.get('event') == 'sweep_stopped' for row in events) and
-                events[-1].get('event') ==
+                last.get('index') == args.start_index and
+                last.get('both_containers_cleaned') is True,
+                'prior stopped task was not explicitly reconciled')
+        if (last.get('event') ==
                 'operator_reconciled_pre_task_prepare_failure' and
-                events[-1].get('index') == args.start_index and
-                events[-1].get('task_seeded') is False and
-                events[-1].get('both_containers_cleaned') is True,
-                'prior pre-task failure was not explicitly reconciled')
+                last.get('task_seeded') is False):
+            recovery_kind = 'unseeded_prepare_failure'
+        elif (last.get('event') ==
+              'operator_reconciled_postpositive_volatile' and
+              last.get('task_seeded') is True):
+            cleanup = (previous.parent / f'case-{args.start_index:03d}' /
+                       'positive/recovery-cleanup.private.json')
+            require(cleanup.is_file() and
+                    sha(cleanup.read_bytes()) ==
+                    last.get('cleanup_receipt_sha256') and
+                    json.loads(cleanup.read_bytes()).get('task_id') ==
+                    cases[args.start_index]['task_id'],
+                    'postpositive scorer/cleanup receipt binding changed')
+            recovery_kind = 'postpositive_volatile_metadata_only'
+        else:
+            raise ValueError('prior failure type has no approved one-case recovery')
         recovery_sha = sha(previous_raw)
     out.mkdir(parents=True, mode=0o700)
     lock_path = ROOT / 'work/magento-original/exclusive-worker.lock'
@@ -301,6 +318,7 @@ def main() -> None:
                            'split': args.split, 'start_index': args.start_index,
                            'limit': args.limit, 'max_concurrent_pairs': 1,
                            'recovery_of_private_journal_sha256': recovery_sha,
+                           'recovery_kind': recovery_kind,
                            'model_calls': 0, 'official_final_admitted': False})
     passed = 0
     try:

@@ -8,6 +8,7 @@ other business tables, and unrelated search documents must be preserved.
 from __future__ import annotations
 
 from decimal import Decimal
+from datetime import datetime
 import hashlib
 import json
 import subprocess
@@ -189,6 +190,42 @@ def check_baseline(case: dict, state: dict) -> None:
                 'baseline variant identity/price changed')
 
 
+def _target_low_stock_clock_only(before: dict, after: dict) -> bool:
+    """Recognize Magento's target-row low-stock timestamp refresh only.
+
+    The independent snapshots retain the raw rows and hashes. A normal price
+    save may advance this one system-owned timestamp for a target variant; no
+    quantity, stock state, other field, row identity, or non-target is masked.
+    """
+    prior = before.get('target_rows', {}).get('cataloginventory_stock_item')
+    current = after.get('target_rows', {}).get('cataloginventory_stock_item')
+    if (not isinstance(prior, list) or not isinstance(current, list) or
+            not prior or len(prior) != len(current)):
+        return False
+    changed = 0
+    for first, second in zip(prior, current):
+        if (not isinstance(first, dict) or not isinstance(second, dict) or
+                first.keys() != second.keys() or
+                first.get('product_id') != second.get('product_id')):
+            return False
+        if {key: value for key, value in first.items()
+            if key != 'low_stock_date'} != {
+                key: value for key, value in second.items()
+                if key != 'low_stock_date'}:
+            return False
+        old, new = first.get('low_stock_date'), second.get('low_stock_date')
+        if old != new:
+            try:
+                after_time = datetime.fromisoformat(new)
+                before_time = datetime.fromisoformat(old) if old else None
+            except (TypeError, ValueError):
+                return False
+            if before_time is not None and after_time < before_time:
+                return False
+            changed += 1
+    return changed > 0
+
+
 def score_saved_state(case: dict, before: dict, after: dict) -> dict:
     check_baseline(case, before)
     require(after['schema'] == before['schema'] and
@@ -213,9 +250,21 @@ def score_saved_state(case: dict, before: dict, after: dict) -> dict:
         if current['prices'].get(entity) != prior['prices'][entity]:
             failures.append('untouched_variant_changed')
             break
+    allowed_volatile_fields = []
     for field in ('other_catalog', 'target_nonprice', 'business'):
-        if current['hashes'][field] != prior['hashes'][field]:
-            failures.append(field + '_changed')
+        if current['hashes'][field] == prior['hashes'][field]:
+            continue
+        if field == 'target_nonprice':
+            old_hash, new_hash = (prior['hashes'][field],
+                                  current['hashes'][field])
+            tables = set(old_hash) | set(new_hash)
+            changed_tables = {table for table in tables
+                              if old_hash.get(table) != new_hash.get(table)}
+            if (changed_tables == {'cataloginventory_stock_item'} and
+                    _target_low_stock_clock_only(prior, current)):
+                allowed_volatile_fields.append('target_stock_low_stock_date_clock')
+                continue
+        failures.append(field + '_changed')
     if (after['search']['document_count'] != before['search']['document_count'] or
             after['search']['other_documents_sha256'] !=
             before['search']['other_documents_sha256']):
@@ -224,6 +273,7 @@ def score_saved_state(case: dict, before: dict, after: dict) -> dict:
             'task_id': case['task_id'], 'passed': not failures,
             'score': 1.0 if not failures else 0.0,
             'failure_codes': failures,
+            'allowed_volatile_fields': allowed_volatile_fields,
             'checked_target_count': len(case['target_variants']),
             'independent_saved_state': True}
 
