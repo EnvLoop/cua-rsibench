@@ -73,7 +73,9 @@ class OfficeWebLoginBridgeTests(unittest.TestCase):
 
     def test_manual_login_session_has_no_microsoft_credentials(self) -> None:
         factory = FakeFactory()
-        with patch.dict(os.environ, {'E2B_API_KEY': 'test-only-key'}):
+        with patch.dict(os.environ, {'E2B_API_KEY': 'test-only-key'}), \
+             patch('tools.office_web_e2b_login_bridge_v1.importlib.metadata.version',
+                   return_value='2.2.0'):
             result = bridge.start(self.out, 600,
                                   bridge.EXPECTED_TEMPLATE_ID, factory)
         self.assertEqual(result['status'], 'awaiting_manual_login')

@@ -20,7 +20,7 @@ from pathlib import Path
 import re
 import secrets
 import time
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlsplit
 import zipfile
 import xml.etree.ElementTree as ET
 
@@ -43,6 +43,11 @@ MAX_TASK_BYTES = 2_000_000
 MAX_PPTX_BYTES = 50_000_000
 _TASK_ID = re.compile(r'ppt-wdi-[a-z0-9]{16}\Z')
 _SANDBOX_ID = re.compile(r'[A-Za-z0-9_-]{8,128}\Z')
+_ONEDRIVE_DOC = re.compile(
+    r'/personal/[0-9A-Fa-f]{16}/_layouts/15/Doc\.aspx\Z')
+_SOURCE_DOC = re.compile(
+    r'\{[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\}\Z')
+_TRAIN_FILE = re.compile(r'EL-PPT-Train-[A-Za-z0-9._-]+\.pptx\Z')
 
 
 class RunnerError(ValueError):
@@ -87,6 +92,36 @@ def load_json(raw: bytes, code: str) -> dict:
         raise RunnerError(code) from None
     require(type(data) is dict, code)
     return data
+
+
+def validate_train_deck_url(url: object) -> str:
+    """Accept only an observed OneDrive Office edit route for train decks.
+
+    The URL shape is an operator assertion, not a source-byte attestation.
+    Live use still requires an independently checked cloud-item binding.
+    """
+    require(type(url) is str and len(url) <= 2048,
+            'invalid_train_deck_url')
+    parsed = urlsplit(url)
+    require(parsed.scheme == 'https' and
+            parsed.hostname == 'onedrive.live.com' and
+            parsed.username is None and parsed.password is None and
+            parsed.port is None and not parsed.fragment and
+            _ONEDRIVE_DOC.fullmatch(parsed.path) is not None,
+            'invalid_train_deck_url')
+    pairs = parse_qsl(parsed.query, keep_blank_values=True)
+    query = dict(pairs)
+    require(len(pairs) == len(query) and
+            set(query) in ({'sourcedoc', 'file', 'action'},
+                           {'sourcedoc', 'file', 'action', 'mobileredirect'}) and
+            _SOURCE_DOC.fullmatch(query['sourcedoc']) is not None and
+            _TRAIN_FILE.fullmatch(query['file']) is not None and
+            not any(token in query['file'].lower()
+                    for token in ('final', 'official')) and
+            query['action'] == 'edit' and
+            (query.get('mobileredirect') in (None, 'true')),
+            'invalid_train_deck_url')
+    return url
 
 
 @dataclass(frozen=True)
@@ -163,16 +198,7 @@ def admit(session_path: Path, task_path: Path, config_path: Path,
             1 <= config['wall_seconds'] <= MAX_WALL_SECONDS and
             config['wall_seconds'] + MIN_LEASE_REMAINDER <= lease_end - now,
             'invalid_run_config')
-    url = config['deck_url']
-    require(type(url) is str and len(url) <= 2048, 'invalid_train_deck_url')
-    parsed = urlsplit(url)
-    require(parsed.scheme == 'https' and
-            parsed.hostname == 'powerpoint.cloud.microsoft' and
-            parsed.username is None and parsed.password is None and
-            parsed.port is None and not parsed.fragment and
-            parsed.path.startswith('/') and parsed.path != '/' and
-            'signin' not in parsed.path.lower(),
-            'invalid_train_deck_url')
+    url = validate_train_deck_url(config['deck_url'])
     task_raw = private_file(task_path, name='task.private.json')
     task = load_json(task_raw, 'invalid_train_package')
     require(task.get('schema') == TASK_SCHEMA and task.get('split') == 'train' and

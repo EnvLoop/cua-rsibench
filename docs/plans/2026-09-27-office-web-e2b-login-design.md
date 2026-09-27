@@ -8,7 +8,7 @@ The E2B lease is bounded and its sandbox/template identity, runtime, attempted a
 
 ## Bounded train runner and current acceptance boundary
 
-`tools/office_web_e2b_train_runner_v1.py` adds the next stage. It accepts only a mode-0600 bridge `session.private.json`, an existing `packages/train/<ppt-wdi-id>/task.private.json` with the pinned train schema and zero official-final credit, and a mode-0600 `run.private.json`, all under the current checkout's ignored `work/`. It rejects paths containing final or official before opening a task file. The actor receives only `actor_task` and current desktop screenshots; calculation fields and train gold stay out of the model request. The run config contains a human-entered `manual_login_confirmed_at_unix`, a `https://powerpoint.cloud.microsoft/...` train deck URL, `max_steps` (1–20), and `wall_seconds` (1–600). The confirmation is an operator attestation, not an automated proof of Microsoft login or deck identity.
+`tools/office_web_e2b_train_runner_v1.py` adds the next stage. It accepts only a mode-0600 bridge `session.private.json`, an existing `packages/train/<ppt-wdi-id>/task.private.json` with the pinned train schema and zero official-final credit, and a mode-0600 `run.private.json`, all under the current checkout's ignored `work/`. It rejects paths containing final or official before opening a task file. The actor receives only `actor_task` and current desktop screenshots; calculation fields and train gold stay out of the model request. The run config contains a human-entered `manual_login_confirmed_at_unix`, a narrowly validated `https://onedrive.live.com/personal/.../_layouts/15/Doc.aspx` train-file edit URL, `max_steps` (1–20), and `wall_seconds` (1–600). The confirmation and train-file name are operator attestations, not automated proof of Microsoft login or cloud-item source identity; a live source-bound download is still required before this runner can qualify any result.
 
 The runner reconnects with `Sandbox.connect(sandbox_id)` without a timeout argument, rechecks the pinned Desktop template, launches the declared train deck, and calls the shared Qwen/Qwen3.8-27B Tinker vision adapter. Each request has a durable proxy journal entry. The runner's private JSONL journal records setup, request intents/results, action intents/results, artifact gate, and teardown, with hashes in place of URLs, typed text, sandbox IDs, and stream credentials. It uses the v0.6.5 action parser on screenshot observations with no invented control refs. Immediately before dispatch it compares a fresh screenshot to the sampled frame and checks the frame, wall, and lease bounds. E2B Desktop 2.2.0 provides `screenshot`, `move_mouse`, `left_click`, `press`, `write`, `scroll`, and `drag`; the runner rejects action forms without an exact desktop mapping. Teardown calls the bridge's class-level kill path even when sampling or action dispatch fails.
 
@@ -21,7 +21,7 @@ After the user manually signs in through the private stream, create `work/.../ru
   "schema": "office-web-e2b-train-run-private-v1",
   "split": "train",
   "manual_login_confirmed_at_unix": 0,
-  "deck_url": "https://powerpoint.cloud.microsoft/p/REPLACE_WITH_TRAIN_DECK",
+  "deck_url": "https://onedrive.live.com/personal/0123456789ABCDEF/_layouts/15/Doc.aspx?sourcedoc=%7B00000000-0000-4000-8000-000000000000%7D&file=EL-PPT-Train-Example.pptx&action=edit&mobileredirect=true",
   "max_steps": 3,
   "wall_seconds": 300
 }
@@ -38,3 +38,5 @@ PYTHONPATH=src python -m tools.office_web_e2b_train_runner_v1 --dry-run \
 ```
 
 `--run` uses the same arguments and is an explicit paid-provider action; it requires host-side `E2B_API_KEY` and `TINKER_API_KEY` plus pinned `e2b-desktop==2.2.0`. The run result remains private under `work/` and, with the default artifact gate, cannot be reported as a successful Office benchmark attempt. The fake sandbox/model test is `PYTHONPATH=src python -m unittest tests.test_office_web_e2b_train_runner_v1 -v`.
+
+A private Python 3.14 target dependency directory was then assembled without changing the project venv. It resolves E2B Desktop 2.2.0, E2B 2.51.0, Tinker 0.30.0, Transformers 5.5.4, Pillow 11.3.0 and `tml-renderers` 0.1.0; `pip check`, offline Qwen3.8 renderer loading and eleven fake runner/bridge tests pass with that directory first on `PYTHONPATH`. This establishes a locally coherent import/render path, **not** E2B account access, Microsoft login, cloud artifact binding, Tinker sampling, provider billing or a model outcome. The private dependency tree remains outside Git and must be rebuilt and hashed before any live study freeze.

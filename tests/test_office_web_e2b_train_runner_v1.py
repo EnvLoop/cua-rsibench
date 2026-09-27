@@ -163,7 +163,11 @@ class OfficeWebTrainRunnerTests(unittest.TestCase):
         self.config_data = {
             'schema': runner.CONFIG_SCHEMA, 'split': 'train',
             'manual_login_confirmed_at_unix': now - 10,
-            'deck_url': 'https://powerpoint.cloud.microsoft/p/train-deck',
+            'deck_url': ('https://onedrive.live.com/personal/'
+                         '0123456789ABCDEF/_layouts/15/Doc.aspx?'
+                         'sourcedoc=%7B00000000-0000-4000-8000-000000000000%7D'
+                         '&file=EL-PPT-Train-Example.pptx&action=edit'
+                         '&mobileredirect=true'),
             'max_steps': 3, 'wall_seconds': 300,
         }
         self.write_inputs()
@@ -238,6 +242,24 @@ class OfficeWebTrainRunnerTests(unittest.TestCase):
                                     'invalid_train_package'):
             runner.admit(self.session, self.task, self.config, self.out)
         self.assertFalse(self.out.exists())
+
+    def test_observed_onedrive_train_route_rejects_final_or_other_hosts(self):
+        self.assertEqual(
+            runner.validate_train_deck_url(self.config_data['deck_url']),
+            self.config_data['deck_url'])
+        for bad in (
+            self.config_data['deck_url'].replace(
+                'EL-PPT-Train-Example', 'EL-PPT-Final-021'),
+            self.config_data['deck_url'].replace(
+                'onedrive.live.com', 'untrusted.example'),
+            self.config_data['deck_url'].replace(
+                'action=edit', 'action=default'),
+            self.config_data['deck_url'] + '&file=EL-PPT-Train-Other.pptx',
+        ):
+            with self.subTest(url=bad):
+                with self.assertRaisesRegex(runner.RunnerError,
+                                            'invalid_train_deck_url'):
+                    runner.validate_train_deck_url(bad)
 
     def test_stale_frame_never_dispatches_and_still_kills(self):
         factory = FakeFactory(change_during_sample=True)
