@@ -31,6 +31,7 @@ from cursibench.scale_action_contract_v066 import (
 )
 from magento_catalog_factory import seed, verify
 from tools import magento_v066_train_adapter as gui
+from tools import magento_dedicated_train_lane_v066 as dedicated
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,19 +39,23 @@ SCHEMA = "envloop-magento-v066-train-teacher-worker-v1"
 MAX_ACTIONS = 90
 WALL_SECONDS = 720
 LOCAL_LEASE_SECONDS = 3600
-# A separate, source-frozen dedicated clone launcher/resetter must be added in
-# a later pre-result revision. No injected backend can enable live dispatch in
-# this revision while the evaluator owns the only qualified Docker lane.
-DEDICATED_BACKEND_IMPLEMENTED = False
+# A dedicated launcher/resetter exists, but a distinct independent train-only
+# positive/negative/fresh-reset smoke must be frozen before this gate opens.
+# No such receipt is shipped and live execution remains disabled by default.
+DEDICATED_BACKEND_IMPLEMENTED = True
 HEX64 = re.compile(r"[0-9a-f]{64}\Z")
 TASK_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}\Z")
 RUNTIME_FILES = (
     "tools/magento_teacher_episode_worker_v066.py",
+    "tools/magento_dedicated_train_lane_v066.py",
     "tools/magento_v066_train_adapter.py",
     "tools/run_magento_model_pilot_v063.py",
     "tools/run_magento_model_pilot_v06.py",
     "tools/start_magento_native_sidecar_clone_v1.py",
+    "tools/sweep_magento_original_gui_controls_v1.py",
     "tools/magento_cron_runtime_contract_v1.py",
+    "tools/qualify_magento_original_catalog_v1.py",
+    "tools/reconcile_magento_unseeded_search_drift_v1.py",
     "magento_catalog_factory/plan.py",
     "magento_catalog_factory/seed.py",
     "magento_catalog_factory/verify.py",
@@ -234,7 +239,10 @@ class MagentoTeacherEpisodeWorker:
                 self.local_cost_authority is None or
                 not _private(self.local_cost_authority) or
                 not callable(self.dispatch_local_service) or
-                self.backend.qualified is not True):
+                not self.dedicated_lane_receipt.resolve().is_relative_to(
+                    (ROOT / "work").resolve()) or
+                not self.local_cost_authority.resolve().is_relative_to(
+                    (ROOT / "work").resolve())):
             raise MagentoTeacherWorkerError(
                 "magento_live_teacher_requires_dedicated_frozen_lane")
         from native_desktop_factory.v066_final_freeze import validate_ratification
@@ -256,21 +264,90 @@ class MagentoTeacherEpisodeWorker:
             raise MagentoTeacherWorkerError(
                 "dedicated_train_lane_receipt_changed")
         lane = json.loads(lane_raw)
+        smoke = lane.get("independent_train_smoke")
         if (lane.get("schema") !=
                 "envloop-magento-v066-dedicated-train-lane-v1" or
-                lane.get("status") != "qualified_before_teacher_episode" or
+                lane.get("status") !=
+                "qualified_after_independent_train_smoke" or
                 lane.get("runtime_sha256") != self.runtime_sha256 or
-                lane.get("app_name") == "envloop-magento-original-control" or
-                lane.get("search_name") == "envloop-magento-native-es" or
+                lane.get("launcher_source_sha256") != _hash(Path(
+                    dedicated.__file__).read_bytes()) or
+                lane.get("app_name") != dedicated.PAIRS[0][0] or
+                lane.get("search_name") != dedicated.PAIRS[0][1] or
+                lane.get("app_reset_name") != dedicated.PAIRS[1][0] or
+                lane.get("search_reset_name") != dedicated.PAIRS[1][1] or
+                lane.get("network") != dedicated.NETWORK or
+                lane.get("loopback_ports") != [7820, 7821, 7822, 7823] or
+                lane.get("source_search_sha256") !=
+                dedicated.evaluator.SEARCH_SHA or
+                lane.get("source_commit") !=
+                dedicated.evaluator.IMAGE_SOURCE_COMMIT or
                 lane.get("app_image_sha256") != seed.IMAGE or
                 lane.get("search_image_sha256") !=
                 verify.NATIVE_SEARCH_IMAGE or
                 lane.get("cron_autostart_disabled") is not True or
                 lane.get("no_host_mounts") is not True or
                 lane.get("actor_role_bound") is not True or
-                lane.get("browser_network_guard_installed") is not True):
+                lane.get("browser_network_guard_installed") is not True or
+                type(smoke) is not dict or
+                smoke.get("known_positive_score") != 1 or
+                smoke.get("wrong_variant_score") != 0 or
+                smoke.get("fresh_clone_reset_passed") is not True or
+                smoke.get("original_magento_gui") is not True or
+                type(smoke.get("private_receipt_ref")) is not dict or
+                type(smoke["private_receipt_ref"].get("path")) is not str or
+                type(smoke["private_receipt_ref"].get("sha256")) is not str or
+                HEX64.fullmatch(smoke["private_receipt_ref"]["sha256"])
+                is None or
+                type(lane.get("actor_credentials_ref")) is not dict or
+                type(lane["actor_credentials_ref"].get("path")) is not str or
+                type(lane["actor_credentials_ref"].get("sha256")) is not str or
+                HEX64.fullmatch(lane["actor_credentials_ref"]["sha256"])
+                is None):
             raise MagentoTeacherWorkerError(
                 "dedicated_train_clone_runtime_not_qualified")
+        smoke_path = Path(smoke["private_receipt_ref"]["path"])
+        if (not _private(smoke_path) or
+                not smoke_path.resolve().is_relative_to(
+                    (ROOT / "work").resolve()) or
+                _hash(smoke_path.read_bytes()) !=
+                smoke["private_receipt_ref"]["sha256"]):
+            raise MagentoTeacherWorkerError(
+                "independent_train_smoke_receipt_missing_or_changed")
+        try:
+            control = json.loads(smoke_path.read_bytes())
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise MagentoTeacherWorkerError(
+                "independent_train_smoke_receipt_invalid") from None
+        if (control.get("schema") !=
+                "envloop-magento-v066-dedicated-train-control-v1" or
+                control.get("status") != "complete_before_teacher" or
+                control.get("evaluator_only") is not True or
+                control.get("model_calls") != 0 or
+                control.get("known_positive_score") != 1 or
+                control.get("wrong_variant_score") != 0 or
+                control.get("fresh_clone_reset_passed") is not True or
+                control.get("different_app_container_ids") is not True or
+                control.get("different_search_container_ids") is not True or
+                control.get("both_pairs_removed") is not True or
+                control.get("actor_acl_verified") is not True or
+                control.get("browser_guard_verified") is not True or
+                control.get("cron_never_autostarted") is not True or
+                control.get("no_evaluator_container_overlap") is not True or
+                control.get("launcher_source_sha256") != _hash(Path(
+                    dedicated.__file__).read_bytes()) or
+                control.get("verifier_source_sha256") !=
+                self.verifier_sha256):
+            raise MagentoTeacherWorkerError(
+                "independent_train_smoke_does_not_qualify_lane")
+        actor_path = Path(lane["actor_credentials_ref"]["path"])
+        if (not _private(actor_path) or
+                not actor_path.resolve().is_relative_to(
+                    (ROOT / "work").resolve()) or
+                _hash(actor_path.read_bytes()) !=
+                lane["actor_credentials_ref"]["sha256"]):
+            raise MagentoTeacherWorkerError(
+                "dedicated_actor_credentials_not_source_bound")
         cost_raw = self.local_cost_authority.read_bytes()
         if (self.local_cost_authority_sha256 != _hash(cost_raw)):
             raise MagentoTeacherWorkerError(
@@ -285,6 +362,10 @@ class MagentoTeacherEpisodeWorker:
             raise MagentoTeacherWorkerError(
                 "magento_local_cost_authority_invalid")
         _money(cost.get("hourly_usd_upper"))
+        # Overwrite any caller-injected backend with this source-bound real
+        # launcher only after the independent smoke and cost gates pass.
+        self.backend = dedicated.DedicatedMagentoTrainRuntime(
+            lane, self.dedicated_lane_receipt)
         return cost
 
     def _train_case(self, task: object) -> dict:

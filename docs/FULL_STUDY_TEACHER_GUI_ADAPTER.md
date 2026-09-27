@@ -10,7 +10,7 @@ The [Odoo Community train worker](FULL_STUDY_ODOO_TEACHER_EPISODE_WORKER_V066.md
 
 The [GitLab CE train worker](FULL_STUDY_GITLAB_TEACHER_EPISODE_WORKER_V066.md) also implements the interface with a scoped original-GitLab browser, evaluator-only PostgreSQL/Git oracle, and two exact cold resets. Its validation is fake-provider/no-Docker only; the concurrent development GUI sweep is separate and is not a model episode.
 
-The [Magento train teacher boundary](FULL_STUDY_MAGENTO_TEACHER_EPISODE_WORKER_V066.md) implements the v0.6.6 GUI and independent saved-state episode contract with fake-backend tests. Its dedicated cron-free clone lifecycle is deliberately live-disabled while the frozen 100-case evaluator owns the existing Docker lane; no Magento model episode is claimed.
+The [Magento train teacher boundary](FULL_STUDY_MAGENTO_TEACHER_EPISODE_WORKER_V066.md) implements the v0.6.6 GUI, independent saved-state episode contract, and a separate cron-free two-pair clone lifecycle with fake process/Playwright tests. It remains live-disabled until an independent dedicated-lane train positive/negative/reset smoke is completed after the frozen 100-case evaluator releases its Docker lane; no Magento model episode is claimed.
 
 The adapter renders admitted turns with `scale_action_output_v066.render_for_model`, the pinned Qwen vision renderer, and Tinker supervised datums. Its render receipt records the **right-shifted Tinker datum length**, which is what the dispatcher charges and validates. Earlier `gui-sft-episode-v2` data use an older action output and are never relabeled v0.6.6. The private output directory must be new under ignored `work/`; a failed or uncertain collection is preserved and never automatically replayed.
 

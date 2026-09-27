@@ -27,6 +27,7 @@ from native_desktop_factory.v066_final_freeze import (
     source_hashes as common_source_hashes,
 )
 from native_desktop_factory import qwen_v066_adapter
+from tools import magento_dedicated_train_lane_v066 as dedicated
 from tools import magento_teacher_episode_worker_v066 as worker_module
 
 
@@ -216,6 +217,131 @@ class MagentoTeacherWorkerTests(unittest.TestCase):
                                     dispatch_e2b=self.e2b)
         self.assertEqual(self.runtime.calls, [])
         self.assertEqual(self.events, [])
+
+    def test_source_bound_independent_smoke_gate_without_docker(self):
+        common = common_source_hashes()
+        profiles = {cell_id: {
+            "common_source_sha256s": common,
+            "adapter_sha256": (self.worker.adapter_sha256
+                               if cell_id == "magento-admin" else "e" * 64),
+        } for cell_id in teacher.matrix.CELLS}
+        profiles["desktop-native"]["adapter_sha256"] = digest(
+            Path(qwen_v066_adapter.__file__).read_bytes())
+        ratification = {
+            "schema": "cua-six-cell-action-profile-v066-ratification-v1",
+            "status": "ratified_pre_result",
+            "ratified_utc": datetime.now(timezone.utc).isoformat(),
+            "action_profile": teacher.ACTION_PROFILE_VERSION,
+            "common_source_sha256s": common,
+            "cell_profiles": profiles,
+            "base_and_selected_identical": True,
+            "hidden_final_model_attempts_before_ratification": 0,
+        }
+        ratification_path = self.work / "ratification.private.json"
+        ratification_sha = write_private(ratification_path, ratification)
+        actor_path = self.work / "actor.private.json"
+        actor_sha = write_private(actor_path, {
+            "username": "synthetic-only", "password": "synthetic-only"})
+        control_path = self.work / "train-control.private.json"
+        control = {
+            "schema": "envloop-magento-v066-dedicated-train-control-v1",
+            "status": "complete_before_teacher", "evaluator_only": True,
+            "model_calls": 0, "known_positive_score": 1,
+            "wrong_variant_score": 0, "fresh_clone_reset_passed": True,
+            "different_app_container_ids": True,
+            "different_search_container_ids": True,
+            "both_pairs_removed": True,
+            "actor_acl_verified": True,
+            "browser_guard_verified": True,
+            "cron_never_autostarted": True,
+            "no_evaluator_container_overlap": True,
+            "launcher_source_sha256": digest(Path(
+                dedicated.__file__).read_bytes()),
+            "verifier_source_sha256": self.worker.verifier_sha256,
+        }
+        control_sha = write_private(control_path, control)
+        lane_path = self.work / "lane.private.json"
+        lane_value = {
+            "schema": "envloop-magento-v066-dedicated-train-lane-v1",
+            "status": "qualified_after_independent_train_smoke",
+            "runtime_sha256": self.worker.runtime_sha256,
+            "launcher_source_sha256": digest(Path(
+                dedicated.__file__).read_bytes()),
+            "app_name": dedicated.PAIRS[0][0],
+            "search_name": dedicated.PAIRS[0][1],
+            "app_reset_name": dedicated.PAIRS[1][0],
+            "search_reset_name": dedicated.PAIRS[1][1],
+            "network": dedicated.NETWORK,
+            "loopback_ports": [7820, 7821, 7822, 7823],
+            "source_search_sha256": dedicated.evaluator.SEARCH_SHA,
+            "source_commit": dedicated.evaluator.IMAGE_SOURCE_COMMIT,
+            "app_image_sha256": seed.IMAGE,
+            "search_image_sha256": worker_module.verify.NATIVE_SEARCH_IMAGE,
+            "cron_autostart_disabled": True,
+            "no_host_mounts": True, "actor_role_bound": True,
+            "browser_network_guard_installed": True,
+            "actor_credentials_ref": {"path": str(actor_path),
+                                      "sha256": actor_sha},
+            "independent_train_smoke": {
+                "known_positive_score": 1, "wrong_variant_score": 0,
+                "fresh_clone_reset_passed": True,
+                "original_magento_gui": True,
+                "private_receipt_ref": {"path": str(control_path),
+                                        "sha256": control_sha}},
+        }
+        lane_sha = write_private(lane_path, lane_value)
+        cost_path = self.work / "local-cost.private.json"
+        cost_sha = write_private(cost_path, {
+            "schema": "cua-full-study-local-opportunity-cost-authority-v1",
+            "cell_id": "magento-admin",
+            "basis": "nominal_local_opportunity_cost_upper",
+            "provider_invoice_usd": None,
+            "lease_seconds": worker_module.LOCAL_LEASE_SECONDS,
+            "hourly_usd_upper": "1.00",
+        })
+        self.worker.enable_live = True
+        self.worker.ratification_path = ratification_path
+        self.worker.ratification_sha256 = ratification_sha
+        self.worker.expected_runtime_sha256 = self.worker.runtime_sha256
+        self.worker.expected_verifier_sha256 = self.worker.verifier_sha256
+        self.worker.dedicated_lane_receipt = lane_path
+        self.worker.dedicated_lane_sha256 = lane_sha
+        self.worker.local_cost_authority = cost_path
+        self.worker.local_cost_authority_sha256 = cost_sha
+        self.worker.dispatch_local_service = self.local_dispatch
+        with patch.object(worker_module, "ROOT", self.root), \
+             patch.object(worker_module, "runtime_sha256",
+                          return_value=self.worker.runtime_sha256):
+            parsed = self.worker._require_live()
+            self.assertEqual(parsed["hourly_usd_upper"], "1.00")
+            self.assertIsInstance(self.worker.backend,
+                                  dedicated.DedicatedMagentoTrainRuntime)
+            for field, bad in (("known_positive_score", 0),
+                               ("wrong_variant_score", 1),
+                               ("fresh_clone_reset_passed", False),
+                               ("actor_acl_verified", False),
+                               ("browser_guard_verified", False)):
+                with self.subTest(field=field):
+                    changed = dict(control, **{field: bad})
+                    changed_sha = write_private(control_path, changed)
+                    altered_lane = copy.deepcopy(lane_value)
+                    altered_lane["independent_train_smoke"][
+                        "private_receipt_ref"]["sha256"] = changed_sha
+                    self.worker.dedicated_lane_sha256 = write_private(
+                        lane_path, altered_lane)
+                    with self.assertRaisesRegex(
+                            worker_module.MagentoTeacherWorkerError,
+                            "independent_train_smoke_does_not_qualify"):
+                        self.worker._require_live()
+            write_private(control_path, control)
+            self.worker.dedicated_lane_sha256 = write_private(
+                lane_path, lane_value)
+            control_path.unlink()
+            with self.assertRaisesRegex(
+                    worker_module.MagentoTeacherWorkerError,
+                    "independent_train_smoke_receipt_missing"):
+                self.worker._require_live()
+        self.assertEqual(self.runtime.calls, [])
 
     def test_fake_saved_state_and_fresh_clone_episode_matches_teacher_contract(self):
         result = self.run_fake()
