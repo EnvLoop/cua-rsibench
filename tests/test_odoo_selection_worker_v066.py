@@ -7,6 +7,7 @@ from hashlib import sha256
 import io
 import json
 from pathlib import Path
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -18,6 +19,7 @@ from cursibench import full_study_campaign_dispatch_v1 as campaign
 from cursibench import full_study_selection_paid_coverage_v1 as paid_coverage
 from cursibench import scale_final_v06 as final
 from cursibench.scale_action_contract import make_observation
+from cursibench.scale_vision_proxy import QwenVisionRenderer
 from enterprise_fallback.odoo18 import selection_worker_v066 as selection
 
 
@@ -130,13 +132,26 @@ class FakeEnvironment:
             "verifier_source_sha256": selection.verifier_sha256(),
             "score": int(index % 2 == 0),
         })
+        semantic = {"business_snapshot": {"synthetic_baseline": index},
+                    "db_checkpoint_sha256": "a" * 64,
+                    "filestore_checkpoint_sha256": "b" * 64}
+        baseline_semantic_sha = private_json(
+            directory / "baseline-semantic.private.json", semantic)
+        restored_semantic_sha = private_json(
+            directory / "restored-semantic.private.json", semantic)
         reset = private_json(directory / "reset.private.json", {
             "schema": "envloop-odoo-selection-reset-v1",
             "task_id": task["task_id"],
             "pre_database_filestore_exact": True,
             "post_database_filestore_exact": True,
-            "baseline_semantic_sha256": "a" * 64,
-            "restored_semantic_sha256": "a" * 64,
+            "baseline_semantic_sha256": baseline_semantic_sha,
+            "restored_semantic_sha256": restored_semantic_sha,
+            "baseline_semantic_ref": {
+                "path": "baseline-semantic.private.json",
+                "sha256": baseline_semantic_sha},
+            "restored_semantic_ref": {
+                "path": "restored-semantic.private.json",
+                "sha256": restored_semantic_sha},
         })
         journal = directory / "sampling-journal" / "requests.sqlite3"
         journal.parent.mkdir(mode=0o700)
@@ -161,6 +176,8 @@ class FakeEnvironment:
                 "saved_state_sha256": saved,
                 "verifier_receipt_sha256": verified,
                 "reset_receipt_sha256": reset,
+                "baseline_semantic_sha256": baseline_semantic_sha,
+                "restored_semantic_sha256": restored_semantic_sha,
                 "actions_sha256": actions,
                 "frames_sha256": frames,
                 "frame_count": 1,
@@ -234,7 +251,7 @@ class SelectionWorkerTests(unittest.TestCase):
             worker_dir=self.root / "selection",
             private_output_root=self.work)
 
-    def run_fake(self):
+    def run_fake(self, *, base_mode=False):
         with patch.object(self.worker, "_require_freeze", return_value={
                 "hourly_usd_upper": "1.00"}), \
              patch.object(self.worker, "_preflight_renderer"), \
@@ -245,7 +262,8 @@ class SelectionWorkerTests(unittest.TestCase):
                 started=self.started, checkpoint_path=self.checkpoint,
                 student_config_raw=self.student_raw,
                 student_config_sha256=self.student_sha,
-                out_dir=self.out, dispatch_paid=self.paid)
+                out_dir=self.out, dispatch_paid=self.paid,
+                base_mode=base_mode)
 
     def test_default_refuses_before_any_cost_or_environment(self):
         with self.assertRaisesRegex(selection.SelectionWorkerError,
@@ -509,8 +527,123 @@ class SelectionWorkerTests(unittest.TestCase):
         self.assertEqual(row["sampled_output_tokens"], 10)
         self.assertEqual(row["sample_paid_attempt_ids"],
                          ["odoo-selection-001-sample-01-000"])
+        reset_receipt = json.loads((task_dir / "reset.private.json")
+                                   .read_bytes())
+        baseline_path = task_dir / reset_receipt[
+            "baseline_semantic_ref"]["path"]
+        restored_path = task_dir / reset_receipt[
+            "restored_semantic_ref"]["path"]
+        self.assertEqual(baseline_path.read_bytes(),
+                         restored_path.read_bytes())
+        self.assertEqual(baseline_path.stat().st_mode & 0o077, 0)
+        self.assertEqual(restored_path.stat().st_mode & 0o077, 0)
+        self.assertEqual(row["baseline_semantic_sha256"],
+                         digest(baseline_path.read_bytes()))
         self.assertEqual(calls, {"score": 2, "snapshot": 3,
                                  "restore": 2})
+
+    def test_base_mode_is_explicit_and_keeps_frozen_checkpoint_identity(self):
+        base_checkpoint_sha = digest(b"frozen base checkpoint manifest")
+        base_start = {**self.started,
+                      "checkpoint_path_sha256": base_checkpoint_sha}
+        with self.assertRaisesRegex(selection.SelectionWorkerError,
+                                    "selection_start_or_checkpoint_unbound"):
+            self.worker.run_selection(
+                started=base_start, checkpoint_path=selection.QWEN_MODEL,
+                student_config_raw=self.student_raw,
+                student_config_sha256=self.student_sha,
+                out_dir=self.out, dispatch_paid=self.paid,
+                base_mode=True)
+        self.assertEqual(self.paid.calls, [])
+        self.assertFalse(self.out.exists())
+        self.worker.allow_base_model = True
+        self.worker.expected_base_checkpoint_sha256 = base_checkpoint_sha
+        self.started = base_start
+        self.checkpoint = selection.QWEN_MODEL
+        outcome = self.run_fake(base_mode=True)
+        self.assertEqual(outcome["status"], "scored")
+        self.assertEqual(outcome["result"]["checkpoint_sha256"],
+                         base_checkpoint_sha)
+        self.assertEqual([call["request"].get("sampling_kind") for call in
+                          self.paid.calls[1:]], ["base"] * 21)
+        ledger = json.loads((self.out / "task-ledger.private.json")
+                            .read_bytes())
+        self.assertEqual(ledger["sampling_kind"], "base")
+        self.assertTrue(all(row["checkpoint_sha256"] ==
+                            base_checkpoint_sha for row in ledger["rows"]))
+
+    def test_fake_sdk_uses_base_model_or_exact_checkpoint_path(self):
+        calls = []
+
+        class FakeService:
+            def __init__(self, *, user_metadata):
+                calls.append(("service", user_metadata["campaign_id"]))
+            def create_sampling_client(self, **kwargs):
+                calls.append(("client", kwargs))
+                return SimpleNamespace(get_base_model=lambda:
+                                       selection.QWEN_MODEL)
+            def close(self, status):
+                calls.append(("close", status))
+                return SimpleNamespace(result=lambda **_kwargs: None)
+
+        renderer = SimpleNamespace(identity={
+            "model": selection.QWEN_MODEL,
+            "renderer": "qwen3_5_disable_thinking",
+            "image_processor": "Qwen2VLImageProcessorPil"})
+        fake_tinker = SimpleNamespace(ServiceClient=FakeService)
+        for mode, path, expected_call in (
+            (True, selection.QWEN_MODEL,
+             {"base_model": selection.QWEN_MODEL}),
+            (False, self.checkpoint, {"model_path": self.checkpoint}),
+        ):
+            with self.subTest(mode=mode), \
+                 patch.dict(sys.modules, {"tinker": fake_tinker}), \
+                 patch.object(QwenVisionRenderer, "load",
+                              return_value=renderer):
+                calls.clear()
+                sampler = selection.RealTinkerSelectionSampler(
+                    path, self.student, self.work, self.started["attempt_id"],
+                    base_mode=mode,
+                    expected_base_checkpoint_sha256=digest(b"frozen base"))
+                with sampler:
+                    self.assertEqual(
+                        sampler.backend.identity["sampling_kind"],
+                        "base" if mode else "checkpoint")
+                self.assertEqual(calls[1], ("client", expected_call))
+                self.assertEqual(calls[-1], ("close", "success"))
+        calls.clear()
+        with self.assertRaisesRegex(selection.SelectionWorkerError,
+                                    "selection_base_checkpoint_unbound"):
+            selection.RealTinkerSelectionSampler(
+                self.checkpoint, self.student, self.work,
+                self.started["attempt_id"], base_mode=True,
+                expected_base_checkpoint_sha256=digest(b"frozen base")
+            ).__enter__()
+        self.assertEqual(calls, [])
+
+    def test_semantic_reset_files_are_reopened_and_equal(self):
+        outcome = self.run_fake()
+        self.assertEqual(outcome["status"], "scored")
+        task = self.started["selection_tasks"][0]
+        row = json.loads((self.out / "task-ledger.private.json")
+                         .read_bytes())["rows"][0]
+        directory = self.out / "tasks" / "task-001"
+        restored = directory / "restored-semantic.private.json"
+        restored.write_bytes(b'{"different":true}\n')
+        with self.assertRaisesRegex(selection.SelectionWorkerError,
+                                    "selection_task_artifact_hash_or_mode_invalid"):
+            selection._audit_task_artifacts(directory, task, row)
+        restored_sha = digest(restored.read_bytes())
+        reset_path = directory / "reset.private.json"
+        reset_receipt = json.loads(reset_path.read_bytes())
+        reset_receipt["restored_semantic_sha256"] = restored_sha
+        reset_receipt["restored_semantic_ref"]["sha256"] = restored_sha
+        row["restored_semantic_sha256"] = restored_sha
+        row["reset_receipt_sha256"] = private_json(reset_path,
+                                                    reset_receipt)
+        with self.assertRaisesRegex(selection.SelectionWorkerError,
+                                    "selection_task_independent_evidence_invalid"):
+            selection._audit_task_artifacts(directory, task, row)
 
     def test_checkpoint_task_and_training_config_tamper_precede_paid_work(self):
         for started, checkpoint, raw, sha in (

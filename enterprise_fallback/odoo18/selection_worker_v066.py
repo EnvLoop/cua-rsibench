@@ -2,8 +2,10 @@
 
 The only task view accepted here is the exact return value from
 ``CampaignSession.start_selection_attempt``. It contains no train or final
-instructions. The selected checkpoint path is private and its SHA-256 must
-match that start receipt. A frozen campaign supplies ``dispatch_paid``: one
+instructions. Selected mode binds a private Tinker checkpoint path to that
+start receipt. Explicit base mode binds the frozen base checkpoint SHA to the
+same receipt while sampling ``Qwen/Qwen3.8-27B``. A frozen campaign supplies
+``dispatch_paid``: one
 local-application reservation, one sampler-setup reservation, and a distinct
 paid attempt per SDK sample are durable before their work. Local runtime and
 rendered token counts are kept separate from provider invoices.
@@ -32,6 +34,9 @@ from cursibench import full_study_selection_environment_v1 as environment_class
 from cursibench import scale_action_output_v066 as output_v066
 from cursibench.scale_action_contract import ContractError, Observation
 from cursibench.scale_action_contract_v066 import ACTION_PROFILE_VERSION
+from cursibench.scale_vision_proxy import (
+    MODEL as QWEN_MODEL, digest as vision_digest,
+)
 from .odoo_v066_train_adapter import OdooV066TrainAdapter, VIEWPORT
 from .teacher_episode_worker_v066 import (
     OdooEpisodeError, ROOT, _canonical, _hash, _mode_private, _write_new,
@@ -104,16 +109,33 @@ def _money(value: object, *, positive: bool = True) -> Decimal:
     return amount
 
 
-def _start_view(started: object, checkpoint_path: str) -> dict:
+def _start_view(started: object, checkpoint_path: str, *,
+                base_mode: bool = False,
+                allow_base_model: bool = False,
+                expected_base_checkpoint_sha256: str | None = None) -> dict:
+    if type(base_mode) is not bool or type(allow_base_model) is not bool:
+        raise SelectionWorkerError("selection_sampling_mode_invalid")
+    if base_mode:
+        checkpoint_bound = (allow_base_model is True and
+            checkpoint_path == QWEN_MODEL and
+            type(expected_base_checkpoint_sha256) is str and
+            HEX64.fullmatch(expected_base_checkpoint_sha256) is not None and
+            type(started) is dict and
+            started.get("checkpoint_path_sha256") ==
+            expected_base_checkpoint_sha256)
+    else:
+        checkpoint_bound = (type(checkpoint_path) is str and
+            campaign.TINKER_PATH.fullmatch(checkpoint_path) is not None and
+            type(started) is dict and
+            _hash(checkpoint_path.encode()) ==
+            started.get("checkpoint_path_sha256"))
     if (type(started) is not dict or set(started) != {
             "attempt_id", "checkpoint_path_sha256", "selection_tasks",
             "selection_identities_sha256", "task_count"} or
             type(started["attempt_id"]) is not str or
             campaign.dollars.ATTEMPT.fullmatch(started["attempt_id"]) is None or
             len(started["attempt_id"]) > 100 or
-            type(checkpoint_path) is not str or
-            campaign.TINKER_PATH.fullmatch(checkpoint_path) is None or
-            _hash(checkpoint_path.encode()) != started["checkpoint_path_sha256"] or
+            checkpoint_bound is not True or
             type(started["selection_tasks"]) is not list or
             len(started["selection_tasks"]) != MAX_TASKS or
             type(started["task_count"]) is not int or
@@ -217,6 +239,8 @@ def _audit_task_artifacts(directory: Path, task: dict, row: dict) -> None:
         "saved_state_sha256": "saved-state.private.json",
         "verifier_receipt_sha256": "verifier.private.json",
         "reset_receipt_sha256": "reset.private.json",
+        "baseline_semantic_sha256": "baseline-semantic.private.json",
+        "restored_semantic_sha256": "restored-semantic.private.json",
         "actions_sha256": "actions.private.json",
         "usage_sha256": "usage.private.json",
         "frames_sha256": "frames.private.json",
@@ -235,6 +259,8 @@ def _audit_task_artifacts(directory: Path, task: dict, row: dict) -> None:
     saved = loaded["saved_state_sha256"]
     verifier = loaded["verifier_receipt_sha256"]
     reset = loaded["reset_receipt_sha256"]
+    baseline_semantic = loaded["baseline_semantic_sha256"]
+    restored_semantic = loaded["restored_semantic_sha256"]
     actions = loaded["actions_sha256"]
     usage = loaded["usage_sha256"]
     frames = loaded["frames_sha256"]
@@ -255,6 +281,18 @@ def _audit_task_artifacts(directory: Path, task: dict, row: dict) -> None:
             reset.get("task_id") != task["task_id"] or
             reset.get("pre_database_filestore_exact") is not True or
             reset.get("post_database_filestore_exact") is not True or
+            type(baseline_semantic) is not dict or
+            baseline_semantic != restored_semantic or
+            reset.get("baseline_semantic_ref") != {
+                "path": "baseline-semantic.private.json",
+                "sha256": row["baseline_semantic_sha256"]} or
+            reset.get("restored_semantic_ref") != {
+                "path": "restored-semantic.private.json",
+                "sha256": row["restored_semantic_sha256"]} or
+            reset.get("baseline_semantic_sha256") !=
+            row["baseline_semantic_sha256"] or
+            reset.get("restored_semantic_sha256") !=
+            row["restored_semantic_sha256"] or
             reset.get("baseline_semantic_sha256") !=
             reset.get("restored_semantic_sha256") or
             type(actions) is not list or len(actions) > MAX_ACTIONS or
@@ -298,10 +336,12 @@ def _audit_task_artifacts(directory: Path, task: dict, row: dict) -> None:
 
 
 class RealTinkerSelectionSampler:
-    """One pinned checkpoint service; one durable sample journal per task."""
+    """Explicit base or pinned checkpoint; durable journal per task."""
 
     def __init__(self, checkpoint_path: str, config: dict,
-                 output_root: Path, attempt_id: str):
+                 output_root: Path, attempt_id: str, *,
+                 base_mode: bool = False,
+                 expected_base_checkpoint_sha256: str | None = None):
         self.checkpoint_path = checkpoint_path
         self.config = config
         self.output_root = output_root
@@ -311,8 +351,22 @@ class RealTinkerSelectionSampler:
         self.renderer = None
         self.adapters = {}
         self.success = False
+        self.base_mode = base_mode
+        self.expected_base_checkpoint_sha256 = (
+            expected_base_checkpoint_sha256)
 
     def __enter__(self):
+        if type(self.base_mode) is not bool:
+            raise SelectionWorkerError("selection_sampling_mode_invalid")
+        if self.base_mode:
+            if (self.checkpoint_path != QWEN_MODEL or
+                    type(self.expected_base_checkpoint_sha256) is not str or
+                    HEX64.fullmatch(
+                        self.expected_base_checkpoint_sha256) is None):
+                raise SelectionWorkerError("selection_base_checkpoint_unbound")
+        elif (type(self.checkpoint_path) is not str or
+              campaign.TINKER_PATH.fullmatch(self.checkpoint_path) is None):
+            raise SelectionWorkerError("selection_checkpoint_path_invalid")
         from cursibench.scale_vision_proxy import (
             QwenVisionRenderer, TinkerVisionBackend, campaign_metadata,
         )
@@ -322,10 +376,15 @@ class RealTinkerSelectionSampler:
             "odoo-selection-" + _hash(self.attempt_id.encode())[:12]))
         try:
             self.backend = TinkerVisionBackend.from_service(
-                self.service, self.renderer, checkpoint=self.checkpoint_path,
+                self.service, self.renderer,
+                checkpoint=None if self.base_mode else self.checkpoint_path,
                 seed=self.config["seed"])
-            if self.backend.identity.get("checkpoint_sha256") != _hash(
-                    self.checkpoint_path.encode()):
+            identity = self.backend.identity
+            expected_kind = "base" if self.base_mode else "checkpoint"
+            expected_identity = vision_digest(
+                QWEN_MODEL if self.base_mode else self.checkpoint_path)
+            if (identity.get("sampling_kind") != expected_kind or
+                    identity.get("checkpoint_sha256") != expected_identity):
                 raise SelectionWorkerError(
                     "selection_sampler_checkpoint_changed")
         except Exception:
@@ -375,7 +434,7 @@ class _PaidSelectionSampler:
     def __init__(self, *, delegate, dispatch_paid: Callable, start: dict,
                  config: dict, config_sha256: str, runtime_sha256: str,
                  paid_attempt_ids: list[str], declared_attempt_ids: list[str],
-                 timeout_rows: list[dict]):
+                 timeout_rows: list[dict], base_mode: bool = False):
         self.delegate = delegate
         self.dispatch_paid = dispatch_paid
         self.start = start
@@ -385,6 +444,7 @@ class _PaidSelectionSampler:
         self.paid_attempt_ids = paid_attempt_ids
         self.declared_attempt_ids = declared_attempt_ids
         self.timeout_rows = timeout_rows
+        self.base_mode = base_mode
 
     def sample(self, observation: Observation, *, task_index: int,
                step: int, task_dir: Path) -> dict:
@@ -410,6 +470,7 @@ class _PaidSelectionSampler:
                 "selection_identities_sha256"],
             "checkpoint_path_sha256": self.start[
                 "checkpoint_path_sha256"],
+            "sampling_kind": "base" if self.base_mode else "checkpoint",
             "student_config_sha256": self.config_sha256,
             "worker_runtime_sha256": self.runtime_sha256,
             "task_id": observation.task_id,
@@ -483,6 +544,8 @@ class _PaidSelectionSampler:
                       "package_sha256": observation.task_binding_sha256,
                       "checkpoint_path_sha256": self.start[
                           "checkpoint_path_sha256"],
+                      "sampling_kind": ("base" if self.base_mode else
+                                        "checkpoint"),
                       "task_index": task_index, "step": step,
                       "frame_sha256": frame_sha},
                 request=request,
@@ -794,16 +857,27 @@ class RealOdooSelectionEnvironment:
                                after[
                                    "physical_filestore_equal_before_web_restart"]
                                and restored == baseline)
+            restored_semantic = {**baseline_semantic,
+                                 "business_snapshot": restored}
+            baseline_semantic_sha = _write_json(
+                task_dir / "baseline-semantic.private.json",
+                baseline_semantic)
+            restored_semantic_sha = _write_json(
+                task_dir / "restored-semantic.private.json",
+                restored_semantic)
             reset_receipt = {
                 "schema": "envloop-odoo-selection-reset-v1",
                 "task_id": task["task_id"],
                 "pre_database_filestore_exact": True,
                 "post_database_filestore_exact": reset_exact,
-                "baseline_semantic_sha256": _hash(_canonical(
-                    baseline_semantic)),
-                "restored_semantic_sha256": _hash(_canonical({
-                    **baseline_semantic,
-                    "business_snapshot": restored})),
+                "baseline_semantic_sha256": baseline_semantic_sha,
+                "restored_semantic_sha256": restored_semantic_sha,
+                "baseline_semantic_ref": {
+                    "path": "baseline-semantic.private.json",
+                    "sha256": baseline_semantic_sha},
+                "restored_semantic_ref": {
+                    "path": "restored-semantic.private.json",
+                    "sha256": restored_semantic_sha},
             }
             _write_json(task_dir / "reset.private.json", reset_receipt)
             if not reset_exact:
@@ -847,6 +921,8 @@ class RealOdooSelectionEnvironment:
                 "verifier_receipt_sha256": verifier_sha,
                 "reset_receipt_sha256": _hash((task_dir /
                                                 "reset.private.json").read_bytes()),
+                "baseline_semantic_sha256": baseline_semantic_sha,
+                "restored_semantic_sha256": restored_semantic_sha,
                 "actions_sha256": actions_sha,
                 "frames_sha256": frames_sha,
                 "frame_count": len(frames),
@@ -875,6 +951,8 @@ class OdooSelectionWorker:
                  expected_verifier_sha256: str | None = None,
                  local_cost_authority_path: Path | None = None,
                  local_cost_authority_sha256: str | None = None,
+                 allow_base_model: bool = False,
+                 expected_base_checkpoint_sha256: str | None = None,
                  enable_live: bool = False):
         self.worker_dir = Path(worker_dir).resolve()
         self.private_output_root = Path(private_output_root).resolve()
@@ -888,6 +966,9 @@ class OdooSelectionWorker:
                                           else None)
         self.local_cost_authority_sha256 = local_cost_authority_sha256
         self.enable_live = enable_live
+        self.allow_base_model = allow_base_model
+        self.expected_base_checkpoint_sha256 = (
+            expected_base_checkpoint_sha256)
         self.runtime_sha256 = runtime_sha256()
         self.verifier_sha256 = verifier_sha256()
         self.adapter_sha256 = adapter_sha256()
@@ -927,9 +1008,12 @@ class OdooSelectionWorker:
             raise SelectionWorkerError("selection_private_output_must_be_new")
 
     def _make_sampler(self, checkpoint_path: str, config: dict,
-                      out_dir: Path, attempt_id: str):
+                      out_dir: Path, attempt_id: str, *,
+                      base_mode: bool = False):
         return RealTinkerSelectionSampler(checkpoint_path, config, out_dir,
-                                          attempt_id)
+            attempt_id, base_mode=base_mode,
+            expected_base_checkpoint_sha256=
+                self.expected_base_checkpoint_sha256)
 
     def _preflight_renderer(self) -> None:
         # Fail before any local-service or Tinker dollar reservation if the
@@ -945,14 +1029,19 @@ class OdooSelectionWorker:
 
     def run_selection(self, *, started: dict, checkpoint_path: str,
                       student_config_raw: bytes, student_config_sha256: str,
-                      out_dir: Path, dispatch_paid: Callable) -> dict:
+                      out_dir: Path, dispatch_paid: Callable,
+                      base_mode: bool = False) -> dict:
         """Return exact 20-task result plus paid IDs/usage evidence for caller.
 
         The caller records the returned result through
         ``session.record_selection_scored``. Invalid attempts return a private
         evaluator receipt for ``session.record_selection_invalid`` instead.
         """
-        start = _start_view(started, checkpoint_path)
+        start = _start_view(
+            started, checkpoint_path, base_mode=base_mode,
+            allow_base_model=self.allow_base_model,
+            expected_base_checkpoint_sha256=
+                self.expected_base_checkpoint_sha256)
         config = _student_sampling_config(student_config_raw,
                                           student_config_sha256)
         if not callable(dispatch_paid):
@@ -1017,13 +1106,15 @@ class OdooSelectionWorker:
                     "selection_identities_sha256"],
                 "checkpoint_path_sha256": start[
                     "checkpoint_path_sha256"],
+                "sampling_kind": "base" if base_mode else "checkpoint",
                 "student_config_sha256": student_config_sha256,
                 "worker_runtime_sha256": self.runtime_sha256,
                 "model": "Qwen/Qwen3.8-27B",
                 "provider_invoice_usd": None,
             }
             sampler_holder = self._make_sampler(
-                checkpoint_path, config, out_dir, start["attempt_id"])
+                checkpoint_path, config, out_dir, start["attempt_id"],
+                base_mode=base_mode)
 
             def setup_sampler(_request: dict) -> dict:
                 nonlocal sampler_open
@@ -1042,7 +1133,9 @@ class OdooSelectionWorker:
                 work={"selection_attempt": start["attempt_id"],
                       "kind": "checkpoint_sampler_setup",
                       "checkpoint_path_sha256": start[
-                          "checkpoint_path_sha256"]},
+                          "checkpoint_path_sha256"],
+                      "sampling_kind": ("base" if base_mode else
+                                        "checkpoint")},
                 request=setup_request,
                 reserve_usd=tinker_sample_reserve_usd(config),
                 resource_reservation={}, provider=setup_sampler)
@@ -1059,7 +1152,7 @@ class OdooSelectionWorker:
                 runtime_sha256=self.runtime_sha256,
                 paid_attempt_ids=paid_attempt_ids,
                 declared_attempt_ids=declared_paid_attempt_ids,
-                timeout_rows=timeout_rows)
+                timeout_rows=timeout_rows, base_mode=base_mode)
             current_stage = "per_sample_tinker_and_odoo_gui"
             try:
                 with self.environment.batch() as active:
@@ -1117,6 +1210,7 @@ class OdooSelectionWorker:
                     "selection_attempt": start["attempt_id"],
                     "checkpoint_sha256": start[
                         "checkpoint_path_sha256"],
+                    "sampling_kind": "base" if base_mode else "checkpoint",
                     "selection_identities_sha256": start[
                         "selection_identities_sha256"],
                     "worker_runtime_sha256": self.runtime_sha256,
@@ -1147,6 +1241,7 @@ class OdooSelectionWorker:
                      "selection_attempt": start["attempt_id"],
                      "checkpoint_sha256": start[
                          "checkpoint_path_sha256"],
+                     "sampling_kind": "base" if base_mode else "checkpoint",
                      "task_count": MAX_TASKS,
                      "sample_calls": sum(row["sample_count"] for row in
                                          task_rows),
