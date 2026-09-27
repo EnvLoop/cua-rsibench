@@ -253,9 +253,12 @@ class MagentoResumable100Tests(unittest.TestCase):
                 v2._cleanup_step(journal, 0, row, 'stop')
                 v2._cleanup_step(journal, 0, row, 'rm')
             self.assertEqual(len(v2.read_journal(journal)), 1)
-            with self.assertRaisesRegex(ValueError, 'exact removal intent'):
-                v2._cleanup_step(Path(temporary) / 'empty.private.jsonl',
-                                 0, row, 'rm')
+            # The missing-container branch must be deterministic even while
+            # the independent live evaluator batch owns this Docker name.
+            with patch.object(v2, '_docker_inspect', return_value=None):
+                with self.assertRaisesRegex(ValueError, 'exact removal intent'):
+                    v2._cleanup_step(Path(temporary) / 'empty.private.jsonl',
+                                     0, row, 'rm')
 
     def test_incomplete_campaign_cannot_emit_public_100_receipt(self):
         with tempfile.TemporaryDirectory() as temporary:
