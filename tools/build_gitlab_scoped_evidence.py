@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -34,6 +35,7 @@ def build() -> tuple[dict, str]:
     state = read("operator-readback-v3.json")
     qwen = read("vision-actor-smoke-v064-summary.json")
     sft_split = read("gui-sft-split-summary.json")
+    analysis = read("analysis-family-public-fields.json")
     restore = read("demo-restoration-v3-receipt.json")
     sweep_result = read("bounded-scoped-v3-sweep-summary.json")
     if not (acl.get("acl_gui_passed") and acl.get("own_project_gui_successes") == 3
@@ -52,6 +54,13 @@ def build() -> tuple[dict, str]:
             sft_split.get("train_source_disjoint_from_selection_and_final") and
             sft_split.get("accepted_training_episodes") == 0):
         raise RuntimeError("shared GUI SFT split exclusion not proven")
+    family_path = PRIVATE / "analysis-families-private.json"
+    if not (analysis.get("clean_final_task_count") == 100 and
+            analysis.get("project_source_family_count") == 20 and
+            analysis.get("tasks_per_project_source_family") == 5 and
+            analysis.get("analysis_manifest_sha256") ==
+            hashlib.sha256(family_path.read_bytes()).hexdigest()):
+        raise RuntimeError("GitLab pre-result analysis-family binding invalid")
     if not (restore.get("demo_identity_preserved") and restore.get("demo_healthy")
             and restore.get("world_removed")):
         raise RuntimeError("pre-existing GitLab demo restoration unverified")
@@ -119,6 +128,7 @@ def build() -> tuple[dict, str]:
                               "stale_frame_rejected": True,
                               "model_calls": 0},
         "shared_gui_sft_split_gate": sft_split,
+        "analysis_family_binding": analysis,
         "evaluator_private_bounded_sweep": sweep_result,
         "official_final_admitted": 0,
         "researcher_campaigns_executed": 0,
@@ -138,7 +148,7 @@ def build() -> tuple[dict, str]:
 
 The frozen v3 world contains 31 private projects, 186 issues, 62 competing MRs, 93 direct project memberships, and three separate non-admin group-owner actors. Real GUI checks let each actor open its own partition's project (3/3) and denied every cross-partition probe with a 404 (6/6). The independently read PostgreSQL/Git business baseline includes private groups, operator administrator flags, group roles, project members, issues, labels, milestones, MRs, and Git refs/blobs. Fresh overlayfs-backed containers reproduced the same v3 digest before each control. The pre-existing GitLab demo returned healthy with the same identity, image, mounts, and ports after the sweep.
 
-The train, selection, and clean final inventories remain 20/20/100. The first five-task development project family was quarantined; an unused CISA/vendor source family supplied five reserve candidates, restoring 100 unexposed final candidates in 20 correlated project families. These are candidate identities, not admitted exam tasks.
+The train, selection, and clean final inventories remain 20/20/100. The first five-task development project family was quarantined; an unused CISA/vendor source family supplied five reserve candidates, restoring 100 unexposed final candidates in 20 correlated project families. A private candidate-level analysis mapping assigns exactly five tasks to each project family and is hash-bound before any official outcome. These are candidate identities, not admitted exam tasks.
 
 Four causally distinct workflows have scoped-operator development controls:
 
