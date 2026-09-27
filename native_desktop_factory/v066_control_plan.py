@@ -52,6 +52,8 @@ def compile_script(script: str) -> tuple[list[dict], Counter]:
     lines = script.splitlines()
     if not lines or lines[-1] != "stop" or lines.count("stop") != 1:
         raise ValueError("A script must end with exactly one stop")
+    if lines == ["stop"]:
+        return [], Counter({"teardown_requests": 1})
     for line in lines:
         name, separator, value = line.partition(" ")
         if name in ("click", "double"):

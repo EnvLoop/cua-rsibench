@@ -32,6 +32,11 @@ class V066ControlPlanTests(unittest.TestCase):
             with self.subTest(script=script), self.assertRaises(ValueError):
                 compile_script(script)
 
+    def test_fresh_cold_reset_has_no_actor_action(self):
+        actions, guards = compile_script("stop\n")
+        self.assertEqual(actions, [])
+        self.assertEqual(guards["teardown_requests"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
