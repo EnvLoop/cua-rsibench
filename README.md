@@ -37,6 +37,8 @@ The [Magento 25-case checkpoint](docs/evidence/magento-original-gui-progress-25-
 
 A later [Magento CMS-menu infrastructure stop](docs/evidence/magento-original-negative-neutral-interruption-2026-09-27.md) was retained before any negative edit. The failed clone's material state and identity-bound cleanup passed; a [pre-result rule](docs/FULL_STUDY_MAGENTO_BOUNDED_GUI_RETRY_2026-09-27.md) allows only one complete, same-controller fresh-clone retry. Neither this interruption nor any future recovery is a model result.
 
+The [one-time Magento recovery](docs/evidence/magento-original-negative-neutral-retry-2026-09-27.md) later passed fresh positive/negative/reset controls without deleting the original failure. The [30-case checkpoint](docs/evidence/magento-original-gui-progress-30-2026-09-27.md) now binds 30 distinct evaluator-only GUI controls; the remaining serial sweep is running on untouched IDs. Official admission remains zero.
+
 The dated [six-cell preparation figure](docs/evidence/full-study-readiness-2026-09-27.md) visualizes offline candidate construction, non-comparable evaluator GUI controls and zero official admissions directly from public aggregate receipts. It is a methods-progress snapshot, not a model-result chart.
 
 The later [offline-complete snapshot](docs/evidence/full-study-readiness-offline-complete-2026-09-27.md) records 600 constructed final-candidate identities across the six cells after the original-SEC Excel split reached 20/20/100. The unchanged official-admission count is zero in every cell; the blue bars remain evaluator development evidence only.

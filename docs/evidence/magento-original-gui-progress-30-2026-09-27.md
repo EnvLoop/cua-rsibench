@@ -1,0 +1,5 @@
+# Magento original-software GUI control progress — 30 cases
+
+The [aggregate receipt](magento-original-gui-progress-30-2026-09-27.json) independently checks the first **30/100 distinct original final candidates** against private task/plan bindings, real Magento admin saved-state positive and wrong-variant negative results, fresh material resets, and verified cleanup of two disposable application/search pairs per completed candidate. The cumulative controls score 30 positives **1** and 30 wrong-variant negatives **0**, with 30 material resets. The single previously disclosed target-stock clock-only reset exception remains the only bounded volatile-field allowance.
+
+The 30th completed candidate is supported by a separately audited [one-time infrastructure recovery](magento-original-negative-neutral-retry-2026-09-27.md). Its earlier CMS menu timeout remains recorded and was never scored; the recovery reran the entire control on new clones. **Seventy candidates remain without individual GUI controls**, and no Magento final task has joined the official denominator or received a hidden-model attempt.
