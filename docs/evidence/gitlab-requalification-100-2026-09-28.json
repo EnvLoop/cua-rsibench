@@ -1,0 +1,24 @@
+{
+  "current_cold_resets_verified": 300,
+  "current_gui_trios_passed": 100,
+  "date": "2026-09-28",
+  "demo_identity_preserved": true,
+  "disposable_world_removed": true,
+  "failure_ledger_head_sha256": "b962e355722cfbb82c75221436ed6b439b2662454914ac9cc90cfd9c71240e11",
+  "index_sha256": "2db41b63d906954c18a57edb6125843469fb698b66aa0c9afbbea8557b6bd728",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_active_denominator": 100,
+  "original_first_attempt_failures_retained": 6,
+  "original_first_attempt_passes": 94,
+  "private_audit_sha256": "a8fb2cc12f94fdb8e89970dfa1689488117442fceabc61fc1ad547b71f343f00",
+  "private_resolution_sha256": "e85a54d8b09ce2baf12af9525967474cf903473d85e36c5836efbe6d5a21893f",
+  "remaining_gates": [
+    "v066_live_train_actor",
+    "per_id_original_software_admission",
+    "six_cell_pre_campaign_freeze"
+  ],
+  "same_id_whole_case_requalifications_passed": 6,
+  "schema": "envloop-gitlab-requalification-100-audit-public-v1",
+  "source_families": 20
+}
