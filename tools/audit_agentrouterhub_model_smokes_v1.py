@@ -1,7 +1,8 @@
-"""Rebuild the three additional researcher smoke rows from private raw responses.
+"""Verify three researcher smoke rows against private raw response bytes.
 
 This is offline and never reads a credential or calls a provider. The fourth
-model, gpt-6-sol, is bound by the separate live route-preflight receipt.
+model, gpt-6-sol, is bound by the separate live route-preflight receipt. HTTP
+status is an observed client field; raw JSON proves its body, not the status.
 """
 
 from __future__ import annotations
@@ -34,7 +35,7 @@ def rows_from_private(private_dir: Path) -> list[dict]:
             raise ValueError("private model response is incomplete or inconsistent")
         request = {"model": model, "input": "Reply with OK.",
                    "max_output_tokens": 8}
-        rows.append({"model": model, "http_status": 200,
+        rows.append({"model": model,
                      "request_sha256": digest(encoded(request)),
                      "response_sha256": digest(raw),
                      "response_status": "completed", "response_model": model,
@@ -47,8 +48,16 @@ def rows_from_private(private_dir: Path) -> list[dict]:
 
 def audit(private_dir: Path, public_path: Path) -> dict:
     public = json.loads(public_path.read_bytes())
+    rows = public.get("models") if isinstance(public, dict) else None
+    observed_statuses = (isinstance(rows, list) and len(rows) == len(MODELS)
+                         and all(isinstance(row, dict) and
+                                 row.get("http_status") == 200 for row in rows))
+    body_fields = ([{key: value for key, value in row.items()
+                     if key != "http_status"} for row in rows]
+                   if observed_statuses else None)
     if (not isinstance(public, dict) or public.get("schema") != SCHEMA
-            or public.get("models") != rows_from_private(private_dir)
+            or not observed_statuses
+            or body_fields != rows_from_private(private_dir)
             or public.get("researcher_campaigns_started") != 0
             or public.get("official_final_tasks_observed") != 0
             or public.get("prior_sol_receipt") !=

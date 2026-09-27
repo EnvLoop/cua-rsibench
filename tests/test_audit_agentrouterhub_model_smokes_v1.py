@@ -17,7 +17,7 @@ class ResearcherSmokeAuditTest(unittest.TestCase):
                                       "total_tokens": 11}}
                 (root / ("tiny-" + model.replace(".", "-") + ".private.json")).write_text(
                     json.dumps(response))
-            rows = rows_from_private(root)
+            rows = [{**row, "http_status": 200} for row in rows_from_private(root)]
             public = {"schema": "envloop-researcher-model-live-smokes-v1",
                       "models": rows, "researcher_campaigns_started": 0,
                       "official_final_tasks_observed": 0,

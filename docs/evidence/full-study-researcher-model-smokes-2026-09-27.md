@@ -9,7 +9,9 @@ models therefore returned a completed tiny request through the approved
 AgentRouterHub endpoint. Provider-reported tokens, request hashes and response
 hashes are public; raw responses are mode 0600 under ignored `work/`.
 The [offline auditor](../../tools/audit_agentrouterhub_model_smokes_v1.py)
-rebuilds the three additional public rows from those private bytes.
+rebuilds model, usage, request and response hash fields from those private
+bytes. HTTP 200 is the recorded client observation; raw response JSON alone
+cannot independently establish the transport status.
 
 These probes sent no benchmark task, hidden source, training data, selection
 query or final evaluation. They show current route and model availability for
