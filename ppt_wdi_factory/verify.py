@@ -612,10 +612,10 @@ def verify(source: Path, attempt: Path, oracle: dict) -> dict:
                 equal = (_masked_chart(before[name], [], True) ==
                          _masked_chart(after[name], [], True))
             elif (oracle["office_web_normalized"] and
-                  name == "ppt/changesInfos/changesInfo1.xml"):
-                # The edit-history log records actions, not the saved task
-                # state. Every slide, chart, workbook and business value is
-                # still independently compared below.
+                  name in ("ppt/changesInfos/changesInfo1.xml",
+                           "ppt/revisionInfo.xml")):
+                # Edit/revision logs record actions and clients, not saved
+                # task state. Every slide, chart and workbook remains strict.
                 equal = (package_guard.xml(before[name]).tag ==
                          package_guard.xml(after[name]).tag)
             elif oracle["office_web_normalized"] and name in package_guard.OFFICE_DERIVED_PARTS:
