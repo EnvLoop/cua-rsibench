@@ -69,6 +69,12 @@ class GitLabOriginalSweepTests(unittest.TestCase):
             chosen = sweep.stratified_order(sweep.candidates())[:5]
             self.assertEqual(len({row["template_group"] for row in chosen}), 5)
             self.assertEqual(len({row["source_family"] for row in chosen}), 5)
+            prior = {factory.sha256(row["source_family"]) for row in chosen}
+            next_five = sweep.stratified_order(sweep.candidates(),
+                                               prior_source_sha256=prior)[:5]
+            self.assertEqual(len({row["template_group"] for row in next_five}), 5)
+            self.assertTrue({row["source_family"] for row in next_five}.isdisjoint(
+                row["source_family"] for row in chosen))
 
 
 class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
@@ -83,6 +89,7 @@ class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
                     "source_family": "source"}
             with patch.object(sweep, "INDEX", private / "index.json"), \
                     patch.object(sweep.runtime, "PRIVATE", private), \
+                    patch.object(sweep.failure_ledger, "PATH", private / "failures.jsonl"), \
                     patch.object(sweep, "candidates", return_value=[item]), \
                     patch.object(sweep.quarantine, "excluded_task_ids", return_value=set()), \
                     patch.object(sweep.verify, "state_snapshot",
@@ -97,6 +104,7 @@ class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(len(index["items"]["private-test-id"]["attempts"]), 1)
                 self.assertEqual((private / "index.json").stat().st_mode & 0o777, 0o600)
                 self.assertEqual(summary["statuses"]["driver_or_environment_failed"], 1)
+                self.assertEqual(summary["append_only_failure_ledger"]["entry_count"], 1)
 
 
 if __name__ == "__main__":
