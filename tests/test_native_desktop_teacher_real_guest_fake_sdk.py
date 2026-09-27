@@ -94,6 +94,8 @@ class FakeDesktopSDK:
         return b"not-used-in-setup"
 
 
+@unittest.skipUnless((CANDIDATES / "candidate-inventory.json").is_file(),
+                     "evaluator-private Desktop corpus is not in this checkout")
 class RealGuestFakeSDKTests(unittest.TestCase):
     def test_actor_and_reset_setup_attest_real_source_shapes(self):
         inventory = json.loads((CANDIDATES / "candidate-inventory.json").read_bytes())
