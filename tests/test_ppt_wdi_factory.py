@@ -39,6 +39,19 @@ class PptWdiFactoryTest(unittest.TestCase):
     def setUpClass(cls):
         cls.candidates = plan.build(bytes.fromhex("f0" * 32))
 
+    @unittest.skipUnless(DEFAULT_SKILL.is_dir() and DEFAULT_MODULES.is_dir(),
+                         "bundled presentation runtime is unavailable")
+    def test_partial_build_refuses_runtime_upgrade(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            private = Path(temporary)
+            (private / "candidate-plan.private.json").write_bytes(
+                plan.canonical(self.candidates))
+            (private / "build-receipt.private.json").write_text(
+                json.dumps({"runtime_bundle_version": "0.0.0"}))
+            with self.assertRaisesRegex(ValueError,
+                                         "Presentations runtime changed"):
+                run(private, DEFAULT_NODE, DEFAULT_MODULES, limit=1)
+
     def test_embedded_chart_workbook_repack_preserves_cells_not_edits(self):
         sheet = (b'<worksheet xmlns="http://schemas.openxmlformats.org/'
                  b'spreadsheetml/2006/main"><sheetData><row r="1">'
@@ -197,7 +210,8 @@ class PptWdiFactoryTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "hash changed"):
                 verify._validate_task_source(task, source_path)
 
-    @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
+    @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir()
+                         and (DEFAULT_SKILL / "SKILL.md").is_file(),
                          "bundled presentation runtime is unavailable")
     def test_positive_partial_collateral_and_chart_controls(self):
         with tempfile.TemporaryDirectory() as temporary:

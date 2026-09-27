@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 
@@ -16,7 +17,25 @@ HERE = Path(__file__).resolve().parent
 DEFAULT_NODE = Path("/Users/xiaoyong/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node")
 DEFAULT_MODULES = Path("/Users/xiaoyong/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules")
 DEFAULT_PYTHON = Path("/Users/xiaoyong/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3")
-DEFAULT_SKILL = Path("/Users/xiaoyong/.codex/plugins/cache/openai-primary-runtime/presentations/26.905.11957/skills/presentations")
+_BUNDLED_PRESENTATIONS = (Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) /
+                          "plugins/cache/openai-primary-runtime/presentations")
+
+
+def bundled_presentations_skill() -> Path:
+    """Choose the installed bundle; each build receipt freezes its version."""
+    explicit = os.environ.get("PRESENTATIONS_SKILL_DIR")
+    if explicit:
+        return Path(explicit)
+    candidates = [path / "skills/presentations"
+                  for path in _BUNDLED_PRESENTATIONS.iterdir()
+                  if path.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", path.name)
+                  and (path / "skills/presentations").is_dir()] if _BUNDLED_PRESENTATIONS.is_dir() else []
+    if not candidates:
+        return _BUNDLED_PRESENTATIONS / "missing/skills/presentations"
+    return max(candidates, key=lambda path: tuple(int(part) for part in path.parent.parent.name.split(".")))
+
+
+DEFAULT_SKILL = bundled_presentations_skill()
 
 
 def prepare_builder(private: Path, modules: Path) -> Path:
@@ -36,6 +55,12 @@ def prepare_builder(private: Path, modules: Path) -> Path:
 def run(private: Path, node: Path, modules: Path, *, limit: int | None = None,
         runtime_python: Path = DEFAULT_PYTHON, skill_dir: Path = DEFAULT_SKILL,
         workers: int = 2) -> dict:
+    skill_dir = Path(skill_dir).resolve()
+    if not skill_dir.is_dir() or not (skill_dir / "SKILL.md").is_file():
+        raise ValueError("Bundled presentations skill is unavailable")
+    runtime_bundle_version = skill_dir.parent.parent.name
+    if not re.fullmatch(r"\d+\.\d+\.\d+", runtime_bundle_version):
+        raise ValueError("Presentations skill bundle version is not pinned")
     plan_path = private / "candidate-plan.private.json"
     manifest = json.loads(plan_path.read_text())
     if manifest.get("schema") != "ppt-wdi-original-candidates-v1":
@@ -49,6 +74,8 @@ def run(private: Path, node: Path, modules: Path, *, limit: int | None = None,
     receipt_path = private / "build-receipt.private.json"
     if receipt_path.exists():
         prior = json.loads(receipt_path.read_bytes())
+        if prior.get("runtime_bundle_version") != runtime_bundle_version:
+            raise ValueError("Presentations runtime changed; use a new private output root")
         if prior.get("builder_sha256") != sha(builder.read_bytes()):
             raise ValueError("Builder changed after source freeze; use a new private output root")
         if (prior.get("finalizer_sha256") is not None
@@ -100,7 +127,7 @@ def run(private: Path, node: Path, modules: Path, *, limit: int | None = None,
                       "plan_sha256": sha(plan_path.read_bytes()),
                       "builder_sha256": sha(builder.read_bytes()),
                       "finalizer_sha256": sha(finalizer.read_bytes()),
-                      "runtime_bundle_version": "26.905.11957", "rows": output,
+                      "runtime_bundle_version": runtime_bundle_version, "rows": output,
                       "official_final_credit": 0})
     if receipt_path.exists() and receipt_path.read_bytes() != data:
         # A partial pilot may be superseded by a complete immutable inventory.
