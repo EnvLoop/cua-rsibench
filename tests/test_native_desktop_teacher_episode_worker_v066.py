@@ -117,8 +117,6 @@ class FakeBackend:
         return guest
 
 
-@unittest.skipUnless((CANDIDATES / "candidate-inventory.json").is_file(),
-                     "evaluator-private Desktop corpus is not in this checkout")
 class DesktopWorkerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

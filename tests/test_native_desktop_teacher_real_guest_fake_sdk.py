@@ -95,8 +95,6 @@ class FakeDesktopSDK:
         return b"not-used-in-setup"
 
 
-@unittest.skipUnless((CANDIDATES / "candidate-inventory.json").is_file(),
-                     "evaluator-private Desktop corpus is not in this checkout")
 class RealGuestFakeSDKTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
