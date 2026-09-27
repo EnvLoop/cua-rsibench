@@ -1,0 +1,23 @@
+{
+  "can_authorize_failed_id_requalification": false,
+  "cold_resets_verified_count": 3,
+  "date": "2026-09-28",
+  "demo_restore_receipt_sha256": "555f32bd3b5b430b269e122367a5255cf0bbe5ceecfd10025a01557253ecbd56",
+  "demo_same_identity_healthy": true,
+  "disposable_world_removed": true,
+  "independent_saved_state_checked": true,
+  "model_calls": 0,
+  "no_regression_checked": true,
+  "official_final_admitted": 0,
+  "operator_source_sha256": "c050c1786a5fa3441bb7bcc85b3f07fe5d45bbebdc1c39f3ab4cf4246d2eebbc",
+  "partition": "train",
+  "per_case_before_after_business_hashes_persisted": false,
+  "private_summary_sha256": "094bb31252ded193157a5793c21aa9f1818c5876680954e292d0b51dce9b2a76",
+  "reload_verified_all": true,
+  "schema": "envloop-gitlab-train-milestone-save-smoke-public-v1",
+  "scores": [
+    1.0,
+    0.0,
+    1.0
+  ]
+}
