@@ -78,6 +78,17 @@ def audit(work_root: Path, *, proposed_new_sandboxes: int,
         records.append({"kind": "runtime_probe", "receipt_sha256": digest(raw),
                         "lease_seconds": lease, "status": receipt.get("status"),
                         "has_sandbox_id": bool(receipt.get("sandbox_id_sha256"))})
+    for path in sorted((work_root / "gui-diagnostics").glob("profile-baseline-*/receipt.json")):
+        raw = path.read_bytes()
+        receipt = json.loads(raw)
+        if receipt.get("schema") != "cua-native-wdi-profile-baseline-v1":
+            raise ValueError("Native profile baseline receipt changed")
+        lease = receipt.get("lease_seconds")
+        if type(lease) is not int or not 120 <= lease <= 600:
+            raise ValueError("Native profile baseline server lease is invalid")
+        records.append({"kind": "profile_baseline", "receipt_sha256": digest(raw),
+                        "lease_seconds": lease, "status": receipt.get("status"),
+                        "has_sandbox_id": bool(receipt.get("sandbox_id_sha256"))})
     health_paths = [*(work_root / "sweep-runs").glob("**/health-probe*.json"),
                     *(work_root / "gui-diagnostics").glob("**/health-probe*.json")]
     for health_path in sorted(health_paths):
