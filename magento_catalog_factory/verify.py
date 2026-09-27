@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from datetime import datetime
+import copy
 import hashlib
 import json
 import subprocess
@@ -280,3 +281,33 @@ def score_saved_state(case: dict, before: dict, after: dict) -> dict:
 
 def check_exact_reset(before: dict, restored: dict) -> None:
     require(restored == before, 'full monitored SQL/search state failed exact reset')
+
+
+def check_material_reset(before: dict, restored: dict) -> list[str]:
+    """Require exact cold reset except a target stock row's system clock.
+
+    The raw before/restored snapshots remain retained. The only equivalence
+    accepted is a monotonic ``low_stock_date`` refresh in a target stock row;
+    both target/non-target business state and the complete search index must
+    otherwise match exactly. The returned exception is explicit in receipts.
+    """
+    if restored == before:
+        return []
+    first = before.get('database', {})
+    second = restored.get('database', {})
+    require(_target_low_stock_clock_only(first, second),
+            'full monitored SQL/search state failed material reset')
+    normalized = copy.deepcopy(restored)
+    stock = 'cataloginventory_stock_item'
+    for group in ('target_nonprice', 'full'):
+        prior = first.get('hashes', {}).get(group, {})
+        current = second.get('hashes', {}).get(group, {})
+        require(isinstance(prior, dict) and isinstance(current, dict) and
+                set(prior) == set(current) and
+                {name for name in prior if prior[name] != current[name]} == {stock},
+                'full monitored SQL/search state failed material reset')
+        normalized['database']['hashes'][group][stock] = prior[stock]
+    normalized['database']['target_rows'][stock] = first['target_rows'][stock]
+    require(normalized == before,
+            'full monitored SQL/search state failed material reset')
+    return ['target_stock_low_stock_date_clock']

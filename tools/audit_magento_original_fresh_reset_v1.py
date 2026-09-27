@@ -1,7 +1,9 @@
-"""Prove exact observed state after reseeding one task in a different fresh clone.
+"""Prove independently saved state after reseeding in a different fresh clone.
 
-The two snapshots must be captured before actor actions. This checks the
-reset baseline; it does not itself run a GUI positive/negative or admit a task.
+The two snapshots must be captured before actor actions. All material SQL and
+search fields match exactly. A target stock row's system-owned monotonic
+low-stock timestamp is listed explicitly if it changed across clones. This
+checks reset only; it does not run a GUI control or admit a task.
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ from magento_catalog_factory.seed import IMAGE, load_case
 from magento_catalog_factory.verify import (
     NATIVE_SEARCH_HOST, NATIVE_SEARCH_IMAGE, NATIVE_SEARCH_NETWORK,
 )
-from magento_catalog_factory.verify import check_baseline, check_exact_reset
+from magento_catalog_factory.verify import check_baseline, check_material_reset
 
 
 def read_private(path: Path) -> tuple[dict, str]:
@@ -73,14 +75,16 @@ def audit(case: dict, first: dict, second: dict,
     require(first_runtime['sidecar_id_sha256'] !=
             second_runtime['sidecar_id_sha256'],
             'fresh reset reused the same search container')
-    check_exact_reset(first, second)
+    allowed_volatile_fields = check_material_reset(first, second)
     return {'schema': 'envloop-magento-original-fresh-reset-v1',
             'task_id': case['task_id'], 'package_sha256': case['package_sha256'],
             'fresh_clone_reset_passed': True,
             'different_container_ids': True,
             'different_search_container_ids': True,
             'same_pinned_application_and_search_images': True,
-            'exact_monitored_sql_and_search_state': True,
+            'exact_monitored_sql_and_search_state': not allowed_volatile_fields,
+            'material_monitored_sql_and_search_state': True,
+            'allowed_volatile_fields': allowed_volatile_fields,
             'official_final_tasks_admitted': 0}
 
 

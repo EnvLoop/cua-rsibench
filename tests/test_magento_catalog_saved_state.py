@@ -132,6 +132,38 @@ class MagentoCatalogSavedStateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'exact reset'):
             verify.check_exact_reset(original, changed)
 
+    def test_cold_reset_exposes_only_target_stock_clock_equivalence(self):
+        before = baseline()
+        before['database']['target_rows'] = {
+            'cataloginventory_stock_item': [
+                {'product_id': '111', 'qty': '1.0000',
+                 'low_stock_date': '2026-09-27 05:06:40'}]}
+        before['database']['hashes']['target_nonprice'][
+            'cataloginventory_stock_item'] = 'old-target-stock'
+        before['database']['hashes']['full'][
+            'cataloginventory_stock_item'] = 'old-full-stock'
+        self.assertEqual(verify.check_material_reset(before, copy.deepcopy(before)), [])
+        restored = copy.deepcopy(before)
+        restored['database']['target_rows']['cataloginventory_stock_item'][0][
+            'low_stock_date'] = '2026-09-27 05:17:14'
+        restored['database']['hashes']['target_nonprice'][
+            'cataloginventory_stock_item'] = 'new-target-stock'
+        restored['database']['hashes']['full'][
+            'cataloginventory_stock_item'] = 'new-full-stock'
+        self.assertEqual(verify.check_material_reset(before, restored),
+                         ['target_stock_low_stock_date_clock'])
+        for path, bad in (('qty', '0.0000'),
+                          ('low_stock_date', '2026-09-27 05:00:00')):
+            tampered = copy.deepcopy(restored)
+            tampered['database']['target_rows'][
+                'cataloginventory_stock_item'][0][path] = bad
+            with self.assertRaisesRegex(ValueError, 'material reset'):
+                verify.check_material_reset(before, tampered)
+        tampered = copy.deepcopy(restored)
+        tampered['search']['full_sha256'] = 'wrong-index'
+        with self.assertRaisesRegex(ValueError, 'material reset'):
+            verify.check_material_reset(before, tampered)
+
     def test_quote_seed_keeps_source_out_of_process_arguments(self):
         fake = SimpleNamespace(returncode=0, stdout=json.dumps({
             'page_id': 8, 'variant_count': 3,
