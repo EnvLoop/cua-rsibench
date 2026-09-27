@@ -80,6 +80,26 @@ def audit(*, plan: Path, plan_sha256: str, source: Path,
             old["runtime_fingerprint_sha256"])
         v2.require(row.get("calibration_sha256") == digest,
                    "completed case calibration changed")
+        case_dir = (v2.attempt_dir(run_dir, index, row["attempt"]) /
+                    f"case-{index:03d}")
+        calibration, _ = v2.read_json(case_dir / "calibration.private.json")
+        for pair in ("positive", "negative"):
+            prepared, prepared_sha = v2.read_json(
+                case_dir / pair / "prepare.private.json")
+            v2.old_contract.validate_prepared(
+                prepared,
+                config_sha256=old["runtime"]["cron_config_sha256"])
+            v2.require(calibration["receipt_sha256"][f"{pair}_prepare"] ==
+                       prepared_sha,
+                       "prepared pair differs from frozen runtime")
+            runtime, runtime_sha = v2.read_json(
+                case_dir / pair / "runtime.private.json")
+            v2.require(calibration["receipt_sha256"][f"{pair}_runtime"] ==
+                       runtime_sha and
+                       runtime["app"] == prepared["application_clone"] and
+                       runtime["sidecar_id_sha256"] ==
+                       prepared["search_sidecar_id_sha256"],
+                       "pair runtime identity differs from preparation")
         receipts.append(digest)
     receipt_chain = sha256(("\n".join(receipts) + "\n").encode()).hexdigest()
     checked_at = datetime.now(timezone.utc).isoformat()
