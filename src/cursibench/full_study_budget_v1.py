@@ -87,7 +87,7 @@ def _plan_limits(plan: object) -> tuple[str, Decimal, dict]:
                         'shared base final cost')
         selection = _dollar(cell['base_selection_cost_upper_bound_usd'],
                             'shared base selection cost')
-        _require(final > 0 and selection >= final,
+        _require(final > 0 and selection == final,
                  'shared base selection needs conservative separate bound')
         shared_final += final
         shared_selection += selection

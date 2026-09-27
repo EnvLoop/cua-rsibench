@@ -16,6 +16,7 @@ from pathlib import Path
 
 from . import full_study_matrix_v1 as matrix
 from . import full_study_selection_environment_v1 as environment
+from . import full_study_selection_paid_coverage_v1 as paid_coverage
 from . import scale_final_v06 as cell_final
 
 
@@ -26,6 +27,7 @@ VERIFIER_SCHEMA = "cua-full-study-shared-base-verifier-v1"
 RESET_SCHEMA = "cua-full-study-shared-base-reset-v1"
 TRACE_SCHEMA = "cua-full-study-shared-base-gui-trace-v1"
 USAGE_SCHEMA = "cua-full-study-shared-base-usage-v1"
+PAID_RESULT_SCHEMA = "cua-full-study-shared-base-paid-result-v1"
 REGISTRY_SCHEMA = "cua-full-study-shared-base-selection-registry-v1"
 MAX_BYTES = 16_000_000
 
@@ -142,6 +144,11 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
              row["package_sha256"] == identity["package_sha256"] and
              row["checkpoint_sha256"] == checkpoint and
              type(row["score"]) is int and row["score"] in (0, 1) and
+             all(type(row.get(name)) is dict and
+                 set(row[name]) == {"path", "sha256"} and
+                 _hash(row[name]["sha256"])
+                 for name in ("saved_state_ref", "verifier_ref",
+                              "reset_ref", "gui_trace_ref")) and
              result_row == {
                  "task_id": row["task_id"],
                  "package_sha256": row["package_sha256"],
@@ -153,24 +160,37 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
     common = {"task_id": row["task_id"],
               "package_sha256": row["package_sha256"]}
     saved, _ = _json_ref(root, row["saved_state_ref"])
-    _require(saved == {
+    _require(type(saved.get("saved_artifact_ref")) is dict and
+             set(saved["saved_artifact_ref"]) == {"path", "sha256"} and
+             _hash(saved.get("saved_artifact_sha256")) and
+             type(saved.get("native_save_observed")) is bool and
+             saved == {
         "schema": SAVED_SCHEMA, **common,
         "readback_performed": True,
+        "native_save_observed": saved["native_save_observed"],
         "saved_artifact_ref": saved.get("saved_artifact_ref"),
         "saved_artifact_sha256": saved.get("saved_artifact_sha256"),
-    } and _hash(saved["saved_artifact_sha256"]) and
+    } and (row["score"] == 0 or saved["native_save_observed"] is True) and
              saved["saved_artifact_ref"]["sha256"] ==
              saved["saved_artifact_sha256"],
              "base_selection_saved_state_not_independent")
     _reference(root, saved["saved_artifact_ref"])
     verifier, _ = _json_ref(root, row["verifier_ref"])
+    target = verifier.get("target_state_pass")
+    no_regression = verifier.get("no_regression_pass")
     _require(verifier == {
         "schema": VERIFIER_SCHEMA, **common,
         "score": row["score"],
         "independent_of_actor": True,
+        "target_state_pass": target,
         "no_regression_checked": True,
+        "no_regression_pass": no_regression,
+        "evaluated_saved_artifact_sha256":
+            saved["saved_artifact_sha256"],
         "verifier_sha256": bindings["verifier"],
-    }, "base_selection_verifier_not_independent")
+    } and type(target) is bool and type(no_regression) is bool and
+             row["score"] == int(target and no_regression),
+             "base_selection_verifier_not_independent")
     reset, _ = _json_ref(root, row["reset_ref"])
     _require(type(reset) is dict and set(reset) == {
         "schema", "task_id", "package_sha256", "fresh_environment",
@@ -190,7 +210,7 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
     _require(type(trace) is dict and set(trace) == {
         "schema", "task_id", "package_sha256", "checkpoint_sha256",
         "original_software_gui", "observation_kind",
-        "current_frame_rechecked", "frame_refs",
+        "current_frame_rechecked", "frame_refs", "action_trace_ref",
         "model_sample_count", "validated_gui_action_count"} and
         trace["schema"] == TRACE_SCHEMA and
         all(trace.get(key) == value for key, value in common.items()) and
@@ -209,6 +229,29 @@ def _task_evidence(root: Path, identity: dict, checkpoint: str,
         _, image = _reference(root, frame, suffix=".png")
         _require(image.startswith(b"\x89PNG\r\n\x1a\n"),
                  "base_selection_frame_not_png")
+    _, actions_raw = _reference(root, trace["action_trace_ref"],
+                                suffix=".json")
+    try:
+        actions = json.loads(actions_raw)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        raise SharedBaseSelectionError(
+            "base_selection_action_trace_invalid") from None
+    frame_shas = {frame["sha256"] for frame in trace["frame_refs"]}
+    _require(type(actions) is list and
+             len(actions) == trace["model_sample_count"] and
+             all(type(action) is dict and set(action) == {
+                 "step", "frame_sha256", "model_result_sha256",
+                 "action_type", "current_frame_checked"} and
+                 action["step"] == index and
+                 action["frame_sha256"] in frame_shas and
+                 _hash(action["model_result_sha256"]) and
+                 (action["action_type"] is None or
+                  type(action["action_type"]) is str) and
+                 action["current_frame_checked"] is True
+                 for index, action in enumerate(actions)) and
+             sum(action["action_type"] is not None for action in actions) ==
+             trace["validated_gui_action_count"],
+             "base_selection_action_trace_unbound")
     tinker_ids = row["tinker_paid_attempt_ids"]
     environment_id = row["environment_paid_attempt_id"]
     _require(type(tinker_ids) is list and tinker_ids and
@@ -242,7 +285,8 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
                 "source_bindings", "original_software_gui",
                 "evaluator_isolated", "result_ref", "task_ledger_ref",
                 "paid_attempt_refs", "paid_attempt_ids",
-                "environment_category", "official_final_tasks_observed"}
+                "environment_category", "selection_attempt",
+                "paid_coverage_sha256", "official_final_tasks_observed"}
     bindings = cell["matched_bindings"]
     profile = study.ratification["cell_profiles"][cell_id]
     source_bindings = {**bindings,
@@ -265,6 +309,9 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
              receipt["evaluator_isolated"] is True and
              receipt["environment_category"] ==
              environment.category(cell_id) and
+             receipt["selection_attempt"] ==
+             "base-selection-" + cell_id and
+             _hash(receipt["paid_coverage_sha256"]) and
              receipt["official_final_tasks_observed"] == 0,
              "base_selection_frozen_source_or_original_gui_unbound")
     selection = list(study.task_views(cell_id)["selection"])
@@ -295,62 +342,116 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
         type(ledger["tasks"]) is list and len(ledger["tasks"]) ==
         matrix.SELECTION_PER_CELL,
         "base_selection_task_ledger_shape_invalid")
-    expected_paid = []
-    paid_binding = {}
+    task_by_id = {}
+    sample_ids = []
+    environment_ids = []
     for identity, row, score_row in zip(selection, ledger["tasks"],
                                         result["tasks"]):
         tinker_ids, environment_id = _task_evidence(
             root, identity, cell["base_checkpoint_sha256"],
             row, score_row, bindings)
-        for attempt_id in tinker_ids:
-            expected_paid.append(attempt_id)
-            paid_binding[attempt_id] = (identity, "tinker", row)
-        expected_paid.append(environment_id)
-        paid_binding[environment_id] = (
-            identity, environment.category(cell_id), row)
-    _require(len(expected_paid) == len(set(expected_paid)) and
-             receipt["paid_attempt_ids"] == expected_paid and
+        trace, _ = _json_ref(root, row["gui_trace_ref"])
+        task_by_id[identity["task_id"]] = {
+            "identity": identity, "row": row,
+            "frame_shas": {frame["sha256"]
+                            for frame in trace["frame_refs"]}}
+        sample_ids.extend(tinker_ids)
+        environment_ids.append(environment_id)
+    unique_environment_ids = set(environment_ids)
+    _require(len(sample_ids) >= 20 and
+             len(sample_ids) == len(set(sample_ids)) and
+             len(unique_environment_ids) in (1, 20) and
+             set(sample_ids).isdisjoint(unique_environment_ids) and
+             type(receipt["paid_attempt_ids"]) is list and
+             len(receipt["paid_attempt_ids"]) ==
+             len(set(receipt["paid_attempt_ids"])) and
+             set(sample_ids) | unique_environment_ids <=
+             set(receipt["paid_attempt_ids"]) and
              type(receipt["paid_attempt_refs"]) is list and
-             len(receipt["paid_attempt_refs"]) == len(expected_paid),
-             "base_selection_paid_task_attempts_not_unique")
+             len(receipt["paid_attempt_refs"]) ==
+             len(receipt["paid_attempt_ids"]),
+             "base_selection_paid_task_coverage_missing")
     records = budget.owner_attempts(f"{cell_id}:shared-base")
     selection_records = {attempt_id: record for attempt_id, record in
                          records.items() if record["category"] !=
                          "shared_base_final"}
-    _require(set(selection_records) == set(expected_paid),
+    _require(set(selection_records) == set(receipt["paid_attempt_ids"]),
              "base_selection_paid_budget_attempts_unmatched")
     seen_paid = set()
+    paid_calls = []
+    coverage_identities_sha = _sha(_canonical(selection))
     for paid in receipt["paid_attempt_refs"]:
         _require(type(paid) is dict and set(paid) == {
-            "attempt_id", "category", "request_ref", "usage_ref"} and
-            paid["attempt_id"] in paid_binding and
+            "attempt_id", "category", "request_ref", "result_ref",
+            "usage_ref"} and
+            paid["attempt_id"] in selection_records and
             paid["attempt_id"] not in seen_paid,
             "base_selection_paid_record_duplicate_or_unknown")
         attempt_id = paid["attempt_id"]
         seen_paid.add(attempt_id)
-        identity, category, task_row = paid_binding[attempt_id]
         budget_row = selection_records[attempt_id]
         request, request_raw = _json_ref(root, paid["request_ref"])
+        paid_result, _ = _json_ref(root, paid["result_ref"])
         usage, usage_raw = _json_ref(root, paid["usage_ref"])
+        category = paid["category"]
+        task_id = request.get("task_id")
+        task = task_by_id.get(task_id) if task_id is not None else None
+        result_status = paid_result.get("status")
+        _require(paid_result == {
+            "schema": PAID_RESULT_SCHEMA,
+            "attempt_id": attempt_id,
+            "category": category,
+            "status": result_status,
+            "selection_attempt": receipt["selection_attempt"],
+            "task_id": task_id,
+            "checkpoint_path_sha256": cell["base_checkpoint_sha256"],
+        } and (result_status is None or
+               (type(result_status) is str and bool(result_status))) and
+            (category != "tinker" or task_id is None or
+             result_status == "completed"),
+            "base_selection_paid_result_not_completed")
         expected_request = {
             "schema": "cua-full-study-shared-base-paid-request-v1",
-            "cell_id": cell_id, "task_id": identity["task_id"],
-            "package_sha256": identity["package_sha256"],
-            "checkpoint_sha256": cell["base_checkpoint_sha256"],
+            "cell_id": cell_id,
+            "selection_attempt": receipt["selection_attempt"],
+            "selection_identities_sha256": coverage_identities_sha,
+            "selection_tasks": request.get("selection_tasks"),
+            "task_id": task_id,
+            "package_sha256": request.get("package_sha256"),
+            "checkpoint_path_sha256": cell["base_checkpoint_sha256"],
             "split": "selection", "category": category,
             "frame_sha256": request.get("frame_sha256"),
             "runtime_sha256": bindings["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
         }
-        trace, _ = _json_ref(root, task_row["gui_trace_ref"])
-        frame_shas = {ref["sha256"] for ref in trace["frame_refs"]}
+        if task is not None:
+            row = task["row"]
+            bound = (request.get("package_sha256") ==
+                     task["identity"]["package_sha256"] and
+                     request.get("selection_tasks") is None and
+                     ((category == "tinker" and
+                       attempt_id in row["tinker_paid_attempt_ids"] and
+                       request.get("frame_sha256") in
+                       task["frame_shas"]) or
+                      (category == environment.category(cell_id) and
+                       attempt_id == row["environment_paid_attempt_id"] and
+                       request.get("frame_sha256") is None)))
+        elif category == "tinker":
+            # One charged sampler setup can precede task-bound sample calls;
+            # it has no task credit in the common paid-coverage validator.
+            bound = (attempt_id not in sample_ids and
+                     request.get("package_sha256") is None and
+                     request.get("selection_tasks") is None and
+                     request.get("frame_sha256") is None)
+        else:
+            bound = (len(unique_environment_ids) == 1 and
+                     attempt_id in unique_environment_ids and
+                     request.get("package_sha256") is None and
+                     request.get("selection_tasks") == selection and
+                     request.get("frame_sha256") is None)
         _require(
-            paid["category"] == category and
+            bound and
             request == expected_request and
-            ((category == "tinker" and
-              request["frame_sha256"] in frame_shas) or
-             (category != "tinker" and
-              request["frame_sha256"] is None)) and
             budget_row["category"] == category and
             budget_row["status"] == "settled" and
             budget_row["request_sha256"] == _sha(request_raw) and
@@ -376,8 +477,27 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
             _amount(budget_row["reserved_usd"]),
             "base_selection_paid_usage_or_invoice_invalid")
         _reference(root, usage["source_ref"])
-    _require(seen_paid == set(expected_paid),
+        paid_calls.append({
+            "attempt_id": attempt_id, "category": category,
+            "request": request, "result_present": True,
+            "result_status": result_status})
+    _require(seen_paid == set(receipt["paid_attempt_ids"]),
              "base_selection_paid_records_incomplete")
+    try:
+        coverage = paid_coverage.validate(
+            cell_id=cell_id,
+            attempt_id=receipt["selection_attempt"],
+            checkpoint_sha256=cell["base_checkpoint_sha256"],
+            selection_tasks=selection,
+            selection_identities_sha256=coverage_identities_sha,
+            paid_calls=paid_calls,
+            related_paid_attempt_ids=set(selection_records))
+    except ValueError:
+        raise SharedBaseSelectionError(
+            "base_selection_twenty_task_paid_coverage_invalid") from None
+    _require(coverage["coverage_sha256"] ==
+             receipt["paid_coverage_sha256"],
+             "base_selection_paid_coverage_digest_changed")
     if require_registry:
         marker, _ = _private_json(root / "accepted.private.json", root)
         _require(marker == {

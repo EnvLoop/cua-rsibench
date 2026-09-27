@@ -142,6 +142,14 @@ class FullStudyBudgetTests(unittest.TestCase):
             self.ledger.reserve('base-extra', owner, 'tinker', '1',
                                 sha('duplicate base selection'))
 
+    def test_shared_base_selection_cannot_be_discounted_from_frozen_final_cap(self):
+        changed = plan_fixture()
+        changed['cells'][0]['base_selection_cost_upper_bound_usd'] = '20'
+        with self.assertRaisesRegex(ValueError,
+                                    'conservative separate bound'):
+            budget.StudyBudgetLedger(
+                Path(self.temp.name) / 'underfunded.jsonl', changed)
+
 
 if __name__ == '__main__':
     unittest.main()

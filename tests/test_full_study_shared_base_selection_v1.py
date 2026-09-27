@@ -46,6 +46,25 @@ class SharedBaseSelectionGateTests(unittest.TestCase):
         self.assertEqual({row["status"] for row in paid.values()},
                          {"settled"})
 
+    def test_self_hosted_batch_lease_and_sampler_setup_cover_same_twenty(self):
+        cell_id = "odoo-community"
+        source = fixture.build(
+            self.study, self.budget, cell_id,
+            environment_batch=True, tinker_setup=True)
+        result, digest = shared.verify_receipt(
+            self.study, self.budget, cell_id, source,
+            require_registry=False)
+        self.assertEqual(len(result["tasks"]), 20)
+        self.assertEqual(shared.admit_receipt(
+            self.study, self.budget, cell_id, source)[
+            "shared_receipt_sha256"], digest)
+        paid = self.budget.owner_attempts(cell_id + ":shared-base")
+        self.assertEqual(len(paid), 22)
+        self.assertEqual(sum(row["category"] == "storage_application"
+                             for row in paid.values()), 1)
+        self.assertEqual(sum(row["category"] == "tinker"
+                             for row in paid.values()), 21)
+
     def test_missing_or_tampered_gui_and_saved_state_cannot_be_admitted(self):
         trace = self.path.parent / "task-001" / "gui-trace.json"
         original = trace.read_bytes()
@@ -84,6 +103,23 @@ class SharedBaseSelectionGateTests(unittest.TestCase):
                             "0.01", shared._sha(b"unreferenced work"))
         with self.assertRaisesRegex(shared.SharedBaseSelectionError,
                                     "paid_budget_attempts_unmatched"):
+            shared.verify_receipt(
+                self.study, self.budget, self.cell_id, self.path,
+                require_registry=False)
+
+    def test_hash_audited_tinker_result_must_say_completed(self):
+        receipt = json.loads(self.path.read_bytes())
+        first = receipt["paid_attempt_refs"][0]
+        self.assertEqual(first["category"], "tinker")
+        result_path = self.path.parent / first["result_ref"]["path"]
+        value = json.loads(result_path.read_bytes())
+        value["status"] = "failed"
+        raw = shared._canonical(value)
+        result_path.write_bytes(raw)
+        first["result_ref"]["sha256"] = shared._sha(raw)
+        self.path.write_bytes(shared._canonical(receipt))
+        with self.assertRaisesRegex(shared.SharedBaseSelectionError,
+                                    "paid_result_not_completed"):
             shared.verify_receipt(
                 self.study, self.budget, self.cell_id, self.path,
                 require_registry=False)
