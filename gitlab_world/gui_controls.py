@@ -51,6 +51,12 @@ async def _login(page, username: str, password: str) -> None:
     await page.wait_for_url(lambda value: "users/sign_in" not in value, timeout=90000)
 
 
+async def _wait_assignee_visible(assignee, username: str) -> None:
+    # GitLab renders the selected user's display name in a profile link. The
+    # picker option contains @username, but that text is absent after save.
+    await assignee.locator('a[href$="/' + username + '"]').wait_for(timeout=30000)
+
+
 async def _gui_issue_triage(page, project: dict, progress: dict,
                             task: dict, issue_key: str, folder: Path) -> dict:
     repo = project["full_path"]
@@ -77,7 +83,7 @@ async def _gui_issue_triage(page, project: dict, progress: dict,
     await assignee.locator('[data-testid="edit-button"]').click()
     user = project["principals"]["oncall"]
     await assignee.get_by_role("option").filter(has_text="@" + user).click()
-    await page.get_by_text("@" + user, exact=False).first.wait_for(timeout=30000)
+    await _wait_assignee_visible(assignee, user)
 
     labels = page.locator('[data-testid="work-item-labels"]')
     await labels.locator('[data-testid="edit-button"]').click()
