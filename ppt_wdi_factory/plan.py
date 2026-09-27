@@ -29,7 +29,7 @@ WORKFLOWS = (
     "price_labor_spread",
     "dual_threshold_review",
     "source_year_reconciliation",
-    "chart_series_relabel",
+    "chart_caption_reconciliation",
 )
 INDICATORS = {
     "gdp": "NY.GDP.MKTP.CD", "gdp_pc": "NY.GDP.PCAP.CD",
@@ -146,6 +146,12 @@ def compute(facts: dict, workflow: str) -> dict:
             "2024 unemployment - 2024 CPI inflation after swapping chart labels",
             "CPI inflation and unemployment (%)", "2024", "legend", 2.0,
             "Match each chart line to the WDI source values and preserve both value series and year labels."),
+        "chart_caption_reconciliation": (
+            spread, -spread, "percentage points",
+            "2024 CPI inflation - 2024 unemployment",
+            "2024 unemployment - 2024 CPI inflation after confusing the two plotted series",
+            "CPI inflation and unemployment (%)", "2024", "chart-caption", 2.0,
+            "The blue line is CPI inflation and the teal line is unemployment; preserve both native value series."),
     }
     if workflow not in reference:
         raise ValueError("Unknown workflow")
@@ -180,6 +186,9 @@ def compute(facts: dict, workflow: str) -> dict:
             "chart_series_relabel": (y23[INDICATORS["unemployment"]]
                                       - y24[INDICATORS["inflation"]],
                                       "2023 unemployment - 2024 CPI inflation after swapping chart labels"),
+            "chart_caption_reconciliation": (y23[INDICATORS["unemployment"]]
+                                             - y24[INDICATORS["inflation"]],
+                                             "2023 unemployment - 2024 CPI inflation after confusing plotted series"),
         }
         wrong_value, wrong_formula = fallbacks[workflow]
         if workflow == "source_year_reconciliation":
@@ -220,7 +229,8 @@ def chart_series(facts: dict, workflow: str) -> dict:
     elif workflow == "population_growth":
         chosen = ("population",)
         divisor, precision, unit = 1e6, 2, "millions of people"
-    elif workflow in ("price_labor_spread", "dual_threshold_review", "chart_series_relabel"):
+    elif workflow in ("price_labor_spread", "dual_threshold_review",
+                      "chart_series_relabel", "chart_caption_reconciliation"):
         chosen = ("inflation", "unemployment")
         divisor, precision, unit = 1, 2, "%"
     elif workflow == "labor_rate_change":
@@ -257,6 +267,7 @@ def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
                         "World Bank, World Development Indicators. CC BY 4.0. https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators"),
         "legend_cpi": "CPI inflation",
         "legend_unemployment": "Unemployment",
+        "chart_caption": "Chart data: the same rounded WDI observations shown on slide 2.",
     }
     draft = {
         "summary": f"Verified change: {wrong_display}",
@@ -269,7 +280,17 @@ def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
                         correct["attribution"]),
         "legend_cpi": "Unemployment" if workflow == "chart_series_relabel" else "CPI inflation",
         "legend_unemployment": "CPI inflation" if workflow == "chart_series_relabel" else "Unemployment",
+        "chart_caption": correct["chart_caption"],
     }
+    if workflow == "chart_caption_reconciliation":
+        cpi = facts["years"]["2024"][INDICATORS["inflation"]]
+        labor = facts["years"]["2024"][INDICATORS["unemployment"]]
+        correct["chart_caption"] = (
+            f"Chart check: blue CPI inflation {cpi:.2f}%; "
+            f"teal unemployment {labor:.2f}%.")
+        draft["chart_caption"] = (
+            f"Chart check: blue unemployment {cpi:.2f}%; "
+            f"teal CPI inflation {labor:.2f}%.")
     if workflow == "source_year_reconciliation":
         correct["summary"] = f"2024 CPI inflation observation: {display}"
         draft["summary"] = f"2024 CPI inflation observation: {wrong_display}"
@@ -283,6 +304,8 @@ def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
                    if workflow == "source_year_reconciliation" else
                    ["summary", "legend_cpi", "legend_unemployment", "interpretation"]
                    if workflow == "chart_series_relabel" else
+                   ["summary", "chart_caption", "ledger", "interpretation"]
+                   if workflow == "chart_caption_reconciliation" else
                    ["summary", "ledger", "interpretation", "decision"])
     for key in correct:
         if key not in target_keys:
@@ -301,6 +324,13 @@ def task(seed: bytes, split: str, iso: str, country_index: int, slot: int,
                  "in the chart and its data workbook, then correct the flagged summary and interpretation "
                  "to match the WDI evidence table. Preserve the chart values, year categories, committee "
                  "decision, source note, and layout. Save the same deck.")
+    elif workflow == "chart_caption_reconciliation" and split == "final_candidate":
+        actor = (f"In the {facts['name']} monitoring brief, the native chart and its data workbook "
+                 "are already correct, but the analyst has confused the blue and teal series in the "
+                 "chart caption and signed 2024 spread. Correct the flagged summary, caption, "
+                 "calculation and interpretation from the WDI table and chart. Preserve the native "
+                 "chart values and legend, source data, committee decision, attribution and layout. "
+                 "Save the same deck.")
     else:
         actor = (f"In the {facts['name']} monitoring brief, reconcile the flagged {workflow.replace('_', ' ')} "
                  f"statements with the WDI evidence table and chart. Correct the marked "

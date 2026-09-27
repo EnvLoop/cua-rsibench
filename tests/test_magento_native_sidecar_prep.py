@@ -22,7 +22,20 @@ class NativeSidecarPreparationTests(unittest.TestCase):
         with patch.object(prep, 'audit_existing', side_effect=ValueError(
                 'native-sidecar catalog differs from frozen source index')):
             with self.assertRaisesRegex(ValueError, 'differs from frozen'):
-                prep.reconcile_indexer_result('a' * 64, outcome)
+                prep.reconcile_indexer_result('a' * 64, outcome,
+                                              settle_seconds=0)
+
+    def test_eventually_visible_index_is_audited_without_reindex_retry(self):
+        outcome = subprocess.CompletedProcess(['indexer'], 0,
+            b'Catalog Search index has been rebuilt successfully', b'')
+        with patch.object(prep, 'audit_existing', side_effect=[
+                ValueError('native-sidecar catalog differs from frozen source index'),
+                {'status': 'clone_and_sidecar_prepared_no_task_seeded'}]) as audit, \
+             patch.object(prep.time, 'sleep'):
+            receipt = prep.reconcile_indexer_result('c' * 64, outcome,
+                                                    settle_seconds=30)
+        self.assertEqual(audit.call_count, 2)
+        self.assertEqual(receipt['indexer_process']['read_only_audit_attempts'], 2)
 
     def test_normal_indexer_keeps_new_clone_mode(self):
         outcome = subprocess.CompletedProcess(['indexer'], 0,

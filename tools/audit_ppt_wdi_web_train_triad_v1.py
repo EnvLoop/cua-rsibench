@@ -53,10 +53,33 @@ def semantic_source_equal(first: Path, second: Path) -> dict:
     slides = sorted(name for name in before if SLIDE.fullmatch(name))
     require(len(slides) == 7 and all(name in after for name in slides),
             "seven slides are required in both files")
+    def content_objects(data: bytes) -> list[tuple]:
+        root = packages.xml(data)
+        objects = []
+        for element in root.iter():
+            if element.tag == verify.P + "sp":
+                identity = element.find(verify.P + "nvSpPr/" + verify.P + "cNvPr")
+                require(identity is not None, "unnamed slide shape")
+                objects.append(("shape", identity.get("id"), identity.get("name"),
+                                "".join(node.text or "" for node in
+                                        element.iter(verify.A + "t"))))
+            elif element.tag == verify.P + "graphicFrame":
+                identity = element.find(verify.P + "nvGraphicFramePr/" + verify.P + "cNvPr")
+                require(identity is not None, "unnamed graphic frame")
+                tables = list(element.iter(verify.A + "tbl"))
+                require(len(tables) <= 1, "ambiguous native table")
+                cells = tuple(tuple("".join(node.text or "" for node in
+                                             cell.iter(verify.A + "t"))
+                                    for cell in row.iter(verify.A + "tc"))
+                              for row in tables[0].iter(verify.A + "tr")) if tables else ()
+                # PowerPoint assigns a display name such as "Table 8" to an
+                # unnamed imported graphic frame. Its stable object ID and
+                # every visible table cell still have to match exactly.
+                objects.append(("graphic_frame", identity.get("id"), cells))
+        return objects
     for name in slides:
-        text = lambda data: [node.text or "" for node in
-                             packages.xml(data).iter(verify.A + "t")]
-        require(text(before[name]) == text(after[name]), "visible slide text changed")
+        require(content_objects(before[name]) == content_objects(after[name]),
+                "visible slide shape/table content changed")
     chart_before, workbook_before = verify._chart_and_workbook_parts(before)
     chart_after, workbook_after = verify._chart_and_workbook_parts(after)
     require(before[workbook_before] == after[workbook_after],

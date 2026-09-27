@@ -25,8 +25,10 @@ A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
 C = "{http://schemas.openxmlformats.org/drawingml/2006/chart}"
 X = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 OFFICE_CHART = "{http://schemas.microsoft.com/office/drawing/2014/chart}"
+OFFICE_TABLE_MODID = "{http://schemas.microsoft.com/office/powerpoint/2010/main}modId"
 SCHEMA = "ppt-wdi-original-frozen-oracle-v1"
 LOCATIONS = {"summary": ("ppt/slides/slide1.xml", "target__summary"),
+             "chart_caption": ("ppt/slides/slide3.xml", "chart_attribution"),
              "ledger": ("ppt/slides/slide4.xml", "table:1:1"),
              "interpretation": ("ppt/slides/slide5.xml", "target__interpretation"),
              "decision": ("ppt/slides/slide6.xml", "target__decision"),
@@ -36,6 +38,7 @@ LEGEND_LOCATIONS = {"legend_cpi": (0, "B1"),
 FINAL_TARGETS = {
     "source_year_reconciliation": ["summary", "ledger", "interpretation", "attribution"],
     "chart_series_relabel": ["summary", "legend_cpi", "legend_unemployment", "interpretation"],
+    "chart_caption_reconciliation": ["summary", "chart_caption", "ledger", "interpretation"],
 }
 DEFAULT_FINAL_TARGETS = ["summary", "ledger", "interpretation", "decision"]
 
@@ -197,14 +200,57 @@ def _expected_numeric(facts: dict, workflow: str) -> float:
         "dual_threshold_review": max(z["FP.CPI.TOTL.ZG"] - 5, z["SL.UEM.TOTL.ZS"] - 6),
         "source_year_reconciliation": z["FP.CPI.TOTL.ZG"],
         "chart_series_relabel": z["FP.CPI.TOTL.ZG"] - z["SL.UEM.TOTL.ZS"],
+        "chart_caption_reconciliation": z["FP.CPI.TOTL.ZG"] - z["SL.UEM.TOTL.ZS"],
     }
     return round(equations[workflow], 2)
 
 
-def _validate_task_source(task: dict) -> None:
-    if task.get("schema") != "ppt-wdi-original-candidates-v1" or task.get("source_snapshot_sha256") != EXPECTED_SHA256:
+def _reserve_country_facts(task: dict, source: Path) -> dict:
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}",
+                    task.get("source_snapshot_date", "")) is None:
+        raise ValueError("Private reserve WDI observation date missing")
+    snapshot = source.parent / "source-snapshot.private.json"
+    raw = snapshot.read_bytes()
+    if sha(raw) != task["source_snapshot_sha256"]:
+        raise ValueError("Private reserve WDI snapshot hash changed")
+    payload = json.loads(raw)
+    if not isinstance(payload, list) or len(payload) != 2:
+        raise ValueError("Invalid reserve WDI response envelope")
+    header, rows = payload
+    if (header.get("page") != 1 or header.get("pages") != 1 or
+            header.get("total") != 30 or len(rows) != 30):
+        raise ValueError("Reserve WDI response is incomplete")
+    observations = {}
+    names = set()
+    for row in rows:
+        iso = row.get("countryiso3code")
+        indicator = row.get("indicator", {}).get("id")
+        year = row.get("date")
+        value = row.get("value")
+        key = (indicator, year)
+        if (iso != task["source_group"] or indicator not in INDICATORS or
+                year not in YEARS or key in observations or
+                isinstance(value, bool) or not isinstance(value, (int, float))):
+            raise ValueError("Missing, duplicate, or nonnumeric reserve WDI observation")
+        observations[key] = value
+        names.add(row.get("country", {}).get("value"))
+    if (len(observations) != len(INDICATORS) * len(YEARS) or
+            len(names) != 1 or None in names):
+        raise ValueError("Reserve WDI country cube or name changed")
+    return {"iso3": task["source_group"], "name": next(iter(names)),
+            "years": {year: {indicator: observations[(indicator, year)]
+                             for indicator in INDICATORS} for year in YEARS}}
+
+
+def _validate_task_source(task: dict, source: Path) -> None:
+    if task.get("schema") != "ppt-wdi-original-candidates-v1":
         raise ValueError("Task/source schema mismatch")
-    actual = country_facts(load(), task["source_group"])
+    if task.get("source_snapshot_sha256") == EXPECTED_SHA256 and not task.get("source_scope"):
+        actual = country_facts(load(), task["source_group"])
+    elif task.get("source_scope") == "private_wdi_reserve_v1":
+        actual = _reserve_country_facts(task, source)
+    else:
+        raise ValueError("Task source snapshot has no verified provenance")
     if task["country_name"] != actual["name"] or task["facts"] != actual["years"]:
         raise ValueError("Task source observations differ from pinned WDI")
     if task["calculation"]["value"] != _expected_numeric(actual, task["workflow"]):
@@ -227,12 +273,24 @@ def _validate_task_source(task: dict) -> None:
                 or task["draft"]["legend_cpi"] != "Unemployment"
                 or task["draft"]["legend_unemployment"] != "CPI inflation"):
             raise ValueError("Chart legend correction is not the intended WDI mapping")
+    if task["workflow"] == "chart_caption_reconciliation":
+        cpi = actual["years"]["2024"]["FP.CPI.TOTL.ZG"]
+        labor = actual["years"]["2024"]["SL.UEM.TOTL.ZS"]
+        expected_correct = (f"Chart check: blue CPI inflation {cpi:.2f}%; "
+                            f"teal unemployment {labor:.2f}%.")
+        expected_draft = (f"Chart check: blue unemployment {cpi:.2f}%; "
+                          f"teal CPI inflation {labor:.2f}%.")
+        if (task["correct"]["chart_caption"] != expected_correct or
+                task["draft"]["chart_caption"] != expected_draft or
+                [series["name"] for series in task["chart"]["series"]] !=
+                ["CPI inflation", "Unemployment"]):
+            raise ValueError("Chart caption does not map the native series to WDI")
     for key in task["target_keys"]:
         if task["correct"][key] == task["draft"][key]:
             raise ValueError("Target is already correct: " + key)
-    if task["split"] == "final_candidate" and task["target_keys"] != FINAL_TARGETS.get(
+    if task["split"] in ("final_candidate", "train_policy_development") and task["target_keys"] != FINAL_TARGETS.get(
             task["workflow"], DEFAULT_FINAL_TARGETS):
-        raise ValueError("Final task lacks its four workflow-specific dependent edits")
+        raise ValueError("Four-target task lacks its workflow-specific dependent edits")
 
 
 def _source_table(members: dict[str, bytes], task: dict) -> None:
@@ -265,7 +323,8 @@ def _source_table(members: dict[str, bytes], task: dict) -> None:
         sources = [("NY.GDP.PCAP.CD", 1, 0, "GDP per capita")]
     elif workflow == "population_growth":
         sources = [("SP.POP.TOTL", 1e6, 2, "Population")]
-    elif workflow in ("price_labor_spread", "dual_threshold_review", "chart_series_relabel"):
+    elif workflow in ("price_labor_spread", "dual_threshold_review",
+                      "chart_series_relabel", "chart_caption_reconciliation"):
         names = (("Unemployment", "CPI inflation") if workflow == "chart_series_relabel"
                  else ("CPI inflation", "Unemployment"))
         sources = [("FP.CPI.TOTL.ZG", 1, 2, names[0]),
@@ -297,8 +356,14 @@ def _source_table(members: dict[str, bytes], task: dict) -> None:
 
 def freeze(source: Path, task: dict, *,
            office_web_normalized: bool = False) -> dict:
-    _validate_task_source(task)
+    _validate_task_source(task, source)
     raw, members = package_guard.package(source)
+    if office_web_normalized:
+        for theme_part in ("ppt/theme/theme1.xml", "ppt/theme/theme2.xml"):
+            theme = package_guard.xml(members[theme_part])
+            minor = theme.find(".//" + A + "minorFont/" + A + "latin")
+            if minor is None or minor.get("typeface") != "Calibri":
+                raise ValueError("Office target-font normalization requires pinned Calibri theme")
     slides = sorted(n for n in members if _slidable(n))
     if len(slides) != 7:
         raise ValueError("Expected seven-slide source deck")
@@ -323,7 +388,8 @@ def freeze(source: Path, task: dict, *,
             targets[key] = {"kind": "text", "part": part, "location": location,
                             "baseline": baseline, "correct": task["correct"][key]}
     return {"schema": SCHEMA, "source_sha256": sha(raw), "task_sha256": sha(canonical(task)),
-            "task_id": task["task_id"], "source_snapshot_sha256": EXPECTED_SHA256,
+            "task_id": task["task_id"],
+            "source_snapshot_sha256": task["source_snapshot_sha256"],
             "targets": targets, "office_web_normalized": office_web_normalized,
             "scope": ("evaluator-frozen PowerPoint-web saved baseline with narrow Office metadata allowances"
                       if office_web_normalized else
@@ -340,16 +406,28 @@ def _canonical_target_slide(data: bytes, target_locations: list[str],
             # The web editor drops dirty="0" on the text run and paragraph
             # end, may add the same East Asian font as the Latin font, and may
             # split a selected text run. Normalize only the named target.
+            ascii_target = _text(node).isascii()
             for child in node.iter():
                 if child.tag in (A + "rPr", A + "endParaRPr") and child.get("dirty") == "0":
                     child.attrib.pop("dirty")
                 if child.tag == A + "rPr":
                     child.set("lang", (child.get("lang") or "en-US").lower())
-                    latin, east_asian = child.find(A + "latin"), child.find(A + "ea")
-                    if (latin is not None and east_asian is not None and
-                            latin.attrib == east_asian.attrib and
-                            len(east_asian) == 0):
-                        child.remove(east_asian)
+                    for key, default in (("b", "0"), ("i", "0"), ("u", "none"),
+                                         ("strike", "noStrike"), ("noProof", "0")):
+                        if child.get(key) == default:
+                            child.attrib.pop(key)
+                if ascii_target and child.tag in (A + "rPr", A + "endParaRPr"):
+                    # Office rewrites fallback fonts of ASCII target text
+                    # and sometimes drops an explicit Arial/Calibri Latin
+                    # font in favor of this deck's minor Latin theme font.
+                    # Other font names, size, color, and non-target shapes
+                    # remain strict no-regression inputs.
+                    for font in list(child):
+                        if (font.tag in (A + "latin", A + "ea", A + "cs") and
+                                set(font.attrib) == {"typeface"} and
+                                font.get("typeface") in ("Arial", "Calibri", "+mn-lt") and
+                                len(font) == 0):
+                            child.remove(font)
             for paragraph in node.iter(A + "p"):
                 previous = None
                 for run in list(paragraph):
@@ -357,13 +435,31 @@ def _canonical_target_slide(data: bytes, target_locations: list[str],
                         previous = None
                         continue
                     props, value = list(run)
+                    # PowerPoint may redistribute spaces across otherwise
+                    # identical target runs and toggle xml:space. The exact
+                    # concatenated target text is scored separately.
+                    if set(value.attrib) <= {"{http://www.w3.org/XML/1998/namespace}space"}:
+                        value.attrib.pop("{http://www.w3.org/XML/1998/namespace}space", None)
                     signature = (package_guard.canonical(props), tuple(sorted(value.attrib.items())))
                     if previous is not None and previous[0] == signature:
                         previous[1].text = (previous[1].text or "") + (value.text or "")
                         paragraph.remove(run)
                     else:
                         previous = (signature, value)
+            # Office may add, remove, or round the invisible paragraph-end
+            # font size after an edit. The visible text-run size remains
+            # strict; normalize end size only when every visible run agrees.
+            sizes = {child.get("sz") for child in node.iter(A + "rPr")
+                     if child.get("sz") is not None}
+            if len(sizes) == 1:
+                for end in node.iter(A + "endParaRPr"):
+                    if (end.get("sz") or "").isdigit():
+                        end.attrib.pop("sz")
         _set_text(node, "__PERMITTED_TARGET_TEXT__")
+    if office_web_normalized and any(item.startswith("table:") for item in target_locations):
+        mod_ids = list(root.iter(OFFICE_TABLE_MODID))
+        if len(mod_ids) == 1 and (mod_ids[0].get("val") or "").isdigit():
+            mod_ids[0].set("val", "__OFFICE_TABLE_MOD_ID__")
     return package_guard.canonical(root)
 
 

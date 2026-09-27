@@ -1,0 +1,21 @@
+{
+  "chart_data_mutation_rejected": true,
+  "collateral_mutation_rejected": true,
+  "distinct_cloud_items": 5,
+  "downloaded_fresh_reset_score": 0,
+  "downloaded_near_miss_score": 0,
+  "downloaded_positive_score": 1,
+  "fresh_reset_byte_equal": true,
+  "model_calls": 0,
+  "near_miss_correct_targets": 3,
+  "normalized_role_inputs_byte_identical": true,
+  "official_final_admitted": 0,
+  "private_evidence_sha256": "69307e85ccca5a727bb58b7db3b2760359a2454f8e0c5885221e707add5373ea",
+  "schema": "envloop-ppt-web-source-year-triad-public-v1",
+  "source_semantic_readback_pass": true,
+  "status": "train_source_gui_calibrated_not_final_admission",
+  "target_count": 4,
+  "train_source_workflow_count": 1,
+  "visual_qa_pages": 7,
+  "wrong_source_footnote_rejected": true
+}

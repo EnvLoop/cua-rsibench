@@ -73,6 +73,19 @@ def run_step(root: Path, journal: Path, index: int, step: str,
            'stderr_sha256': sha(outcome.stderr),
            'stdout_bytes': len(outcome.stdout),
            'stderr_bytes': len(outcome.stderr)}
+    if outcome.returncode != 0:
+        # Preserve the actual diagnostic bytes under ignored, private work/.
+        # Hashes alone cannot distinguish a provider/process timeout from a
+        # changed application state during later controlled reconciliation.
+        for label, data in (('stdout', outcome.stdout),
+                            ('stderr', outcome.stderr)):
+            if data:
+                fd = os.open(root / f'{step}-{label}.private.bin',
+                             os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                with os.fdopen(fd, 'wb') as stream:
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
     write_new(root / f'{step}-process.private.json', raw)
     append_event(journal, {'event': 'step_finished', 'index': index,
                            'step': step, 'time': time.time(), **raw})

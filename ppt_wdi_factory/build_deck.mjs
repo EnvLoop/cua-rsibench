@@ -10,6 +10,8 @@ const outputPath = process.argv[3];
 if (!inputPath || !outputPath) throw new Error("Usage: build_deck.mjs TASK_JSON OUTPUT_PPTX");
 const task = JSON.parse(await fs.readFile(inputPath, "utf8"));
 if (task.schema !== "ppt-wdi-original-candidates-v1") throw new Error("Bad task schema");
+const snapshotDate = task.source_snapshot_date ?? "2026-09-25";
+if (!/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate)) throw new Error("Bad WDI snapshot date");
 
 const W = 1280, H = 720;
 const colors = { ink: "#183044", blue: "#205D82", teal: "#176F72", muted: "#536B78", amber: "#9B5A1F" };
@@ -33,13 +35,14 @@ function slideBase(title, n, note) {
   s.speakerNotes.textFrame.setText(note);
   return s;
 }
-const sourceNote = "Source: World Bank, World Development Indicators, pinned API snapshot 2026-09-25, 2019–2024, CC BY 4.0. The monitoring brief, draft defects, and committee rules are EnvLoop-authored simulations, not World Bank conclusions.";
+const sourceNote = `Source: World Bank, World Development Indicators, pinned API snapshot ${snapshotDate}, 2019–2024, CC BY 4.0. The monitoring brief, draft defects, and committee rules are EnvLoop-authored simulations, not World Bank conclusions.`;
 const s1 = slideBase(`${task.country_name} | economic monitoring`, 1, sourceNote);
 text(s1, "brief_heading", task.heading, 72, 159, 1134, 75, 25, false, colors.muted);
 text(s1, "target__summary", task.draft.summary, 76, 276, 1110, 92, 32, true, colors.amber);
 const targetLabels = { summary: "summary", ledger: "calculation", interpretation: "interpretation",
   decision: "committee decision", attribution: "source footnote",
-  legend_cpi: "blue chart legend", legend_unemployment: "teal chart legend" };
+  legend_cpi: "blue chart legend", legend_unemployment: "teal chart legend",
+  chart_caption: "chart caption" };
 text(s1, "brief_method", `Reconcile the flagged ${task.target_keys.map(key => targetLabels[key]).join(", ")} with the pinned evidence. Preserve all other content.`, 76, 422, 1080, 105, 23, false, colors.ink);
 
 const s2 = slideBase("WDI source observations", 2, sourceNote);
@@ -62,10 +65,24 @@ for (let c = 0; c < 6; c++) evidence.getCell(0, c).fill = "#E3EEF2";
 for (let r = 0; r < 7; r++) for (let c = 0; c < 6; c++) {
   evidence.getCell(r, c).text.style = { typeface: font, fontSize: 16, color: colors.ink };
 }
-text(s2, "source_attribution", "World Development Indicators  •  pinned snapshot 2026-09-25  •  CC BY 4.0", 66, 595, 1120, 32, 14, false, colors.muted);
+text(s2, "source_attribution", `World Development Indicators  •  pinned snapshot ${snapshotDate}  •  CC BY 4.0`, 66, 595, 1120, 32, 14, false, colors.muted);
 
 const s3 = slideBase("Indicator trend, 2019–2024", 3, sourceNote);
 text(s3, "chart_unit", `${task.calculation.series}  |  ${task.chart.unit}`, 70, 122, 1100, 42, 20, false, colors.muted);
+const observedChartValues = task.chart.series.flatMap(series => series.values.map(Number));
+if (!observedChartValues.length || observedChartValues.some(value => !Number.isFinite(value))) {
+  throw new Error("Chart source values must be finite WDI observations");
+}
+const chartLow = Math.min(...observedChartValues);
+const chartHigh = Math.max(...observedChartValues);
+const chartPadding = Math.max(0.2, (chartHigh - chartLow) * 0.12);
+const axisFloor = chartLow < 0 ? chartLow - chartPadding : 0;
+const axisCeiling = Math.max(0, chartHigh + chartPadding);
+const rawAxisStep = Math.max(Number.EPSILON, (axisCeiling - axisFloor) / 5);
+const axisMagnitude = 10 ** Math.floor(Math.log10(rawAxisStep));
+const axisStep = [1, 2, 5, 10].find(step => step * axisMagnitude >= rawAxisStep) * axisMagnitude;
+const axisMin = Math.floor(axisFloor / axisStep) * axisStep;
+const axisMax = Math.ceil(axisCeiling / axisStep) * axisStep;
 const chart = s3.charts.add("line", {
   position: { left: 83, top: 175, width: 1090, height: 425 },
   categories: task.chart.categories,
@@ -74,13 +91,16 @@ const chart = s3.charts.add("line", {
     line: { style: "solid", fill: i === 0 ? colors.blue : colors.teal, width: 3 },
     marker: { symbol: "circle", size: 5 },
   })),
+  lineOptions: { smooth: false },
   hasLegend: task.chart.series.length > 1,
   legend: { position: "bottom", overlay: false, textStyle: { typeface: font, fontSize: 15, fill: colors.ink } },
   xAxis: { textStyle: { typeface: font, fontSize: 15, fill: colors.muted } },
-  yAxis: { textStyle: { typeface: font, fontSize: 15, fill: colors.muted },
+  yAxis: { min: axisMin, max: axisMax, majorUnit: axisStep,
+           textStyle: { typeface: font, fontSize: 15, fill: colors.muted },
            majorGridlines: { style: "solid", fill: "#DAE4E8", width: 1 } },
 });
-text(s3, "chart_attribution", "Chart data: the same rounded WDI observations shown on slide 2.", 70, 605, 1090, 33, 14, false, colors.muted);
+text(s3, "chart_attribution", task.draft.chart_caption ?? "Chart data: the same rounded WDI observations shown on slide 2.", 70, 605, 1090, 33, 14, false,
+     task.target_keys.includes("chart_caption") ? colors.amber : colors.muted);
 
 const s4 = slideBase("Calculation review", 4, sourceNote);
 text(s4, "calculation_rule", `Review rule: ${task.calculation.rule}`, 72, 140, 1105, 72, 23, false, colors.ink);

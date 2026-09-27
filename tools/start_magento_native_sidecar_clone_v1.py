@@ -139,17 +139,33 @@ def audit_existing(expected_search_sha256: str, mode: str) -> dict:
 
 
 def reconcile_indexer_result(expected_search_sha256: str,
-                             indexer: subprocess.CompletedProcess) -> dict:
+                             indexer: subprocess.CompletedProcess,
+                             *, settle_seconds: float = 30) -> dict:
     reported_success = (b'Catalog Search index has been rebuilt successfully'
                         in indexer.stdout)
     mode = ('new_clone' if indexer.returncode == 0 and reported_success else
             'read_only_state_reconciled_after_indexer_process_error')
-    audited = audit_existing(expected_search_sha256, mode)
+    # Elasticsearch can report a completed reindex before its search view
+    # exposes all documents. Poll only the read-only pinned-source audit; do
+    # not dispatch another indexer, seed a task, or accept a partial index.
+    deadline = time.monotonic() + settle_seconds
+    audits = 0
+    while True:
+        audits += 1
+        try:
+            audited = audit_existing(expected_search_sha256, mode)
+            break
+        except ValueError as error:
+            if (str(error) != 'native-sidecar catalog differs from frozen source index'
+                    or time.monotonic() >= deadline):
+                raise
+            time.sleep(min(2.0, max(0.0, deadline - time.monotonic())))
     audited['indexer_process'] = {
         'exit_code': indexer.returncode,
         'reported_success': reported_success,
         'stdout_sha256': hashlib.sha256(indexer.stdout).hexdigest(),
         'stderr_sha256': hashlib.sha256(indexer.stderr).hexdigest(),
+        'read_only_audit_attempts': audits,
     }
     return audited
 

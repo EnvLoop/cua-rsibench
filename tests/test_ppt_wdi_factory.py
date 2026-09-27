@@ -13,6 +13,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from ppt_wdi_factory import plan, qa, verify
 from ppt_wdi_factory.build import DEFAULT_MODULES, DEFAULT_NODE, DEFAULT_PYTHON, DEFAULT_SKILL, prepare_builder, run
+from native_desktop_factory import source as wdi_source
 
 
 def finalized_package(private: Path, row: dict) -> Path:
@@ -79,6 +80,43 @@ class PptWdiFactoryTest(unittest.TestCase):
                              set(original[split]))
         self.assertEqual(rerun["country_partition_alignment"],
                          "shared_wdi_desktop_private_partition")
+
+    def test_private_reserve_requires_exact_pinned_wdi_observation_cube(self):
+        # Synthetic parser fixture only; these are not benchmark observations.
+        rows = []
+        years = list(wdi_source.YEARS)
+        for indicator in wdi_source.INDICATORS:
+            for offset, year in enumerate(years):
+                value = {
+                    "NY.GDP.MKTP.CD": 100_000_000_000 + offset * 5_000_000_000,
+                    "NY.GDP.PCAP.CD": 20_000 + offset * 500,
+                    "FP.CPI.TOTL.ZG": 2.0 + offset * 0.2,
+                    "SP.POP.TOTL": 5_000_000 + offset * 30_000,
+                    "SL.UEM.TOTL.ZS": 4.0 + offset * 0.1,
+                }[indicator]
+                rows.append({"countryiso3code": "ZZZ",
+                             "country": {"value": "Synthetic Testland"},
+                             "indicator": {"id": indicator},
+                             "date": year, "value": value})
+        raw = json.dumps([{"page": 1, "pages": 1, "total": 30}, rows]).encode()
+        with tempfile.TemporaryDirectory() as temporary:
+            package = Path(temporary)
+            snapshot = package / "source-snapshot.private.json"
+            snapshot.write_bytes(raw)
+            source_path = package / "source.pptx"
+            facts = verify._reserve_country_facts({
+                "source_snapshot_sha256": plan.sha(raw),
+                "source_snapshot_date": "2026-09-27",
+                "source_group": "ZZZ"}, source_path)
+            task = plan.task(bytes.fromhex("f0" * 32), "final_candidate",
+                             "ZZZ", 0, 0, facts)
+            task["source_scope"] = "private_wdi_reserve_v1"
+            task["source_snapshot_sha256"] = plan.sha(raw)
+            task["source_snapshot_date"] = "2026-09-27"
+            verify._validate_task_source(task, source_path)
+            snapshot.write_bytes(raw + b" ")
+            with self.assertRaisesRegex(ValueError, "hash changed"):
+                verify._validate_task_source(task, source_path)
 
     @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
                          "bundled presentation runtime is unavailable")
@@ -168,6 +206,87 @@ class PptWdiFactoryTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify._canonical_target_slide(ET.tostring(split), ["target__summary"], True)
 
+    def test_office_table_modid_and_invisible_end_size_are_scoped(self):
+        slide = ET.Element(verify.P + "sld")
+        ET.SubElement(slide, verify.OFFICE_TABLE_MODID, {"val": "123"})
+        table = ET.SubElement(slide, verify.A + "tbl")
+        for row_number in range(2):
+            row = ET.SubElement(table, verify.A + "tr")
+            for column in range(2):
+                cell = ET.SubElement(row, verify.A + "tc")
+                paragraph = ET.SubElement(cell, verify.A + "p")
+                run = ET.SubElement(paragraph, verify.A + "r")
+                ET.SubElement(run, verify.A + "rPr", {"sz": "1250"})
+                ET.SubElement(run, verify.A + "t").text = f"{row_number}:{column}"
+                ET.SubElement(paragraph, verify.A + "endParaRPr", {"sz": "1275"})
+        original = ET.tostring(slide)
+        after = ET.fromstring(original)
+        after.find(verify.OFFICE_TABLE_MODID).set("val", "456")
+        target = verify._target_node(after, "table:1:1")
+        target.find(".//" + verify.A + "t").text = "changed target"
+        target.find(".//" + verify.A + "endParaRPr").set("sz", "1250")
+        self.assertEqual(
+            verify._canonical_target_slide(original, ["table:1:1"], True),
+            verify._canonical_target_slide(ET.tostring(after), ["table:1:1"], True))
+        other = verify._target_node(after, "table:0:0")
+        other.find(".//" + verify.A + "rPr").set("sz", "1300")
+        self.assertNotEqual(
+            verify._canonical_target_slide(original, ["table:1:1"], True),
+            verify._canonical_target_slide(ET.tostring(after), ["table:1:1"], True))
+
+    def test_office_ascii_target_font_fallback_and_run_split_are_scoped(self):
+        slide = ET.Element(verify.P + "sld")
+        for name, value in (("target__summary", "Old target"),
+                            ("untouched", "Guard text")):
+            shape = ET.SubElement(slide, verify.P + "sp")
+            identity = ET.SubElement(shape, verify.P + "nvSpPr")
+            ET.SubElement(identity, verify.P + "cNvPr", {"name": name})
+            paragraph = ET.SubElement(shape, verify.A + "p")
+            run = ET.SubElement(paragraph, verify.A + "r")
+            props = ET.SubElement(run, verify.A + "rPr",
+                                  {"lang": "en-US", "sz": "2400"})
+            ET.SubElement(props, verify.A + "latin", {"typeface": "Calibri"})
+            ET.SubElement(props, verify.A + "ea", {"typeface": "+mn-lt"})
+            ET.SubElement(props, verify.A + "cs", {"typeface": "Arial"})
+            ET.SubElement(run, verify.A + "t").text = value
+            end = ET.SubElement(paragraph, verify.A + "endParaRPr",
+                                {"lang": "en-US"})
+            ET.SubElement(end, verify.A + "cs", {"typeface": "Arial"})
+        before = ET.tostring(slide)
+        edited = ET.fromstring(before)
+        target = verify._target_node(edited, "target__summary")
+        paragraph = next(target.iter(verify.A + "p"))
+        first = next(paragraph.iter(verify.A + "r"))
+        first.find(verify.A + "t").text = "New "
+        first_props = first.find(verify.A + "rPr")
+        first_props.set("dirty", "0")
+        first_props.remove(first_props.find(verify.A + "latin"))
+        first_props.find(verify.A + "cs").set("typeface", "+mn-lt")
+        second = ET.Element(verify.A + "r")
+        second_props = ET.SubElement(second, verify.A + "rPr",
+                                     {"lang": "en-US", "sz": "2400", "b": "0"})
+        ET.SubElement(second_props, verify.A + "ea", {"typeface": "+mn-lt"})
+        ET.SubElement(second_props, verify.A + "cs", {"typeface": "+mn-lt"})
+        ET.SubElement(second, verify.A + "t").text = "target"
+        paragraph.insert(1, second)
+        end = paragraph.find(verify.A + "endParaRPr")
+        end.set("dirty", "0")
+        end.set("sz", "2400")
+        end.find(verify.A + "cs").set("typeface", "+mn-lt")
+        ET.SubElement(end, verify.A + "ea", {"typeface": "+mn-lt"})
+        self.assertEqual(
+            verify._canonical_target_slide(before, ["target__summary"], True),
+            verify._canonical_target_slide(ET.tostring(edited), ["target__summary"], True))
+        changed_other = ET.fromstring(ET.tostring(edited))
+        verify._target_node(changed_other, "untouched").find(
+            ".//" + verify.A + "t").text = "Changed guard"
+        self.assertNotEqual(
+            verify._canonical_target_slide(before, ["target__summary"], True),
+            verify._canonical_target_slide(ET.tostring(changed_other), ["target__summary"], True))
+        first_props.find(verify.A + "cs").set("typeface", "Times New Roman")
+        with self.assertRaises(ValueError):
+            verify._canonical_target_slide(ET.tostring(edited), ["target__summary"], True)
+
     @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
                          "bundled presentation runtime is unavailable")
     def test_final_four_dependent_targets_and_near_miss(self):
@@ -202,10 +321,10 @@ class PptWdiFactoryTest(unittest.TestCase):
 
     @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
                          "bundled presentation runtime is unavailable")
-    def test_provenance_and_chart_legend_workflows(self):
+    def test_provenance_and_web_editable_chart_caption_workflows(self):
         with tempfile.TemporaryDirectory() as temporary:
             private = Path(temporary)
-            for workflow in ("source_year_reconciliation", "chart_series_relabel"):
+            for workflow in ("source_year_reconciliation", "chart_caption_reconciliation"):
                 row = next(r for r in self.candidates["sets"]["final_candidate"]
                            if r["workflow"] == workflow)
                 package = finalized_package(private, row)
@@ -215,8 +334,11 @@ class PptWdiFactoryTest(unittest.TestCase):
                 if workflow == "source_year_reconciliation":
                     self.assertIn("attribution", row["target_keys"])
                 else:
-                    self.assertEqual(receipt["checks"]["legend_desync"]["score"], 0)
-                    self.assertTrue(receipt["checks"]["legend_desync"]["preservation_pass"])
+                    self.assertIn("chart_caption", row["target_keys"])
+                    self.assertEqual(receipt["checks"]["positive"]["score"], 1)
+                    self.assertEqual(receipt["checks"]["near_miss"]["score"], 0)
+                    self.assertEqual([r["name"] for r in row["chart"]["series"]],
+                                     ["CPI inflation", "Unemployment"])
 
 
 if __name__ == "__main__":
