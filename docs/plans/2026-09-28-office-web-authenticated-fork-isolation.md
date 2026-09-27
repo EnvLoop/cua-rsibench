@@ -176,6 +176,10 @@ tests cover extra grants, omitted inventory, wrong child/scope, stale/order
 errors, prior Recent entries, and tampering. These tests made no provider
 request and leave `official_final_admitted = 0`. The guard is **not wired into
 the train runner** yet; its return value is not a dispatch authorization.
+The inventory digest is SHA-256 of a compact UTF-8 JSON array of the sorted
+SHA-256 item IDs, with separators `(',', ':')`; the trusted collector must
+derive that set from the sealed private item manifest. The test suite now has
+seven cases, including a same-count inventory substitution.
 
 The first live acceptance test must use a disposable *train-only* PowerPoint
 file and workbook, never a sealed final item: one clean parent, two sequential
