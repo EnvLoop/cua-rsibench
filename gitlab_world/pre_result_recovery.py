@@ -12,6 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import stat
 
 from . import bootstrap, factory, runtime
 
@@ -29,6 +30,147 @@ FAILURE_STATUSES = {"development_gui_trio_failed",
 INFRA_STATUSES = {"driver_or_environment_failed",
                   "cold_reset_or_verifier_failed"}
 PASS_STATUS = "development_gui_trio_passed"
+TRAIN_RECEIPT_SHAPES = {
+    "cross_record_issue_triage": {
+        "schema": "envloop-gitlab-train-issue-triage-probe-v2",
+        "directory": "train-issue-triage-probe",
+        "labels": ("positive-1", "wrong-retired-asset", "positive-2"),
+        "operator_module": "gui_controls",
+        "probe_script": "probe_gitlab_issue_triage_train_v2.py",
+    },
+    "release_milestone_coordination": {
+        "schema": "envloop-gitlab-train-milestone-save-probe-v2",
+        "directory": "train-milestone-save-probe",
+        "labels": ("positive-1", "wrong-due-date", "positive-2"),
+        "operator_module": "gui_workflows",
+        "probe_script": "probe_gitlab_milestone_save_train_v1.py",
+    },
+}
+
+
+def _secure_private_path(root: Path, relative_text: str) -> Path:
+    """Resolve only restrictive regular files inside a non-symlink private tree."""
+    if not isinstance(relative_text, str):
+        raise ValueError("private evidence path is not text")
+    relative = Path(relative_text)
+    if (relative.is_absolute() or not relative.parts
+            or any(part in (".", "..") for part in relative.parts)):
+        raise ValueError("private evidence path escapes its ignored root")
+    root = Path(root).resolve(strict=True)
+    if root.stat().st_mode & 0o077:
+        raise ValueError("private evidence root permissions are too broad")
+    candidate = root / relative
+    current = root
+    for index, component in enumerate(relative.parts):
+        current = current / component
+        mode = current.lstat().st_mode
+        if stat.S_ISLNK(mode):
+            raise ValueError("private evidence path contains a symlink")
+        if index < len(relative.parts) - 1 and (not stat.S_ISDIR(mode)
+                                                or mode & 0o077):
+            raise ValueError("private evidence parent permissions are too broad")
+    if not candidate.resolve(strict=True).is_relative_to(root):
+        raise ValueError("private evidence path escapes its ignored root")
+    mode = candidate.stat().st_mode
+    if not stat.S_ISREG(mode) or mode & 0o077:
+        raise ValueError("private evidence is not a restrictive regular file")
+    return candidate
+
+
+def _read_bound_private_json(root: Path, ref: dict) -> tuple[dict, str]:
+    """Reopen an ignored, mode-0600 file by a relative, non-symlink path."""
+    if (not isinstance(ref, dict) or set(ref) != {"path", "sha256"}
+            or not isinstance(ref["path"], str)
+            or not isinstance(ref["sha256"], str)
+            or not re.fullmatch(r"[0-9a-f]{64}", ref["sha256"])):
+        raise ValueError("private evidence needs exact {path,sha256} reference")
+    candidate = _secure_private_path(root, ref["path"])
+    raw = candidate.read_bytes()
+    digest = factory.sha256(raw)
+    if digest != ref["sha256"]:
+        raise ValueError("private evidence file digest differs")
+    value = json.loads(raw)
+    if not isinstance(value, dict):
+        raise ValueError("private evidence JSON is not an object")
+    return value, digest
+
+
+def validate_generic_fix_evidence(
+        world: dict, refs: dict[str, dict],
+        *, private_root: Path = runtime.PRIVATE) -> dict[str, str]:
+    """Prove each deterministic fix from actual train receipts and source bytes."""
+    if not isinstance(refs, dict) or not set(refs) <= set(TRAIN_RECEIPT_SHAPES):
+        raise ValueError("generic fix map contains an unsupported workflow")
+    if not refs:
+        return {}
+    private_root = Path(private_root)
+    baseline_path = _secure_private_path(private_root, "baseline-persisted-state.json")
+    baseline = json.loads(baseline_path.read_bytes())
+    if not isinstance(baseline, dict):
+        raise ValueError("independent DB/Git baseline is not an object")
+    baseline_sha = baseline.get("business_sha256")
+    if not isinstance(baseline_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", baseline_sha):
+        raise ValueError("independent DB/Git baseline digest is invalid")
+    train_projects = {project["full_path"] for project in world.get("projects", [])
+                      if project.get("partition") == "train"}
+    if len(train_projects) != 5:
+        raise ValueError("private world lacks five distinct train source projects")
+    from . import gui_controls, gui_workflows
+    source_files = {"gui_controls": Path(gui_controls.__file__),
+                    "gui_workflows": Path(gui_workflows.__file__)}
+    scripts = Path(__file__).resolve().parents[1] / "tools"
+    validated = {}
+    for workflow, ref in refs.items():
+        shape = TRAIN_RECEIPT_SHAPES[workflow]
+        expected_prefix = shape["directory"] + "/run-"
+        if (not isinstance(ref, dict)
+                or not isinstance(ref.get("path"), str)
+                or not ref["path"].startswith(expected_prefix)
+                or not ref["path"].endswith("/summary-private.json")):
+            raise ValueError("train receipt is outside its workflow-specific private path")
+        receipt, digest = _read_bound_private_json(private_root, ref)
+        if (receipt.get("schema") != shape["schema"]
+                or receipt.get("workflow") != workflow
+                or receipt.get("partition") != "train"
+                or receipt.get("project_path") not in train_projects
+                or receipt.get("scores") != [1.0, 0.0, 1.0]
+                or receipt.get("cold_resets") != [True, True, True]
+                or any(value is not True for value in receipt.get("cold_resets", []))
+                or receipt.get("baseline_business_sha256") != baseline_sha
+                or receipt.get("visible_reload_verified_all") is not True
+                or receipt.get("independent_saved_state_checked") is not True
+                or receipt.get("no_regression_checked") is not True
+                or receipt.get("passed") is not True
+                or receipt.get("model_calls") != 0
+                or receipt.get("official_final_admitted") != 0):
+            raise ValueError("train probe summary lacks complete 1/0/1 saved-state evidence")
+        operator_sha = factory.sha256(source_files[shape["operator_module"]].read_bytes())
+        script_sha = factory.sha256((scripts / shape["probe_script"]).read_bytes())
+        if (receipt.get("generic_operator_sha256") != operator_sha
+                or receipt.get("probe_script_sha256") != script_sha):
+            raise ValueError("train probe operator or probe script source changed")
+        cases = receipt.get("case_receipts")
+        if not isinstance(cases, dict) or set(cases) != set(shape["labels"]):
+            raise ValueError("train probe is missing a positive or near-miss case receipt")
+        parent = (private_root / ref["path"]).parent
+        for label, expected_score in zip(shape["labels"], (1.0, 0.0, 1.0)):
+            case_ref = cases[label]
+            if not isinstance(case_ref, dict) or case_ref.get("path") != label + "/receipt.json":
+                raise ValueError("train probe case receipt path differs")
+            case, _ = _read_bound_private_json(parent, case_ref)
+            if (case.get("label") != label or case.get("score") != expected_score
+                    or case.get("before_business_sha256") != baseline_sha
+                    or case.get("post_reset_business_sha256") != baseline_sha
+                    or case.get("after_business_sha256") == baseline_sha
+                    or not isinstance(case.get("after_business_sha256"), str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", case["after_business_sha256"])
+                    or case.get("cold_reset_verified") is not True
+                    or case.get("visible_reload_verified") is not True
+                    or case.get("independent_saved_state_checked") is not True
+                    or case.get("no_regression_checked") is not True):
+                raise ValueError("train probe case lacks independent save/reset evidence")
+        validated[workflow] = digest
+    return validated
 
 
 def load_catalog(path: Path = FULL_CATALOG) -> list[dict]:
@@ -184,7 +326,8 @@ def freeze_private_queue(queue: dict, path: Path = PRIVATE_QUEUE) -> dict:
 
 def first_attempt_resolution(world: dict, index: dict, ledger: list[dict],
                              *, excluded_task_ids: set[str],
-                             generic_fix_evidence: dict[str, str]) -> dict:
+                             generic_fix_evidence: dict[str, dict],
+                             private_root: Path = runtime.PRIVATE) -> dict:
     """Reconcile all first attempts before any requalification is dispatched.
 
     A scored miss remains deterministic even if a later repeat in the same
@@ -231,16 +374,15 @@ def first_attempt_resolution(world: dict, index: dict, ledger: list[dict],
                 or entry.get("source_family_sha256") != factory.sha256(row["source_family"])
                 or entry.get("entry_sha256") != item.get("failure_ledger_entry_sha256")):
             raise ValueError("first failure differs from immutable ledger")
-    if not isinstance(generic_fix_evidence, dict):
-        raise ValueError("generic fix evidence mapping is missing")
+    validated_fixes = validate_generic_fix_evidence(
+        world, generic_fix_evidence, private_root=private_root)
     eligible = []
     immediate_retire = []
     for task_id, item, row in sorted(failures,
                                      key=lambda entry: ledger_by_id[entry[0]]["seq"]):
         deterministic = item["status"] == "development_gui_trio_failed"
-        fix = generic_fix_evidence.get(row["template_group"])
-        if deterministic and (not isinstance(fix, str)
-                              or not re.fullmatch(r"[0-9a-f]{64}", fix)):
+        fix = validated_fixes.get(row["template_group"])
+        if deterministic and fix is None:
             immediate_retire.append(task_id)
         else:
             eligible.append({"task_id": task_id, "first_failure_entry_sha256":
@@ -248,6 +390,9 @@ def first_attempt_resolution(world: dict, index: dict, ledger: list[dict],
                              "first_failure_status": item["status"],
                              "source_family_sha256": factory.sha256(row["source_family"]),
                              "generic_fix_train_receipt_sha256": fix if deterministic else None,
+                             "generic_fix_train_receipt_ref": (
+                                 generic_fix_evidence[row["template_group"]]
+                                 if deterministic else None),
                              "maximum_additional_attempts": 1})
     return {"schema": RESOLUTION_SCHEMA,
             "original_active_denominator": 100,
@@ -298,17 +443,24 @@ def freeze_private_resolution(resolution: dict,
     return receipt
 
 
-def read_private_resolution(path: Path = PRIVATE_RESOLUTION) -> dict:
+def read_private_resolution(path: Path = PRIVATE_RESOLUTION,
+                            *, private_root: Path = runtime.PRIVATE) -> dict:
     path = Path(path)
-    if path.stat().st_mode & 0o077:
-        raise RuntimeError("private recovery resolution permissions are too broad")
-    result = json.loads(path.read_text())
+    root_input = Path(private_root).absolute()
+    root = root_input.resolve(strict=True)
+    supplied = path if path.is_absolute() else Path.cwd() / path
+    if not supplied.is_relative_to(root_input):
+        raise ValueError("requalification plan must stay in ignored private GitLab work")
+    safe = _secure_private_path(root, str(supplied.relative_to(root_input)))
+    result = json.loads(safe.read_text())
     public_resolution(result)
     return result
 
 
 def eligible_requalification_rows(rows: list[dict], index: dict,
-                                  ledger: list[dict], resolution: dict) -> list[dict]:
+                                  ledger: list[dict], resolution: dict,
+                                  *, world: dict,
+                                  private_root: Path = runtime.PRIVATE) -> list[dict]:
     """Return only once-failed IDs named by a frozen first-attempt plan."""
     public_resolution(resolution)
     if (resolution.get("original_active_denominator") != 100
@@ -333,6 +485,19 @@ def eligible_requalification_rows(rows: list[dict], index: dict,
                 for task_id in sorted(row_by_id)}))
             != resolution.get("original_first_attempts_sha256")):
         raise ValueError("first-attempt denominator or records changed after freeze")
+    deterministic_refs = {}
+    for entry in allowed:
+        task_id = entry["task_id"]
+        if task_id not in row_by_id:
+            raise ValueError("requalification identity is outside active roster")
+        if entry.get("first_failure_status") == "development_gui_trio_failed":
+            workflow = row_by_id[task_id]["template_group"]
+            ref = entry.get("generic_fix_train_receipt_ref")
+            if workflow in deterministic_refs and deterministic_refs[workflow] != ref:
+                raise ValueError("deterministic workflow receipts differ across failed IDs")
+            deterministic_refs[workflow] = ref
+    validated_fixes = validate_generic_fix_evidence(
+        world, deterministic_refs, private_root=private_root)
     result = []
     for entry in allowed:
         task_id = entry["task_id"]
@@ -356,8 +521,9 @@ def eligible_requalification_rows(rows: list[dict], index: dict,
                 or entry.get("maximum_additional_attempts") != 1):
             raise ValueError("requalification plan differs from original failed ID")
         if item["status"] == "development_gui_trio_failed":
-            fix = entry.get("generic_fix_train_receipt_sha256")
-            if not isinstance(fix, str) or not re.fullmatch(r"[0-9a-f]{64}", fix):
+            workflow = row_by_id[task_id]["template_group"]
+            if validated_fixes.get(workflow) != entry.get(
+                    "generic_fix_train_receipt_sha256"):
                 raise ValueError("deterministic GUI miss lacks frozen generic train evidence")
         result.append(row_by_id[task_id])
     return result
@@ -491,9 +657,17 @@ def main() -> None:
     else:
         if args.generic_fix_evidence_path is None:
             raise ValueError("freeze-resolution requires explicit generic fix evidence map")
-        if args.generic_fix_evidence_path.stat().st_mode & 0o077:
-            raise RuntimeError("generic fix evidence map permissions are too broad")
-        fixes = json.loads(args.generic_fix_evidence_path.read_text())
+        private_root = runtime.PRIVATE.resolve(strict=True)
+        evidence_file = (args.generic_fix_evidence_path if
+                         args.generic_fix_evidence_path.is_absolute() else
+                         Path.cwd() / args.generic_fix_evidence_path)
+        if not evidence_file.is_relative_to(private_root):
+            raise ValueError("generic fix map must stay in ignored private GitLab work")
+        relative = str(evidence_file.relative_to(private_root))
+        evidence_file = _secure_private_path(private_root, relative)
+        evidence_ref = {"path": relative,
+                        "sha256": factory.sha256(evidence_file.read_bytes())}
+        fixes, _ = _read_bound_private_json(private_root, evidence_ref)
         if (fixes.get("schema") != "envloop-gitlab-generic-fix-evidence-map-v1"
                 or not isinstance(fixes.get("workflows"), dict)):
             raise ValueError("generic fix evidence map schema differs")
@@ -503,7 +677,8 @@ def main() -> None:
         resolution = first_attempt_resolution(
             world, index, failure_ledger.private_entries(),
             excluded_task_ids=quarantine.excluded_task_ids(),
-            generic_fix_evidence=fixes["workflows"])
+            generic_fix_evidence=fixes["workflows"],
+            private_root=private_root)
         public = freeze_private_resolution(resolution, args.private_resolution_path)
     print(json.dumps(public, indent=2, sort_keys=True))
 
