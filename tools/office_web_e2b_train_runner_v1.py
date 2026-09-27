@@ -378,6 +378,8 @@ def run(session_path: Path, task_path: Path, config_path: Path, out: Path,
         # No timeout argument: reconnect must not renew the human-login lease.
         connect_attempted = True
         sandbox = sandbox_factory.connect(admission.sandbox_id)
+        require(sandbox.sandbox_id == admission.sandbox_id,
+                'desktop_identity_mismatch')
         info = sandbox.get_info(request_timeout=12)
         require(info.template_id == admission.template_id,
                 'desktop_template_drift')

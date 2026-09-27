@@ -271,6 +271,16 @@ class OfficeWebTrainRunnerTests(unittest.TestCase):
         self.assertEqual(factory.kill_calls, [FakeSandbox.sandbox_id])
         self.assertEqual(sampler.requests, [])
 
+    def test_reconnect_identity_mismatch_never_launches_or_samples(self):
+        factory = FakeFactory()
+        factory.sandbox.sandbox_id = 'different-sandbox-1234'
+        result, _, sampler, _ = self.invoke([], factory=factory)
+        self.assertEqual(result['status'], 'desktop_identity_mismatch')
+        self.assertFalse(any(call[0] == 'launch'
+                             for call in factory.sandbox.calls))
+        self.assertEqual(sampler.requests, [])
+        self.assertEqual(factory.kill_calls, [FakeSandbox.sandbox_id])
+
     def test_artifact_interface_checks_pptx_but_does_not_score(self):
         result, _, _, _ = self.invoke([{'type': 'finish'}],
                                       retriever=FakeArtifactRetriever())
