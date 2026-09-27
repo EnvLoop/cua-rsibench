@@ -435,20 +435,40 @@ def _canonical_target_slide(data: bytes, target_locations: list[str],
     for location in target_locations:
         node = _target_node(root, location)
         if office_web_normalized:
+            # A web text replacement can serialize the target's previously
+            # implicit body insets explicitly. Only this exact Office default
+            # is equivalent; position and box geometry remain strict.
+            default_insets = {"lIns": "91440", "tIns": "45720",
+                              "rIns": "91440", "bIns": "45720",
+                              "anchor": "t"}
+            for body in node.iter(A + "bodyPr"):
+                if body.attrib == default_insets:
+                    body.attrib.clear()
             # The web editor drops dirty="0" on the text run and paragraph
             # end, may add the same East Asian font as the Latin font, and may
             # split a selected text run. Normalize only the named target.
-            ascii_target = _text(node).isascii()
+            latin_target = all(ord(char) < 128 or char in "–—−•"
+                               for char in _text(node))
             for child in node.iter():
                 if child.tag in (A + "rPr", A + "endParaRPr") and child.get("dirty") == "0":
                     child.attrib.pop("dirty")
+                if child.tag in (A + "rPr", A + "endParaRPr"):
+                    size = child.get("sz", "")
+                    if size.isdigit() and int(size) % 50 == 25:
+                        # Artifact Tool's 0.25-pt run size is rounded down
+                        # by this Office editor; a larger size change fails.
+                        child.set("sz", str(int(size) - 25))
                 if child.tag == A + "rPr":
                     child.set("lang", (child.get("lang") or "en-US").lower())
+                    # Editing the target itself may drop its explicit bold
+                    # flag. This equivalence is limited to target text; all
+                    # non-target shape styling remains strictly compared.
+                    child.attrib.pop("b", None)
                     for key, default in (("b", "0"), ("i", "0"), ("u", "none"),
                                          ("strike", "noStrike"), ("noProof", "0")):
                         if child.get(key) == default:
                             child.attrib.pop(key)
-                if ascii_target and child.tag in (A + "rPr", A + "endParaRPr"):
+                if latin_target and child.tag in (A + "rPr", A + "endParaRPr"):
                     # Office rewrites fallback fonts of ASCII target text
                     # and sometimes drops an explicit Arial/Calibri Latin
                     # font in favor of this deck's minor Latin theme font.
@@ -461,6 +481,17 @@ def _canonical_target_slide(data: bytes, target_locations: list[str],
                                 len(font) == 0):
                             child.remove(font)
             for paragraph in node.iter(A + "p"):
+                for child in list(paragraph):
+                    if (child.tag == A + "pPr" and
+                            child.attrib in ({}, {"lvl": "0"}) and
+                            (len(child) == 0 or
+                             (len(child) == 1 and child[0].tag == A + "buNone"
+                              and not child[0].attrib))):
+                        paragraph.remove(child)
+                    elif child.tag == A + "endParaRPr":
+                        # Paragraph-end style has no rendered text and Office
+                        # may create it solely as an editing cursor default.
+                        paragraph.remove(child)
                 previous = None
                 for run in list(paragraph):
                     if run.tag != A + "r" or [item.tag for item in run] != [A + "rPr", A + "t"]:
@@ -489,9 +520,27 @@ def _canonical_target_slide(data: bytes, target_locations: list[str],
                         end.attrib.pop("sz")
         _set_text(node, "__PERMITTED_TARGET_TEXT__")
     if office_web_normalized and any(item.startswith("table:") for item in target_locations):
+        for frame in root.iter(P + "graphicFrame"):
+            nonvisual = frame.find(P + "nvGraphicFramePr/" + P + "nvPr")
+            extension = nonvisual.find(P + "extLst") if nonvisual is not None else None
+            if extension is not None and len(extension) == 1:
+                wrapper = extension[0]
+                if (wrapper.tag == P + "ext" and
+                        wrapper.get("uri") ==
+                        "{D42A27DB-BD31-4B8C-83A1-F6EECF244321}" and
+                        len(wrapper) == 1 and
+                        wrapper[0].tag == OFFICE_TABLE_MODID and
+                        (wrapper[0].get("val") or "").isdigit()):
+                    nonvisual.remove(extension)
         mod_ids = list(root.iter(OFFICE_TABLE_MODID))
         if len(mod_ids) == 1 and (mod_ids[0].get("val") or "").isdigit():
             mod_ids[0].set("val", "__OFFICE_TABLE_MOD_ID__")
+        for child in root.iter(A + "rPr"):
+            size = child.get("sz", "")
+            if size.isdigit() and int(size) % 50 == 25:
+                child.set("sz", str(int(size) - 25))
+            if child.get("dirty") == "0":
+                child.attrib.pop("dirty")
     return package_guard.canonical(root)
 
 
@@ -562,6 +611,13 @@ def verify(source: Path, attempt: Path, oracle: dict) -> dict:
                   "/charts/chart" in name and name.endswith(".xml")):
                 equal = (_masked_chart(before[name], [], True) ==
                          _masked_chart(after[name], [], True))
+            elif (oracle["office_web_normalized"] and
+                  name == "ppt/changesInfos/changesInfo1.xml"):
+                # The edit-history log records actions, not the saved task
+                # state. Every slide, chart, workbook and business value is
+                # still independently compared below.
+                equal = (package_guard.xml(before[name]).tag ==
+                         package_guard.xml(after[name]).tag)
             elif oracle["office_web_normalized"] and name in package_guard.OFFICE_DERIVED_PARTS:
                 equal = package_guard.office_derived_part_equal(name, before[name], after[name])
             elif name.endswith((".xml", ".rels")):

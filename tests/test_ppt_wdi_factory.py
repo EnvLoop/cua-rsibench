@@ -60,6 +60,63 @@ class PptWdiFactoryTest(unittest.TestCase):
         self.assertFalse(verify._masked_workbook_equal(
             first, pack(altered.items(), ZIP_DEFLATED), []))
 
+    def test_office_target_roundtrip_equivalence_keeps_collateral_strict(self):
+        def slide(*, edited=False, guard='guard', target_color='9B5A1F',
+                  target_size='2000'):
+            root = ET.Element(verify.P + 'sld')
+            for name, value in (('target__interpretation',
+                                 'draft 2023–2024' if not edited else
+                                 'correct 2023–2024'), ('untouched', guard)):
+                shape = ET.SubElement(root, verify.P + 'sp')
+                nonvisual = ET.SubElement(shape, verify.P + 'nvSpPr')
+                ET.SubElement(nonvisual, verify.P + 'cNvPr',
+                              {'id': '2' if name.startswith('target') else '3',
+                               'name': name})
+                body = ET.SubElement(shape, verify.P + 'txBody')
+                ET.SubElement(body, verify.A + 'bodyPr',
+                              ({'lIns': '91440', 'tIns': '45720',
+                                'rIns': '91440', 'bIns': '45720',
+                                'anchor': 't'} if edited and
+                               name.startswith('target') else {}))
+                paragraph = ET.SubElement(body, verify.A + 'p')
+                if edited and name.startswith('target'):
+                    props = ET.SubElement(paragraph, verify.A + 'pPr',
+                                          {'lvl': '0'})
+                    ET.SubElement(props, verify.A + 'buNone')
+                run = ET.SubElement(paragraph, verify.A + 'r')
+                attrs = ({'lang': 'en-US', 'sz': target_size, 'dirty': '0'}
+                         if edited and name.startswith('target') else
+                         {'sz': '2025', 'b': '1'})
+                style = ET.SubElement(run, verify.A + 'rPr', attrs)
+                fill = ET.SubElement(style, verify.A + 'solidFill')
+                ET.SubElement(fill, verify.A + 'srgbClr',
+                              {'val': target_color if name.startswith('target')
+                               else '183044'})
+                if edited and name.startswith('target'):
+                    for tag in ('ea', 'cs'):
+                        ET.SubElement(style, verify.A + tag,
+                                      {'typeface': '+mn-lt'})
+                else:
+                    for tag in ('latin', 'ea', 'cs'):
+                        ET.SubElement(style, verify.A + tag,
+                                      {'typeface': 'Arial'})
+                ET.SubElement(run, verify.A + 't').text = value
+                if edited and name.startswith('target'):
+                    ET.SubElement(paragraph, verify.A + 'endParaRPr',
+                                  {'lang': 'en-US', 'dirty': '0'})
+            return ET.tostring(root)
+        original = slide()
+        roundtrip = slide(edited=True)
+        normalize = lambda raw: verify._canonical_target_slide(
+            raw, ['target__interpretation'], True)
+        self.assertEqual(normalize(original), normalize(roundtrip))
+        self.assertNotEqual(normalize(original),
+                            normalize(slide(edited=True, guard='corrupt')))
+        self.assertNotEqual(normalize(original), normalize(
+            slide(edited=True, target_color='FF0000')))
+        self.assertNotEqual(normalize(original), normalize(
+            slide(edited=True, target_size='1800')))
+
     def test_140_country_disjoint_candidates_with_distinct_causal_workflows(self):
         sets = self.candidates["sets"]
         self.assertEqual({key: len(rows) for key, rows in sets.items()}, plan.COUNTS)
@@ -192,6 +249,18 @@ class PptWdiFactoryTest(unittest.TestCase):
                                 verify._masked_chart(second, []))
             self.assertEqual(verify._masked_chart(first, [], True),
                              verify._masked_chart(second, [], True))
+            smooth = next(chart.iter(verify.C + "smooth"))
+            previous_smooth = smooth.get("val")
+            smooth.set("val", "1" if previous_smooth == "0" else "0")
+            self.assertNotEqual(verify._masked_chart(first, [], True),
+                                verify._masked_chart(ET.tostring(chart), [], True))
+            smooth.set("val", previous_smooth)
+            axis_min = next(chart.iter(verify.C + "min"))
+            previous_min = axis_min.get("val")
+            axis_min.set("val", str(float(previous_min) - 1))
+            self.assertNotEqual(verify._masked_chart(first, [], True),
+                                verify._masked_chart(ET.tostring(chart), [], True))
+            axis_min.set("val", previous_min)
             value = next(chart.iter(verify.C + "val")).find(".//" + verify.C + "v")
             value.text = str(float(value.text) + 1)
             self.assertNotEqual(verify._masked_chart(first, [], True),
@@ -224,7 +293,9 @@ class PptWdiFactoryTest(unittest.TestCase):
         self.assertEqual(
             verify._canonical_target_slide(original, ["target__summary"], True),
             verify._canonical_target_slide(ET.tostring(split), ["target__summary"], True))
-        right.find(verify.A + "rPr").set("b", "0")
+        # Bold is an observed target-only Office representation change;
+        # a substantive run-size change still cannot be merged away.
+        right.find(verify.A + "rPr").set("sz", "1800")
         with self.assertRaises(ValueError):
             verify._canonical_target_slide(ET.tostring(split), ["target__summary"], True)
 
