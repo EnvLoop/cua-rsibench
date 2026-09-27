@@ -50,3 +50,18 @@ must match the frozen 181-document digest. It remains training-only and
 does not change historical or active final-candidate sweep commands. A
 successful v2 startup still needs separate train GUI positive/negative and
 reset controls before a cell-wide runtime amendment can be adopted.
+
+The [v2 startup receipt](evidence/magento-cron-never-autostart-train-probe-2026-09-27.json)
+now records a passing unseeded training probe: cron remained stopped from
+supervisor startup, all four price-index checkpoints had zero changed rows
+against the replica, and the 181-document search digest matched the frozen
+source after reindex and a 60-second idle check. The pair was pinned and
+mount-free. **No GUI control or model run occurred**, and this does not
+retroactively qualify any of the earlier 35 candidate passes. The disposable
+probe pair must be identity-bound and retired before a fresh train GUI trio
+under this policy.
+The [v2 pair reconciliation controller](../tools/reconcile_magento_cron_probe_v2.py)
+verifies the exact saved startup receipt, pinned container identities, the
+still-frozen 181-document search index, stopped cron configuration, zero
+price drift and zero benchmark quote pages before stopping/removing only that
+disposable pair. Cleanup does not seed or score a task.

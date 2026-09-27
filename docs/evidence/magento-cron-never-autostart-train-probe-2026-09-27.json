@@ -1,0 +1,27 @@
+{
+  "app_container_id_sha256": "0d4aaa9490f7282599e4706bb36d54df55065765e843c1cc11eb764eed78abb7",
+  "app_image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "app_mount_count": 0,
+  "cron_config_sha256": "5b93a97ce7c205be2a85fac38d1f4f59999fa4c81f605e55c06d272a99325b0d",
+  "cron_policy": "cron_autostart_disabled_before_supervisor",
+  "date": "2026-09-27",
+  "gui_train_controls_passed": 0,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "pair_cleanup_pending": true,
+  "price_changed_rows_by_stage": {
+    "after_config_cache": 0,
+    "after_cron_policy_and_http_ready": 0,
+    "after_idle_60_seconds": 0,
+    "after_search_reindex": 0
+  },
+  "private_pair_audit_sha256": "3af22692cb1d193a789b51fc58e1356f8522f8dd7485ca157b4abd302bde957b",
+  "private_receipt_sha256": "cb59cdfd92994ecc2be8c0eb2654f140a225c724eb9e9713386fa72a9ab5d7b9",
+  "schema": "envloop-magento-cron-never-autostart-train-success-public-v1",
+  "search_container_id_sha256": "0acfcda050ce3b163cc80b42865603f2db40d9dd64515f86d4314de0b1cbe50c",
+  "search_documents": 181,
+  "search_documents_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+  "search_image_sha256": "sha256:2c257b68f361872e13bdd476cba152e232a314ec61b0eedfc1f71b628ba39432",
+  "status": "unseeded_training_startup_and_60_second_idle_passed",
+  "task_seeded": false
+}
