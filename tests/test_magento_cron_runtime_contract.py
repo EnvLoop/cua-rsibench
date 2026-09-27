@@ -14,6 +14,7 @@ from magento_catalog_factory.seed import IMAGE
 from magento_catalog_factory.verify import NATIVE_SEARCH_IMAGE
 from tools import audit_magento_cron_requalification_v1 as auditor
 from tools import magento_cron_runtime_contract_v1 as contract
+from tools import reconcile_magento_cron_train_gui_interruption_v1 as reconciliation
 
 
 def prepared() -> dict:
@@ -80,6 +81,25 @@ class MagentoCronRuntimeContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'uninterrupted'):
                 contract.validate_train_gui(root, 'c' * 64, 'a' * 64,
                                             'r' * 64)
+
+    def test_train_cleanup_requires_failed_negative_neutral_before_gui(self):
+        events = [
+            {'event': 'sweep_started', 'split': 'train_policy_development',
+             'start_index': 0, 'limit': 1,
+             'recovery_of_private_journal_sha256': None,
+             'model_calls': 0, 'official_final_admitted': False},
+            {'event': 'pair_cleanup_verified', 'index': 0,
+             'pair': 'positive'},
+            {'event': 'step_finished', 'index': 0,
+             'step': 'negative-neutral', 'exit_code': 1},
+            {'event': 'sweep_stopped', 'passed': 0,
+             'official_final_admitted': 0},
+        ]
+        reconciliation.validate_stopped_events(events)
+        events.insert(-1, {'event': 'step_intent', 'index': 0,
+                           'step': 'negative-gui'})
+        with self.assertRaisesRegex(ValueError, 'only the original incomplete'):
+            reconciliation.validate_stopped_events(events)
 
     def test_requalification_audit_rejects_partial_journal(self):
         with tempfile.TemporaryDirectory() as temporary:
