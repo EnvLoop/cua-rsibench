@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import io
 import os
 from pathlib import Path
 import subprocess
@@ -37,6 +38,27 @@ class PptWdiFactoryTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.candidates = plan.build(bytes.fromhex("f0" * 32))
+
+    def test_embedded_chart_workbook_repack_preserves_cells_not_edits(self):
+        sheet = (b'<worksheet xmlns="http://schemas.openxmlformats.org/'
+                 b'spreadsheetml/2006/main"><sheetData><row r="1">'
+                 b'<c r="A1" t="n"><v>5.62</v></c></row></sheetData></worksheet>')
+        members = {'xl/worksheets/sheet1.xml': sheet,
+                   'xl/workbook.xml': b'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"/>'}
+        def pack(rows, compressed):
+            out = io.BytesIO()
+            with ZipFile(out, 'w', compression=compressed) as archive:
+                for name, content in rows:
+                    archive.writestr(name, content)
+            return out.getvalue()
+        first = pack(members.items(), ZIP_DEFLATED)
+        repacked = pack(reversed(list(members.items())), 0)
+        self.assertNotEqual(first, repacked)
+        self.assertTrue(verify._masked_workbook_equal(first, repacked, []))
+        altered = dict(members)
+        altered['xl/worksheets/sheet1.xml'] = sheet.replace(b'5.62', b'6.62')
+        self.assertFalse(verify._masked_workbook_equal(
+            first, pack(altered.items(), ZIP_DEFLATED), []))
 
     def test_140_country_disjoint_candidates_with_distinct_causal_workflows(self):
         sets = self.candidates["sets"]

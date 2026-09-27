@@ -82,8 +82,11 @@ def semantic_source_equal(first: Path, second: Path) -> dict:
                 "visible slide shape/table content changed")
     chart_before, workbook_before = verify._chart_and_workbook_parts(before)
     chart_after, workbook_after = verify._chart_and_workbook_parts(after)
-    require(before[workbook_before] == after[workbook_after],
-            "embedded chart workbook changed")
+    # PowerPoint may re-pack the embedded XLSX ZIP without changing any member.
+    # Compare every member's XML/content, so a data/formula edit still fails.
+    require(verify._masked_workbook_equal(before[workbook_before],
+                                          after[workbook_after], []),
+            "embedded chart workbook content changed")
     def values(data: bytes) -> list[str]:
         return [node.text or "" for node in packages.xml(data).iter(verify.C + "v")]
     left, right = values(before[chart_before]), values(after[chart_after])
@@ -96,7 +99,9 @@ def semantic_source_equal(first: Path, second: Path) -> dict:
             equal = a == b
         require(equal, "native chart label/value changed")
     return {"slide_count": 7, "slide_text_equal": True,
-            "embedded_workbook_bytes_equal": True,
+            "embedded_workbook_bytes_equal":
+            before[workbook_before] == after[workbook_after],
+            "embedded_workbook_members_equal": True,
             "native_chart_cache_semantically_equal": True,
             "native_chart_cache_values_checked": len(left)}
 
