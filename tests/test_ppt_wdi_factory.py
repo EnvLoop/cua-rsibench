@@ -100,6 +100,74 @@ class PptWdiFactoryTest(unittest.TestCase):
             self.assertFalse(receipt["checks"]["collateral"]["preservation_pass"])
             self.assertFalse(receipt["checks"]["wrong_chart"]["preservation_pass"])
 
+            # A real PowerPoint web save can drop target-run dirty="0" and
+            # regenerate an opaque chart series ID. These narrow masks still
+            # reject a changed native chart value.
+            with ZipFile(package / "source.pptx") as archive:
+                members = {name: archive.read(name) for name in archive.namelist()}
+            slide = ET.fromstring(members["ppt/slides/slide1.xml"])
+            target = verify._target_node(slide, "target__summary")
+            run_properties = next(node for node in target.iter()
+                                  if node.tag == verify.A + "rPr")
+            run_properties.set("dirty", "0")
+            with_dirty = ET.tostring(slide)
+            run_properties.attrib.pop("dirty")
+            without_dirty = ET.tostring(slide)
+            self.assertNotEqual(
+                verify._canonical_target_slide(with_dirty, ["target__summary"]),
+                verify._canonical_target_slide(without_dirty, ["target__summary"]))
+            self.assertEqual(
+                verify._canonical_target_slide(with_dirty, ["target__summary"], True),
+                verify._canonical_target_slide(without_dirty, ["target__summary"], True))
+
+            chart_part = next(name for name in members if "/charts/chart" in name
+                              and name.endswith(".xml"))
+            chart = ET.fromstring(members[chart_part])
+            series_id = ET.SubElement(chart, verify.OFFICE_CHART + "uniqueId")
+            series_id.set("val", "{00000000-1111-2222-3333-444444444444}")
+            first = ET.tostring(chart)
+            series_id.set("val", "{00000000-AAAA-BBBB-CCCC-DDDDDDDDDDDD}")
+            second = ET.tostring(chart)
+            self.assertNotEqual(verify._masked_chart(first, []),
+                                verify._masked_chart(second, []))
+            self.assertEqual(verify._masked_chart(first, [], True),
+                             verify._masked_chart(second, [], True))
+            value = next(chart.iter(verify.C + "val")).find(".//" + verify.C + "v")
+            value.text = str(float(value.text) + 1)
+            self.assertNotEqual(verify._masked_chart(first, [], True),
+                                verify._masked_chart(ET.tostring(chart), [], True))
+
+    def test_office_target_run_split_preserves_style_but_not_style_damage(self):
+        slide = ET.Element(verify.P + "sld")
+        shape = ET.SubElement(slide, verify.P + "sp")
+        nv = ET.SubElement(shape, verify.P + "nvSpPr")
+        ET.SubElement(nv, verify.P + "cNvPr", {"name": "target__summary"})
+        body = ET.SubElement(shape, verify.P + "txBody")
+        paragraph = ET.SubElement(body, verify.A + "p")
+        first_run = ET.SubElement(paragraph, verify.A + "r")
+        props = ET.SubElement(first_run, verify.A + "rPr",
+                              {"b": "1", "sz": "2400", "lang": "en-US"})
+        ET.SubElement(props, verify.A + "latin", {"typeface": "Arial"})
+        ET.SubElement(first_run, verify.A + "t").text = "Verified change: +24.79 %"
+        ET.SubElement(paragraph, verify.A + "endParaRPr", {"lang": "en-US"})
+        original = ET.tostring(slide)
+        split = ET.fromstring(original)
+        split_paragraph = next(split.iter(verify.A + "p"))
+        left = next(child for child in split_paragraph if child.tag == verify.A + "r")
+        right = ET.fromstring(ET.tostring(left))
+        left.find(verify.A + "t").text = "Verified change: +"
+        right.find(verify.A + "t").text = "24.79 %"
+        left_props = left.find(verify.A + "rPr")
+        left_props.attrib.pop("lang")
+        ET.SubElement(left_props, verify.A + "ea", {"typeface": "Arial"})
+        split_paragraph.insert(1, right)
+        self.assertEqual(
+            verify._canonical_target_slide(original, ["target__summary"], True),
+            verify._canonical_target_slide(ET.tostring(split), ["target__summary"], True))
+        right.find(verify.A + "rPr").set("b", "0")
+        with self.assertRaises(ValueError):
+            verify._canonical_target_slide(ET.tostring(split), ["target__summary"], True)
+
     @unittest.skipUnless(DEFAULT_NODE.is_file() and DEFAULT_MODULES.is_dir(),
                          "bundled presentation runtime is unavailable")
     def test_final_four_dependent_targets_and_near_miss(self):

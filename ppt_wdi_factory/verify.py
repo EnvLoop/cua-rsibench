@@ -12,6 +12,7 @@ import copy
 import io
 import json
 from pathlib import Path
+import re
 import zipfile
 import xml.etree.ElementTree as ET
 
@@ -23,6 +24,7 @@ P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
 A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
 C = "{http://schemas.openxmlformats.org/drawingml/2006/chart}"
 X = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+OFFICE_CHART = "{http://schemas.microsoft.com/office/drawing/2014/chart}"
 SCHEMA = "ppt-wdi-original-frozen-oracle-v1"
 LOCATIONS = {"summary": ("ppt/slides/slide1.xml", "target__summary"),
              "ledger": ("ppt/slides/slide4.xml", "table:1:1"),
@@ -136,10 +138,20 @@ def _replace_legend(members: dict[str, bytes], index: int, cell_ref: str,
     members[workbook_part] = output.getvalue()
 
 
-def _masked_chart(data: bytes, indices: list[int]) -> str:
+def _masked_chart(data: bytes, indices: list[int],
+                  office_web_normalized: bool = False) -> str:
     chart = package_guard.xml(data)
     for index in indices:
         _chart_series_name(chart, index).text = "__PERMITTED_LEGEND_LABEL__"
+    if office_web_normalized:
+        # A PowerPoint web save regenerates this per-series opaque ID even when
+        # no chart data or legend changes. Keep the element, and mask only the
+        # observed Office-generated UUID shape; all other chart bytes compare.
+        for node in chart.iter(OFFICE_CHART + "uniqueId"):
+            value = node.get("val", "")
+            if re.fullmatch(r"\{00000000-(?:[0-9A-F]{4}-){3}[0-9A-F]{12}\}",
+                            value, re.IGNORECASE):
+                node.set("val", "__OFFICE_SERIES_ID__")
     return package_guard.canonical(chart)
 
 
@@ -283,7 +295,8 @@ def _source_table(members: dict[str, bytes], task: dict) -> None:
             raise ValueError("Chart/cache/workbook series labels disagree")
 
 
-def freeze(source: Path, task: dict) -> dict:
+def freeze(source: Path, task: dict, *,
+           office_web_normalized: bool = False) -> dict:
     _validate_task_source(task)
     raw, members = package_guard.package(source)
     slides = sorted(n for n in members if _slidable(n))
@@ -311,15 +324,45 @@ def freeze(source: Path, task: dict) -> dict:
                             "baseline": baseline, "correct": task["correct"][key]}
     return {"schema": SCHEMA, "source_sha256": sha(raw), "task_sha256": sha(canonical(task)),
             "task_id": task["task_id"], "source_snapshot_sha256": EXPECTED_SHA256,
-            "targets": targets, "office_web_normalized": False,
-            "scope": "offline source OOXML; freeze again from untouched Microsoft-normalized download",
+            "targets": targets, "office_web_normalized": office_web_normalized,
+            "scope": ("evaluator-frozen PowerPoint-web saved baseline with narrow Office metadata allowances"
+                      if office_web_normalized else
+                      "offline source OOXML; freeze again from evaluator-normalized Microsoft download"),
             "official_final_credit": 0}
 
 
-def _canonical_target_slide(data: bytes, target_locations: list[str]) -> str:
+def _canonical_target_slide(data: bytes, target_locations: list[str],
+                            office_web_normalized: bool = False) -> str:
     root = package_guard.xml(data)
     for location in target_locations:
         node = _target_node(root, location)
+        if office_web_normalized:
+            # The web editor drops dirty="0" on the text run and paragraph
+            # end, may add the same East Asian font as the Latin font, and may
+            # split a selected text run. Normalize only the named target.
+            for child in node.iter():
+                if child.tag in (A + "rPr", A + "endParaRPr") and child.get("dirty") == "0":
+                    child.attrib.pop("dirty")
+                if child.tag == A + "rPr":
+                    child.set("lang", (child.get("lang") or "en-US").lower())
+                    latin, east_asian = child.find(A + "latin"), child.find(A + "ea")
+                    if (latin is not None and east_asian is not None and
+                            latin.attrib == east_asian.attrib and
+                            len(east_asian) == 0):
+                        child.remove(east_asian)
+            for paragraph in node.iter(A + "p"):
+                previous = None
+                for run in list(paragraph):
+                    if run.tag != A + "r" or [item.tag for item in run] != [A + "rPr", A + "t"]:
+                        previous = None
+                        continue
+                    props, value = list(run)
+                    signature = (package_guard.canonical(props), tuple(sorted(value.attrib.items())))
+                    if previous is not None and previous[0] == signature:
+                        previous[1].text = (previous[1].text or "") + (value.text or "")
+                        paragraph.remove(run)
+                    else:
+                        previous = (signature, value)
         _set_text(node, "__PERMITTED_TARGET_TEXT__")
     return package_guard.canonical(root)
 
@@ -372,7 +415,8 @@ def verify(source: Path, attempt: Path, oracle: dict) -> dict:
                 continue
             if name == legend_chart_part:
                 try:
-                    equal = _masked_chart(before[name], legend_indices) == _masked_chart(after[name], legend_indices)
+                    equal = (_masked_chart(before[name], legend_indices, oracle["office_web_normalized"])
+                             == _masked_chart(after[name], legend_indices, oracle["office_web_normalized"]))
                 except (ValueError, IndexError):
                     equal = False
             elif name == legend_workbook_part:
@@ -382,9 +426,14 @@ def verify(source: Path, attempt: Path, oracle: dict) -> dict:
                     equal = False
             elif name in by_part:
                 try:
-                    equal = _canonical_target_slide(before[name], by_part[name]) == _canonical_target_slide(after[name], by_part[name])
+                    equal = (_canonical_target_slide(before[name], by_part[name], oracle["office_web_normalized"])
+                             == _canonical_target_slide(after[name], by_part[name], oracle["office_web_normalized"]))
                 except (ValueError, IndexError):
                     equal = False
+            elif (oracle["office_web_normalized"] and
+                  "/charts/chart" in name and name.endswith(".xml")):
+                equal = (_masked_chart(before[name], [], True) ==
+                         _masked_chart(after[name], [], True))
             elif oracle["office_web_normalized"] and name in package_guard.OFFICE_DERIVED_PARTS:
                 equal = package_guard.office_derived_part_equal(name, before[name], after[name])
             elif name.endswith((".xml", ".rels")):
