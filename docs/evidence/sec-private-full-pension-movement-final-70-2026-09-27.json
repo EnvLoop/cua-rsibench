@@ -1,0 +1,65 @@
+{
+  "schema": "sec-private-full-pension-movement-final-70-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "two additional original SEC 10-K filing-distinct offline final candidates in a new full pension-asset movement graph; zero official Excel-web hidden-final admission",
+  "additional_original_sec_10k_accessions_accepted": 2,
+  "additional_original_sec_10k_accessions_rejected_for_nonzero_filing_precision_residual": 1,
+  "additional_new_issuer_families": 0,
+  "additional_selected_original_numeric_facts": 32,
+  "additional_excluded_scope_filed_dashes_preserved": 4,
+  "additional_original_funded_status_bridges": 4,
+  "additional_complete_original_asset_movement_bridges": 4,
+  "additional_private_semantic_workflow_graphs": 1,
+  "additional_offline_actor_reference_pairs": 2,
+  "additional_checked_formula_targets": 136,
+  "additional_individually_detected_faults": 18,
+  "additional_positive_references_passed": 2,
+  "additional_unrepaired_actors_rejected": 2,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcoded_target_and_collateral_original_fact_edit_controls_rejected": true,
+  "cumulative_private_issuer_families_disjoint_from_public_development": 28,
+  "cumulative_offline_actor_reference_pairs": 70,
+  "cumulative_original_numeric_facts_checked": 1043,
+  "cumulative_private_semantic_workflow_graphs": 15,
+  "cumulative_final_semantic_workflow_graphs": 12,
+  "cumulative_checked_formula_targets": 5025,
+  "cumulative_individually_detected_faults": 630,
+  "private_split_reservations": {
+    "train": 20,
+    "selection": 20,
+    "final": 100
+  },
+  "offline_candidates": {
+    "train": 7,
+    "selection": 7,
+    "final": 56
+  },
+  "empty_reservations": {
+    "train": 13,
+    "selection": 13,
+    "final": 44
+  },
+  "maximum_offline_cases_per_issuer": 5,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "pre_result_reservation_amendment": "Two empty final slots of a previously reserved issuer were assigned distinct original 10-Ks and a new source/template-isolated full asset-movement graph before model outcomes.",
+  "private_evidence_sha256": {
+    "original_filing_numeric_controls": "4c540a9f8c732689b29a3f3c2c421437532756a45b5925f3af885fc828b1b12c",
+    "source_acceptance_and_rejection": "eb892ee20073b596c856b46c59b7d7640a91db9832242516d254eb34d891c533",
+    "first_verified_source_excerpt": "619be63b174e5bd36b45117f04bb4c4de72fb6c4ba306b229a077b43c02bf5bc",
+    "second_verified_source_excerpt": "43c43b1206aa83ca7fa8c9b3b2b0a7aefd602d9686303f3b7e80f1f95cca4de8",
+    "case_manifest": "4e86f05cc31de64c2eccfb05772f78bcf8876cb7877ea7dda892bfffccacad2a",
+    "offline_ooxml_audit": "cadf13e5bc3dcfc8f3a6e271a4c3f57acf42e1d6777b7eee8919afe4754deba2",
+    "private_workbook_builder": "0fb513ac1b7263ac0e17b9e5ad0b53fa2c4366459f29a053cc0e3373876a91d8",
+    "independent_ooxml_verifier": "8d945672f6398a647c046dec5cb49ca18185519bdc636a26ba76c601ccf1ec92",
+    "private_split_slot_reservations": "4d18dd0de7d675233ef6a205b60ce41280077061c4cfc472309b9e1e47ed9e34",
+    "integrated_offline_audit": "551cf3cf954d53157c76e3b9fdfa1492d8e99fccf369d5be2dff76a6e5b92e2f",
+    "integrated_auditor": "7ee4112169e2709c86bc535f45b80482bf3531db488321c8f177e876f7400a28",
+    "private_slot_allocator": "3ec5347bd71a68e92560402db967a16d1e2a6162a5d36868b2a9ac4cf73a41f7"
+  },
+  "limitations": [
+    "One additional original filing was rejected from this exact-bridge graph because its displayed asset movement leaves small nonzero residuals at filing precision; no plug was invented.",
+    "The accepted graph keeps employer and participant contributions, signed currency translation/other, returns and benefits distinct. Filed ESOP dashes belong to an excluded other-retiree scope and are not counted as pension numeric facts.",
+    "The remaining 70 reservations are empty, including 44 of 100 final slots. No hidden-final ID has its own Microsoft Excel for the web saved/downloaded readback and fresh-copy reset."
+  ]
+}
