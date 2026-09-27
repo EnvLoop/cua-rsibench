@@ -12,6 +12,10 @@ const task = JSON.parse(await fs.readFile(inputPath, "utf8"));
 if (task.schema !== "ppt-wdi-original-candidates-v1") throw new Error("Bad task schema");
 const snapshotDate = task.source_snapshot_date ?? "2026-09-25";
 if (!/^\d{4}-\d{2}-\d{2}$/.test(snapshotDate)) throw new Error("Bad WDI snapshot date");
+const countryCsv = task.source_scope === "private_wdi_country_csv_reserve_v1";
+if (countryCsv && !/^\d{4}-\d{2}-\d{2}$/.test(task.source_csv_data_last_updated ?? "")) {
+  throw new Error("Bad World Bank country CSV data-update date");
+}
 
 const W = 1280, H = 720;
 const colors = { ink: "#183044", blue: "#205D82", teal: "#176F72", muted: "#536B78", amber: "#9B5A1F" };
@@ -35,7 +39,10 @@ function slideBase(title, n, note) {
   s.speakerNotes.textFrame.setText(note);
   return s;
 }
-const sourceNote = `Source: World Bank, World Development Indicators, pinned API snapshot ${snapshotDate}, 2019–2024, CC BY 4.0. The monitoring brief, draft defects, and committee rules are EnvLoop-authored simulations, not World Bank conclusions.`;
+const pinnedSource = countryCsv
+  ? `pinned country CSV download ${snapshotDate} (data updated ${task.source_csv_data_last_updated})`
+  : `pinned API snapshot ${snapshotDate}`;
+const sourceNote = `Source: World Bank, World Development Indicators, ${pinnedSource}, 2019–2024, CC BY 4.0. The monitoring brief, draft defects, and committee rules are EnvLoop-authored simulations, not World Bank conclusions.`;
 const s1 = slideBase(`${task.country_name} | economic monitoring`, 1, sourceNote);
 text(s1, "brief_heading", task.heading, 72, 159, 1134, 75, 25, false, colors.muted);
 text(s1, "target__summary", task.draft.summary, 76, 276, 1110, 92, 32, true, colors.amber);
@@ -65,7 +72,7 @@ for (let c = 0; c < 6; c++) evidence.getCell(0, c).fill = "#E3EEF2";
 for (let r = 0; r < 7; r++) for (let c = 0; c < 6; c++) {
   evidence.getCell(r, c).text.style = { typeface: font, fontSize: 16, color: colors.ink };
 }
-text(s2, "source_attribution", `World Development Indicators  •  pinned snapshot ${snapshotDate}  •  CC BY 4.0`, 66, 595, 1120, 32, 14, false, colors.muted);
+text(s2, "source_attribution", `World Development Indicators  •  pinned ${countryCsv ? "country CSV" : "snapshot"} ${snapshotDate}  •  CC BY 4.0`, 66, 595, 1120, 32, 14, false, colors.muted);
 
 const s3 = slideBase("Indicator trend, 2019–2024", 3, sourceNote);
 text(s3, "chart_unit", `${task.calculation.series}  |  ${task.chart.unit}`, 70, 122, 1100, 42, 20, false, colors.muted);
@@ -136,7 +143,7 @@ text(s6, "decision_scope", task.target_keys.includes("decision")
      74, 530, 1090, 70, 19, false, colors.ink);
 
 const s7 = slideBase("Method and attribution", 7, sourceNote);
-text(s7, "method_1", "Observed values: World Development Indicators, 2019–2024 API snapshot. The table contains the five pinned series for this country.", 75, 150, 1090, 90, 23, false, colors.ink);
+text(s7, "method_1", `Observed values: World Development Indicators, 2019–2024 ${countryCsv ? "country CSV extract" : "API snapshot"}. The table contains the five pinned series for this country.`, 75, 150, 1090, 90, 23, false, colors.ink);
 text(s7, "method_2", "Calculations: derive from the displayed, rounded WDI values; round results to two decimals for the committee memo.", 75, 283, 1090, 86, 23, false, colors.ink);
 text(s7, "method_3", "Scenario: the committee threshold and the intentional draft errors are EnvLoop-authored benchmark fiction.", 75, 417, 1090, 86, 23, false, colors.ink);
 text(s7, "target__attribution", task.draft.attribution, 75, 552, 1090, 62, 16, false,

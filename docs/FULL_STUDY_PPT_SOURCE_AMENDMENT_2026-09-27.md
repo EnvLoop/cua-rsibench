@@ -11,3 +11,5 @@ The resulting revised private manifest SHA-256 is `98794a6465cee21c4f57dce5b823a
 The revised inventory still requires per-ID PowerPoint-web positive/near-miss/fresh-reset controls, legal and cost review, and the common Qwen/six-cell pre-campaign freeze. **PowerPoint-web official final admission remains 0/100**. The revised manifest and this amendment must remain fixed before checkpoint training or official results; any later change requires another dated revision.
 
 The amendment does not relabel the development task as a scored final result, alter other cells, or change the planned primary paired estimator. Its purpose is to preserve a hidden exam after using one candidate family to learn Office-web normalization behavior.
+
+**Later same-day supersession:** a second evaluator-only GUI controller check exposed another four-task final source family. The [second source amendment](FULL_STUDY_PPT_SECOND_SOURCE_AMENDMENT_2026-09-27.md) records its quarantine and a distinct official WDI country CSV replacement. The manifest above remains a historical pre-result checkpoint; the newer two-reserve manifest is the current offline candidate inventory.

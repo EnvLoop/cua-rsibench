@@ -13,6 +13,7 @@ import io
 import json
 from pathlib import Path
 import re
+from urllib.parse import urlparse
 import zipfile
 import xml.etree.ElementTree as ET
 
@@ -213,6 +214,36 @@ def _reserve_country_facts(task: dict, source: Path) -> dict:
     raw = snapshot.read_bytes()
     if sha(raw) != task["source_snapshot_sha256"]:
         raise ValueError("Private reserve WDI snapshot hash changed")
+    if task.get("source_scope") == "private_wdi_country_csv_reserve_v1":
+        from tools.extract_wdi_country_csv_reserve_v1 import extract
+
+        provenance_raw = (source.parent / "source-provenance.private.json").read_bytes()
+        country_zip = (source.parent / "source-country.private.zip").read_bytes()
+        if (sha(provenance_raw) != task["source_provenance_sha256"] or
+                sha(country_zip) != task["source_zip_sha256"]):
+            raise ValueError("Private World Bank country CSV source hash changed")
+        provenance = json.loads(provenance_raw)
+        if (provenance.get("schema") !=
+                "envloop-wdi-official-country-csv-extract-private-v1" or
+                provenance.get("source_type") !=
+                "worldbank_official_country_csv_zip" or
+                provenance.get("country_iso") != task["source_group"] or
+                provenance.get("zip_sha256") != task["source_zip_sha256"] or
+                provenance.get("snapshot_sha256") != task["source_snapshot_sha256"] or
+                provenance.get("download_date") != task["source_snapshot_date"] or
+                provenance.get("catalog_license") != "CC BY 4.0" or
+                urlparse(provenance.get("official_download_url", "")).hostname !=
+                "api.worldbank.org" or
+                urlparse(provenance.get("official_page_url", "")).hostname !=
+                "data.worldbank.org"):
+            raise ValueError("World Bank country CSV provenance changed")
+        extracted, detail = extract(country_zip, task["source_group"])
+        if (raw != extracted or
+                detail["data_member_sha256"] !=
+                provenance.get("data_member_sha256") or
+                detail["data_last_updated"] !=
+                provenance.get("data_last_updated")):
+            raise ValueError("World Bank country CSV observations changed")
     payload = json.loads(raw)
     if not isinstance(payload, list) or len(payload) != 2:
         raise ValueError("Invalid reserve WDI response envelope")
@@ -247,7 +278,8 @@ def _validate_task_source(task: dict, source: Path) -> None:
         raise ValueError("Task/source schema mismatch")
     if task.get("source_snapshot_sha256") == EXPECTED_SHA256 and not task.get("source_scope"):
         actual = country_facts(load(), task["source_group"])
-    elif task.get("source_scope") == "private_wdi_reserve_v1":
+    elif task.get("source_scope") in ("private_wdi_reserve_v1",
+                                      "private_wdi_country_csv_reserve_v1"):
         actual = _reserve_country_facts(task, source)
     else:
         raise ValueError("Task source snapshot has no verified provenance")
