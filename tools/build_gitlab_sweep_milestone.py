@@ -105,6 +105,11 @@ def build(*, previous_public: Path, prior_index: Path, completed_summary: Path,
     passed = completed["development_gui_trio_passed"]
     invalid = expected_attempted - passed
     remaining = 100 - expected_attempted
+    remaining_sentence = (
+        f"The remaining **{remaining}** candidates lack a per-ID control."
+        if remaining else
+        f"All **100** candidates have an attempted per-ID control, but **{invalid}** "
+        "failed or infrastructure-invalid IDs have not passed qualification.")
     coverage_phrase = (
         f", expanding source-family coverage by **{new_families}**"
         if new_families else " within the 20 already-attempted project source families")
@@ -124,7 +129,7 @@ The [previous aggregate control receipt]({previous_public.name.removesuffix('.js
 
 This batch attempted **{new_attempted} untouched IDs**{coverage_phrase}: **{new_passed} passed** and **{new_attempted-new_passed} failed or infrastructure-invalid**. The [machine-readable aggregate](gitlab-scoped-gui-progress-{expected_attempted}-{report_date}.json) contains per-workflow counts. Every pass has independent saved-state and no-regression readback, 1/0/1 GUI scores, and three fresh cold resets. The append-only ledger has {ledger['entry_count']} verified entries; no failed ID was silently retried or converted into a model failure. The original demo was restored healthy with its pre-stop container identity.
 
-The remaining **{remaining}** candidates lack a per-ID control. These deterministic GUI qualification checks are separate from Qwen's screenshot-only action policy. No paid training, selection feedback, researcher campaign, or official final admission is claimed. CI YAML persistence has been checked, while runner execution remains unproven. The GitLab cell remains **0/100 officially admitted** until all per-ID and global pre-campaign gates pass.
+{remaining_sentence} These deterministic GUI qualification checks are separate from Qwen's screenshot-only action policy. No paid training, selection feedback, researcher campaign, or official final admission is claimed. CI YAML persistence has been checked, while runner execution remains unproven. The GitLab cell remains **0/100 officially admitted** until all per-ID and global pre-campaign gates pass.
 """
     if SENSITIVE.search(json.dumps(public, sort_keys=True) + md):
         raise RuntimeError("GitLab public milestone includes a sensitive pattern")
