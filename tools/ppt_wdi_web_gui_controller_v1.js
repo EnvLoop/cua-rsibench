@@ -189,3 +189,126 @@ async function neutralControlCaseV5(c) {
   let tab = await openCloudExactV2(name);
   return await finishNeutralDataV5(c, tab);
 }
+
+// Positive, near-miss, fresh-reset, and collateral each use a separate,
+// byte-identical copy of the independently frozen Office-normalized baseline.
+// The caller passes one role at a time and scores the returned saved PPTX.
+async function finishRoleDataV1(c, tab, role) {
+  if (!['positive', 'near_miss', 'fresh_reset', 'collateral'].includes(role))
+    throw Error('unregistered GUI control role');
+  let frame = tab.playwright.frameLocator('iframe#WacFrame_PowerPoint_0');
+  let first = c.targets[0], ready = false;
+  for (let i = 0; i < 20; i++) {
+    if (await frame.getByRole('option', {name: /Slide/}).count() === 7) {
+      await frame.getByRole('option', {name: /Slide/}).nth(first.slide - 1).click();
+      if (await frame.getByText(first.draft, {exact: true}).count() >= 1) {
+        ready = true;
+        break;
+      }
+    }
+    await tab.getAXState({emit: false});
+  }
+  if (!ready) throw Error('role editor not ready');
+  if (role === 'positive' || role === 'near_miss') {
+    for (let t of c.targets) {
+      if (role === 'near_miss' && t.key === c.near_miss_omits) continue;
+      await editTargetV6(tab, frame, t, t.draft, t.correct);
+    }
+  } else if (role === 'collateral') {
+    if (!c.collateral || c.collateral.key !== 'collateral' ||
+        c.collateral.slide !== 3 || !c.collateral.draft ||
+        !c.collateral.corrupt || c.collateral.draft === c.collateral.corrupt)
+      throw Error('collateral perturbation not bound');
+    await editTargetV6(tab, frame, c.collateral,
+                       c.collateral.draft, c.collateral.corrupt);
+  }
+  let saved = false;
+  for (let i = 0; i < 20; i++) {
+    let s = await tab.playwright.domSnapshot();
+    if (s.includes('Last saved:') || s.includes('Saved to OneDrive')) {
+      saved = true;
+      break;
+    }
+    await tab.getAXState({emit: false});
+  }
+  if (!saved) throw Error('role save not confirmed');
+  await tab.reload();
+  ready = false;
+  for (let i = 0; i < 20; i++) {
+    if (await frame.getByRole('option', {name: /Slide/}).count() === 7) {
+      let probe = role === 'positive' ||
+          (role === 'near_miss' && first.key !== c.near_miss_omits)
+          ? first.correct : first.draft;
+      await frame.getByRole('option', {name: /Slide/}).nth(first.slide - 1).click();
+      if (await frame.getByText(probe, {exact: true}).count() >= 1) {
+        ready = true;
+        break;
+      }
+    }
+    await tab.getAXState({emit: false});
+  }
+  if (!ready) throw Error('role reload not ready');
+  for (let t of c.targets) {
+    let expected = (role === 'positive' ||
+                    (role === 'near_miss' && t.key !== c.near_miss_omits))
+      ? t.correct : t.draft;
+    await frame.getByRole('option', {name: /Slide/}).nth(t.slide - 1).click();
+    await frame.getByText(expected, {exact: true}).first()
+      .waitFor({state: 'visible', timeoutMs: 10000});
+  }
+  if (role === 'collateral') {
+    await frame.getByRole('option', {name: /Slide/}).nth(c.collateral.slide - 1).click();
+    await frame.getByText(c.collateral.corrupt, {exact: true}).first()
+      .waitFor({state: 'visible', timeoutMs: 10000});
+  }
+  let d = await crypto.subtle.digest('SHA-256',
+                                   new TextEncoder().encode(await tab.url()));
+  let cloudSha = [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join('');
+  let path = await downloadCloudExactV2(c.baselinePath.split('/').at(-1));
+  evaluatorRoleRuns.push({index: c.index, role, download_path: path,
+                          cloud_url_sha256: cloudSha,
+                          targets_verified: c.targets.length,
+                          official_final_admitted: 0});
+  await tab.close();
+  return {index: c.index, role, downloaded: true,
+          targets_verified: c.targets.length, official_final_admitted: 0};
+}
+
+async function roleControlCaseV1(c, role) {
+  let name = await uploadOneV3(c);
+  let tab = await openCloudExactV2(name);
+  return await finishRoleDataV1(c, tab, role);
+}
+
+// Office's editor readback may precede OneDrive download propagation. A first
+// downloaded file can still be byte-identical to the uploaded source. Require
+// a separate fresh editor session before downloading again, then let the
+// independent local PPTX verifier decide whether this attempt is valid.
+async function durableRoleControlCaseV2(c, role) {
+  await roleControlCaseV1(c, role);
+  let name = c.baselinePath.split('/').at(-1);
+  let tab = await openCloudExactV2(name);
+  let frame = tab.playwright.frameLocator('iframe#WacFrame_PowerPoint_0');
+  await frame.getByRole('option', {name: /Slide/}).nth(0)
+    .waitFor({state: 'visible', timeoutMs: 15000});
+  for (let t of c.targets) {
+    let expected = (role === 'positive' ||
+                    (role === 'near_miss' && t.key !== c.near_miss_omits))
+      ? t.correct : t.draft;
+    await frame.getByRole('option', {name: /Slide/}).nth(t.slide - 1).click();
+    await frame.getByText(expected, {exact: true}).first()
+      .waitFor({state: 'visible', timeoutMs: 10000});
+  }
+  if (role === 'collateral') {
+    await frame.getByRole('option', {name: /Slide/}).nth(c.collateral.slide - 1).click();
+    await frame.getByText(c.collateral.corrupt, {exact: true}).first()
+      .waitFor({state: 'visible', timeoutMs: 10000});
+  }
+  await tab.close();
+  let path = await downloadCloudExactV2(name);
+  evaluatorRoleRuns.push({index: c.index, role, download_path: path,
+                          fresh_editor_readback: true,
+                          official_final_admitted: 0});
+  return {index: c.index, role, downloaded: true,
+          fresh_editor_readback: true, official_final_admitted: 0};
+}
