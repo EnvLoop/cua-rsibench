@@ -102,6 +102,15 @@ def public_summary(index: dict) -> dict:
                        for item in attempted.values()
                        if item.get("status") != "development_gui_trio_passed"
                        and item.get("source_family_sha256")}
+    by_id = {row["task_id"]: row for row in rows}
+    attempted_workflows = Counter(by_id[task_id]["template_group"]
+                                  for task_id in attempted)
+    passed_workflows = Counter(by_id[task_id]["template_group"]
+                               for task_id, item in attempted.items()
+                               if item.get("status") == "development_gui_trio_passed")
+    failed_workflows = Counter(by_id[task_id]["template_group"]
+                               for task_id, item in attempted.items()
+                               if item.get("status") != "development_gui_trio_passed")
     by_family = Counter(row["template_group"] for row in rows)
     prior_failure_count = sum(
         sum(attempt.get("status") != "development_gui_trio_passed"
@@ -120,7 +129,13 @@ def public_summary(index: dict) -> dict:
             "attempted_source_family_count": len(attempted_families),
             "passed_source_family_count": len(passed_families),
             "failed_source_family_count": len(failed_families),
+            "attempted_workflow_counts": dict(sorted(attempted_workflows.items())),
+            "passed_workflow_counts": dict(sorted(passed_workflows.items())),
+            "failed_workflow_counts": dict(sorted(failed_workflows.items())),
             "development_gui_trio_passed": counts.get("development_gui_trio_passed", 0),
+            "verified_cold_resets_for_passed_ids": sum(
+                item.get("cold_resets", 0) for item in attempted.values()
+                if item.get("status") == "development_gui_trio_passed"),
             "retained_prior_failed_attempts": prior_failure_count,
             "append_only_failure_ledger": failure_ledger.audit(),
             "official_final_admitted": 0,

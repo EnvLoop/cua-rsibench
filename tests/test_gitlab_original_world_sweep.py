@@ -38,6 +38,7 @@ class GitLabOriginalSweepTests(unittest.TestCase):
             self.assertEqual(summary["individually_attempted_ids"], 1)
             self.assertEqual(summary["attempted_source_family_count"], 1)
             self.assertEqual(summary["passed_source_family_count"], 1)
+            self.assertEqual(sum(summary["attempted_workflow_counts"].values()), 1)
             self.assertEqual(summary["statuses"]["not_attempted"], 99)
             self.assertFalse(summary["complete_100_per_id_gui_admission"])
             self.assertNotIn(first, str(summary))
