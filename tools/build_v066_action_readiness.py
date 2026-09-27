@@ -25,6 +25,7 @@ TEST_MODULES = (
     "tests.test_scale_action_output_v066",
     "tests.test_native_desktop_v066_adapter",
     "tests.test_shared_v066_train_adapters",
+    "tests.test_gitlab_v066_train_adapter",
     "tests.test_shared_action_bundle_v066",
 )
 SOURCE_GROUPS = {
@@ -46,7 +47,11 @@ SOURCE_GROUPS = {
         "enterprise_fallback/odoo18/odoo_native_adapter.py",
         "enterprise_fallback/odoo18/official_runner_v065.py",
     ),
-    "gitlab": (),
+    "gitlab": (
+        "gitlab_world/vision_actor_v066_train.py",
+        "gitlab_world/vision_actor.py",
+        "gitlab_world/vision_actor_smoke.py",
+    ),
     "magento-admin": (
         "tools/magento_v066_train_adapter.py",
         "tools/run_magento_model_pilot_v063.py",
@@ -58,7 +63,7 @@ PROPOSED_ADAPTER = {
     "excel-web": "tools/excel_web_e2b_v066_train_adapter.py",
     "desktop-native": "native_desktop_factory/qwen_v066_adapter.py",
     "odoo-community": "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
-    "gitlab": None,
+    "gitlab": "gitlab_world/vision_actor_v066_train.py",
     "magento-admin": "tools/magento_v066_train_adapter.py",
 }
 
@@ -150,18 +155,24 @@ def markdown(bundle: dict, ledger: dict) -> str:
         "the Qwen renderer/preprocessor identifiers and the exact v0.6.6 "
         "model-action prompt bytes. It is regenerated from tracked source.\n\n"
         f"{ledger['test_evidence']['test_count']} synthetic contract/adapter "
-        "tests passed with zero provider calls and zero live application "
-        "actions. These tests prove local parser/dispatch mapping only.\n\n"
+        "tests passed with zero external provider calls and zero live "
+        "application actions. GitLab's fake-provider responses are local "
+        "test data. These tests prove local parser/dispatch mapping only.\n\n"
         "| Cell | Synthetic v0.6.6 mapping | Historical runner wired | "
-        "Live v0.6.6 smoke | Fresh final GUI trios |\n"
+        "Live smoke assessed by this static ledger | Fresh final GUI trios |\n"
         "| --- | --- | --- | --- | ---: |\n"
         + "\n".join(states) + "\n\n"
         "The PowerPoint-web and Excel-web modules are bounded train-only E2B "
         "mappings; neither historical runner selects them. Odoo's v0.6.5 "
         "official gate remains closed and unchanged. Magento's older pinned "
         "pilot remains unchanged. The Desktop module has a prospective grammar "
-        "plan, but no fresh v0.6.6 per-ID GUI trios. GitLab has no adapter "
-        "mapping in this branch and is being audited separately.\n\n"
+        "plan, but no fresh v0.6.6 per-ID GUI trios. GitLab's proposed "
+        "train-only mapping reuses the historical capture and local-origin "
+        "guard, requires an explicit train partition at model-request and "
+        "dispatch boundaries, and pins the proposed shared bundle hash. It "
+        "has synthetic dispatch evidence only. A separate dated "
+        "[Odoo train-only no-model GUI smoke](odoo-v066-native-train-smoke-2026-09-28.md) "
+        "is outside this static ledger's live-smoke field.\n\n"
         "Before ratification, each application needs a source-bound live "
         "train/selection smoke under the same prompt, parser and physical-frame "
         "checks; source/runtime and budget freezes remain separate gates. "
