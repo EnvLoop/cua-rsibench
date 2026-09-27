@@ -154,7 +154,7 @@ class FullStudyResultAuditTests(unittest.TestCase):
             'storage_application_usd_cap_per_campaign': '5',
             'e2b_sandbox_hours_cap_per_campaign': '20',
             'per_campaign_all_in_ceiling_usd': '750',
-            'declared_all_in_cost_upper_bound_usd': '18600',
+            'declared_all_in_cost_upper_bound_usd': '19200',
             'matched_non_tinker_campaign_caps': {
                 'researcher_calls_per_campaign': 1000,
                 'teacher_rollout_tokens_per_campaign': 1000000,

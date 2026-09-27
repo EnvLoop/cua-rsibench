@@ -21,7 +21,8 @@ def sha(value: str) -> str:
 
 def plan_fixture() -> dict:
     cells = [{'cell_id': cell_id,
-              'selected_final_cost_upper_bound_usd': '100'}
+              'selected_final_cost_upper_bound_usd': '100',
+              'base_selection_cost_upper_bound_usd': '100'}
              for cell_id in matrix.CELLS]
     intents = [{
         'cell_id': cell_id, 'researcher_id': researcher,
@@ -34,7 +35,10 @@ def plan_fixture() -> dict:
     } for cell_id in matrix.CELLS for researcher in matrix.RESEARCHERS]
     return {'schema': pre_campaign.PLAN_SCHEMA, 'campaign_count': 24,
             'distinct_official_task_identities': 600,
-            'declared_all_in_cost_upper_bound_usd': '18600',
+            'declared_shared_base_final_cost_upper_bound_usd': '600',
+            'declared_shared_base_selection_cost_upper_bound_usd': '600',
+            'declared_shared_base_cost_upper_bound_usd': '1200',
+            'declared_all_in_cost_upper_bound_usd': '19200',
             'cells': cells, 'campaign_intents': intents}
 
 
@@ -120,6 +124,23 @@ class FullStudyBudgetTests(unittest.TestCase):
         self.assertTrue(snapshot['paid_dispatch_frozen'])
         with self.assertRaisesRegex(ValueError, 'overrun freezes'):
             self.ledger.reserve('next', self.owner, 'tinker', '0.01', sha('new work'))
+
+    def test_shared_base_selection_is_once_per_cell_and_never_an_e2b_fiction(self):
+        owner = 'gitlab:shared-base'
+        self.ledger.reserve('base-tinker', owner, 'tinker', '60',
+                            sha('twenty base samples'))
+        self.ledger.reserve('base-app', owner, 'storage_application',
+                            '40', sha('twenty GitLab runtimes'))
+        self.ledger.reserve('base-final', owner, 'shared_base_final',
+                            '100', sha('one hundred base finals'))
+        self.assertEqual(self.ledger.snapshot()['owner_totals_usd'][owner],
+                         '200')
+        with self.assertRaisesRegex(ValueError, 'unknown owner/category'):
+            self.ledger.reserve('fake-e2b', owner, 'e2b', '1',
+                                sha('uncreated E2B sandbox'))
+        with self.assertRaisesRegex(ValueError, 'all-in cap exhausted'):
+            self.ledger.reserve('base-extra', owner, 'tinker', '1',
+                                sha('duplicate base selection'))
 
 
 if __name__ == '__main__':

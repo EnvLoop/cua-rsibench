@@ -31,6 +31,7 @@ from . import full_study_matrix_v1 as matrix
 from . import full_study_pre_campaign_v1 as pre_campaign
 from . import full_study_selection_environment_v1 as selection_environment
 from . import full_study_selection_paid_coverage_v1 as paid_coverage
+from . import full_study_shared_base_selection_v1 as shared_base
 from . import scale_final_v06 as cell_final
 
 
@@ -304,16 +305,28 @@ class FrozenStudy:
         owner = (cell_id, researcher_id)
         _require(owner in self.intents, 'undeclared_campaign')
         work = self.repo_root / 'work'
+        source = shared_base.receipt_path(self, cell_id)
+        _require(source.is_file() and not source.is_symlink(),
+                 'shared_base_selection_required_before_campaign')
+        budget = dollars.StudyBudgetLedger(work / 'full-study-budget.jsonl',
+                                           self.plan)
+        shared_base.verify_receipt(self, budget, cell_id, source)
         target = Path(private_dir).absolute()
         _require(not work.is_symlink() and not target.is_symlink() and
                  target.parent.resolve().is_relative_to(work.resolve()),
                  'private_work_directory_required')
         target.mkdir(parents=True, exist_ok=True, mode=0o700)
         target.chmod(0o700)
-        budget = dollars.StudyBudgetLedger(work / 'full-study-budget.jsonl',
-                                           self.plan)
         return CampaignSession(self, target, self.intents[owner], budget,
                                now=now)
+
+    def admit_shared_base_selection(self, cell_id: str,
+                                    source: Path) -> dict:
+        """Accept one independently saved 20-task base result before campaigns."""
+        work = self.repo_root / 'work'
+        budget = dollars.StudyBudgetLedger(work / 'full-study-budget.jsonl',
+                                           self.plan)
+        return shared_base.admit_receipt(self, budget, cell_id, source)
 
 
 class CampaignJournal:
@@ -404,6 +417,8 @@ class CampaignSession:
                                 {'epoch_seconds': int(self.now())})
         # Expired campaigns remain readable for reconciliation and audit.
         self._audit_paid_files()
+        if self._events('base_selection'):
+            self._checked_base_selection()
 
     def _events(self, kind: str | None = None) -> list[dict]:
         rows = self.journal.rows()[1:]
@@ -588,22 +603,58 @@ class CampaignSession:
         _require(set(scores) == set(expected), 'selection_task_coverage_incomplete')
         return scores
 
-    def record_base_selection(self, result: dict) -> dict:
-        """Import evaluator-owned 20-task base feedback; never a final task."""
-        self._check_time()
-        _require(not self._events('base_selection') and
-                 not self._events('researcher_proposal'),
-                 'base_selection_already_recorded_or_research_started')
-        scores = self._selection_result(
-            result, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
-        raw = _canonical(result)
-        _private_write_new(self.directory / 'base-selection.private.json', raw)
-        self.journal.append('base_selection', {
-            'result_sha256': _sha(raw), 'wins': sum(scores.values()),
-            'epoch_seconds': int(self.now()),
-        })
-        return {'wins': sum(scores.values()), 'task_count': len(scores),
-                'result_sha256': _sha(raw)}
+    def record_base_selection(self, *, shared_receipt_path: Path) -> dict:
+        """Import the cell's already-admitted, one-time base receipt only."""
+        with self._operation_lock():
+            self._check_time()
+            _require(not self._events('base_selection') and
+                     not self._events('researcher_proposal') and
+                     not self._events('researcher_invalid_output') and
+                     not self._events('paid_intent'),
+                     'base_selection_already_recorded_or_research_started')
+            try:
+                result, shared_sha = shared_base.verify_receipt(
+                    self.study, self.budget, self.intent['cell_id'],
+                    shared_receipt_path)
+            except shared_base.SharedBaseSelectionError:
+                raise DispatchError('shared_base_selection_evidence_invalid') from None
+            scores = self._selection_result(
+                result,
+                checkpoint_sha256=self.intent['base_checkpoint_sha256'])
+            raw = _canonical(result)
+            _private_write_new(
+                self.directory / 'base-selection.private.json', raw)
+            self.journal.append('base_selection', {
+                'result_sha256': _sha(raw),
+                'shared_receipt_sha256': shared_sha,
+                'wins': sum(scores.values()),
+                'epoch_seconds': int(self.now()),
+            })
+            return {'wins': sum(scores.values()),
+                    'task_count': len(scores),
+                    'result_sha256': _sha(raw),
+                    'shared_receipt_sha256': shared_sha}
+
+    def _checked_base_selection(self) -> dict:
+        base = self.directory / 'base-selection.private.json'
+        result, raw = _json(base, 'base_selection')
+        events = self._events('base_selection')
+        _require(len(events) == 1 and
+                 events[0]['data'].get('result_sha256') == _sha(raw) and
+                 cell_final.is_hash(events[0]['data'].get(
+                     'shared_receipt_sha256')),
+                 'base_selection_receipt_changed')
+        try:
+            shared_result, shared_sha = shared_base.verify_receipt(
+                self.study, self.budget, self.intent['cell_id'],
+                shared_base.receipt_path(self.study,
+                                         self.intent['cell_id']))
+        except shared_base.SharedBaseSelectionError:
+            raise DispatchError('shared_base_selection_evidence_changed') from None
+        _require(shared_sha == events[0]['data']['shared_receipt_sha256'] and
+                 result == shared_result,
+                 'base_selection_shared_receipt_changed')
+        return result
 
     def _train_context(self, path: Path) -> tuple[list[dict], str]:
         target = _private_input(path, self.study.repo_root, 'train_context')
@@ -632,12 +683,7 @@ class CampaignSession:
         return value['tasks'], _sha(raw)
 
     def _selection_feedback(self) -> list[dict]:
-        base = self.directory / 'base-selection.private.json'
-        result, raw = _json(base, 'base_selection')
-        events = self._events('base_selection')
-        _require(len(events) == 1 and
-                 events[0]['data']['result_sha256'] == _sha(raw),
-                 'base_selection_receipt_changed')
+        result = self._checked_base_selection()
         self._selection_result(
             result, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
         feedback = [{'round_index': 0, 'role': 'shared_base',
@@ -1239,12 +1285,7 @@ class CampaignSession:
         return row['data']
 
     def _incumbent(self) -> tuple[str, dict[str, int]]:
-        base, base_raw = _json(self.directory / 'base-selection.private.json',
-                               'base_selection')
-        base_events = self._events('base_selection')
-        _require(len(base_events) == 1 and
-                 base_events[0]['data']['result_sha256'] == _sha(base_raw),
-                 'base_selection_receipt_changed')
+        base = self._checked_base_selection()
         scores = self._selection_result(
             base, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
         checkpoint = self.intent['base_checkpoint_sha256']

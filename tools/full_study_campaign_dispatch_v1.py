@@ -49,6 +49,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--public-commit', required=True)
     sub = parser.add_subparsers(dest='command', required=True)
     sub.add_parser('check')
+    base_admit = sub.add_parser('base-admit')
+    base_admit.add_argument('--cell', required=True)
+    base_admit.add_argument('--receipt', type=Path, required=True)
     for name in ('start', 'snapshot', 'base-selection', 'researcher-call',
                  'selection-start', 'selection-invalid', 'selection-score',
                  'selection-freeze',
@@ -58,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument('--cell', required=True)
         command.add_argument('--researcher', required=True)
         if name == 'base-selection':
-            command.add_argument('--result', type=Path, required=True)
+            command.add_argument('--receipt', type=Path, required=True)
         elif name == 'researcher-call':
             command.add_argument('--round', type=int, required=True)
             command.add_argument('--train-context', type=Path, required=True)
@@ -94,6 +97,9 @@ def main(argv: list[str] | None = None) -> int:
                       'plan_sha256': study.plan_sha256,
                       'public_witness_sha256': study.public_witness_sha256,
                       'provider_calls': 0}
+        elif args.command == 'base-admit':
+            result = study.admit_shared_base_selection(
+                args.cell, args.receipt)
         else:
             session = study.open_campaign(
                 args.private_dir, cell_id=args.cell,
@@ -101,8 +107,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.command in {'start', 'snapshot'}:
                 result = session.snapshot()
             elif args.command == 'base-selection':
-                value, _ = _private_evidence(args.result, study)
-                result = session.record_base_selection(value)
+                result = session.record_base_selection(
+                    shared_receipt_path=args.receipt)
             elif args.command == 'researcher-call':
                 result = session.dispatch_researcher(
                     round_index=args.round,

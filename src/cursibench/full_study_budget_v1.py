@@ -16,6 +16,7 @@ from pathlib import Path
 import re
 
 from . import full_study_pre_campaign_v1 as pre_campaign
+from . import full_study_selection_environment_v1 as selection_environment
 from . import scale_final_v06 as cell_final
 
 
@@ -78,12 +79,36 @@ def _plan_limits(plan: object) -> tuple[str, Decimal, dict]:
         _require(sum(category_caps.values(), Decimal(0)) <= all_in,
                  f'{owner}: category caps exceed campaign ceiling')
         limits[owner] = {'all_in': all_in, 'categories': category_caps}
+    shared_final = Decimal(0)
+    shared_selection = Decimal(0)
     for cell_id, cell in by_cell.items():
         owner = f'{cell_id}:shared-base'
-        amount = _dollar(cell['selected_final_cost_upper_bound_usd'],
-                         'shared base final cost')
-        limits[owner] = {'all_in': amount,
-                         'categories': {'shared_base_final': amount}}
+        final = _dollar(cell['selected_final_cost_upper_bound_usd'],
+                        'shared base final cost')
+        selection = _dollar(cell['base_selection_cost_upper_bound_usd'],
+                            'shared base selection cost')
+        _require(final > 0 and selection >= final,
+                 'shared base selection needs conservative separate bound')
+        shared_final += final
+        shared_selection += selection
+        environment = selection_environment.category(cell_id)
+        # Tinker and the actual environment can each reserve up to the
+        # selection envelope, but the owner's all-in cap allows their sum
+        # only once. No duplicate baseline cost enters four campaigns.
+        limits[owner] = {
+            'all_in': final + selection,
+            'categories': {'shared_base_final': final,
+                           'tinker': selection,
+                           environment: selection},
+        }
+    _require(
+        _dollar(plan['declared_shared_base_final_cost_upper_bound_usd'],
+                'declared shared base final') == shared_final and
+        _dollar(plan['declared_shared_base_selection_cost_upper_bound_usd'],
+                'declared shared base selection') == shared_selection and
+        _dollar(plan['declared_shared_base_cost_upper_bound_usd'],
+                'declared shared base total') == shared_final + shared_selection,
+        'shared base selection/final budget declaration changed')
     global_cap = _dollar(plan['declared_all_in_cost_upper_bound_usd'],
                          'declared_all_in_cost_upper_bound_usd')
     _require(sum(row['all_in'] for row in limits.values()) == global_cap,

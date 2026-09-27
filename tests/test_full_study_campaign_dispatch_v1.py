@@ -22,6 +22,7 @@ from cursibench import scale_final_v06 as cell_final  # noqa: E402
 from native_desktop_factory import qwen_v066_adapter  # noqa: E402
 from native_desktop_factory.v066_final_freeze import source_hashes  # noqa: E402
 import test_full_study_matrix_v1 as matrix_fixture  # noqa: E402
+import shared_base_selection_fixture as base_fixture  # noqa: E402
 
 
 def sha(raw: bytes) -> str:
@@ -134,8 +135,16 @@ class FullStudyDispatchTests(unittest.TestCase):
             public_commit_sha1=self.commit,
             witness_fetcher=lambda _url: cell_final.json_bytes(witness))
 
-    def campaign(self, cell_id=matrix.CELLS[0]):
+    def campaign(self, cell_id=matrix.CELLS[0], *, base_winning_indices=()):
         frozen = self.frozen()
+        work = self.root / 'work'
+        work.mkdir(mode=0o700, exist_ok=True)
+        budget = dispatch.dollars.StudyBudgetLedger(
+            work / 'full-study-budget.jsonl', frozen.plan)
+        receipt = base_fixture.build(
+            frozen, budget, cell_id,
+            winning_indices=base_winning_indices)
+        frozen.admit_shared_base_selection(cell_id, receipt)
         session = frozen.open_campaign(
             self.root / 'work' / ('campaign-astra' if cell_id == matrix.CELLS[0]
                                   else 'campaign-astra-' + cell_id),
@@ -143,19 +152,52 @@ class FullStudyDispatchTests(unittest.TestCase):
             now=lambda: self.clock[0])
         return frozen, session
 
+    def test_campaign_cannot_start_without_one_shared_base_selection(self):
+        frozen = self.frozen()
+        path = self.root / 'work' / 'premature-campaign'
+        with self.assertRaisesRegex(dispatch.DispatchError,
+                                    'shared_base_selection_required'):
+            frozen.open_campaign(path, cell_id=matrix.CELLS[0],
+                                 researcher_id='astra',
+                                 now=lambda: self.clock[0])
+        self.assertFalse(path.exists())
+
+    def test_four_researchers_import_identical_one_time_base_receipt(self):
+        frozen, first = self.campaign()
+        shared = dispatch.shared_base.receipt_path(frozen, matrix.CELLS[0])
+        receipts = [first.record_base_selection(
+            shared_receipt_path=shared)['shared_receipt_sha256']]
+        for researcher in ('sol56', 'sol6', 'luna6'):
+            session = frozen.open_campaign(
+                self.root / 'work' / ('campaign-' + researcher),
+                cell_id=matrix.CELLS[0], researcher_id=researcher,
+                now=lambda: self.clock[0])
+            receipts.append(session.record_base_selection(
+                shared_receipt_path=shared)['shared_receipt_sha256'])
+        self.assertEqual(len(set(receipts)), 1)
+        owner = first.budget.owner_attempts(matrix.CELLS[0] + ':shared-base')
+        self.assertEqual(len(owner), 40)
+        self.assertEqual({row['status'] for row in owner.values()},
+                         {'settled'})
+
+    def test_naked_base_score_object_is_not_an_import_interface(self):
+        _, session = self.campaign()
+        with self.assertRaises(TypeError):
+            session.record_base_selection({
+                'schema': 'cua-full-study-selection-saved-result-v1',
+                'tasks': []})
+        self.assertFalse(session._events('base_selection'))
+
     def base_selection(self, session, *, winning_indices=()):
-        tasks = [{'task_id': row['task_id'],
-                  'package_sha256': row['package_sha256'],
-                  'score': int(index in winning_indices),
-                  'saved_state_sha256': sha(b'saved:' + row['task_id'].encode()),
-                  'verifier_receipt_sha256': sha(b'verifier:' + row['task_id'].encode()),
-                  'reset_receipt_sha256': sha(b'reset:' + row['task_id'].encode())}
-                 for index, row in enumerate(session.views['selection'])]
-        result = {'schema': 'cua-full-study-selection-saved-result-v1',
-                  'cell_id': session.intent['cell_id'],
-                  'checkpoint_sha256': session.intent['base_checkpoint_sha256'],
-                  'evaluator_isolated': True, 'tasks': tasks}
-        session.record_base_selection(result)
+        receipt = dispatch.shared_base.receipt_path(
+            session.study, session.intent['cell_id'])
+        value, _ = dispatch.shared_base.verify_receipt(
+            session.study, session.budget, session.intent['cell_id'],
+            receipt)
+        self.assertEqual(
+            [index for index, row in enumerate(value['tasks'])
+             if row['score'] == 1], list(winning_indices))
+        session.record_base_selection(shared_receipt_path=receipt)
         train = self.root / 'work' / 'train-context.private.json'
         train.parent.mkdir(exist_ok=True)
         train.write_bytes(cell_final.json_bytes({
@@ -610,7 +652,7 @@ class FullStudyDispatchTests(unittest.TestCase):
             session._incumbent()
 
     def test_selection_strict_gain_with_one_regression_retains_incumbent(self):
-        _, session = self.campaign()
+        _, session = self.campaign(base_winning_indices=(0,))
         trained = self.trained_candidate(
             session, baseline_winning_indices=(0,))
         started = session.start_selection_attempt(round_index=1,
