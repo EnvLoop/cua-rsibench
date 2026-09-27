@@ -172,7 +172,8 @@ def validate_preseed_search_drift_recovery(previous: Path,
 
 
 def task(index: int, case: dict, plan: Path, plan_sha: str,
-         source: Path, root: Path, journal: Path) -> dict:
+         source: Path, root: Path, journal: Path,
+         train_cron_never_autostart: bool = False) -> dict:
     case_dir = root / f'case-{index:03d}'
     require(not case_dir.exists(),
             'existing case attempt must not be silently retried')
@@ -185,9 +186,13 @@ def task(index: int, case: dict, plan: Path, plan_sha: str,
         out = case_dir / pair
         out.mkdir(mode=0o700)
         prep = out / 'prepare.private.json'
+        prepare_command = [str(sys.executable),
+                           str(ROOT / 'tools/start_magento_native_sidecar_clone_v1.py'),
+                           '--expected-search-sha256', SEARCH_SHA, '--out', str(prep)]
+        if train_cron_never_autostart:
+            prepare_command.append('--train-probe-disable-cron-autostart')
         run_step(out, journal, index, f'{pair}-prepare',
-                 [str(sys.executable), str(ROOT / 'tools/start_magento_native_sidecar_clone_v1.py'),
-                  '--expected-search-sha256', SEARCH_SHA, '--out', str(prep)],
+                 prepare_command,
                  timeout=TIMEOUT['prepare'])
         seed = out / 'seed.private.json'
         run_step(out, journal, index, f'{pair}-seed',
@@ -290,7 +295,12 @@ def main() -> None:
     parser.add_argument('--limit', type=int, required=True)
     parser.add_argument('--recovery-of', type=Path,
                         help='private stopped sweep journal for one controlled retry')
+    parser.add_argument('--train-cron-never-autostart', action='store_true',
+                        help='train-policy GUI control under proposed revised startup')
     args = parser.parse_args()
+    require(not args.train_cron_never_autostart or
+            args.split == 'train_policy_development',
+            'cron startup probe is train-only until cell-wide runtime freeze')
     private = (ROOT / 'work').resolve()
     plan, source, out = args.plan.resolve(), args.source.resolve(), args.out_dir.resolve()
     require(plan.is_relative_to(private) and source.is_relative_to(private)
@@ -413,7 +423,8 @@ def main() -> None:
     try:
         for index in range(args.start_index, args.start_index + args.limit):
             result = task(index, cases[index], plan, args.plan_sha256,
-                          source, out, journal)
+                          source, out, journal,
+                          train_cron_never_autostart=args.train_cron_never_autostart)
             passed += 1
             print(json.dumps({'status': 'candidate_gui_calibrated',
                               'completed_in_run': passed,

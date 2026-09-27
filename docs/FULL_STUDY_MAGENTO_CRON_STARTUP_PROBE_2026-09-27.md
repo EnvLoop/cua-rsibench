@@ -65,3 +65,13 @@ verifies the exact saved startup receipt, pinned container identities, the
 still-frozen 181-document search index, stopped cron configuration, zero
 price drift and zero benchmark quote pages before stopping/removing only that
 disposable pair. Cleanup does not seed or score a task.
+
+The unchanged [GUI sweep](../tools/sweep_magento_original_gui_controls_v1.py)
+now offers a **train-only** `--train-cron-never-autostart` switch for one
+`train_policy_development` case. It passes the v2 startup policy to both
+fresh positive and negative clones and otherwise runs the existing seed,
+neutralization, native GUI, independent scorer and cold-reset sequence. The
+switch refuses the `official_candidate` split before reading a plan or
+starting a container. A passing training GUI trio would still not adopt the
+revised runtime for final candidates; a dated cell-wide freeze and a full
+100-task rerun are required.

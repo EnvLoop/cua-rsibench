@@ -318,13 +318,17 @@ def main() -> None:
     parser.add_argument('--expected-search-sha256', required=True)
     parser.add_argument('--adopt-existing', action='store_true',
                         help='read-only audit after a bounded reindex failure')
+    parser.add_argument('--train-probe-disable-cron-autostart', action='store_true',
+                        help='train-only revised startup; never used by original final sweep')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     out = args.out.resolve()
     require(out.is_relative_to((ROOT / 'work').resolve()) and not out.exists(),
             'new private work/ receipt required')
     receipt = prepare(args.expected_search_sha256,
-                      adopt_existing=args.adopt_existing)
+                      adopt_existing=args.adopt_existing,
+                      train_probe_disable_cron_autostart=
+                      args.train_probe_disable_cron_autostart)
     out.parent.mkdir(parents=True, exist_ok=True)
     raw = (json.dumps(receipt, sort_keys=True, indent=2) + '\n').encode()
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
