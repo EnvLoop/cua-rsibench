@@ -11,6 +11,7 @@ import unittest
 from PIL import Image
 
 from cursibench.scale_action_contract import ContractError
+from cursibench.scale_action_output_v065 import normalize_model_action as normalize_v065
 from native_desktop_factory.qwen_v064_adapter import (
     PhysicalFrameDrift, application_frame_digest, dispatch, observe,
     parse_current_action, render_for_model,
@@ -109,6 +110,13 @@ class DesktopV064AdapterTests(unittest.TestCase):
         with self.assertRaisesRegex(ContractError, "invalid_action"):
             dispatch(self.sandbox, action)
         self.assertEqual(self.sandbox.calls, [])
+
+    def test_cell_neutral_v065_normalizer_still_uses_current_desktop_frame(self):
+        action = parse_current_action(
+            '{"action":"click","target":{"x":91,"y":242}}',
+            self.frame, self.sandbox, normalizer=normalize_v065)
+        self.assertEqual(action["type"], "click")
+        self.assertEqual(action["target"], {"x": 91, "y": 242})
 
     def test_final_candidate_rejected_before_inventory_or_provider(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,38 @@
+{
+  "checked_date": "2026-09-27",
+  "desktop_private_receipt_sha256s": [
+    "80a7b10918bf0106f0825fac3caa29a924a76ccacd3287b3310d47f2d9194055",
+    "f3898cde6309d7b8823d6f9f4581b066b1fb69e4e9044b2c6ee1c48af484431d",
+    "b0eb124cc680641db412df530b5b1eae00ce83ade34eb6fb07de74517bf06eba",
+    "45cdea811072e67b2a5b9e59e248d2a2095df6bee50538988e6667b464759345"
+  ],
+  "desktop_response_shape_counts": {
+    "control_ref_target": 4,
+    "coordinate_target": 5,
+    "plain_json": 1,
+    "top_level_action_alias": 4,
+    "top_level_type": 5,
+    "whole_response_fence": 8
+  },
+  "desktop_sample_count": 9,
+  "desktop_v064_synthetic_shape_results": {
+    "accepted_synthetic_shape_only": 1,
+    "invalid_action": 4,
+    "stale_frame": 4
+  },
+  "desktop_v065_synthetic_shape_results": {
+    "accepted_synthetic_shape_only": 5,
+    "stale_frame": 4
+  },
+  "new_gui_actions": 0,
+  "new_provider_calls": 0,
+  "odoo_historical_text_sha256": "d62b7437de9c4d9a2c43968627de48ea86d7ccd64392dd8dce42bed11aae0ac3",
+  "odoo_public_source_sha256": "4cd63af02272b597bf16302281a201af591fcf04e312b76a127d3ecd876e0b0b",
+  "odoo_single_fence_full_action_parse_passed": true,
+  "official_hidden_task_used": false,
+  "official_task_scores_added": 0,
+  "schema": "cua-full-study-v065-nonfinal-offline-replay-v1",
+  "scope": "Historical Odoo full-action JSON-fence syntax and Desktop v0.6.4 minimal-action shape only. Desktop observations are reconstructed from saved train screenshots with new synthetic current-frame IDs. No provider call, GUI dispatch, task score or hidden-final input.",
+  "v064_adapter_sha256": "3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70",
+  "v065_adapter_sha256": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28"
+}

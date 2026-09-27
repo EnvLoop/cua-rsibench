@@ -25,7 +25,7 @@ if __package__:
     from . import qwen_v064_adapter
     from . import runtime_fingerprint_probe, profile_canonical
     from .qwen_v064_adapter import (PhysicalFrameDrift, dispatch, observe,
-                                    parse_current_action, render_for_model)
+                                    parse_current_action)
     from .verify import verify
 else:
     from budget_ledger import audit as audit_budget
@@ -33,10 +33,11 @@ else:
     import qwen_v064_adapter
     import runtime_fingerprint_probe, profile_canonical
     from qwen_v064_adapter import (PhysicalFrameDrift, dispatch, observe,
-                                   parse_current_action, render_for_model)
+                                   parse_current_action)
     from verify import verify
 
-from cursibench import scale_action_contract, scale_action_output_v064, scale_vision_proxy
+from cursibench import (scale_action_contract, scale_action_output_v064,
+                        scale_action_output_v065, scale_vision_proxy)
 
 
 def digest(raw: bytes) -> str:
@@ -86,6 +87,7 @@ def main() -> int:
     parser.add_argument("--expected-profile-manifest", type=Path, required=True)
     parser.add_argument("--max-actions", type=int, default=3)
     parser.add_argument("--max-samples", type=int, default=4)
+    parser.add_argument("--output-contract", choices=("v064", "v065"), default="v064")
     parser.add_argument("--lease-seconds", type=int, default=600)
     parser.add_argument("--max-lane-reserved-usd", type=Decimal, default=Decimal("40"))
     parser.add_argument("--expected-template-id", default="k0wmnzir0zuzye6dndlw")
@@ -93,6 +95,8 @@ def main() -> int:
     if not (1 <= args.max_actions <= 10 and args.max_actions <= args.max_samples <= 12
             and 120 <= args.lease_seconds <= 600):
         raise ValueError("Invalid action/sample/lease envelope")
+    output_contract = (scale_action_output_v064 if args.output_contract == "v064"
+                       else scale_action_output_v065)
     if args.out.exists():
         raise ValueError("Refusing to overwrite a smoke receipt")
     if not args.out.resolve().is_relative_to((args.work_root / "gui-diagnostics").resolve()):
@@ -121,7 +125,7 @@ def main() -> int:
     args.out.mkdir(parents=True)
     receipt = {
         "schema": "cua-native-wdi-gui-development-attempt-v1",
-        "attempt": "qwen_v064_nonfinal_smoke", "status": "started",
+        "attempt": f"qwen_{args.output_contract}_nonfinal_smoke", "status": "started",
         "split": package["split"], "task_id": package["task_id"],
         "input_sha256": digest(baseline), "task_binding_sha256": package["package_sha256"],
         "sandbox_timeout_seconds": args.lease_seconds,
@@ -131,6 +135,8 @@ def main() -> int:
         "native_adapter_source_sha256": source_digest(qwen_v064_adapter),
         "shared_action_parser_sha256": source_digest(scale_action_contract),
         "shared_v064_adapter_sha256": source_digest(scale_action_output_v064),
+        "selected_model_output_version": output_contract.OUTPUT_VERSION,
+        "selected_model_output_adapter_sha256": source_digest(output_contract),
         "shared_vision_proxy_sha256": source_digest(scale_vision_proxy),
         "expected_guest_identity_manifest_sha256": digest(identity_raw),
         "expected_profile_manifest_sha256": digest(profile_raw),
@@ -260,7 +266,7 @@ def main() -> int:
                 "bytes": len(frame.screenshot_bytes),
             })
             persist()
-            rendered = render_for_model(frame)
+            rendered = output_contract.render_for_model(frame)
             request_id = "desktopv064_" + uuid4().hex
             result = sampler.sample(request_id=request_id, **rendered)
             receipt["sampling"].append(scale_vision_proxy.public_receipt(result))
@@ -277,7 +283,8 @@ def main() -> int:
                 persist()
             try:
                 action = parse_current_action(result["text"], frame, sandbox,
-                                              on_stale_frame=save_stale_frame)
+                                              on_stale_frame=save_stale_frame,
+                                              normalizer=output_contract.normalize_model_action)
             except scale_action_contract.ContractError as exc:
                 receipt["actions"].append({"step": step, "status": "rejected",
                                            "error_code": exc.code})

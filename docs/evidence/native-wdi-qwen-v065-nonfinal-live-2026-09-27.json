@@ -1,0 +1,57 @@
+{
+  "actual_billed_usd": null,
+  "all_guest_content_attested": true,
+  "all_sandboxes_terminated": true,
+  "all_task_bound_profiles_attested": true,
+  "all_tinker_sessions_closed": true,
+  "applied_gui_action_types": [
+    "click",
+    "click",
+    "click"
+  ],
+  "attempt_count": 3,
+  "checked_date": "2026-09-27",
+  "completed_multimodal_samples": 5,
+  "distinct_actor_sandboxes": 3,
+  "distinct_output_adapter_source_sha256s": [
+    "5f7404bf98ea30551acd59e92ca221e8d8164056affe5067f7b9ca240fac701b",
+    "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+    "6fbdf55c9f1052247da89e1f9e2af220cb0ac1d9b4964736ff57f6127f6685dc"
+  ],
+  "historical_status_counts": {
+    "action_budget_reached": 1,
+    "model_output_or_frame_rejected": 2
+  },
+  "latest_attempt_applied_gui_actions": 2,
+  "latest_attempt_completed_samples": 2,
+  "latest_native_desktop_adapter_sha256": "68466227d160a572eb334c56fc8dbc795238a98347d85a2847a7944470490086",
+  "latest_output_adapter_sha256": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+  "latest_renderer_identity": {
+    "image_processor": "Qwen2VLImageProcessorPil",
+    "model": "Qwen/Qwen3.8-27B",
+    "processor_config_sha256": "f30d048e3fda7839c8b3e0e9b8559e5f4581ce7d4f9b15ccd893b9bf5c6ac45b",
+    "renderer": "qwen3_5_disable_thinking",
+    "tokenizer_vocabulary_sha256": "420ab4b96193b4325156f56cd7c3876a8a0d46f515fe4f711a7a6bf5553bf8fa"
+  },
+  "latest_shared_action_parser_sha256": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+  "latest_train_runner_sha256": "ae036b94c296e34f71624bd68ca63b31a51dc4ed6bc0081487c8c5cfec912884",
+  "native_lane_cap_usd": "40",
+  "native_lane_full_server_lease_reserve_usd": "39.16111111111111111111111111",
+  "official_full_study_desktop_admissions": 0,
+  "official_full_study_desktop_model_results": 0,
+  "official_hidden_final_model_attempts": 0,
+  "output_token_limit_stop_count": 1,
+  "private_receipt_sha256s": [
+    "b0676267261d4f1336aa5b4b4e6f824b1b52aecda9ca0f282dee6ed7865f24fd",
+    "27b97fa4ff60db430842f884db247f7c1542a09e4250d80721286b2fad8a56d0",
+    "67690697d08cbc77575cf65b5f9eeabb4fd3d0cd3524f07dc43a4decc2ed736c"
+  ],
+  "provider_active_probe_sha256": "f21beb6ea76df42041f555bc55959f28c65a88941d813356d846df1502eb0b8b",
+  "rejected_action_code_counts": {
+    "invalid_action_json": 1,
+    "stale_frame": 1
+  },
+  "saved_training_artifact_changed_count": 0,
+  "schema": "cua-native-wdi-qwen-v065-nonfinal-live-public-v1",
+  "scope": "Three pre-result v0.6.5 variants on one train-only native Calc task. Latest prompt removes a literal dummy ref; earlier failed variants are preserved. No final model attempt or official score."
+}

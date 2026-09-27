@@ -61,7 +61,8 @@ def observe(sandbox, *, task_id: str, task_binding_sha256: str,
     )
 
 
-def parse_current_action(raw: str, observation, sandbox, *, on_stale_frame=None):
+def parse_current_action(raw: str, observation, sandbox, *, on_stale_frame=None,
+                         normalizer=None):
     """Recheck the physical screen and current frame before returning action."""
     current = bytes(sandbox.screenshot())
     if application_frame_digest(current) != application_frame_digest(
@@ -69,8 +70,8 @@ def parse_current_action(raw: str, observation, sandbox, *, on_stale_frame=None)
         if on_stale_frame is not None:
             on_stale_frame(current)
         raise PhysicalFrameDrift()
-    return normalize_model_action(raw, observation,
-                                  current_frame_id=observation.frame_id)
+    normalizer = normalizer or normalize_model_action
+    return normalizer(raw, observation, current_frame_id=observation.frame_id)
 
 
 def _point(target: dict) -> tuple[int, int]:

@@ -1,0 +1,7 @@
+# Shared v0.6.5 nonfinal offline replay — 2026-09-27
+
+The [aggregate JSON](full-study-v065-nonfinal-offline-replay-2026-09-27.json) verifies the published hash of one preserved **Odoo training** Qwen3.8 reply and the original receipt hashes/model-text hashes of **nine preserved Native Desktop training** replies. The Odoo reply remains a whole-response JSON-fenced **full action**; the shared fence parser accepts its syntax, with no retrospective current-frame validation or GUI dispatch.
+
+For the nine Desktop **minimal-action** replies, the replay constructed new synthetic frame IDs from their saved train screenshots and empty-control lists. Under historical v0.6.4, one passed this limited shape check, four failed as `invalid_action` because the model used an unambiguous top-level `action` key, and four failed as `stale_frame` because the model named a nonexistent control ref. Under proposed v0.6.5, **five** passed the same synthetic shape check and the **same four invented refs still failed**. The alias change does not repair a target or choose a coordinate. These counts are parser diagnostics on selected historical training replies, not an accuracy estimate or score.
+
+The replay made **zero provider calls and zero GUI actions**, did not recreate the original live frame, and did not inspect any hidden final task. The raw model text, source screenshots and task identifiers remain private; the public receipt contains only hashes and aggregate categories. Historical v0.6.4 failures are not rewritten.

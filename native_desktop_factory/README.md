@@ -60,6 +60,8 @@ The [scoped guest-content identity candidate](../docs/evidence/native-wdi-guest-
 
 The [task-bound final profile audit](../docs/evidence/native-wdi-final-profile-baselines-2026-09-27.md) now verifies **100/100** neutral GUI references. It includes 99 direct teardown receipts, one separately reconciled post-lease teardown, and two preserved initial Calc startup failures followed by fresh successful retries. Per-ID hashes and screenshots remain private. Historical GUI controls did not record the newer complete guest-content fingerprint; the proposed identity rule must apply prospectively to every model actor sandbox. The shared Qwen contract and six-cell freeze still block official final admissions.
 
+The separate [pre-result shared action-output amendment](../docs/FULL_STUDY_ACTION_OUTPUT_AMENDMENT_2026-09-27.md) proposes v0.6.5 for all six cells. A train-only [offline replay](../docs/evidence/full-study-v065-nonfinal-offline-replay-2026-09-27.md) retains stale-ref rejection while accepting an unambiguous `action`-key alias; the final bounded [real Desktop smoke](../docs/evidence/native-wdi-qwen-v065-nonfinal-live-2026-09-27.md) attested guest/profile state and applied two Qwen-selected GUI clicks. The historical v0.6.4 receipts and failures remain unchanged. No final model execution or official admission has occurred.
+
 ## Remaining work before a publishable final cell
 
 - Bind the **completed** 100/100 native-GUI and 25/25 Impress-normalization evidence, plus the v2 fair saved-artifact scorer bundle SHA-256, into the six-cell pre-campaign freeze before any official Qwen attempt. Preserve screenshots and actual file bytes privately.
