@@ -24,12 +24,11 @@ from native_desktop_factory.teacher_episode_worker_v066 import (
 )
 from native_desktop_factory.v066_final_freeze import digest
 from native_desktop_factory.v066_final_freeze import source_hashes
+from tests.native_desktop_teacher_fixture import make_fixture
 from tests.test_full_study_teacher_adapter_v1 import FakeSession, write_private
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATES = ROOT / "work/native-desktop/candidates-v2-distinct-d"
-PRIVATE_MAP = ROOT / "work/native-desktop/private-map.json"
 GUEST_IDENTITY = ROOT / "docs/evidence/native-wdi-guest-content-identity-2026-09-27.json"
 
 
@@ -121,23 +120,32 @@ class FakeBackend:
 @unittest.skipUnless((CANDIDATES / "candidate-inventory.json").is_file(),
                      "evaluator-private Desktop corpus is not in this checkout")
 class DesktopWorkerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixture_temp = tempfile.TemporaryDirectory(prefix="desktop-wdi-source-")
+        cls.addClassCleanup(cls.fixture_temp.cleanup)
+        cls.CANDIDATES, cls.PRIVATE_MAP = make_fixture(Path(cls.fixture_temp.name))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="desktop-teacher-test-")
         self.addCleanup(self.temp.cleanup)
         self.private_root = Path(self.temp.name) / "private"
         self.private_root.mkdir(mode=0o700)
-        self.rows = json.loads((CANDIDATES / "candidate-inventory.json").read_bytes())["tasks"]
+        self.rows = json.loads((self.CANDIDATES / "candidate-inventory.json").read_bytes())["tasks"]
         self.sampled = []
         self.leases = []
 
     def case(self, workflow):
         row = next(r for r in self.rows if r["split"] == "train"
                    and r["workflow"] == workflow and "mex" in r["task_id"])
-        package = CANDIDATES / "train" / row["task_id"]
+        package = self.CANDIDATES / "train" / row["task_id"]
         positive_paths = {
-            "calc-growth": ROOT / "work/native-desktop/gui/mex-calc-positive-1/saved.xlsx",
-            "impress-deck": ROOT / "work/native-desktop/gui/mex-impress-normalized-positive-1/saved.pptx",
-            "writer-brief": ROOT / "work/native-desktop/gui/mex-writer-positive-1/saved.docx",
+            "calc-growth": ROOT / "native_desktop_factory/dev-fixtures/"
+                           "wdi-native-mex-calc-growth/controls/positive.xlsx",
+            "impress-deck": ROOT / "native_desktop_factory/dev-fixtures/"
+                            "wdi-native-mex-impress-deck-normalized/controls/positive.pptx",
+            "writer-brief": ROOT / "native_desktop_factory/dev-fixtures/"
+                            "wdi-native-mex-writer-brief/controls/positive.docx",
         }
         task = {"task_id": row["task_id"],
                 "package_sha256": row["package_sha256"],
@@ -147,13 +155,13 @@ class DesktopWorkerTests(unittest.TestCase):
     def worker(self, saved):
         backend = FakeBackend(saved)
         worker = DesktopTrainEpisodeWorker(
-            candidate_root=CANDIDATES, private_map=PRIVATE_MAP,
+            candidate_root=self.CANDIDATES, private_map=self.PRIVATE_MAP,
             guest_identity_public=GUEST_IDENTITY,
             private_output_root=self.private_root,
             expected_runtime_sha256=runtime_sha256(),
             expected_verifier_sha256=verifier_sha256(),
             expected_inventory_sha256=digest(
-                (CANDIDATES / "candidate-inventory.json").read_bytes()),
+                (self.CANDIDATES / "candidate-inventory.json").read_bytes()),
             expected_guest_identity_sha256=digest(GUEST_IDENTITY.read_bytes()),
             backend=backend)
         # Synthetic tests bypass only this gate. Production always rejects a
@@ -253,10 +261,9 @@ class DesktopWorkerTests(unittest.TestCase):
         worker, backend = self.worker(saved)
         for split in ("selection", "final_candidate"):
             row = next(r for r in self.rows if r["split"] == split)
-            package = CANDIDATES / split / row["task_id"]
             forbidden = {"task_id": row["task_id"],
                          "package_sha256": row["package_sha256"],
-                         "visible_instruction": (package / "actor_task.txt").read_text()}
+                         "visible_instruction": "Forbidden non-train fixture."}
             with self.subTest(split=split), self.assertRaisesRegex(
                     DesktopEpisodeError, "desktop_source_not_train_only"):
                 worker.run_episode(task=forbidden, out_dir=self.episode_dir(),
@@ -316,7 +323,7 @@ class DesktopWorkerTests(unittest.TestCase):
     def test_real_backend_is_blocked_without_six_cell_freeze(self):
         task, _saved = self.case("calc-growth")
         worker = DesktopTrainEpisodeWorker(
-            candidate_root=CANDIDATES, private_map=PRIVATE_MAP,
+            candidate_root=self.CANDIDATES, private_map=self.PRIVATE_MAP,
             guest_identity_public=GUEST_IDENTITY,
             private_output_root=self.private_root)
         with self.assertRaisesRegex(DesktopEpisodeError,
@@ -394,13 +401,13 @@ class DesktopWorkerTests(unittest.TestCase):
         session.context_sha = digest(context.read_bytes())
         destination = repo_root / "work/teacher-round-001"
         worker = DesktopTrainEpisodeWorker(
-            candidate_root=CANDIDATES, private_map=PRIVATE_MAP,
+            candidate_root=self.CANDIDATES, private_map=self.PRIVATE_MAP,
             guest_identity_public=GUEST_IDENTITY,
             private_output_root=destination,
             expected_runtime_sha256=runtime_sha256(),
             expected_verifier_sha256=verifier_sha256(),
             expected_inventory_sha256=digest(
-                (CANDIDATES / "candidate-inventory.json").read_bytes()),
+                (self.CANDIDATES / "candidate-inventory.json").read_bytes()),
             expected_guest_identity_sha256=digest(GUEST_IDENTITY.read_bytes()),
             backend=FakeBackend(saved))
         worker._require_live_freeze = lambda: None

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -13,10 +14,10 @@ from native_desktop_factory.teacher_episode_worker_v066 import (
     RealDesktopGuest, _semantic_input,
 )
 from native_desktop_factory.v066_final_freeze import digest
+from tests.native_desktop_teacher_fixture import make_fixture
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATES = ROOT / "work/native-desktop/candidates-v2-distinct-d"
 GUEST = json.loads((ROOT / "docs/evidence/"
                     "native-wdi-guest-content-identity-2026-09-27.json").read_bytes())
 REGISTRY = (b'<?xml version="1.0"?><root>'
@@ -97,14 +98,20 @@ class FakeDesktopSDK:
 @unittest.skipUnless((CANDIDATES / "candidate-inventory.json").is_file(),
                      "evaluator-private Desktop corpus is not in this checkout")
 class RealGuestFakeSDKTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixture_temp = tempfile.TemporaryDirectory(prefix="desktop-guest-wdi-")
+        cls.addClassCleanup(cls.fixture_temp.cleanup)
+        cls.CANDIDATES, _map = make_fixture(Path(cls.fixture_temp.name))
+
     def test_actor_and_reset_setup_attest_real_source_shapes(self):
-        inventory = json.loads((CANDIDATES / "candidate-inventory.json").read_bytes())
+        inventory = json.loads((self.CANDIDATES / "candidate-inventory.json").read_bytes())
         for workflow in ("calc-growth", "impress-deck", "writer-brief"):
             row = next(item for item in inventory["tasks"]
                        if item["split"] == "train" and
                        item["workflow"] == workflow and
                        "mex" in item["task_id"])
-            directory, source, oracle = admit._package(CANDIDATES, row)
+            directory, source, oracle = admit._package(self.CANDIDATES, row)
             file = next(path for path in directory.iterdir()
                         if path.suffix in (".xlsx", ".pptx", ".docx"))
             actor = RealDesktopGuest(FakeDesktopSDK(workflow, file.name),
