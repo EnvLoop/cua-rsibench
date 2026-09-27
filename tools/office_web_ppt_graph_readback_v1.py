@@ -190,12 +190,104 @@ class GraphOwnerReadback:
                                separators=(',', ':')) + '\n').encode())
         return receipt
 
-    def permissions_empty(self, *, owner_user_id: str,
-                          drive_id: str, item_id: str) -> dict:
-        """Verify the prior one-file actor grant was removed by the owner."""
+    @staticmethod
+    def _revoked_permissions(value: object, *, owner_user_id: str,
+                             actor_email: str,
+                             prior_permission_id: str) -> dict:
+        """Preserve owner/inherited entries while rejecting actor or broad grants.
+
+        Graph lists *effective* permissions. An empty collection is therefore
+        not a valid general post-revocation requirement. Unknown direct grants
+        and specific-user sharing links fail closed because they could retain
+        actor access without exposing an invitation email.
+        """
+        _require(type(value) is list and len(value) <= 1000 and
+                 type(actor_email) is str and actor_email and
+                 type(prior_permission_id) is str and prior_permission_id,
+                 'graph_permission_response_invalid')
+        owner_count = inherited_count = existing_access_link_count = 0
+        for permission in value:
+            _require(type(permission) is dict and
+                     type(permission.get('id')) is str and
+                     permission['id'],
+                     'graph_permission_response_invalid')
+            roles = permission.get('roles')
+            _require(type(roles) is list and
+                     all(type(role) is str for role in roles),
+                     'graph_permission_response_invalid')
+            _require(permission['id'] != prior_permission_id,
+                     'graph_prior_actor_permission_still_present')
+            link = permission.get('link')
+            if link is not None:
+                _require(type(link) is dict and
+                         link.get('scope') == 'existingAccess',
+                         'graph_broad_or_unidentified_link_present')
+                existing_access_link_count += 1
+            emails = []
+            invitation = permission.get('invitation')
+            if invitation is not None:
+                _require(type(invitation) is dict and
+                         type(invitation.get('email')) is str,
+                         'graph_permission_response_invalid')
+                emails.append(invitation['email'])
+            owner_identity = False
+            for name in ('grantedToV2', 'grantedTo'):
+                identity = permission.get(name)
+                if identity is None:
+                    continue
+                _require(type(identity) is dict,
+                         'graph_permission_response_invalid')
+                user = identity.get('user')
+                if user is not None:
+                    _require(type(user) is dict,
+                             'graph_permission_response_invalid')
+                    owner_identity |= user.get('id') == owner_user_id
+                    if type(user.get('email')) is str:
+                        emails.append(user['email'])
+            for name in ('grantedToIdentitiesV2', 'grantedToIdentities'):
+                identities = permission.get(name)
+                if identities is None:
+                    continue
+                _require(type(identities) is list,
+                         'graph_permission_response_invalid')
+                for identity in identities:
+                    _require(type(identity) is dict and
+                             type(identity.get('user')) is dict,
+                             'graph_permission_response_invalid')
+                    user = identity['user']
+                    owner_identity |= user.get('id') == owner_user_id
+                    if type(user.get('email')) is str:
+                        emails.append(user['email'])
+            _require(all(email.casefold() != actor_email.casefold()
+                         for email in emails),
+                     'graph_actor_identity_still_granted')
+            inherited = permission.get('inheritedFrom') is not None
+            if inherited:
+                _require(type(permission['inheritedFrom']) is dict,
+                         'graph_permission_response_invalid')
+                inherited_count += 1
+                continue
+            if link is not None:
+                # existingAccess does not grant a new principal access.
+                continue
+            _require(owner_identity or 'owner' in roles,
+                     'graph_unknown_direct_grant_after_revocation')
+            owner_count += 1
+        return {'remaining_permission_count': len(value),
+                'owner_permission_count': owner_count,
+                'inherited_permission_count': inherited_count,
+                'existing_access_link_count': existing_access_link_count}
+
+    def verify_actor_revoked(self, *, owner_user_id: str,
+                             drive_id: str, item_id: str,
+                             actor_email: str,
+                             prior_permission_id: str) -> dict:
+        """Verify the exact actor grant is gone without requiring an empty list."""
         self.preflight()
         _require(all(type(value) is str and _IDENTIFIER.fullmatch(value)
-                     for value in (owner_user_id, drive_id, item_id)),
+                     for value in (owner_user_id, drive_id, item_id)) and
+                 type(actor_email) is str and
+                 type(prior_permission_id) is str,
                  'graph_permission_item_binding_invalid')
         token = os.environ['MS_GRAPH_OWNER_TOKEN']
         headers = {'Authorization': 'Bearer ' + token}
@@ -212,12 +304,21 @@ class GraphOwnerReadback:
             response = client.get(base + '/permissions', headers=headers)
             _require(response.status_code == 200 and
                      type(response.json()) is dict and
-                     response.json().get('value') == [],
-                     'graph_actor_permission_still_present')
+                     response.json().get('@odata.nextLink') is None,
+                     'graph_permission_response_invalid_or_paginated')
+            audit = self._revoked_permissions(
+                response.json().get('value'),
+                owner_user_id=owner_user_id,
+                actor_email=actor_email,
+                prior_permission_id=prior_permission_id)
         finally:
             client.close()
         return {'schema': 'cua-office-ppt-owner-revocation-readback-v1',
                 'owner_user_id_sha256': _sha(owner_user_id),
                 'drive_id_sha256': _sha(drive_id),
                 'item_id_sha256': _sha(item_id),
-                'permissions_count': 0}
+                'actor_email_sha256': _sha(actor_email.casefold()),
+                'prior_permission_id_sha256': _sha(prior_permission_id),
+                'actor_grants_remaining': 0,
+                'broad_links_remaining': 0,
+                **audit}

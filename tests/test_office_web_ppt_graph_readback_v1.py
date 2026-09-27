@@ -51,12 +51,15 @@ class Stream:
 class FakeClient:
     def __init__(self, first: bytes, second: bytes,
                  *, wrong_meta=False, wrong_redirect=False,
-                 permission_present=False):
+                 permission_present=False, link_scope=None,
+                 unknown_direct=False):
         self.bodies = [first, second]
         self.initial_size = len(first)
         self.wrong_meta = wrong_meta
         self.wrong_redirect = wrong_redirect
         self.permission_present = permission_present
+        self.link_scope = link_scope
+        self.unknown_direct = unknown_direct
         self.content_calls = 0
         self.download_headers = []
         self.closed = False
@@ -65,8 +68,25 @@ class FakeClient:
         if url.endswith('/me'):
             return Response(200, value={'id': 'owner1234'})
         if url.endswith('/permissions'):
-            return Response(200, value={'value': ([{'id': 'old-share'}] if
-                                                   self.permission_present else [])})
+            permissions = [
+                {'id': 'owner-permission', 'roles': ['owner'],
+                 'grantedToV2': {'user': {'id': 'owner1234'}}},
+                {'id': 'inherited-permission', 'roles': ['read'],
+                 'inheritedFrom': {'driveId': 'drive1234', 'id': 'parent1234'},
+                 'grantedToV2': {'user': {'id': 'other-user'}}},
+            ]
+            if self.permission_present:
+                permissions.append({'id': 'old-share', 'roles': ['write'],
+                                    'invitation': {'email': 'actor@example.test'}})
+            if self.link_scope:
+                permissions.append({'id': 'link-1', 'roles': ['write'],
+                                    'link': {'scope': self.link_scope,
+                                             'type': 'edit'}})
+            if self.unknown_direct:
+                permissions.append({'id': 'unexpected-direct',
+                                    'roles': ['write'],
+                                    'grantedToV2': {'user': {'id': 'other-user'}}})
+            return Response(200, value={'value': permissions})
         if url.endswith('/content'):
             self.content_calls += 1
             redirect = ('http://localhost/private' if self.wrong_redirect
@@ -137,19 +157,42 @@ class GraphReadbackTests(unittest.TestCase):
                 GraphOwnerReadback(client_factory=lambda: self.fail(
                     'client must not be constructed')).capture(**self.kwargs)
 
-    def test_revocation_requires_empty_owner_permission_set(self):
+    def test_revocation_preserves_owner_and_inherited_but_rejects_actor_grant(self):
         safe = FakeClient(pptx('a'), pptx('a'))
         with patch.dict(os.environ, {'MS_GRAPH_OWNER_TOKEN': 'test-only-token'}):
-            receipt = GraphOwnerReadback(client_factory=lambda: safe).permissions_empty(
+            receipt = GraphOwnerReadback(client_factory=lambda: safe).verify_actor_revoked(
                 owner_user_id='owner1234', drive_id='drive1234',
-                item_id='item1234')
-        self.assertEqual(receipt['permissions_count'], 0)
+                item_id='item1234', actor_email='actor@example.test',
+                prior_permission_id='old-share')
+        self.assertEqual(receipt['actor_grants_remaining'], 0)
+        self.assertEqual(receipt['remaining_permission_count'], 2)
+        self.assertEqual(receipt['owner_permission_count'], 1)
+        self.assertEqual(receipt['inherited_permission_count'], 1)
         stale = FakeClient(pptx('a'), pptx('a'), permission_present=True)
         with patch.dict(os.environ, {'MS_GRAPH_OWNER_TOKEN': 'test-only-token'}):
-            with self.assertRaisesRegex(ValueError, 'permission_still_present'):
-                GraphOwnerReadback(client_factory=lambda: stale).permissions_empty(
+            with self.assertRaisesRegex(ValueError, 'prior_actor_permission_still_present'):
+                GraphOwnerReadback(client_factory=lambda: stale).verify_actor_revoked(
                     owner_user_id='owner1234', drive_id='drive1234',
-                    item_id='item1234')
+                    item_id='item1234', actor_email='actor@example.test',
+                    prior_permission_id='old-share')
+
+    def test_revocation_rejects_broad_links_and_new_unknown_direct_grants(self):
+        for scope in ('anonymous', 'organization', 'users'):
+            with self.subTest(scope=scope):
+                fake = FakeClient(pptx('a'), pptx('a'), link_scope=scope)
+                with patch.dict(os.environ, {'MS_GRAPH_OWNER_TOKEN': 'test-only-token'}):
+                    with self.assertRaisesRegex(ValueError, 'broad_or_unidentified_link'):
+                        GraphOwnerReadback(client_factory=lambda: fake).verify_actor_revoked(
+                            owner_user_id='owner1234', drive_id='drive1234',
+                            item_id='item1234', actor_email='actor@example.test',
+                            prior_permission_id='old-share')
+        unknown = FakeClient(pptx('a'), pptx('a'), unknown_direct=True)
+        with patch.dict(os.environ, {'MS_GRAPH_OWNER_TOKEN': 'test-only-token'}):
+            with self.assertRaisesRegex(ValueError, 'unknown_direct_grant'):
+                GraphOwnerReadback(client_factory=lambda: unknown).verify_actor_revoked(
+                    owner_user_id='owner1234', drive_id='drive1234',
+                    item_id='item1234', actor_email='actor@example.test',
+                    prior_permission_id='old-share')
 
 
 if __name__ == '__main__':

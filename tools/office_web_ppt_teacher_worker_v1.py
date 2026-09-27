@@ -488,9 +488,29 @@ class OfficePptTeacherWorker:
         old_runner.readback_pptx(first_raw)
         return first, receipt
 
-    def _graph_permissions_empty(self, *, phase: str, item: dict,
-                                 binding: dict, episode_dir: Path) -> dict:
+    def _graph_actor_revoked(self, *, phase: str, item: dict,
+                             binding: dict, episode_dir: Path,
+                             lease_session_path: Path) -> dict:
         self.graph_reader.preflight()
+        scope, _ = _private_json(
+            lease_session_path.parent / 'actor-scope.private.json',
+            Path(self.session.study.repo_root) / 'work',
+            phase + '_scope_for_revocation')
+        snapshot, _ = _private_json(
+            lease_session_path.parent / 'assigned-permissions.private.json',
+            Path(self.session.study.repo_root) / 'work',
+            phase + '_permission_for_revocation')
+        permissions = snapshot.get('response', {}).get('value')
+        _require(type(permissions) is list and len(permissions) == 1 and
+                 type(permissions[0]) is dict and
+                 type(permissions[0].get('id')) is str and
+                 permissions[0]['id'] and
+                 type(scope.get('actor_email')) is str and
+                 _sha(scope['actor_email'].casefold()) ==
+                 binding['actor_email_sha256'],
+                 'office_prior_actor_permission_identity_missing')
+        prior_id = permissions[0]['id']
+        actor_email = scope['actor_email']
         attempt_id = ('graph-ppt-' + _sha(str(episode_dir.resolve()))[:16] +
                       '-' + phase + '-revoked')
         request = {
@@ -500,24 +520,42 @@ class OfficePptTeacherWorker:
             'owner_user_id_sha256': _sha(item['owner_user_id']),
             'drive_id_sha256': _sha(item['drive_id']),
             'item_id_sha256': _sha(item['item_id']),
+            'actor_email_sha256': _sha(actor_email.casefold()),
+            'prior_permission_id_sha256': _sha(prior_id),
         }
         def read(_request: dict) -> dict:
-            return self.graph_reader.permissions_empty(
+            return self.graph_reader.verify_actor_revoked(
                 owner_user_id=item['owner_user_id'],
-                drive_id=item['drive_id'], item_id=item['item_id'])
+                drive_id=item['drive_id'], item_id=item['item_id'],
+                actor_email=actor_email,
+                prior_permission_id=prior_id)
         paid = self.session.dispatch_paid(
             attempt_id=attempt_id, category='storage_application',
             work=request, request=request,
             reserve_usd=binding['graph_read_reserve_usd'],
             resource_reservation={}, provider=read)
         result = paid['result']
-        _require(type(result) is dict and result == {
-            'schema': 'cua-office-ppt-owner-revocation-readback-v1',
-            'owner_user_id_sha256': _sha(item['owner_user_id']),
-            'drive_id_sha256': _sha(item['drive_id']),
-            'item_id_sha256': _sha(item['item_id']),
-            'permissions_count': 0,
-        }, 'office_prior_actor_file_permission_not_revoked')
+        _require(type(result) is dict and
+                 result.get('schema') ==
+                 'cua-office-ppt-owner-revocation-readback-v1' and
+                 result.get('owner_user_id_sha256') ==
+                 _sha(item['owner_user_id']) and
+                 result.get('drive_id_sha256') ==
+                 _sha(item['drive_id']) and
+                 result.get('item_id_sha256') ==
+                 _sha(item['item_id']) and
+                 result.get('actor_email_sha256') ==
+                 _sha(actor_email.casefold()) and
+                 result.get('prior_permission_id_sha256') ==
+                 _sha(prior_id) and
+                 result.get('actor_grants_remaining') == 0 and
+                 result.get('broad_links_remaining') == 0 and
+                 all(type(result.get(name)) is int and result[name] >= 0
+                     for name in ('remaining_permission_count',
+                                  'owner_permission_count',
+                                  'inherited_permission_count',
+                                  'existing_access_link_count')),
+                 'office_prior_actor_file_permission_not_revoked')
         return result
 
     def _actor_loop(self, *, sandbox, admission, task: dict,
@@ -645,9 +683,10 @@ class OfficePptTeacherWorker:
             self.operator_wait_revocation(
                 out_dir, actor_item, 'actor',
                 binding['manual_wait_seconds'])
-            actor_revoked = self._graph_permissions_empty(
+            actor_revoked = self._graph_actor_revoked(
                 phase='actor', item=actor_item,
-                binding=binding, episode_dir=out_dir)
+                binding=binding, episode_dir=out_dir,
+                lease_session_path=actor_session)
             reset_paid, reset_session, reset_admission, reset_sandbox = self._lease(
                 phase='reset', item=reset_item, binding=binding,
                 episode_dir=out_dir, task_path=task_path,
@@ -672,9 +711,10 @@ class OfficePptTeacherWorker:
             self.operator_wait_revocation(
                 out_dir, reset_item, 'reset',
                 binding['manual_wait_seconds'])
-            reset_revoked = self._graph_permissions_empty(
+            reset_revoked = self._graph_actor_revoked(
                 phase='reset', item=reset_item,
-                binding=binding, episode_dir=out_dir)
+                binding=binding, episode_dir=out_dir,
+                lease_session_path=reset_session)
             baseline_state = {
                 'schema': 'cua-office-ppt-neutral-semantic-state-v1',
                 'baseline_sha256': _sha(baseline_path.read_bytes()),

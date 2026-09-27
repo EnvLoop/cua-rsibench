@@ -167,17 +167,25 @@ class FakeGraph:
                       worker_module._canonical(receipt))
         return receipt
 
-    def permissions_empty(self, *, owner_user_id, drive_id, item_id):
+    def verify_actor_revoked(self, *, owner_user_id, drive_id, item_id,
+                             actor_email, prior_permission_id):
         phase = 'actor' if item_id == 'DEMO!101' else 'reset'
         self.calls.append((phase + '-revoked', item_id))
         if phase == 'actor' and self.actor_permission_present:
-            raise ValueError('graph_actor_permission_still_present')
+            raise ValueError('graph_prior_actor_permission_still_present')
         return {
             'schema': 'cua-office-ppt-owner-revocation-readback-v1',
             'owner_user_id_sha256': sha(owner_user_id),
             'drive_id_sha256': sha(drive_id),
             'item_id_sha256': sha(item_id),
-            'permissions_count': 0,
+            'actor_email_sha256': sha(actor_email.casefold()),
+            'prior_permission_id_sha256': sha(prior_permission_id),
+            'actor_grants_remaining': 0,
+            'broad_links_remaining': 0,
+            'remaining_permission_count': 2,
+            'owner_permission_count': 1,
+            'inherited_permission_count': 1,
+            'existing_access_link_count': 0,
         }
 
 
