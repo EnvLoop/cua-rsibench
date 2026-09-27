@@ -14,6 +14,7 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import tempfile
 
 from tools import magento_resumable_100_v2 as v2
 
@@ -52,11 +53,13 @@ def audit(*, plan: Path, plan_sha256: str, source: Path,
     raw = live_journal.read_bytes()
     v2.require(raw.endswith(b"\n"),
                "live journal snapshot ended mid-row; retry read-only audit")
-    private.mkdir(parents=True, mode=0o700)
-    private.chmod(0o700)
-    snapshot = private / "journal-snapshot.private.jsonl"
-    _write_new(snapshot, raw)
-    events = v2.read_journal(snapshot)
+    # Validate a temporary snapshot first. A too-early or malformed milestone
+    # must not strand the immutable output directory on a failed audit.
+    with tempfile.TemporaryDirectory(
+            prefix=".magento-progress-", dir=work) as scratch:
+        snapshot = Path(scratch) / "journal-snapshot.private.jsonl"
+        _write_new(snapshot, raw)
+        events = v2.read_journal(snapshot)
     v2.validate_run_header(events, freeze_sha, frozen)
     v2.validate_case_sequence(events, cases)
     completed = [row for row in events
@@ -80,6 +83,9 @@ def audit(*, plan: Path, plan_sha256: str, source: Path,
         receipts.append(digest)
     receipt_chain = sha256(("\n".join(receipts) + "\n").encode()).hexdigest()
     checked_at = datetime.now(timezone.utc).isoformat()
+    private.mkdir(parents=True, mode=0o700)
+    private.chmod(0o700)
+    _write_new(private / "journal-snapshot.private.jsonl", raw)
     private_receipt = {
         "schema": SCHEMA,
         "checked_at_utc": checked_at,
