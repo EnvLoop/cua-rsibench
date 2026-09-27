@@ -244,6 +244,7 @@ class FinalGate:
                 'completion_index_not_frozen_full_matrix')
         by_cell = {row['cell_id']: row for row in self.plan['cells']}
         self.freezes = {}
+        self.freeze_raw_sha256s = {}
         for entry in index['campaigns']:
             require(type(entry) is dict and set(entry) == {
                 'cell_id', 'researcher_id', 'selection_freeze', 'campaign_journal'},
@@ -265,6 +266,7 @@ class FinalGate:
             _campaign_journal(frozen, journal_path, cell_id, researcher_id,
                               sha(freeze_raw), freeze)
             self.freezes[key] = freeze
+            self.freeze_raw_sha256s[key] = sha(freeze_raw)
         require(set(self.freezes) == {(cell, rid) for cell in matrix.CELLS
                                       for rid in matrix.RESEARCHERS},
                 'all_24_campaigns_must_freeze_before_final_dispatch')
@@ -290,8 +292,9 @@ class FinalGate:
             'ratification_sha256': frozen.ratification_sha256,
             'retry_rule_sha256': RETRY_RULE_SHA256,
             'selection_freeze_sha256_by_campaign': {
-                f'{cell_id}:{researcher_id}': sha(evidence.json_bytes(freeze))
-                for (cell_id, researcher_id), freeze in sorted(self.freezes.items())},
+                f'{cell_id}:{researcher_id}': digest
+                for (cell_id, researcher_id), digest in
+                sorted(self.freeze_raw_sha256s.items())},
             'official_final_model_attempts_before_freeze': 0,
         }
         require(witness == expected_witness,
