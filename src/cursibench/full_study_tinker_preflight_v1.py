@@ -330,7 +330,7 @@ class TrainingTelemetry:
 
 
 def bind_sampler_checkpoint(repo_root: Path, private_path: Path, *,
-                            sampler_path: str, sampler_client,
+                            sampler_path: str, service_client,
                             plan_sha256: str,
                             campaign_intent_sha256: str, train_data_sha256: str,
                             action_bundle_sha256: str, optimizer_steps: int,
@@ -338,14 +338,12 @@ def bind_sampler_checkpoint(repo_root: Path, private_path: Path, *,
     """Bind an actual sampler checkpoint after a future frozen training run.
 
     The account-specific path is only written to a private mode-0600 file.
-    The caller supplies the provider's SamplingClient created from this exact
-    path. We read its base model; no caller-provided model claim is accepted.
+    Create the provider's SamplingClient from this exact path and read its
+    base model; no caller-provided model claim or unrelated sampler is accepted.
     """
     require(isinstance(sampler_path, str) and
             SAMPLER_PATH.fullmatch(sampler_path) is not None,
             'sampler_checkpoint_path_invalid')
-    observed_base_model = sampler_client.get_base_model()
-    require(observed_base_model == MODEL, 'sampler_base_model_mismatch')
     for label, value in (('plan', plan_sha256),
                          ('campaign_intent', campaign_intent_sha256),
                          ('train_data', train_data_sha256),
@@ -354,6 +352,15 @@ def bind_sampler_checkpoint(repo_root: Path, private_path: Path, *,
         exact_hash(value, label)
     require(type(optimizer_steps) is int and optimizer_steps > 0,
             'optimizer_steps_missing')
+    root = repo_root.resolve()
+    target = private_path.absolute().parent.resolve() / private_path.name
+    require(target.is_relative_to(root / 'work') and
+            not target.is_symlink(),
+            'private_checkpoint_path_required')
+    require(not target.exists(), 'checkpoint_binding_already_exists')
+    sampler_client = service_client.create_sampling_client(model_path=sampler_path)
+    observed_base_model = sampler_client.get_base_model()
+    require(observed_base_model == MODEL, 'sampler_base_model_mismatch')
     private = {'schema': 'cua-full-study-sampler-checkpoint-binding-v1',
                'model': MODEL, 'sampler_path': sampler_path,
                'observed_base_model': observed_base_model,
@@ -363,13 +370,6 @@ def bind_sampler_checkpoint(repo_root: Path, private_path: Path, *,
                'action_bundle_sha256': action_bundle_sha256,
                'optimizer_steps': optimizer_steps,
                'usage_receipt_sha256': usage_receipt_sha256}
-    root = repo_root.resolve()
-    target = private_path.absolute().parent.resolve() / private_path.name
-    require(target.is_relative_to(root / 'work') and
-            not target.is_symlink(),
-            'private_checkpoint_path_required')
-    require(not target.exists() and not target.is_symlink(),
-            'checkpoint_binding_already_exists')
     private_write_new(target, canonical(private))
     return {'schema': 'cua-full-study-sampler-checkpoint-public-binding-v1',
             'model': MODEL,

@@ -48,6 +48,16 @@ class FakeSampler:
         return self.base
 
 
+class FakeCheckpointService:
+    def __init__(self, base=MODEL):
+        self.base = base
+        self.paths = []
+
+    def create_sampling_client(self, *, model_path):
+        self.paths.append(model_path)
+        return FakeSampler(self.base)
+
+
 class PreflightTests(unittest.TestCase):
     def test_exact_official_catalog_and_rate_distinctions(self):
         raw = json.dumps([MODEL_ROW]).encode()
@@ -148,27 +158,34 @@ class PreflightTests(unittest.TestCase):
                           action_bundle_sha256='d' * 64,
                           usage_receipt_sha256='e' * 64)
             sampler_path = 'tinker://run:train:0/sampler_weights/step-0001'
+            wrong_service = FakeCheckpointService('other')
             with self.assertRaisesRegex(preflight.PreflightError,
                                         'sampler_base_model_mismatch'):
                 preflight.bind_sampler_checkpoint(
                     root, path, sampler_path=sampler_path,
-                    sampler_client=FakeSampler('other'), optimizer_steps=1,
+                    service_client=wrong_service, optimizer_steps=1,
                     **hashes)
             self.assertFalse(path.exists())
+            self.assertEqual(wrong_service.paths, [sampler_path])
+            service = FakeCheckpointService()
             public = preflight.bind_sampler_checkpoint(
                 root, path, sampler_path=sampler_path,
-                sampler_client=FakeSampler(), optimizer_steps=1, **hashes)
+                service_client=service, optimizer_steps=1, **hashes)
+            self.assertEqual(service.paths, [sampler_path])
             self.assertNotIn('tinker://', json.dumps(public))
             self.assertEqual(public['checkpoint_path_sha256'],
                              preflight.sha256(sampler_path.encode()))
             self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
             self.assertEqual(json.loads(path.read_text())['sampler_path'],
                              sampler_path)
+            outside_service = FakeCheckpointService()
             with self.assertRaisesRegex(preflight.PreflightError,
                                         'private_checkpoint_path_required'):
                 preflight.bind_sampler_checkpoint(
                     root, root / 'public.json', sampler_path=sampler_path,
-                    sampler_client=FakeSampler(), optimizer_steps=1, **hashes)
+                    service_client=outside_service, optimizer_steps=1,
+                    **hashes)
+            self.assertEqual(outside_service.paths, [])
 
     def test_training_telemetry_is_private_sequential_and_tamper_evident(self):
         with tempfile.TemporaryDirectory() as scratch:
