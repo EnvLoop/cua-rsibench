@@ -1,0 +1,7 @@
+# Native Desktop evaluator Python environment
+
+The v0.6.6 original LibreOffice evaluator uses the separate E2B Desktop Python package, not only the base `e2b` SDK. The project now declares a `desktop` optional dependency set with `e2b-desktop==2.2.0`, `e2b==2.51.0`, Pillow 11.3.0, and Requests. This matches the previously published Desktop SDK 2.2.0/runtime probe and the [official E2B Desktop installation and import example](https://github.com/e2b-dev/desktop/blob/main/README.md). Install it in a dedicated environment with `pip install -e '.[desktop]'`; keep the existing general/report environment separate if it uses Pillow 12.
+
+The first 2026-09-28 one-task evaluator dispatch failed **before any sandbox create** because the general study environment had `e2b` but lacked `e2b_desktop`. A dedicated Python 3.14 Desktop environment had the Desktop package without its base SDK and Pillow dependencies; completing those pinned dependencies passed `pip check` and imported both the Desktop SDK and evaluator controller. The same frozen one-task plan then began a real E2B evaluator-control trio. A source-compatible import and dependency check is necessary but is not a GUI pass, provider bill, or official final admission. Full outcome and raw evidence remain evaluator-private until the independent control auditor accepts them.
+
+Context7 returned its monthly quota error for the SDK lookup. The package name and import were verified against E2B's official repository and the pinned local wheel metadata rather than inferred from a failed documentation response.
