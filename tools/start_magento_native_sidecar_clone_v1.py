@@ -104,6 +104,26 @@ def stop_cron_for_train_probe() -> dict:
             'policy': 'cron_stopped_before_config_and_search_reindex'}
 
 
+def verify_cron_never_autostarted() -> dict:
+    """Read a pre-supervisor cron policy; do not wait for cron to run first."""
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        status = subprocess.run(
+            ['docker', '--context', 'colima-cua-scale', 'exec', APP,
+             'supervisorctl', 'status', 'cron'], capture_output=True, text=True,
+            timeout=15, check=False)
+        if 'cron' in status.stdout and 'STOPPED' in status.stdout:
+            config = docker('exec', APP, 'cat',
+                            '/etc/supervisor.d/cron.ini', timeout=15)
+            require('autostart=false' in config and 'autostart=true' not in config,
+                    'cron autostart config was not disabled')
+            return {'policy': 'cron_autostart_disabled_before_supervisor',
+                    'status_stdout_sha256': hashlib.sha256(status.stdout.encode()).hexdigest(),
+                    'config_sha256': hashlib.sha256(config.encode()).hexdigest()}
+        time.sleep(1)
+    raise TimeoutError('pre-supervisor cron policy not observable')
+
+
 def read_price_index_shape() -> dict:
     """Read derived index hashes without exposing any product or task value."""
     from tools.reconcile_magento_unseeded_search_drift_v1 import SQL_READ
@@ -198,12 +218,15 @@ def reconcile_indexer_result(expected_search_sha256: str,
 
 def prepare(expected_search_sha256: str,
             *, adopt_existing: bool = False,
-            train_probe_freeze_cron: bool = False) -> dict:
+            train_probe_freeze_cron: bool = False,
+            train_probe_disable_cron_autostart: bool = False) -> dict:
     require(len(expected_search_sha256) == 64 and
             all(char in '0123456789abcdef' for char in expected_search_sha256),
             'frozen source search digest required')
+    require(not (train_probe_freeze_cron and train_probe_disable_cron_autostart),
+            'one train-only cron policy at a time')
     if adopt_existing:
-        require(not train_probe_freeze_cron,
+        require(not train_probe_freeze_cron and not train_probe_disable_cron_autostart,
                 'cron probe cannot adopt a prior container')
         return audit_existing(expected_search_sha256,
                               'read_only_adoption_after_reindex_retry')
@@ -224,16 +247,29 @@ def prepare(expected_search_sha256: str,
            '-e', 'ES_JAVA_OPTS=-Xms512m -Xmx512m',
            NATIVE_SEARCH_IMAGE, timeout=120)
     wait_ready(sidecar_health, 'native search')
-    docker('run', '-d', '--name', APP, '--network', NATIVE_SEARCH_NETWORK,
-           '-p', f'127.0.0.1:{HTTP_PORT}:80',
-           '-p', f'127.0.0.1:{CONTROL_PORT}:8877',
-           IMAGE, timeout=120)
+    app_args = ['run', '-d', '--name', APP, '--network', NATIVE_SEARCH_NETWORK,
+                '-p', f'127.0.0.1:{HTTP_PORT}:80',
+                '-p', f'127.0.0.1:{CONTROL_PORT}:8877']
+    if train_probe_disable_cron_autostart:
+        # The pinned image's /etc/supervisor.d/cron.ini has autostart=true.
+        # Change only this disposable container before the original entrypoint
+        # starts supervisord. No host mount or altered image is introduced.
+        app_args += ['--entrypoint', '/bin/sh', IMAGE, '-c',
+                     "sed -i 's/^autostart=true$/autostart=false/' "
+                     "/etc/supervisor.d/cron.ini && "
+                     "grep -q '^autostart=false$' /etc/supervisor.d/cron.ini && "
+                     "exec /custom-entrypoint.sh supervisord -n -j /supervisord.pid"]
+    else:
+        app_args += [IMAGE]
+    docker(*app_args, timeout=120)
     check_clone(APP, HTTP_PORT, CONTROL_PORT)
-    cron = stop_cron_for_train_probe() if train_probe_freeze_cron else None
-    stages = ({'after_cron_stop': read_price_index_shape()}
-              if train_probe_freeze_cron else None)
+    cron = (verify_cron_never_autostarted()
+            if train_probe_disable_cron_autostart else
+            stop_cron_for_train_probe() if train_probe_freeze_cron else None)
     stop_embedded_search()
     wait_ready(http_ready, 'Magento HTTP')
+    stages = ({'after_cron_policy_and_http_ready': read_price_index_shape()}
+              if cron is not None else None)
     settings = (
         ('catalog/search/engine', 'elasticsearch7'),
         ('catalog/search/elasticsearch7_server_hostname', NATIVE_SEARCH_HOST),
@@ -260,6 +296,12 @@ def prepare(expected_search_sha256: str,
     result = reconcile_indexer_result(expected_search_sha256, indexer)
     if stages is not None:
         stages['after_search_reindex'] = read_price_index_shape()
+        if train_probe_disable_cron_autostart:
+            time.sleep(60)
+            verify_cron_never_autostarted()
+            audit_existing(expected_search_sha256,
+                           'train_probe_after_60_second_idle')
+            stages['after_idle_60_seconds'] = read_price_index_shape()
         require(all(row['price_rows'] == 8156 and
                     row['price_key_sets_equal'] is True and
                     row['price_changed_rows'] == 0

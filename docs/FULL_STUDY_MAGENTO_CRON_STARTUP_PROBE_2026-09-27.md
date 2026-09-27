@@ -26,3 +26,27 @@ must be rerun in fresh clones before they can be pooled with the remaining
 researcher campaign and official final counts remain zero. The conservative
 provider bill and final runtime fingerprint remain unknown until live
 execution and reconciliation.
+
+## First probe failure and narrower startup revision
+
+The [first train-only probe](evidence/magento-cron-startup-probe-v1-failure-2026-09-27.json)
+failed before it could stop cron: the app container was running but its
+supervisor control socket was not ready at the immediate stop call. It seeded
+no task, called no model and left an exact pinned, no-mount disposable pair.
+The pair was read-only audited and must be retired by the
+[exact training-pair controller](../tools/reconcile_magento_cron_probe_v1.py)
+before another probe. This is a setup-timing failure, not evidence that a
+cron-free environment passes the source-index gate.
+
+The separately versioned [v2 train probe](../tools/probe_magento_cron_never_autostart_v2.py)
+sets `autostart=false` in the disposable container's pinned supervisor cron
+configuration **before** the original entrypoint starts supervisord. It
+verifies that cron never entered RUNNING, retains the same pinned application
+and native-search image IDs with zero host mounts, and reads the price-index
+shape after HTTP readiness, after configuration/cache work, after frozen
+search reindex, and after a 60-second idle period. Every stage must keep zero
+derived-price differences against the source replica; both search checks
+must match the frozen 181-document digest. It remains training-only and
+does not change historical or active final-candidate sweep commands. A
+successful v2 startup still needs separate train GUI positive/negative and
+reset controls before a cell-wide runtime amendment can be adopted.

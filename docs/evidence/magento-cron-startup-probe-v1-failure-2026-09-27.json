@@ -1,0 +1,14 @@
+{
+  "benchmark_quote_pages": 0,
+  "date": "2026-09-27",
+  "error_type": "ValueError",
+  "failure_receipt_sha256": "93e814a2fc5e1a017b0f64abf3af18ad52fa394ca7035ff90ea91ba80721ff6a",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "pair_cleanup_pending": true,
+  "pinned_no_mount_pair_verified": true,
+  "private_pair_audit_sha256": "a902cc5fa39ecca7a6e387c9df795220051e92b4d93d4205f591060e842159f1",
+  "schema": "envloop-magento-train-cron-probe-v1-failure-public-v1",
+  "status": "failed_before_cron_stop_or_task_seed",
+  "task_seeded": false
+}
