@@ -384,3 +384,11 @@ class StudyBudgetLedger:
                                                 for row in state.values()),
                     'cancelled_attempts': sum(row['status'] == 'cancelled'
                                                for row in state.values())}
+
+    def owner_attempts(self, owner: str) -> dict[str, dict]:
+        """Read-only reconciliation view; callers still cannot erase attempts."""
+        _require(owner in self.limits, 'unknown budget owner')
+        with self._lock():
+            _, state = self._load()
+            return {attempt_id: dict(record) for attempt_id, record in state.items()
+                    if record['owner'] == owner}
