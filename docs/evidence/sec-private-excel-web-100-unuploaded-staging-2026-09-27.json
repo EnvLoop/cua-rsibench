@@ -1,0 +1,61 @@
+{
+  "schema": "sec-private-excel-web-100-unuploaded-staging-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "100 final GUI-control triads staged locally, unuploaded and not admitted",
+  "offline_final_cases_with_staging": 100,
+  "original_actor_upload_copies": 300,
+  "byte_identical_three_copy_sets": 100,
+  "opaque_slot_based_upload_filenames": 300,
+  "exact_positive_repair_formulas_in_private_plans": 900,
+  "near_miss_repair_formulas_in_private_plans": 800,
+  "near_miss_one_known_fault_omissions_proven": 100,
+  "fresh_reset_planned_edits": 0,
+  "blank_false_gui_witnesses": 100,
+  "nonblank_gui_witnesses": 0,
+  "private_per_id_scorer_commands": 100,
+  "staged_reference_oracle_positive_passes": 100,
+  "staged_unrepaired_seed_rejections": 100,
+  "local_dry_run_rejects_missing_gui_witness": true,
+  "private_source_template_diversity_audit": {
+    "issuer_families": {"train": 4, "selection": 5, "final": 24},
+    "semantic_graph_types": {"train": 2, "selection": 1, "final": 13},
+    "distinct_original_filing_accessions": 140,
+    "max_cases_per_issuer": 5,
+    "cross_split_issuer_overlap": 0,
+    "cross_split_graph_name_overlap": 0,
+    "public_development_issuer_overlap": 0,
+    "public_development_graph_name_overlap": 0,
+    "sheet_order_and_target_address_structural_signatures": 19,
+    "structural_signatures_shared_between_graph_names": 0
+  },
+  "common_screenshot_action_protocol_audit": {
+    "main_pr_revision_inspected": "35f359a96060cc563d3233931ec1987442253036",
+    "proposed_output_adapter": "scale-action-output-v0.6.5",
+    "bounded_parser_safety_tests_passed": 4,
+    "excel_web_specific_v065_runtime_qualified": false,
+    "six_cell_protocol_hash_freeze_complete": false,
+    "excel_web_v065_model_attempts": 0
+  },
+  "cloud_uploads": 0,
+  "original_excel_web_saves": 0,
+  "downloaded_final_readbacks": 0,
+  "structurally_qualified_hidden_final_tasks": 0,
+  "official_excel_web_hidden_final_admissions": 0,
+  "model_scored_hidden_final_attempts": 0,
+  "private_evidence_sha256": {
+    "staging_generator": "76f7128fccba1ea896df9414663963b7582beb3e8a171e298eb16f11a0638560",
+    "private_stage_receipt": "0872c731fb482e5bc6a19feefecb9d5a2d23b374b72f277c5592147b35b2a2ac",
+    "private_staging_audit": "be43222a23cb40dcabd92e5e46cb4d7adeccb8a834fe7291e77d6d62592b87fc",
+    "private_slot_map": "6bf1dcaceefa34c77e7415c4d14e6fad667db72cb7f0bbabed63229dfff2162b",
+    "private_source_template_protocol_auditor": "ad5d8a7dadd57d6c31e9870ff240bdbd79836a733229f0780d087497502eb205",
+    "private_source_template_protocol_audit": "89b869ec61fbed205f5b50e62040e848d1c30e584a1d6647a69654d42c1dad77",
+    "private_saved_download_triad_scorer": "32c8610cc8530f2bb9fac293e1832c26b346e098aabfab1d858c51b82ea578cb",
+    "proposed_shared_v065_output_adapter_in_main_pr": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+    "shared_v065_action_amendment_in_main_pr": "6ed2a3a8cd174c80800167b6428f4ea74eb6338720aa52c4fb9d5863f998878a"
+  },
+  "limitations": [
+    "The staging receipts and local dry run are not original Microsoft Excel for the web execution.",
+    "No final ID has positive, near-miss and fresh-reset downloaded artifacts with completed GUI provenance.",
+    "The shared v0.6.5 parser exists, but no Excel-web student runtime binds it under the six-cell pre-campaign freeze."
+  ]
+}
