@@ -32,6 +32,8 @@ The separate `gitlab_world.vision_actor_v066_train` module is a proposed, train-
 
 The [train teacher episode worker](../docs/FULL_STUDY_GITLAB_TEACHER_EPISODE_WORKER_V066.md) binds that proposed action profile to a scoped GitLab browser, a separate evaluator-only train oracle, and exact overlayfs reset. Its current evidence is offline fake-provider testing; it has not opened the live GitLab world or created training data.
 
+The separate [20-task selection worker](../docs/FULL_STUDY_GITLAB_SELECTION_WORKER_V066.md) resolves a hash-bound Qwen sampler checkpoint and returns independent saved-state scores plus a private paid-task ledger for the 20 original GitLab selection IDs. Its current receipt is fake-provider/no-Docker only; it has no live model result or official final admission.
+
 The deterministic Playwright qualification drivers use visible UI controls but are distinct from the model's screenshot-only execution. Their known-positive traces and near misses are evaluator-owned calibration, not evidence that Qwen can solve an admitted final task under its action/time budget. The CI/runbook task verifies saved Git blobs; the current fixture has no registered runner or demonstrated pipeline execution.
 
 The [visible-save calibration](../docs/evidence/gitlab-visible-save-calibration-2026-09-27.md) records a training-partition probe of GitLab's assignee and due-date display timing. The operator waits for visible saved state and confirms due-date persistence after a reload. Earlier failed evaluator-private controls remain in the append-only ledger and are not silently retried.
