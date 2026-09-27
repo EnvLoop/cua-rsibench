@@ -1,0 +1,33 @@
+{
+  "causal_workflow_types_shared_selection_and_final": 8,
+  "causal_workflow_types_shared_train_and_final": 4,
+  "final_causal_workflow_types": 10,
+  "final_causal_workflow_types_unseen_in_selection": 2,
+  "final_source_families": 25,
+  "final_target_fields_on_distinct_slides": true,
+  "final_tasks_per_source_family": 4,
+  "final_tasks_per_workflow_type": 10,
+  "independent_source_families_by_split": {
+    "final_candidate": 25,
+    "selection": 5,
+    "train": 5
+  },
+  "model_calls": 0,
+  "no_unseen_workflow_generalization_claim": true,
+  "official_final_admitted": 0,
+  "private_plan_sha256": "71b263d9d5c899cde24b2835b3de64a98421bf2af811965001f54cc7d3b6e4ea",
+  "schema": "envloop-ppt-wdi-split-difficulty-shape-public-v1",
+  "source_families_disjoint_across_splits": true,
+  "split_candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "status": "offline_structure_not_user_or_model_difficulty_measure",
+  "target_fields_per_task": {
+    "final_candidate": 4,
+    "selection": 3,
+    "train": 1
+  },
+  "task_and_instance_ids_disjoint_across_splits": true
+}
