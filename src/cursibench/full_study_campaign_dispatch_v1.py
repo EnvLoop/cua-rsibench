@@ -30,6 +30,7 @@ from . import full_study_budget_v1 as dollars
 from . import full_study_matrix_v1 as matrix
 from . import full_study_pre_campaign_v1 as pre_campaign
 from . import full_study_selection_environment_v1 as selection_environment
+from . import full_study_selection_paid_coverage_v1 as paid_coverage
 from . import scale_final_v06 as cell_final
 
 
@@ -645,6 +646,7 @@ class CampaignSession:
                                 'score': row['score']}
                                for row in result['tasks']]}]
         for event in self._events('selection_scored'):
+            self._verify_selection_coverage_event(event)
             selection, selection_raw = _json(
                 self.directory /
                 f"selection-{event['data']['attempt_id']}.private.json",
@@ -1091,6 +1093,65 @@ class CampaignSession:
         _require(len(matches) <= 1, 'selection_attempt_completed_twice')
         return matches[0] if matches else None
 
+    def _selection_paid_coverage(self, *, attempt_id: str,
+                                 checkpoint_sha256: str,
+                                 paid_attempt_ids: list[str]) -> dict:
+        """Reopen exact paid requests; category presence alone is not coverage."""
+        self._audit_paid_files()
+        starts = [row for row in self._events('selection_started')
+                  if row['data']['attempt_id'] == attempt_id]
+        _require(len(starts) == 1, 'selection_paid_start_missing')
+        start = starts[0]
+        related = [row for row in self._events('paid_intent')
+                   if row['data']['attempt_id'].startswith(attempt_id + '-')]
+        _require(all(row['sequence'] > start['sequence'] for row in related),
+                 'selection_paid_before_attempt_start')
+        by_id = {row['data']['attempt_id']: row['data'] for row in related}
+        completed = {row['data']['attempt_id'] for row in
+                     self._events('paid_result')}
+        _require(type(paid_attempt_ids) is list and
+                 len(paid_attempt_ids) == len(set(paid_attempt_ids)) and
+                 set(paid_attempt_ids) == set(by_id),
+                 'selection_paid_attempt_hidden_or_missing')
+        calls = []
+        for paid_id in paid_attempt_ids:
+            request, raw = _json(self.directory /
+                                 f'{paid_id}.request.private.json',
+                                 'selection_paid_request')
+            _require(_sha(raw) == by_id[paid_id]['request_sha256'],
+                     'selection_paid_request_changed')
+            calls.append({
+                'attempt_id': paid_id,
+                'category': by_id[paid_id]['category'],
+                'request': request,
+                'result_present': paid_id in completed,
+            })
+        try:
+            return paid_coverage.validate(
+                cell_id=self.intent['cell_id'], attempt_id=attempt_id,
+                checkpoint_sha256=checkpoint_sha256,
+                selection_tasks=list(self.views['selection']),
+                selection_identities_sha256=
+                    start['data']['selection_identities_sha256'],
+                paid_calls=calls,
+                related_paid_attempt_ids=set(by_id))
+        except ValueError as exc:
+            raise DispatchError(str(exc)) from None
+
+    def _verify_selection_coverage_event(self, event: dict) -> None:
+        data = event['data']
+        attempt_id = data['attempt_id']
+        expected = self._selection_paid_coverage(
+            attempt_id=attempt_id,
+            checkpoint_sha256=data['checkpoint_path_sha256'],
+            paid_attempt_ids=data['paid_attempt_ids'])
+        saved, raw = _json(self.directory /
+                           f'selection-{attempt_id}-paid-coverage.private.json',
+                           'selection_paid_coverage')
+        _require(saved == expected and
+                 data.get('paid_coverage_sha256') == _sha(raw),
+                 'selection_paid_coverage_receipt_changed')
+
     def start_selection_attempt(self, *, round_index: int, attempt_id: str,
                                 retry_rule_sha256: str | None = None) -> dict:
         """Reserve one complete 20-task original-software selection execution.
@@ -1178,6 +1239,7 @@ class CampaignSession:
             base, checkpoint_sha256=self.intent['base_checkpoint_sha256'])
         checkpoint = self.intent['base_checkpoint_sha256']
         for event in self._events('selection_scored'):
+            self._verify_selection_coverage_event(event)
             result, raw = _json(
                 self.directory /
                 f"selection-{event['data']['attempt_id']}.private.json",
@@ -1238,6 +1300,10 @@ class CampaignSession:
                      {paid[paid_id]['category']
                       for paid_id in paid_attempt_ids}),
                  'selection_sampler_or_environment_cost_missing')
+        coverage = self._selection_paid_coverage(
+            attempt_id=attempt_id,
+            checkpoint_sha256=started['checkpoint_path_sha256'],
+            paid_attempt_ids=paid_attempt_ids)
         current_checkpoint, incumbent = self._incumbent()
         regressions = sum(scores[key] < incumbent[key] for key in scores)
         promoted = sum(scores.values()) > sum(incumbent.values()) and\
@@ -1245,6 +1311,10 @@ class CampaignSession:
         raw = _canonical(result)
         _private_write_new(self.directory /
                            f'selection-{attempt_id}.private.json', raw)
+        coverage_raw = _canonical(coverage)
+        _private_write_new(self.directory /
+                           f'selection-{attempt_id}-paid-coverage.private.json',
+                           coverage_raw)
         self.journal.append('selection_scored', {
             'attempt_id': attempt_id,
             'round_index': started['round_index'],
@@ -1258,6 +1328,7 @@ class CampaignSession:
                 started['checkpoint_path_sha256'] if promoted else
                 current_checkpoint),
             'paid_attempt_ids': paid_attempt_ids,
+            'paid_coverage_sha256': _sha(coverage_raw),
             'epoch_seconds': int(self.now()),
         })
         return {'attempt_id': attempt_id,

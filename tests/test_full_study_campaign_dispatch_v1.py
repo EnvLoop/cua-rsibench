@@ -228,6 +228,55 @@ class FullStudyDispatchTests(unittest.TestCase):
             })
         return result
 
+    def paid_selection_tasks(self, session, started):
+        """Fake every task's model sample and one exact original-world lease."""
+        attempt = started['attempt_id']
+        cell = session.intent['cell_id']
+        category = ('e2b' if cell in {'powerpoint-web', 'excel-web',
+                                      'desktop-native'} else
+                    'storage_application')
+        env_id = attempt + '-env-batch'
+        session.dispatch_paid(
+            attempt_id=env_id, category=category,
+            work={'selection_attempt': attempt,
+                  'kind': 'complete_original_software_environment'},
+            request={
+                'schema': 'cua-full-study-selection-environment-request-v1',
+                'selection_attempt': attempt, 'cell_id': cell,
+                'selection_identities_sha256':
+                    started['selection_identities_sha256'],
+                'selection_tasks': started['selection_tasks'],
+            },
+            reserve_usd='0.01',
+            resource_reservation=(
+                {'e2b_sandbox_hours': '0.01',
+                 'e2b_peak_concurrency': '1'} if category == 'e2b' else {}),
+            provider=lambda _: {'status': 'fake_environment_completed'}),
+        paid_ids = [env_id]
+        for ordinal, task in enumerate(started['selection_tasks'], 1):
+            sample_id = f'{attempt}-sample-{ordinal:03d}'
+            session.dispatch_paid(
+                attempt_id=sample_id, category='tinker',
+                work={'selection_attempt': attempt,
+                      'task_id': task['task_id'], 'kind': 'sample'},
+                request={
+                    'schema': 'cua-full-study-selection-sampling-request-v1',
+                    'selection_attempt': attempt, 'cell_id': cell,
+                    'task_id': task['task_id'],
+                    'package_sha256': task['package_sha256'],
+                    'checkpoint_path_sha256':
+                        started['checkpoint_path_sha256'],
+                    'step': 0,
+                },
+                reserve_usd='0.000001', resource_reservation={},
+                provider=lambda _: {
+                    'status': 'completed',
+                    'reported_model': 'Qwen/Qwen3.8-27B',
+                    'usage': {'input_tokens': 100,
+                              'output_tokens': 10}})
+            paid_ids.append(sample_id)
+        return paid_ids
+
     def test_current_missing_real_manifest_refuses_before_fetch_or_provider(self):
         calls = []
         with self.assertRaisesRegex(ValueError, 'pre_campaign_manifest_missing'):
@@ -466,36 +515,19 @@ class FullStudyDispatchTests(unittest.TestCase):
             retry_rule_sha256=sha(b'predeclared one infrastructure retry'))
         self.assertEqual(second['checkpoint_path_sha256'],
                          trained['checkpoint_path_sha256'])
-        session.dispatch_paid(
-            attempt_id='selection-002-sample-001', category='tinker',
-            work={'selection_attempt': 'selection-002', 'kind': 'sample'},
-            request={'schema': 'cua-full-study-selection-sampling-request-v1',
-                     'selection_attempt': 'selection-002'},
-            reserve_usd='0.01', resource_reservation={},
-            provider=lambda _: {'sampled': True})
-        session.dispatch_paid(
-            attempt_id='selection-002-env-001', category='e2b',
-            work={'selection_attempt': 'selection-002', 'kind': 'environment'},
-            request={'schema': 'cua-full-study-selection-environment-request-v1',
-                     'selection_attempt': 'selection-002'},
-            reserve_usd='0.01',
-            resource_reservation={'e2b_sandbox_hours': '0.01',
-                                  'e2b_peak_concurrency': '1'},
-            provider=lambda _: {'saved_state_checked': True})
+        paid_ids = self.paid_selection_tasks(session, second)
         base = json.loads((session.directory / 'base-selection.private.json').read_bytes())
         candidate = dict(base, checkpoint_sha256=trained['checkpoint_path_sha256'])
         candidate['tasks'] = [dict(row) for row in base['tasks']]
         candidate['tasks'][0]['score'] = 1
         selected = session.record_selection_scored(
             attempt_id='selection-002', result=candidate,
-            paid_attempt_ids=['selection-002-sample-001',
-                              'selection-002-env-001'])
+            paid_attempt_ids=paid_ids)
         self.assertTrue(selected['promoted'])
         self.assertEqual(selected['score_wins'], 1)
         with self.assertRaisesRegex(ValueError, 'provider_usage_not_reconciled'):
             session.freeze_selection()
-        for attempt_id in ('researcher-001', 'tinker-001',
-                           'selection-002-sample-001', 'selection-002-env-001'):
+        for attempt_id in ('researcher-001', 'tinker-001', *paid_ids):
             session.reconcile_paid(attempt_id, actual_usd='0.000000001',
                                    provider_usage_sha256=sha(attempt_id.encode()))
         frozen = session.freeze_selection()
@@ -516,40 +548,19 @@ class FullStudyDispatchTests(unittest.TestCase):
         started = session.start_selection_attempt(
             round_index=1, attempt_id='odoo-selection-001')
         self.assertEqual(len(started['selection_tasks']), 20)
-        session.dispatch_paid(
-            attempt_id='odoo-selection-001-sample-001', category='tinker',
-            work={'selection_attempt': 'odoo-selection-001',
-                  'kind': 'sampling'},
-            request={'schema': 'cua-full-study-selection-sampling-request-v1',
-                     'selection_attempt': 'odoo-selection-001'},
-            reserve_usd='0.01', resource_reservation={},
-            provider=lambda _: {'usage': {'input_tokens': 100,
-                                           'output_tokens': 10}})
-        session.dispatch_paid(
-            attempt_id='odoo-selection-001-local-env-001',
-            category='storage_application',
-            work={'selection_attempt': 'odoo-selection-001',
-                  'kind': 'actual_local_environment'},
-            request={'schema': 'cua-full-study-original-software-local-lease-v1',
-                     'selection_attempt': 'odoo-selection-001',
-                     'software': 'Odoo Community 18.0'},
-            reserve_usd='0.01', resource_reservation={},
-            provider=lambda _: {'allocated': True,
-                                'provider_invoice_usd': None,
-                                'cost_basis': 'nominal local runtime envelope'})
+        paid_ids = self.paid_selection_tasks(session, started)
         base = json.loads((session.directory / 'base-selection.private.json').read_bytes())
         candidate = dict(base, checkpoint_sha256=trained['checkpoint_path_sha256'])
         candidate['tasks'] = [dict(row) for row in base['tasks']]
         scored = session.record_selection_scored(
             attempt_id='odoo-selection-001', result=candidate,
-            paid_attempt_ids=['odoo-selection-001-sample-001',
-                              'odoo-selection-001-local-env-001'])
+            paid_attempt_ids=paid_ids)
         self.assertEqual(scored['score_wins'], 0)
         self.assertFalse(scored['promoted'])
         event = session._events('selection_scored')[-1]
-        self.assertEqual(event['data']['paid_attempt_ids'], [
-            'odoo-selection-001-sample-001',
-            'odoo-selection-001-local-env-001'])
+        self.assertEqual(event['data']['paid_attempt_ids'], paid_ids)
+        self.assertRegex(event['data']['paid_coverage_sha256'],
+                         r'^[0-9a-f]{64}$')
 
     def test_selection_rejects_evaluation_identity_or_missing_cost_category(self):
         _, session = self.campaign()
@@ -570,27 +581,41 @@ class FullStudyDispatchTests(unittest.TestCase):
                 attempt_id='selection-001', result=candidate,
                 paid_attempt_ids=['tinker-001'])
 
+    def test_selection_cannot_hide_paid_task_or_tamper_coverage_on_resume(self):
+        _, session = self.campaign()
+        trained = self.trained_candidate(session)
+        started = session.start_selection_attempt(
+            round_index=1, attempt_id='selection-coverage-001')
+        paid_ids = self.paid_selection_tasks(session, started)
+        base = json.loads((session.directory /
+                           'base-selection.private.json').read_bytes())
+        candidate = dict(base,
+                         checkpoint_sha256=trained['checkpoint_path_sha256'])
+        candidate['tasks'] = [dict(row) for row in base['tasks']]
+        with self.assertRaisesRegex(ValueError,
+                                    'selection_paid_attempt_hidden_or_missing'):
+            session.record_selection_scored(
+                attempt_id=started['attempt_id'], result=candidate,
+                paid_attempt_ids=paid_ids[:-1])
+        session.record_selection_scored(
+            attempt_id=started['attempt_id'], result=candidate,
+            paid_attempt_ids=paid_ids)
+        coverage_path = (session.directory /
+                         'selection-selection-coverage-001-paid-coverage.private.json')
+        saved = coverage_path.read_bytes()
+        coverage_path.write_bytes(saved.replace(
+            b'"task_count":20', b'"task_count":19'))
+        with self.assertRaisesRegex(ValueError,
+                                    'selection_paid_coverage_receipt_changed'):
+            session._incumbent()
+
     def test_selection_strict_gain_with_one_regression_retains_incumbent(self):
         _, session = self.campaign()
         trained = self.trained_candidate(
             session, baseline_winning_indices=(0,))
-        session.start_selection_attempt(round_index=1,
-                                        attempt_id='selection-001')
-        for suffix, category, resources in (
-            ('sample-001', 'tinker', {}),
-            ('env-001', 'e2b', {'e2b_sandbox_hours': '0.01',
-                               'e2b_peak_concurrency': '1'}),
-        ):
-            request = {'schema': ('cua-full-study-selection-sampling-request-v1'
-                                  if category == 'tinker' else
-                                  'cua-full-study-selection-environment-request-v1'),
-                       'selection_attempt': 'selection-001'}
-            session.dispatch_paid(
-                attempt_id=f'selection-001-{suffix}', category=category,
-                work={'selection_attempt': 'selection-001', 'kind': suffix},
-                request=request, reserve_usd='0.01',
-                resource_reservation=resources,
-                provider=lambda _: {'completed': True})
+        started = session.start_selection_attempt(round_index=1,
+                                                  attempt_id='selection-001')
+        paid_ids = self.paid_selection_tasks(session, started)
         base = json.loads((session.directory / 'base-selection.private.json').read_bytes())
         candidate = dict(base, checkpoint_sha256=trained['checkpoint_path_sha256'])
         candidate['tasks'] = [dict(row) for row in base['tasks']]
@@ -599,8 +624,7 @@ class FullStudyDispatchTests(unittest.TestCase):
         candidate['tasks'][2]['score'] = 1
         result = session.record_selection_scored(
             attempt_id='selection-001', result=candidate,
-            paid_attempt_ids=['selection-001-sample-001',
-                              'selection-001-env-001'])
+            paid_attempt_ids=paid_ids)
         self.assertEqual(result['score_wins'], 2)
         self.assertEqual(result['regressions_vs_incumbent'], 1)
         self.assertFalse(result['promoted'])
