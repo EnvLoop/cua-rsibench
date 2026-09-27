@@ -12,7 +12,8 @@ from collections import Counter
 import json
 from pathlib import Path
 
-from . import bootstrap, factory, failure_ledger, gui_controls, quarantine, runtime, verify
+from . import (bootstrap, factory, failure_ledger, gui_controls, pre_result_recovery,
+               quarantine, runtime, verify)
 
 
 INDEX = runtime.PRIVATE / "gui-development-sweep-index-v3.json"
@@ -155,20 +156,27 @@ def public_summary(index: dict) -> dict:
 
 
 async def run(max_tasks: int, *, family: str | None = None,
-              retry_failed: bool = False, stratified: bool = False) -> dict:
+              retry_failed: bool = False, stratified: bool = False,
+              requalification_plan: Path | None = None) -> dict:
     if max_tasks < 0 or max_tasks > 100:
         raise ValueError("max_tasks must be 0..100")
     index = _load()
     reconcile_failure_ledger(index)
     excluded = quarantine.excluded_task_ids()
-    eligible = [row for row in candidates()
+    if retry_failed:
+        if requalification_plan is None:
+            raise ValueError("retry requires a frozen private requalification plan")
+        resolution = pre_result_recovery.read_private_resolution(requalification_plan)
+        eligible = pre_result_recovery.eligible_requalification_rows(
+            candidates(), index, failure_ledger.private_entries(), resolution)
+    else:
+        if requalification_plan is not None:
+            raise ValueError("requalification plan supplied without retry mode")
+        eligible = [row for row in candidates() if row["task_id"] not in index["items"]]
+    eligible = [row for row in eligible
                 if row["template_group"] in IMPLEMENTED_GUI_FAMILIES
                 and row["task_id"] not in excluded
-                and (family is None or row["template_group"] == family)
-                and (row["task_id"] not in index["items"] or
-                     (retry_failed and index["items"][row["task_id"]].get("status") !=
-                      "development_gui_trio_passed" and
-                      len(index["items"][row["task_id"]].get("attempts", [])) < 2))]
+                and (family is None or row["template_group"] == family)]
     if stratified:
         prior_sources = {item["source_family_sha256"] for item in index["items"].values()
                          if item.get("source_family_sha256")}
@@ -254,11 +262,13 @@ def main() -> None:
     parser.add_argument("--max-tasks", type=int, default=0)
     parser.add_argument("--family", choices=sorted(IMPLEMENTED_GUI_FAMILIES))
     parser.add_argument("--retry-failed", action="store_true")
+    parser.add_argument("--requalification-plan", type=Path)
     parser.add_argument("--stratified", action="store_true")
     args = parser.parse_args()
     print(json.dumps(asyncio.run(run(args.max_tasks, family=args.family,
                                      retry_failed=args.retry_failed,
-                                     stratified=args.stratified)),
+                                     stratified=args.stratified,
+                                     requalification_plan=args.requalification_plan)),
                      indent=2, sort_keys=True))
 
 

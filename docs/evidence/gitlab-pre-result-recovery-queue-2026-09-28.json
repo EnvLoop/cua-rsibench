@@ -1,0 +1,14 @@
+{
+  "schema": "envloop-gitlab-pre-result-recovery-commitment-v1",
+  "source_commit": "203fa4633af39c6944608e30984996f04ccc4541",
+  "full_catalog_sha256": "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1",
+  "original_world_sha256": "8a815883423f48960bd28ac4ba448578a48d19a7c1fdb086f4c914ec2b412085",
+  "ordered_queue_sha256": "e74c499312c9a3c8aa10964edfafd19f11dc7152c75ffa44e272b77a921dcdfd",
+  "reserve_source_families": 5,
+  "reserve_candidate_tasks": 25,
+  "max_whole_family_replacements": 5,
+  "source_project_cve_vendor_entity_principal_disjoint": true,
+  "official_final_admitted": 0,
+  "model_calls": 0,
+  "status": "fixed_pre_result_queue_not_admitted_final_set"
+}

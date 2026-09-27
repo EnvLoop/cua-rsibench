@@ -63,28 +63,59 @@ async def milestone(page, project: dict, progress: dict, folder: Path,
         raise RuntimeError("GitLab did not show a saved milestone")
     await page.get_by_text(policy_row["milestone_title"], exact=False).first.wait_for(timeout=30000)
     await page.screenshot(path=str(folder / "milestone-saved.png"), full_page=True)
+    link_attempts = {}
     for key in ("active", "validation"):
         iid = int(progress["issue_iids"][key])
-        await page.goto(runtime.BASE + "/" + repo + "/-/issues/" + str(iid),
-                        wait_until="domcontentloaded", timeout=90000)
-        await page.get_by_text("Active remediation:" if key == "active"
-                               else "Validate mitigation:", exact=False).first.wait_for(timeout=30000)
-        section = page.locator('[data-testid="work-item-milestone"]')
-        await section.locator('[data-testid="edit-button"]').click()
-        search = section.locator('[data-testid="listbox-search-input"]')
-        await search.fill(policy_row["milestone_title"])
-        await section.get_by_role("option").filter(
-            has_text=policy_row["milestone_title"]).first.click()
-        if await section.locator('[data-testid="apply-button"]').count():
-            await section.locator('[data-testid="apply-button"]').click()
-        await section.locator('[data-testid="edit-button"]').wait_for(timeout=30000)
-        await section.get_by_text(policy_row["milestone_title"], exact=False).first.wait_for()
+        link_attempts[key] = await _link_issue_milestone_with_reload(
+            page, repo, iid, policy_row["milestone_title"],
+            "Active remediation:" if key == "active" else "Validate mitigation:")
         await page.screenshot(path=str(folder / ("issue-" + key + "-linked.png")),
                               full_page=True)
     return {**source, "saved_visible": True, "issue_links_visible": 2,
+            "issue_links_reload_verified": True,
+            "issue_link_attempts": link_attempts,
             "wrong_due_negative": wrong_due,
             "milestone_screenshot_sha256": hashlib.sha256(
                 (folder / "milestone-saved.png").read_bytes()).hexdigest()}
+
+
+async def _link_issue_milestone_with_reload(page, repo: str, iid: int,
+                                            milestone_title: str,
+                                            issue_heading: str) -> int:
+    """Bounded visible-UI save/reload check, identical for every issue link.
+
+    GitLab can show the chosen sidebar milestone while its save spinner is
+    active and PostgreSQL still contains the old milestone_id. A full reload
+    is required before the evaluator captures independent persisted state.
+    """
+    async def visible(locator) -> bool:
+        return bool(await locator.count()) and await locator.first.is_visible()
+
+    for attempt in range(1, 4):
+        await page.goto(runtime.BASE + "/" + repo + "/-/issues/" + str(iid),
+                        wait_until="domcontentloaded", timeout=90000)
+        await page.get_by_text(issue_heading, exact=False).first.wait_for(timeout=30000)
+        section = page.locator('[data-testid="work-item-milestone"]')
+        if not await visible(section.get_by_text(milestone_title, exact=False)):
+            await section.locator('[data-testid="edit-button"]').click()
+            search = section.locator('[data-testid="listbox-search-input"]')
+            await search.fill(milestone_title)
+            await section.get_by_role("option").filter(
+                has_text=milestone_title).first.click()
+            if await section.locator('[data-testid="apply-button"]').count():
+                await section.locator('[data-testid="apply-button"]').click()
+        await section.get_by_text(milestone_title, exact=False).first.wait_for(timeout=30000)
+        await section.locator(".gl-spinner").wait_for(state="hidden", timeout=30000)
+        await page.reload(wait_until="domcontentloaded", timeout=90000)
+        section = page.locator('[data-testid="work-item-milestone"]')
+        await page.get_by_text(issue_heading, exact=False).first.wait_for(timeout=30000)
+        for _ in range(30):
+            if await visible(section.get_by_text(milestone_title, exact=False)):
+                await section.locator(".gl-spinner").wait_for(
+                    state="hidden", timeout=30000)
+                return attempt
+            await page.wait_for_timeout(500)
+    raise RuntimeError("milestone issue link did not survive bounded GUI reload checks")
 
 
 async def merge_request(page, project: dict, progress: dict, folder: Path,
