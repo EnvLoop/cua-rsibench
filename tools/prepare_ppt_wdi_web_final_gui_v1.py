@@ -83,6 +83,19 @@ def main() -> None:
         source_raw = source.read_bytes()
         case_dir = out / f"case-{index:03d}"
         case_dir.mkdir(mode=0o700)
+        # The independent verifier resolves original reserve provenance next
+        # to a downloaded Office baseline. Keep these evaluator-only source
+        # sidecars alongside staged role files, never inside the actor deck.
+        if row.get("source_scope") == "private_wdi_reserve_v1":
+            sidecars = ("source-snapshot.private.json",)
+        elif row.get("source_scope") == "private_wdi_country_csv_reserve_v1":
+            sidecars = ("source-snapshot.private.json",
+                        "source-country.private.zip",
+                        "source-provenance.private.json")
+        else:
+            sidecars = ()
+        for name in sidecars:
+            write_new(case_dir / name, (package / name).read_bytes())
         copies = {}
         for role in ROLES:
             filename = f"EL-PPT-Final-{index+1:03d}-{role.replace('_', '-')}.pptx"
