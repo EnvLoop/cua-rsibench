@@ -1107,7 +1107,7 @@ class CampaignSession:
         _require(all(row['sequence'] > start['sequence'] for row in related),
                  'selection_paid_before_attempt_start')
         by_id = {row['data']['attempt_id']: row['data'] for row in related}
-        completed = {row['data']['attempt_id'] for row in
+        completed = {row['data']['attempt_id']: row['data'] for row in
                      self._events('paid_result')}
         _require(type(paid_attempt_ids) is list and
                  len(paid_attempt_ids) == len(set(paid_attempt_ids)) and
@@ -1120,11 +1120,21 @@ class CampaignSession:
                                  'selection_paid_request')
             _require(_sha(raw) == by_id[paid_id]['request_sha256'],
                      'selection_paid_request_changed')
+            result_status = None
+            if paid_id in completed:
+                paid_result, result_raw = _json(
+                    self.directory / f'{paid_id}.result.private.json',
+                    'selection_paid_result')
+                _require(_sha(result_raw) ==
+                         completed[paid_id]['result_sha256'],
+                         'selection_paid_result_changed')
+                result_status = paid_result.get('status')
             calls.append({
                 'attempt_id': paid_id,
                 'category': by_id[paid_id]['category'],
                 'request': request,
                 'result_present': paid_id in completed,
+                'result_status': result_status,
             })
         try:
             return paid_coverage.validate(

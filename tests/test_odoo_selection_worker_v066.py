@@ -292,6 +292,7 @@ class SelectionWorkerTests(unittest.TestCase):
                 "category": call["category"],
                 "request": call["request"],
                 "result_present": "result" in call,
+                "result_status": call.get("result", {}).get("status"),
             } for call in self.paid.calls],
             related_paid_attempt_ids=set(outcome["paid_attempt_ids"]))
         self.assertEqual(paid_projection["sample_paid_attempt_count"], 20)

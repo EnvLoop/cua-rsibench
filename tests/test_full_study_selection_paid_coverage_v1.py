@@ -26,6 +26,7 @@ def fixture(cell: str, *, per_task_environment: bool):
             paid.append({
                 "attempt_id": f"select-1-env-{index:02d}",
                 "category": category, "result_present": True,
+                "result_status": "active",
                 "request": {
                     "selection_attempt": "select-1", "cell_id": cell,
                     "task_id": task["task_id"],
@@ -36,7 +37,7 @@ def fixture(cell: str, *, per_task_environment: bool):
     else:
         paid.append({
             "attempt_id": "select-1-env-batch", "category": category,
-            "result_present": True,
+            "result_present": True, "result_status": "active",
             "request": {
                 "selection_attempt": "select-1", "cell_id": cell,
                 "selection_identities_sha256": digest,
@@ -45,7 +46,7 @@ def fixture(cell: str, *, per_task_environment: bool):
         })
     paid.append({
         "attempt_id": "select-1-sampler-setup", "category": "tinker",
-        "result_present": True,
+        "result_present": True, "result_status": "ready",
         "request": {"selection_attempt": "select-1", "cell_id": cell,
                     "selection_identities_sha256": digest,
                     "checkpoint_path_sha256": checkpoint},
@@ -54,6 +55,7 @@ def fixture(cell: str, *, per_task_environment: bool):
         paid.append({
             "attempt_id": f"select-1-sample-{index:02d}",
             "category": "tinker", "result_present": True,
+            "result_status": "completed",
             "request": {
                 "selection_attempt": "select-1", "cell_id": cell,
                 "task_id": task["task_id"],
@@ -109,6 +111,13 @@ class SelectionPaidCoverageTests(unittest.TestCase):
             "selection_tasks"][:-1]
         with self.assertRaisesRegex(ValueError,
                                     "selection_paid_environment_batch_roster_changed"):
+            coverage.validate(**data)
+
+    def test_task_sample_with_noncompleted_paid_result_cannot_score(self):
+        data = fixture("gitlab", per_task_environment=True)
+        data["paid_calls"][-1]["result_status"] = "failed"
+        with self.assertRaisesRegex(ValueError,
+                                    "selection_paid_model_result_not_completed"):
             coverage.validate(**data)
 
 

@@ -67,7 +67,8 @@ def validate(*, cell_id: str, attempt_id: str,
     included = set()
     for paid in paid_calls:
         _require(type(paid) is dict and set(paid) == {
-            "attempt_id", "category", "request", "result_present"},
+            "attempt_id", "category", "request", "result_present",
+            "result_status"},
             "selection_paid_call_shape_invalid")
         paid_id = paid["attempt_id"]
         kind = paid["category"]
@@ -79,7 +80,9 @@ def validate(*, cell_id: str, attempt_id: str,
                  type(request) is dict and
                  request.get("selection_attempt") == attempt_id and
                  request.get("cell_id") == cell_id and
-                 paid["result_present"] is True,
+                 paid["result_present"] is True and
+                 (paid["result_status"] is None or
+                  type(paid["result_status"]) is str),
                  "selection_paid_call_unbound_or_incomplete")
         included.add(paid_id)
         task_id = request.get("task_id")
@@ -90,6 +93,8 @@ def validate(*, cell_id: str, attempt_id: str,
                      checkpoint_sha256,
                      "selection_paid_task_or_checkpoint_changed")
             if kind == "tinker":
+                _require(paid["result_status"] == "completed",
+                         "selection_paid_model_result_not_completed")
                 sample_covered.add(task_id)
                 sample_count += 1
             else:

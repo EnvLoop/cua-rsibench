@@ -245,6 +245,8 @@ class SelectionWorkerTests(unittest.TestCase):
                 "category": call["category"],
                 "request": call["request"],
                 "result_present": True,
+                "result_status": ("completed" if call["category"] ==
+                                  "tinker" else "active"),
             } for call in self.session.calls],
             related_paid_attempt_ids=set(result["paid_attempt_ids"]))
         self.assertEqual(paid_projection["sample_paid_attempt_count"], 20)
