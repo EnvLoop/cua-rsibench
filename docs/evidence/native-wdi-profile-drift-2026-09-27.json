@@ -1,0 +1,46 @@
+{
+  "actual_billed_usd": null,
+  "canonical_profile_stable_across_two_probes": true,
+  "canonical_profile_tree_sha256": "d5af90558e968b2e31401f95ed100265a3802b8e8feb6fa2d44739097b37a86b",
+  "canonical_registry_sha256": "87b764db3a99d1876a138d0e77dad7d06e2cf01373e4ea06e9f7ce79c1cb77fc",
+  "canonicalizer_sha256": "f60b2be5b81d86acba1cbd087f51dd4a48dd936c4d691c0d4f118e7cd8fd11c5",
+  "checked_date": "2026-09-27",
+  "differing_profile_file_count": 1,
+  "differing_profile_file_names": [
+    "registrymodifications.xcu"
+  ],
+  "differing_registry_property_names": [
+    "LastTimeDonateShown",
+    "LastTimeGetInvolvedShown"
+  ],
+  "distinct_sandboxes": 2,
+  "full_image_profile_freeze_gate_passed": false,
+  "guest_tree_matches_later_file_manifest_each": [
+    false,
+    false
+  ],
+  "native_lane_cap_usd": "40",
+  "native_lane_full_lease_reserve_usd_after_all_probes": "33.06111111111111111111111111",
+  "official_full_study_desktop_admissions": 0,
+  "official_full_study_model_results": 0,
+  "private_receipt_sha256s": [
+    "aa1d3f15c90cfccd3b4cc361748d2e6f8903e5c0d17ffcf4606458c86b36cf6a",
+    "a84f7b2c1a74be4d7b1455dc2cb831906d016d982aedb53982481738ba1cd31e"
+  ],
+  "private_registry_sha256s": [
+    "2b4969892285800ccab768c1d2acb267fdca4f0fa481d7a49eef3f67be24eb51",
+    "24dd760688f0e4d1bfa24122ae6adbc9f89c1708b0538dda9f3ad5271ff289cf"
+  ],
+  "profile_file_count_each": [
+    27,
+    27
+  ],
+  "provider_image_digest_available": false,
+  "raw_profile_stable_across_two_probes": false,
+  "raw_profile_tree_sha256s": [
+    "382a4ea10e46b91c8f4b65b0d8b7e32278f981900c2ac7dcc977ba77f4fa29fe",
+    "c7dbea610f135e1646a532caa8e2b1d7b0511ce5cc1e7f65edc77003c552cf4c"
+  ],
+  "schema": "cua-native-wdi-profile-drift-analysis-public-v1",
+  "scope": "Two additional neutral, distinct E2B Desktop sandboxes opened one public training workbook; no model or final package was used."
+}

@@ -54,6 +54,8 @@ The [nonfinal Qwen v0.6.4 live smoke](../docs/evidence/native-wdi-qwen-v064-nonf
 
 A separate [two-sandbox runtime fingerprint](../docs/evidence/native-wdi-runtime-fingerprint-2026-09-27.md) found matching LibreOffice binary, OS/package manifest, installed font-tree and fontconfig hashes, while LibreOffice's 27-file profile after a neutral open differed bytewise. The installed E2B SDK did not expose a provider image digest. The image/profile freeze gate therefore remains open; do not infer full runtime identity from a template ID alone.
 
+The later [profile drift analysis](../docs/evidence/native-wdi-profile-drift-2026-09-27.md) traced the cross-sandbox raw profile mismatch to two numeric prompt-timing properties in `registrymodifications.xcu`. A strict audit-only canonicalization matched the two detailed profile snapshots; it is **not** applied to live sandboxes and does not pass the image/profile freeze gate. The profile continued to write during neutral open, and image identity is still unavailable.
+
 ## Remaining work before a publishable final cell
 
 - Bind the **completed** 100/100 native-GUI and 25/25 Impress-normalization evidence, plus the v2 fair saved-artifact scorer bundle SHA-256, into the six-cell pre-campaign freeze before any official Qwen attempt. Preserve screenshots and actual file bytes privately.

@@ -51,6 +51,17 @@ print(json.dumps({'font_tree':font,'libreoffice_profile_tree':profile,
  'fontconfig_catalog_sha256':sha(fontconfig.encode()),'fontconfig_entry_count':len(fontconfig.splitlines())},sort_keys=True))
 '''
 
+PROFILE_FILE_PROBE = r'''import hashlib,json,pathlib
+root=pathlib.Path('/home/user/.config/libreoffice/4/user')
+rows=[]
+for path in sorted(root.rglob('*')) if root.exists() else []:
+ if path.is_file():
+  rows.append({'path':str(path.relative_to(root)),
+   'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+   'bytes':path.stat().st_size})
+print(json.dumps(rows,sort_keys=True))
+'''
+
 
 def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
@@ -136,6 +147,20 @@ def main() -> int:
         sandbox.press("esc")
         time.sleep(1)
         receipt["after_neutral_open"] = guest_probe()
+        sandbox.files.write("/tmp/native-profile-file-probe.py", PROFILE_FILE_PROBE.encode())
+        profile_detail = sandbox.commands.run("python3 /tmp/native-profile-file-probe.py")
+        if profile_detail.exit_code != 0:
+            raise ValueError("Guest profile-file probe failed")
+        receipt["profile_file_probe_script_sha256"] = digest(PROFILE_FILE_PROBE.encode())
+        receipt["after_open_profile_files"] = json.loads(profile_detail.stdout)
+        if len(receipt["after_open_profile_files"]) != receipt["after_neutral_open"]["libreoffice_profile_tree"]["files"]:
+            raise ValueError("Profile file count changed during read-only detail probe")
+        registry = bytes(sandbox.files.read(
+            "/home/user/.config/libreoffice/4/user/registrymodifications.xcu",
+            format="bytes"))
+        (args.out.parent / "registrymodifications.xcu").write_bytes(registry)
+        receipt["private_registrymodifications_sha256"] = digest(registry)
+        receipt["private_registrymodifications_bytes"] = len(registry)
         if (receipt["fresh_guest"]["font_tree"] != receipt["after_neutral_open"]["font_tree"]
                 or receipt["fresh_guest"]["libreoffice_executable_sha256"] !=
                 receipt["after_neutral_open"]["libreoffice_executable_sha256"]):
