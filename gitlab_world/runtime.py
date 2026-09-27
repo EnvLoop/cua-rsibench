@@ -28,7 +28,7 @@ ACTIVE_VERSION_FILE = PRIVATE / "active-volume-version.txt"
 
 
 def volume_names(version: str) -> dict[str, str]:
-    if version not in ("v1", "v2"):
+    if version not in ("v1", "v2", "v3"):
         raise ValueError("unknown GitLab volume generation")
     return {role: f"envloop-gitlab-world-{version}-{role}"
             for role in ("config", "logs", "data")}

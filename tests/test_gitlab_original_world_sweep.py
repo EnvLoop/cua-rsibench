@@ -32,8 +32,12 @@ class GitLabOriginalSweepTests(unittest.TestCase):
                 patch.object(sweep.quarantine, "load", return_value={"families": {}}):
             first = sweep.candidates()[0]["task_id"]
             summary = sweep.public_summary({"items": {
-                first: {"status": "development_gui_trio_passed", "scores": [1, 0, 1]}}})
+                first: {"status": "development_gui_trio_passed", "scores": [1, 0, 1],
+                        "source_family_sha256": "a" * 64}}})
             self.assertEqual(summary["development_gui_trio_passed"], 1)
+            self.assertEqual(summary["individually_attempted_ids"], 1)
+            self.assertEqual(summary["attempted_source_family_count"], 1)
+            self.assertEqual(summary["passed_source_family_count"], 1)
             self.assertEqual(summary["statuses"]["not_attempted"], 99)
             self.assertFalse(summary["complete_100_per_id_gui_admission"])
             self.assertNotIn(first, str(summary))
@@ -59,6 +63,13 @@ class GitLabOriginalSweepTests(unittest.TestCase):
             self.assertEqual(len({row["source_family"] for row in clean}), 20)
             self.assertFalse({row["task_id"] for row in clean} & excluded)
 
+    def test_stratified_queue_covers_five_templates_and_source_families(self):
+        with patch.object(sweep.bootstrap, "world", return_value=WORLD), \
+                patch.object(sweep.quarantine, "excluded_task_ids", return_value=set()):
+            chosen = sweep.stratified_order(sweep.candidates())[:5]
+            self.assertEqual(len({row["template_group"] for row in chosen}), 5)
+            self.assertEqual(len({row["source_family"] for row in chosen}), 5)
+
 
 class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
     async def test_gui_error_is_recorded_before_sweep_stops(self):
@@ -77,8 +88,7 @@ class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
                     patch.object(sweep.verify, "state_snapshot",
                                  return_value={"business_sha256": "same"}), \
                     patch.object(sweep.gui_controls, "run", side_effect=fail):
-                with self.assertRaises(TimeoutError):
-                    await sweep.run(1)
+                summary = await sweep.run(1)
                 index = json.loads((private / "index.json").read_text())
                 self.assertEqual(index["items"]["private-test-id"]["status"],
                                  "driver_or_environment_failed")
@@ -86,6 +96,7 @@ class GitLabSweepFailurePersistenceTests(unittest.IsolatedAsyncioTestCase):
                                  "TimeoutError")
                 self.assertEqual(len(index["items"]["private-test-id"]["attempts"]), 1)
                 self.assertEqual((private / "index.json").stat().st_mode & 0o777, 0o600)
+                self.assertEqual(summary["statuses"]["driver_or_environment_failed"], 1)
 
 
 if __name__ == "__main__":

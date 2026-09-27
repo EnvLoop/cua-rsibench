@@ -205,6 +205,66 @@ def promote_replacement_baseline() -> dict:
             "official_final_admitted": 0}
 
 
+def promote_scoped_operator_baseline() -> dict:
+    """Promote the checked non-admin split ACLs into a third cold seed."""
+    from . import operators
+
+    global VM_ROOT
+    if runtime.ACTIVE_VERSION != "v2" or not STATE_FILE.exists():
+        raise RuntimeError("operator promotion requires active v2 cold baseline")
+    acl_gui = json.loads((PRIVATE / "operator-acl-gui-receipt-private.json").read_text())
+    if (not acl_gui.get("acl_gui_passed") or acl_gui.get("own_project_gui_successes") != 3
+            or acl_gui.get("cross_partition_gui_denials") != 6):
+        raise RuntimeError("native GUI partition ACL control incomplete")
+    if not operators.RECEIPT.exists():
+        raise RuntimeError("non-admin operator bootstrap absent")
+    current = verify.state_snapshot()
+    verify.verify_bootstrap(current)
+    if len(current["project_ids"]) != 31:
+        raise RuntimeError("reserve-refilled world missing")
+    old_baseline = json.loads((PRIVATE / "baseline-persisted-state.json").read_text())
+    if len(old_baseline["project_ids"]) != 31 or old_baseline["schema"] == current["schema"]:
+        raise RuntimeError("v2 baseline not preserved separately from scoped ACL revision")
+    _stop_remove_case()
+    next_volumes = runtime.volume_names("v3")
+    for role, volume in next_volumes.items():
+        runtime.docker("volume", "create", volume, timeout=30)
+        vm_shell(f"set -eu; cp -a {VM_ROOT}/{role}/merged/. "
+                 f"/var/lib/docker/volumes/{volume}/_data/", timeout=600)
+    for role in runtime.DESTS:
+        base = f"{VM_ROOT}/{role}"
+        vm_shell("set -eu; "
+                 f"if mountpoint -q {base}/merged; then umount {base}/merged; fi")
+    args = ["run", "-d", "--name", runtime.WORLD, "--hostname", "gitlab-world.local",
+            "--restart", "no", "--env-file", str(runtime._env_file()),
+            "-p", "127.0.0.1:8014:8014"]
+    for role, destination in runtime.DESTS.items():
+        args.extend(["-v", next_volumes[role] + ":" + destination])
+    args.append(runtime.IMAGE)
+    runtime.docker(*args)
+    runtime.wait_world()
+    copied = verify.state_snapshot()
+    if copied["business_sha256"] != current["business_sha256"]:
+        raise RuntimeError("v3 seed volumes differ from checked operator ACL state")
+    (PRIVATE / "baseline-persisted-state.json").rename(
+        PRIVATE / "baseline-persisted-state-v2.json")
+    STATE_FILE.rename(PRIVATE / "cow-reset-state-v2.json")
+    verify.save_baseline(copied)
+    temporary = runtime.ACTIVE_VERSION_FILE.with_suffix(".tmp")
+    temporary.write_text("v3\n")
+    temporary.chmod(0o600)
+    temporary.replace(runtime.ACTIVE_VERSION_FILE)
+    runtime.ACTIVE_VERSION = "v3"
+    runtime.VOLUMES = next_volumes
+    VM_ROOT = "/var/lib/envloop-gitlab-cow-v3"
+    frozen = freeze()
+    return {"schema": "envloop-gitlab-scoped-operator-cold-baseline-v1",
+            "non_admin_operator_count": 3, "cross_partition_gui_denials": 6,
+            "project_count": 31, "baseline_business_sha256": copied["business_sha256"],
+            "cold_clone_equal": frozen["same_business_sha256"],
+            "official_final_admitted": 0}
+
+
 def reset() -> dict:
     state = _state()
     baseline = _baseline()
@@ -280,7 +340,7 @@ def restore_preserved_demo(*, remove_seed_volumes: bool = False) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=["freeze", "reset", "restore-demo",
-                                           "resume", "promote-reserve"])
+                                           "resume", "promote-reserve", "promote-operators"])
     args = parser.parse_args()
     if args.action == "freeze":
         result = freeze()
@@ -290,6 +350,8 @@ def main() -> None:
         result = resume_after_demo()
     elif args.action == "promote-reserve":
         result = promote_replacement_baseline()
+    elif args.action == "promote-operators":
+        result = promote_scoped_operator_baseline()
     else:
         result = restore_preserved_demo()
     print(json.dumps(result, indent=2, sort_keys=True))

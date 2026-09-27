@@ -12,7 +12,7 @@ import subprocess
 from . import bootstrap, factory, runtime
 
 
-SCHEMA = "envloop-gitlab-persisted-state-v1"
+SCHEMA = "envloop-gitlab-persisted-state-v2"
 
 
 def _ids() -> list[int]:
@@ -78,7 +78,23 @@ def git_blob(project_id: int, ref: str, path: str) -> bytes:
 def state_snapshot() -> dict:
     ids = _ids()
     id_sql = ",".join(map(str, ids))
+    from . import operators
+    progress = json.loads(bootstrap.PROGRESS_FILE.read_text())
+    group_ids = sorted(int(value) for value in progress["groups"].values())
+    operator_receipt = json.loads(operators.RECEIPT.read_text())
+    operator_ids = sorted(int(item["user_id"])
+                          for item in operator_receipt["identities"].values())
+    if len(group_ids) != 3 or len(set(group_ids)) != 3 or len(operator_ids) != 3:
+        raise RuntimeError("operator or group roster invalid")
+    group_sql = ",".join(map(str, group_ids))
+    operator_sql = ",".join(map(str, operator_ids))
     query = {
+        "groups": ("id,path,type,visibility_level,parent_id", "namespaces",
+                   f"id IN ({group_sql})", "id"),
+        "group_members": ("id,source_id,user_id,access_level,expires_at,state,type",
+                          "members", f"source_type='Namespace' AND source_id IN ({group_sql})", "id"),
+        "operators": ("id,username,state,admin,external", "users",
+                      f"id IN ({operator_sql})", "id"),
         "projects": ("id,name,path,namespace_id,visibility_level,archived,"
                      "only_allow_merge_if_pipeline_succeeds", "projects", f"id IN ({id_sql})", "id"),
         "issues": ("id,project_id,iid,title,description,milestone_id,due_date,state_id,confidential",
@@ -162,6 +178,8 @@ def verify_bootstrap(snapshot: dict) -> dict:
                 "members": project_count * 3,
                 "merge_requests": project_count * 2,
                 "projects_with_git_refs": project_count}
+    if snapshot["schema"] == SCHEMA:
+        expected.update(groups=3, group_members=6, operators=3)
     actual = counts(snapshot)
     for name, value in expected.items():
         if actual[name] != value:
@@ -170,6 +188,19 @@ def verify_bootstrap(snapshot: dict) -> dict:
         raise RuntimeError("every project requires main and two MR branches")
     if actual["milestones"] != 0 or actual["issue_assignees"] != 0:
         raise RuntimeError("GitLab initial milestone or assignee state is not blank")
+    if snapshot["schema"] == SCHEMA:
+        if not all(row["admin"] is False for row in snapshot["db"]["operators"]):
+            raise RuntimeError("benchmark operator is an administrator")
+        if not all(row["visibility_level"] == 0 for row in snapshot["db"]["groups"]):
+            raise RuntimeError("benchmark group is not private")
+        operator_ids = {row["id"] for row in snapshot["db"]["operators"]}
+        group_ids = {row["id"] for row in snapshot["db"]["groups"]}
+        scoped = [row for row in snapshot["db"]["group_members"]
+                  if row["user_id"] in operator_ids]
+        if (len(scoped) != 3 or {row["user_id"] for row in scoped} != operator_ids
+                or {row["source_id"] for row in scoped} != group_ids
+                or any(row["access_level"] != 50 for row in scoped)):
+            raise RuntimeError("benchmark operators are not one-owner-per-private-group")
     return {"schema": "envloop-gitlab-real-world-readback-v1",
             "counts": actual, "business_sha256": snapshot["business_sha256"],
             "independent_postgresql_and_git_readback": True,
@@ -346,6 +377,11 @@ def evaluate_final_task(task: dict, before: dict, after: dict,
             _require(a[approved_iid]["state_id"] == 3 and
                      a[approved_iid]["merge_commit_sha"] is not None,
                      "approved MR is not persisted as merged")
+            expected_mr = dict(b[approved_iid])
+            for field in ("state_id", "merge_commit_sha", "merged_commit_sha"):
+                expected_mr[field] = a[approved_iid][field]
+            _require(a[approved_iid] == expected_mr,
+                     "approved MR changed beyond merge state and commit SHA")
             _require(before["git"][str(project_id)]["refs"]["refs/heads/main"] !=
                      after["git"][str(project_id)]["refs"]["refs/heads/main"],
                      "default branch did not advance")
