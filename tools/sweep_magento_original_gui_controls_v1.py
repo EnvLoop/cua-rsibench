@@ -343,6 +343,13 @@ def main() -> None:
             freeze_path, ROOT, probe_dir, train_dir)
         require(cellwide_freeze['final_candidate_plan_sha256'] == args.plan_sha256,
                 'cell-wide freeze belongs to a different candidate plan')
+        for candidate in (ROOT / 'work/magento-original').glob('*/events.private.jsonl'):
+            lines = candidate.read_bytes().splitlines()
+            if not lines:
+                continue
+            started = json.loads(lines[0])
+            require(started.get('cellwide_cron_freeze_sha256') != freeze_sha,
+                    'cell-wide 100-case sweep already dispatched for this runtime freeze')
     manifest = json.loads(raw_plan)
     cases = manifest['cases'][args.split]
     require(len(cases) == PLAN_CELLS[args.split] and
