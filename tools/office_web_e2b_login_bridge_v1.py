@@ -138,9 +138,10 @@ def stop(session_path: Path, sandbox_factory) -> dict:
             session['status'] == 'awaiting_manual_login' and
             session['task_split'] == 'train_only',
             'login bridge session changed')
-    sandbox = sandbox_factory.connect(session['sandbox_id'])
     try:
-        killed = sandbox.kill()
+        # The class-level kill path avoids reconnecting to (and potentially
+        # resuming) a paused sandbox merely to terminate it.
+        killed = sandbox_factory.kill(session['sandbox_id'])
     except Exception:
         killed = False
     receipt = {'schema': SCHEMA, 'status':

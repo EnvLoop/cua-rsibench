@@ -58,9 +58,9 @@ class FakeFactory:
         self.sandbox = FakeSandbox(self.template_id)
         return self.sandbox
 
-    def connect(self, sandbox_id: str):
+    def kill(self, sandbox_id: str) -> bool:
         assert sandbox_id == self.sandbox.sandbox_id
-        return self.sandbox
+        return self.sandbox.kill()
 
 
 class OfficeWebLoginBridgeTests(unittest.TestCase):
