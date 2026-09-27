@@ -1,0 +1,14 @@
+{
+  "actual_provider_billed_usd": null,
+  "e2b_sandboxes_created_at_reservation": 0,
+  "initial_full_lease_reserved_usd": "50",
+  "initial_sandbox_count": 300,
+  "lane_cap_usd": "60",
+  "maximum_attempt_count_including_manual_recovery": 360,
+  "official_final_admissions": 0,
+  "official_final_model_attempts": 0,
+  "private_reservation_sha256": "8fd64cad37495252a6d0540298559351da82eac1ec78d22cbf131c93ea12a03d",
+  "ratification_sha256": "30a0f3501b8e5ae5bace62aa68adea59c176778906349fb8b0a3a7b33845caa2",
+  "schema": "cua-native-wdi-v066-control-lane-public-reservation-v1",
+  "status": "reserved_before_first_evaluator_control_create"
+}
