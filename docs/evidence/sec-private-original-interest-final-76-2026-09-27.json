@@ -1,0 +1,73 @@
+{
+  "schema": "sec-private-original-interest-final-76-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "four additional original SEC 10-K filing-distinct offline final candidates in reported interest-coverage workflow; zero official Excel-web hidden-final admission",
+  "additional_original_sec_10k_accessions_accepted": 4,
+  "additional_new_issuer_families": 0,
+  "additional_selected_original_numeric_facts": 56,
+  "additional_supporting_original_numeric_controls": 20,
+  "additional_offline_actor_reference_pairs": 4,
+  "additional_checked_formula_targets": 252,
+  "additional_individually_detected_faults": 36,
+  "additional_positive_references_passed": 4,
+  "additional_unrepaired_actors_rejected": 4,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcoded_target_and_collateral_original_fact_edit_controls_rejected": true,
+  "positive_gross_interest_expense_population_kept_separate_from_signed_interest_income": true,
+  "negative_net_interest_expense_population_preserved_as_filed": true,
+  "current_debt_sign_scope_preserved_per_original_filing": true,
+  "parallel_private_staging_collision_resolved_and_prior_staging_receipts_invalidated": true,
+  "cumulative_private_issuer_families_disjoint_from_public_development": 28,
+  "cumulative_offline_actor_reference_pairs": 76,
+  "cumulative_original_numeric_facts_checked": 1123,
+  "cumulative_private_semantic_workflow_graphs": 15,
+  "cumulative_final_semantic_workflow_graphs": 12,
+  "cumulative_checked_formula_targets": 5401,
+  "cumulative_individually_detected_faults": 684,
+  "private_split_reservations": {
+    "train": 20,
+    "selection": 20,
+    "final": 100
+  },
+  "offline_candidates": {
+    "train": 7,
+    "selection": 7,
+    "final": 62
+  },
+  "empty_reservations": {
+    "train": 13,
+    "selection": 13,
+    "final": 38
+  },
+  "maximum_offline_cases_per_issuer": 5,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "pre_result_reservation_amendment": "Four empty final slots of two previously reserved issuer families were assigned distinct original 10-K accessions before model outcomes.",
+  "private_evidence_sha256": {
+    "positive_interest_source_controls": "12892e5c8405046df5bb604f0cb9440ffeb646b269920ce2b57e000d69b358f7",
+    "positive_interest_source_acceptance": "5b24cbf94765fcff1737977eee126ffb4031608be9c0b9b5a58087d161e4f820",
+    "positive_interest_first_verified_source": "0eb55554a8f83d4574812352d5858836df67c577aa8c3820ee5dc5b02e5e04c1",
+    "positive_interest_second_verified_source": "42f633304a8107dc30ea07bf909b978c12bd91c0cf444a81df75860be771fb9a",
+    "positive_interest_case_manifest": "24674fc435da6ee45306bef5dececddd7df4582530be82ea748877292178fded",
+    "positive_interest_offline_audit": "62807e26c68af12166cdfba97580d091fc14b43d131500098e0cff2ca66746de",
+    "positive_interest_independent_ooxml_verifier": "9b07e5bb1229c7585c130d81f42f15cf8e394d7899d7eef6bf6852b9e41a913a",
+    "preserved_transient_staging_manifest": "1b7c3ccb23101ebc0e5294df484b344b2be81b9fc0e2853c74dba4994d48866f",
+    "negative_interest_source_controls": "039a6d4b4ded4e25b98ac404ef6c402aab34b80ec55569d636ea3e80a9f0975d",
+    "negative_interest_source_acceptance": "b568a6f29c2006624f137cfb30967c8c7fab0d69a40b29ea7489252592a7bd76",
+    "negative_interest_first_verified_source": "0f5665b29c085f01d450207f8ab338ba7b1466acf603af007bde807fdecbc299",
+    "negative_interest_second_verified_source": "3bcc82521dbf57d70bbe6b3dd5e7cf1c7bf4cb0b29bf5ac8991d077e686c4061",
+    "negative_interest_case_manifest": "4185dc5199fabc00d633508900896b27d0388fdc9140339beb69432dc209d2e9",
+    "negative_interest_offline_audit": "52b1cf2162b339fe11731b3029bade8a989224a47d890e9782f8dbee19a8bf9f",
+    "negative_interest_private_workbook_builder": "9c37de0751ab8a2d8455f23337751503485406ff3a11543d0409d1efabaa78b6",
+    "negative_interest_independent_ooxml_verifier": "f6d180d5185478965329884e29abf0153e433e6d6aa9173969562b199aa016c8",
+    "private_split_slot_reservations": "2054627fc28a677a0d4ec5eaa7fb1cb215f9f41736ea17308b7c72f60e123104",
+    "integrated_offline_audit": "5fb4d2a93ebcad6854ca97d46af16a82434df23afd4714ca666ec0eae4ec3a62",
+    "integrated_auditor": "0e90d2aa6f280069e3eb58c0db43ffecf1ee04e8a958f09096ea6ae7360d4362",
+    "private_slot_allocator": "4a3e3d3d4c6c4319f8b2d148943fb414fe360eedebcb99b11a9711ac3110f885"
+  },
+  "limitations": [
+    "The two source families use different original interest conventions: positive gross expense with separate signed income versus negative net expense. Case-specific sign policies retain the filing values and convert only for coverage arithmetic.",
+    "A transient concurrent private-staging directory collision was isolated. Earlier collision-state bytes were preserved; the affected pair was rebuilt under a unique path and all source, workbook, mutation, visual, and regression checks rerun before integration.",
+    "The remaining 64 reservations are empty, including 38 of 100 final slots. No hidden-final ID has its own Microsoft Excel for the web saved/downloaded readback and fresh-copy reset."
+  ]
+}
