@@ -4,9 +4,9 @@ The only task view accepted here is the exact return value from
 ``CampaignSession.start_selection_attempt``. It contains no train or final
 instructions. The selected checkpoint path is private and its SHA-256 must
 match that start receipt. A frozen campaign supplies ``dispatch_paid``: one
-real local-application planning reservation and one bounded Tinker batch are
-durably recorded before their corresponding environment/model work. Local
-runtime is metered separately from any provider invoice.
+local-application reservation, one sampler-setup reservation, and a distinct
+paid attempt per SDK sample are durable before their work. Local runtime and
+rendered token counts are kept separate from provider invoices.
 
 This worker is disabled for live execution until a six-cell ratification,
 source bindings, and a private local cost authority are present. It has no
@@ -15,6 +15,7 @@ public CLI. Fake-provider tests never start Docker or a Tinker service.
 
 from __future__ import annotations
 
+import base64
 from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
 from hashlib import sha256
@@ -109,6 +110,7 @@ def _start_view(started: object, checkpoint_path: str) -> dict:
             "selection_identities_sha256", "task_count"} or
             type(started["attempt_id"]) is not str or
             campaign.dollars.ATTEMPT.fullmatch(started["attempt_id"]) is None or
+            len(started["attempt_id"]) > 100 or
             type(checkpoint_path) is not str or
             campaign.TINKER_PATH.fullmatch(checkpoint_path) is None or
             _hash(checkpoint_path.encode()) != started["checkpoint_path_sha256"] or
@@ -163,13 +165,16 @@ def _student_sampling_config(raw: object, config_sha: str) -> dict:
 
 
 def tinker_upper_reserve_usd(config: dict) -> str:
-    calls = MAX_TASKS * MAX_ACTIONS
-    tokens_usd = (Decimal(calls) * (
+    return str(_money(tinker_sample_reserve_usd(config)) *
+               Decimal(MAX_TASKS * MAX_ACTIONS + 1))
+
+
+def tinker_sample_reserve_usd(config: dict) -> str:
+    tokens_usd = (
         Decimal(MAX_INPUT_TOKENS) *
         _money(config["prefill_usd_per_million_tokens"]) +
         Decimal(config["sample_max_tokens"]) *
-        _money(config["sample_usd_per_million_tokens"])) /
-        Decimal(1_000_000))
+        _money(config["sample_usd_per_million_tokens"])) / Decimal(1_000_000)
     return str((tokens_usd * _money(config["billing_multiplier_upper"]))
                .quantize(Decimal("0.000000001"), rounding=ROUND_CEILING))
 
@@ -262,6 +267,10 @@ def _audit_task_artifacts(directory: Path, task: dict, row: dict) -> None:
             usage.get("sampled_output_tokens") != row.get(
                 "sampled_output_tokens") or
             len(usage.get("samples", [])) != row.get("sample_count") or
+            type(row.get("sample_paid_attempt_ids")) is not list or
+            len(row["sample_paid_attempt_ids"]) != row.get("sample_count") or
+            [sample.get("paid_attempt_id") for sample in usage["samples"]]
+            != row["sample_paid_attempt_ids"] or
             type(frames) is not list or
             len(frames) != row.get("frame_count") or not frames):
         raise SelectionWorkerError("selection_task_independent_evidence_invalid")
@@ -358,6 +367,154 @@ class RealTinkerSelectionSampler:
             except Exception:
                 raise SelectionProviderUncertain(
                     "selection_sampler_close_uncertain") from None
+
+
+class _PaidSelectionSampler:
+    """Reserve one exact, frame-bound Tinker attempt before each SDK sample."""
+
+    def __init__(self, *, delegate, dispatch_paid: Callable, start: dict,
+                 config: dict, config_sha256: str, runtime_sha256: str,
+                 paid_attempt_ids: list[str], declared_attempt_ids: list[str],
+                 timeout_rows: list[dict]):
+        self.delegate = delegate
+        self.dispatch_paid = dispatch_paid
+        self.start = start
+        self.config = config
+        self.config_sha256 = config_sha256
+        self.runtime_sha256 = runtime_sha256
+        self.paid_attempt_ids = paid_attempt_ids
+        self.declared_attempt_ids = declared_attempt_ids
+        self.timeout_rows = timeout_rows
+
+    def sample(self, observation: Observation, *, task_index: int,
+               step: int, task_dir: Path) -> dict:
+        if (type(observation) is not Observation or
+                not 1 <= task_index <= MAX_TASKS or
+                not 0 <= step < MAX_ACTIONS or
+                len(observation.screenshot_bytes) > 4_000_000 or
+                observation.task_id != self.start[
+                    "selection_tasks"][task_index - 1]["task_id"] or
+                observation.task_binding_sha256 != self.start[
+                    "selection_tasks"][task_index - 1]["package_sha256"]):
+            raise SelectionWorkerError("selection_paid_sample_frame_unbound")
+        rendered = output_v066.render_for_model(observation)
+        paid_id = (self.start["attempt_id"] +
+                   f"-sample-{task_index:02d}-{step:03d}")
+        self.declared_attempt_ids.append(paid_id)
+        frame_sha = _hash(observation.screenshot_bytes)
+        request = {
+            "schema": "cua-full-study-selection-sampling-request-v1",
+            "cell_id": "odoo-community",
+            "selection_attempt": self.start["attempt_id"],
+            "selection_identities_sha256": self.start[
+                "selection_identities_sha256"],
+            "checkpoint_path_sha256": self.start[
+                "checkpoint_path_sha256"],
+            "student_config_sha256": self.config_sha256,
+            "worker_runtime_sha256": self.runtime_sha256,
+            "task_id": observation.task_id,
+            "package_sha256": observation.task_binding_sha256,
+            "task_index": task_index,
+            "step": step,
+            "frame_id": observation.frame_id,
+            "frame_sha256": frame_sha,
+            "image_base64": base64.b64encode(
+                observation.screenshot_bytes).decode(),
+            "instruction": rendered["instruction"],
+            "visible_text": rendered["visible_text"],
+            "max_input_tokens": MAX_INPUT_TOKENS,
+            "max_output_tokens": self.config["sample_max_tokens"],
+        }
+
+        def call(paid_request: dict) -> dict:
+            if (paid_request != request or
+                    _hash(base64.b64decode(
+                        paid_request["image_base64"], validate=True)) !=
+                    frame_sha):
+                raise SelectionWorkerError("selection_paid_frame_request_changed")
+            result = self.delegate.sample(
+                observation, task_index=task_index, step=step,
+                task_dir=task_dir)
+            if (type(result) is not dict or
+                    result.get("status") != "completed" or
+                    result.get("new_dispatch") is not True or
+                    result.get("reused") is True):
+                self.timeout_rows.append({
+                    "task_index": task_index, "step": step,
+                    "paid_attempt_id": paid_id,
+                    "failure_class": "provider_or_timeout_uncertain",
+                    "subtype": (result.get("error_subtype") if
+                                type(result) is dict else
+                                "provider_result_invalid"),
+                })
+                raise SelectionProviderUncertain(
+                    "selection_tinker_sample_uncertain")
+            usage = result.get("usage")
+            if (type(result.get("text")) is not str or
+                    type(usage) is not dict or
+                    type(usage.get("input_tokens")) is not int or
+                    type(usage.get("output_tokens")) is not int or
+                    usage["input_tokens"] <= 0 or
+                    usage["output_tokens"] < 0):
+                self.timeout_rows.append({
+                    "task_index": task_index, "step": step,
+                    "paid_attempt_id": paid_id,
+                    "failure_class": "provider_usage_ambiguous",
+                    "subtype": "completed_without_bounded_usage",
+                })
+                raise SelectionProviderUncertain(
+                    "selection_tinker_usage_ambiguous")
+            return {
+                "schema": "envloop-odoo-v066-paid-sample-result-v1",
+                "status": "completed", "text": result["text"],
+                "request_id": result.get("request_id"),
+                "error_subtype": None,
+                "new_dispatch": True, "reused": False,
+                "rendered_usage": usage,
+                "usage": {"provider_billed_tokens": None},
+                "sampler_result_sha256": _hash(_canonical(result)),
+            }
+
+        try:
+            paid = self.dispatch_paid(
+                attempt_id=paid_id, category="tinker",
+                work={"selection_attempt": self.start["attempt_id"],
+                      "task_id": observation.task_id,
+                      "package_sha256": observation.task_binding_sha256,
+                      "checkpoint_path_sha256": self.start[
+                          "checkpoint_path_sha256"],
+                      "task_index": task_index, "step": step,
+                      "frame_sha256": frame_sha},
+                request=request,
+                reserve_usd=tinker_sample_reserve_usd(self.config),
+                resource_reservation={}, provider=call)
+        except Exception:
+            if not any(row.get("paid_attempt_id") == paid_id for row in
+                       self.timeout_rows):
+                self.timeout_rows.append({
+                    "task_index": task_index, "step": step,
+                    "paid_attempt_id": paid_id,
+                    "failure_class": "reservation_or_provider_uncertain",
+                    "subtype": "paid_attempt_not_replayable",
+                })
+            raise SelectionProviderUncertain(
+                "selection_tinker_paid_attempt_uncertain") from None
+        result = paid.get("result") if type(paid) is dict else None
+        if (type(paid) is not dict or
+                paid.get("attempt_id") != paid_id or
+                type(result) is not dict or
+                result.get("status") != "completed" or
+                type(result.get("text")) is not str):
+            self.timeout_rows.append({
+                "task_index": task_index, "step": step,
+                "paid_attempt_id": paid_id,
+                "failure_class": "paid_result_ambiguous",
+                "subtype": "paid_response_cannot_be_scored",
+            })
+            raise SelectionProviderUncertain(
+                "selection_tinker_paid_result_ambiguous")
+        self.paid_attempt_ids.append(paid_id)
+        return {**result, "paid_attempt_id": paid_id}
 
 
 class RealOdooSelectionEnvironment:
@@ -568,9 +725,10 @@ class RealOdooSelectionEnvironment:
                     samples.append({
                         "step": step, "status": result.get("status"),
                         "error_subtype": result.get("error_subtype"),
-                        "usage": result.get("usage"),
+                        "usage": result.get("rendered_usage"),
                         "request_id_sha256": _hash(str(result.get(
                             "request_id", "")).encode()),
+                        "paid_attempt_id": result.get("paid_attempt_id"),
                         "model_text_sha256": (_hash(result["text"].encode())
                                               if type(result.get("text")) is str
                                               else None),
@@ -578,7 +736,7 @@ class RealOdooSelectionEnvironment:
                     if result.get("status") != "completed":
                         raise SelectionProviderUncertain(
                             "selection_tinker_sample_uncertain")
-                    usage = result.get("usage")
+                    usage = result.get("rendered_usage")
                     if (type(usage) is not dict or
                             type(usage.get("input_tokens")) is not int or
                             type(usage.get("output_tokens")) is not int or
@@ -593,7 +751,15 @@ class RealOdooSelectionEnvironment:
                     except ContractError:
                         termination = "model_action_invalid"
                         break
-                    applied = adapter.dispatch(action)
+                    try:
+                        applied = adapter.dispatch(action)
+                    except ContractError as exc:
+                        if (exc.code == "expired_frame" and
+                                time.monotonic() - started >
+                                WALL_SECONDS_PER_TASK):
+                            termination = "task_wall_budget"
+                            break
+                        raise
                     actions.append({
                         "step": step, "frame_sha256": _hash(frame_raw),
                         "action_type": action["type"],
@@ -686,6 +852,8 @@ class RealOdooSelectionEnvironment:
                 "frame_count": len(frames),
                 "usage_sha256": usage_sha,
                 "sample_count": len(samples),
+                "sample_paid_attempt_ids": [row["paid_attempt_id"]
+                                            for row in samples],
                 "rendered_input_tokens": rendered_input,
                 "sampled_output_tokens": sampled_output,
                 "termination": termination}
@@ -800,6 +968,8 @@ class OdooSelectionWorker:
         task_rows = []
         timeout_rows = []
         environment_failure = False
+        sampler_holder = None
+        sampler_open = False
         try:
             self._preflight_renderer()
             self.environment.validate_tasks(start["selection_tasks"])
@@ -836,10 +1006,11 @@ class OdooSelectionWorker:
                 raise SelectionWorkerError(
                     "selection_local_service_reservation_ambiguous")
             paid_attempt_ids.append(local_id)
-            sample_id = start["attempt_id"] + "-tinker-batch"
-            declared_paid_attempt_ids.append(sample_id)
-            sample_request = {
+            setup_id = start["attempt_id"] + "-tinker-setup"
+            declared_paid_attempt_ids.append(setup_id)
+            setup_request = {
                 "schema": "cua-full-study-selection-sampling-request-v1",
+                "kind": "checkpoint_sampler_setup",
                 "cell_id": self.cell_id,
                 "selection_attempt": start["attempt_id"],
                 "selection_identities_sha256": start[
@@ -848,178 +1019,170 @@ class OdooSelectionWorker:
                     "checkpoint_path_sha256"],
                 "student_config_sha256": student_config_sha256,
                 "worker_runtime_sha256": self.runtime_sha256,
-                "task_count": MAX_TASKS,
-                "max_actions_per_task": MAX_ACTIONS,
-                "wall_seconds_per_task": WALL_SECONDS_PER_TASK,
-                "max_input_tokens_per_action": MAX_INPUT_TOKENS,
-                "max_output_tokens_per_action": config[
-                    "sample_max_tokens"],
+                "model": "Qwen/Qwen3.8-27B",
                 "provider_invoice_usd": None,
             }
+            sampler_holder = self._make_sampler(
+                checkpoint_path, config, out_dir, start["attempt_id"])
 
-            def run_batch(_request: dict) -> dict:
-                nonlocal task_rows, timeout_rows, environment_failure
-                current = time.monotonic()
-                try:
-                    with self.environment.batch() as active:
-                        with self._make_sampler(checkpoint_path, config, out_dir,
-                                                start["attempt_id"]) as sampler:
-                            for index, task in enumerate(
-                                    start["selection_tasks"], 1):
-                                directory = (out_dir / "tasks" /
-                                             f"task-{index:03d}")
-                                directory.mkdir(mode=0o700)
-                                try:
-                                    row = active.run_case(task, index, sampler,
-                                                          directory)
-                                except SelectionProviderUncertain as exc:
-                                    timeout_rows.append({
-                                        "task_index": index,
-                                        "failure_class":
-                                            "provider_or_timeout_uncertain",
-                                        "subtype": str(exc),
-                                    })
-                                    raise
-                                if (type(row) is not dict or
-                                        row.get("task_id") != task["task_id"] or
-                                        row.get("package_sha256") !=
-                                        task["package_sha256"] or
-                                        row.get("score") not in (0, 1) or
-                                        any(type(row.get(key)) is not str or
-                                            HEX64.fullmatch(row[key]) is None
-                                            for key in ("saved_state_sha256",
-                                                        "verifier_receipt_sha256",
-                                                        "reset_receipt_sha256"))):
-                                    raise SelectionWorkerError(
-                                        "selection_task_result_unbound")
-                                _audit_task_artifacts(directory, task, row)
-                                task_rows.append({
-                                    **row,
-                                    "checkpoint_sha256": start[
-                                        "checkpoint_path_sha256"],
-                                })
-                except SelectionProviderUncertain:
-                    raise
-                except Exception:
-                    environment_failure = True
-                    raise
-                runtime = self.environment.runtime_receipt
-                if (type(runtime) is not dict or
-                        runtime.get("services_restored_to_initial_state")
-                        is not True or
-                        runtime.get("final_database_snapshot_equal") is not True or
-                        runtime.get("final_physical_filestore_equal") is not True or
-                        runtime.get("elapsed_seconds", LOCAL_LEASE_SECONDS + 1)
-                        > LOCAL_LEASE_SECONDS):
-                    environment_failure = True
-                    raise SelectionWorkerError("selection_batch_reset_unverified")
-                runtime_sha = _write_json(out_dir /
-                                          "local-runtime.private.json", runtime)
-                task_ledger_sha = _write_json(
-                    out_dir / "task-ledger.private.json", {
-                        "schema": "envloop-odoo-v066-selection-task-ledger-v1",
-                        "selection_attempt": start["attempt_id"],
-                        "checkpoint_sha256": start[
+            def setup_sampler(_request: dict) -> dict:
+                nonlocal sampler_open
+                sampler_holder.__enter__()
+                sampler_open = True
+                return {"schema": "envloop-odoo-v066-sampler-setup-v1",
+                        "status": "ready",
+                        "checkpoint_path_sha256": start[
                             "checkpoint_path_sha256"],
-                        "selection_identities_sha256": start[
-                            "selection_identities_sha256"],
-                        "worker_runtime_sha256": self.runtime_sha256,
-                        "verifier_sha256": self.verifier_sha256,
-                        "adapter_sha256": self.adapter_sha256,
-                        "environment_mapping_sha256":
-                            environment_class.binding_sha256(),
-                        "paid_attempt_ids": [local_id, sample_id],
-                        "rows": task_rows,
-                    })
-                result = {
-                    "schema": RESULT_SCHEMA,
-                    "cell_id": self.cell_id,
-                    "checkpoint_sha256": start["checkpoint_path_sha256"],
-                    "evaluator_isolated": True,
-                    "tasks": [{key: row[key] for key in (
-                        "task_id", "package_sha256", "score",
-                        "saved_state_sha256", "verifier_receipt_sha256",
-                        "reset_receipt_sha256")}
-                        for row in task_rows],
-                }
-                if len(result["tasks"]) != MAX_TASKS:
-                    raise SelectionWorkerError("selection_task_coverage_incomplete")
-                result_sha = _write_json(out_dir /
-                                         "selection-result.private.json", result)
-                usage = {"schema": USAGE_SCHEMA,
-                         "selection_attempt": start["attempt_id"],
-                         "checkpoint_sha256": start[
-                             "checkpoint_path_sha256"],
-                         "task_count": MAX_TASKS,
-                         "sample_calls": sum(row["sample_count"] for row in
-                                             task_rows),
-                         "rendered_input_tokens": sum(row[
-                             "rendered_input_tokens"] for row in task_rows),
-                         "sampled_output_tokens": sum(row[
-                             "sampled_output_tokens"] for row in task_rows),
-                         "task_usage_sha256s": [row["usage_sha256"] for
-                                                 row in task_rows],
-                         "task_ledger_sha256": task_ledger_sha,
-                         "local_runtime_receipt_sha256": runtime_sha,
-                         "tinker_provider_billed_usd": None,
-                         "local_provider_invoice_usd": None,
-                         "basis": "rendered_tokens_and_metered_local_wall_not_invoice",
-                         "elapsed_seconds": time.monotonic() - current}
-                usage_sha = _write_json(out_dir / "usage.private.json", usage)
-                timeout_sha = _write_json(out_dir / "timeouts.private.json", {
-                    "schema": TIMEOUT_SCHEMA,
-                    "selection_attempt": start["attempt_id"],
-                    "timeout_or_uncertain_count": len(timeout_rows),
-                    "rows": timeout_rows,
-                    "task_budget_termination_count": sum(
-                        row["termination"] in {"task_wall_budget",
-                                               "task_action_budget"}
-                        for row in task_rows),
-                    "task_budget_rows": [
-                        {"task_index": index,
-                         "termination": row["termination"]}
-                        for index, row in enumerate(task_rows, 1)
-                        if row["termination"] in {"task_wall_budget",
-                                                  "task_action_budget"}],
-                })
-                return {"schema": "envloop-odoo-v066-selection-batch-v1",
-                        "status": "completed",
-                        "result_sha256": result_sha,
-                        "usage_sha256": usage_sha,
-                        "timeouts_sha256": timeout_sha,
-                        "local_runtime_sha256": runtime_sha,
-                        "task_ledger_sha256": task_ledger_sha,
-                        "task_count": MAX_TASKS,
-                        "usage": {"input_tokens": usage[
-                                      "rendered_input_tokens"],
-                                  "output_tokens": usage[
-                                      "sampled_output_tokens"],
-                                  "provider_billed_tokens": None,
-                                  "basis": "per-task private sampler journals"}}
+                        "usage": {"provider_billed_tokens": None},
+                        "provider_invoice_usd": None}
 
-            current_stage = "tinker_batch_reservation_and_execution"
-            sampled = dispatch_paid(
-                attempt_id=sample_id, category="tinker",
+            current_stage = "tinker_setup_reservation"
+            setup_paid = dispatch_paid(
+                attempt_id=setup_id, category="tinker",
                 work={"selection_attempt": start["attempt_id"],
-                      "kind": "complete_20_task_qwen_sampling",
-                      "identities_sha256": start[
-                          "selection_identities_sha256"],
-                      "checkpoint_sha256": start[
+                      "kind": "checkpoint_sampler_setup",
+                      "checkpoint_path_sha256": start[
                           "checkpoint_path_sha256"]},
-                request=sample_request,
-                reserve_usd=tinker_upper_reserve_usd(config),
-                resource_reservation={}, provider=run_batch)
-            if (type(sampled) is not dict or
-                    sampled.get("attempt_id") != sample_id or
-                    sampled.get("result", {}).get("status") != "completed" or
-                    sampled["result"].get("task_count") != MAX_TASKS):
-                raise SelectionWorkerError("selection_tinker_batch_result_ambiguous")
-            paid_attempt_ids.append(sample_id)
-            result_raw = (out_dir / "selection-result.private.json").read_bytes()
-            result = json.loads(result_raw)
-            if (sampled["result"]["result_sha256"] != _hash(result_raw) or
-                    result["checkpoint_sha256"] != start[
-                        "checkpoint_path_sha256"] or
+                request=setup_request,
+                reserve_usd=tinker_sample_reserve_usd(config),
+                resource_reservation={}, provider=setup_sampler)
+            if (type(setup_paid) is not dict or
+                    setup_paid.get("attempt_id") != setup_id or
+                    setup_paid.get("result", {}).get("status") != "ready"):
+                raise SelectionProviderUncertain(
+                    "selection_sampler_setup_result_ambiguous")
+            paid_attempt_ids.append(setup_id)
+            paid_sampler = _PaidSelectionSampler(
+                delegate=sampler_holder, dispatch_paid=dispatch_paid,
+                start=start, config=config,
+                config_sha256=student_config_sha256,
+                runtime_sha256=self.runtime_sha256,
+                paid_attempt_ids=paid_attempt_ids,
+                declared_attempt_ids=declared_paid_attempt_ids,
+                timeout_rows=timeout_rows)
+            current_stage = "per_sample_tinker_and_odoo_gui"
+            try:
+                with self.environment.batch() as active:
+                    for index, task in enumerate(
+                            start["selection_tasks"], 1):
+                        directory = (out_dir / "tasks" /
+                                     f"task-{index:03d}")
+                        directory.mkdir(mode=0o700)
+                        row = active.run_case(task, index, paid_sampler,
+                                              directory)
+                        if (type(row) is not dict or
+                                row.get("task_id") != task["task_id"] or
+                                row.get("package_sha256") !=
+                                task["package_sha256"] or
+                                row.get("score") not in (0, 1) or
+                                any(type(row.get(key)) is not str or
+                                    HEX64.fullmatch(row[key]) is None
+                                    for key in ("saved_state_sha256",
+                                                "verifier_receipt_sha256",
+                                                "reset_receipt_sha256"))):
+                            raise SelectionWorkerError(
+                                "selection_task_result_unbound")
+                        _audit_task_artifacts(directory, task, row)
+                        task_rows.append({
+                            **row,
+                            "checkpoint_sha256": start[
+                                "checkpoint_path_sha256"],
+                        })
+            except SelectionProviderUncertain:
+                raise
+            except Exception:
+                environment_failure = True
+                raise
+            finally:
+                if sampler_open:
+                    try:
+                        sampler_holder.__exit__(None, None, None)
+                    finally:
+                        sampler_open = False
+            runtime = self.environment.runtime_receipt
+            if (type(runtime) is not dict or
+                    runtime.get("services_restored_to_initial_state")
+                    is not True or
+                    runtime.get("final_database_snapshot_equal") is not True or
+                    runtime.get("final_physical_filestore_equal") is not True or
+                    runtime.get("elapsed_seconds", LOCAL_LEASE_SECONDS + 1)
+                    > LOCAL_LEASE_SECONDS):
+                environment_failure = True
+                raise SelectionWorkerError("selection_batch_reset_unverified")
+            runtime_sha = _write_json(
+                out_dir / "local-runtime.private.json", runtime)
+            task_ledger_sha = _write_json(
+                out_dir / "task-ledger.private.json", {
+                    "schema": "envloop-odoo-v066-selection-task-ledger-v1",
+                    "selection_attempt": start["attempt_id"],
+                    "checkpoint_sha256": start[
+                        "checkpoint_path_sha256"],
+                    "selection_identities_sha256": start[
+                        "selection_identities_sha256"],
+                    "worker_runtime_sha256": self.runtime_sha256,
+                    "verifier_sha256": self.verifier_sha256,
+                    "adapter_sha256": self.adapter_sha256,
+                    "environment_mapping_sha256":
+                        environment_class.binding_sha256(),
+                    "paid_attempt_ids": paid_attempt_ids,
+                    "rows": task_rows,
+                })
+            result = {
+                "schema": RESULT_SCHEMA,
+                "cell_id": self.cell_id,
+                "checkpoint_sha256": start["checkpoint_path_sha256"],
+                "evaluator_isolated": True,
+                "tasks": [{key: row[key] for key in (
+                    "task_id", "package_sha256", "score",
+                    "saved_state_sha256", "verifier_receipt_sha256",
+                    "reset_receipt_sha256")}
+                    for row in task_rows],
+            }
+            if len(result["tasks"]) != MAX_TASKS:
+                raise SelectionWorkerError(
+                    "selection_task_coverage_incomplete")
+            result_sha = _write_json(
+                out_dir / "selection-result.private.json", result)
+            usage = {"schema": USAGE_SCHEMA,
+                     "selection_attempt": start["attempt_id"],
+                     "checkpoint_sha256": start[
+                         "checkpoint_path_sha256"],
+                     "task_count": MAX_TASKS,
+                     "sample_calls": sum(row["sample_count"] for row in
+                                         task_rows),
+                     "rendered_input_tokens": sum(row[
+                         "rendered_input_tokens"] for row in task_rows),
+                     "sampled_output_tokens": sum(row[
+                         "sampled_output_tokens"] for row in task_rows),
+                     "task_usage_sha256s": [row["usage_sha256"] for
+                                             row in task_rows],
+                     "paid_attempt_ids": paid_attempt_ids,
+                     "task_ledger_sha256": task_ledger_sha,
+                     "local_runtime_receipt_sha256": runtime_sha,
+                     "tinker_provider_billed_usd": None,
+                     "local_provider_invoice_usd": None,
+                     "basis":
+                         "per_sample_rendered_tokens_and_local_wall_not_invoice"}
+            usage_sha = _write_json(out_dir / "usage.private.json", usage)
+            timeout_sha = _write_json(out_dir / "timeouts.private.json", {
+                "schema": TIMEOUT_SCHEMA,
+                "selection_attempt": start["attempt_id"],
+                "timeout_or_uncertain_count": len(timeout_rows),
+                "rows": timeout_rows,
+                "task_budget_termination_count": sum(
+                    row["termination"] in {"task_wall_budget",
+                                           "task_action_budget"}
+                    for row in task_rows),
+                "task_budget_rows": [
+                    {"task_index": index,
+                     "termination": row["termination"]}
+                    for index, row in enumerate(task_rows, 1)
+                    if row["termination"] in {"task_wall_budget",
+                                              "task_action_budget"}],
+            })
+            result_raw = (out_dir /
+                          "selection-result.private.json").read_bytes()
+            if (result_sha != _hash(result_raw) or
                     [row["task_id"] for row in result["tasks"]] !=
                     [row["task_id"] for row in start["selection_tasks"]] or
                     [row["package_sha256"] for row in result["tasks"]] !=
@@ -1027,25 +1190,28 @@ class OdooSelectionWorker:
                      start["selection_tasks"]]):
                 raise SelectionWorkerError("selection_saved_result_changed")
             return {"status": "scored", "result": result,
-                    "result_sha256": _hash(result_raw),
+                    "result_sha256": result_sha,
                     "paid_attempt_ids": paid_attempt_ids,
                     "task_ledger_path": str(out_dir /
                                             "task-ledger.private.json"),
-                    "task_ledger_sha256": sampled[
-                        "result"]["task_ledger_sha256"],
+                    "task_ledger_sha256": task_ledger_sha,
                     "usage_receipt_path": str(out_dir /
                                               "usage.private.json"),
-                    "usage_receipt_sha256": sampled["result"]["usage_sha256"],
+                    "usage_receipt_sha256": usage_sha,
                     "timeout_receipt_path": str(out_dir /
                                                 "timeouts.private.json"),
-                    "timeout_receipt_sha256": sampled[
-                        "result"]["timeouts_sha256"],
+                    "timeout_receipt_sha256": timeout_sha,
                     "local_runtime_receipt_path": str(out_dir /
                         "local-runtime.private.json"),
-                    "local_runtime_receipt_sha256": sampled[
-                        "result"]["local_runtime_sha256"],
+                    "local_runtime_receipt_sha256": runtime_sha,
                     "provider_invoice_usd": None}
         except Exception as exc:
+            if sampler_open and sampler_holder is not None:
+                try:
+                    sampler_holder.__exit__(type(exc), exc,
+                                            exc.__traceback__)
+                except Exception:
+                    pass
             failure_type = ("environment" if environment_failure or
                             current_stage in {"local_preflight",
                                               "local_service_reservation"}

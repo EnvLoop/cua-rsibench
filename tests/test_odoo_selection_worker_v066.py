@@ -16,6 +16,7 @@ from PIL import Image
 
 from cursibench import full_study_campaign_dispatch_v1 as campaign
 from cursibench import scale_final_v06 as final
+from cursibench.scale_action_contract import make_observation
 from enterprise_fallback.odoo18 import selection_worker_v066 as selection
 
 
@@ -35,6 +36,7 @@ class FakeSampler:
     def __init__(self, events):
         self.events = events
         self.calls = 0
+        self.fail_at_task = None
 
     def __enter__(self):
         self.events.append("fake_sampler_open")
@@ -46,8 +48,16 @@ class FakeSampler:
     def sample(self, observation, *, task_index, step, task_dir):
         self.calls += 1
         self.events.append("fake_tinker_sample")
+        if self.fail_at_task == task_index:
+            return {"status": "error", "text": None,
+                    "request_id": f"fake-{task_index}-{step}",
+                    "new_dispatch": True, "reused": False,
+                    "error_subtype": "provider_timeout_uncertain",
+                    "usage": {"input_tokens": 100,
+                              "output_tokens": None}}
         return {"status": "completed", "text": '{"type":"finish"}',
                 "request_id": f"fake-{task_index}-{step}",
+                "new_dispatch": True, "reused": False,
                 "usage": {"input_tokens": 100, "output_tokens": 10}}
 
 
@@ -55,7 +65,6 @@ class FakeEnvironment:
     def __init__(self, events):
         self.events = events
         self.runtime_receipt = None
-        self.fail_at_task = None
         self.fail_reset = False
         self.tamper_artifact_at = None
         self.cases = []
@@ -87,12 +96,6 @@ class FakeEnvironment:
 
     def run_case(self, task, index, sampler, directory):
         self.cases.append(task["task_id"])
-        if self.fail_at_task == index:
-            raise selection.SelectionProviderUncertain(
-                "selection_tinker_sample_uncertain")
-        sampled = sampler.sample(None, task_index=index, step=0,
-                                 task_dir=directory)
-        assert sampled["status"] == "completed"
         frame_dir = directory / "frames"
         frame_dir.mkdir(mode=0o700)
         png = io.BytesIO()
@@ -101,6 +104,14 @@ class FakeEnvironment:
         frame_path.write_bytes(png.getvalue())
         frame_path.chmod(0o600)
         frame_sha = digest(png.getvalue())
+        observation = make_observation(
+            task_id=task["task_id"],
+            task_binding_sha256=task["package_sha256"],
+            instruction="Repair the visible synthetic selection record.",
+            step=0, screenshot_bytes=png.getvalue())
+        sampled = sampler.sample(observation, task_index=index, step=0,
+                                 task_dir=directory)
+        assert sampled["status"] == "completed"
         frames = private_json(directory / "frames.private.json", [{
             "path": "frames/step-000.png", "sha256": frame_sha,
         }])
@@ -133,7 +144,8 @@ class FakeEnvironment:
         usage = private_json(directory / "usage.private.json", {
             "schema": "envloop-odoo-selection-task-usage-v1",
             "task_id": task["task_id"],
-            "samples": [{"usage": sampled["usage"]}],
+            "samples": [{"usage": sampled["rendered_usage"],
+                         "paid_attempt_id": sampled["paid_attempt_id"]}],
             "rendered_input_tokens": 100, "sampled_output_tokens": 10,
             "provider_billed_usd": None,
             "sampling_journal_sha256": digest(journal.read_bytes()),
@@ -153,6 +165,7 @@ class FakeEnvironment:
                 "frame_count": 1,
                 "usage_sha256": usage,
                 "sample_count": 1,
+                "sample_paid_attempt_ids": [sampled["paid_attempt_id"]],
                 "rendered_input_tokens": 100,
                 "sampled_output_tokens": 10,
                 "termination": "model_finish"}
@@ -176,6 +189,7 @@ class FakePaidDispatch:
             self.events.append("paid_" + category + "_uncertain")
             raise campaign.DispatchError(
                 "paid_response_uncertain_reconcile_before_retry") from None
+        self.calls[-1]["result"] = result
         return {"attempt_id": attempt_id, "result": result,
                 "result_sha256": digest(selection._canonical(result)),
                 "billing_state": "awaiting_provider_usage_reconciliation"}
@@ -244,21 +258,27 @@ class SelectionWorkerTests(unittest.TestCase):
         self.assertEqual(self.paid.calls, [])
         self.assertEqual(self.events, [])
 
-    def test_exact_twenty_results_and_two_paid_attempts(self):
+    def test_exact_twenty_results_and_per_sample_paid_attempts(self):
         outcome = self.run_fake()
         self.assertEqual(outcome["status"], "scored")
         self.assertEqual([call["category"] for call in self.paid.calls],
-                         ["storage_application", "tinker"])
+                         ["storage_application"] + ["tinker"] * 21)
         self.assertEqual([call["resources"] for call in self.paid.calls],
-                         [{}, {}])
-        self.assertEqual(self.events[:5], [
+                         [{}] * 22)
+        self.assertTrue(all(call["result"].get("usage") ==
+                            {"provider_billed_tokens": None}
+                            for call in self.paid.calls[1:]))
+        self.assertEqual([call["result"].get("rendered_usage", {}).get(
+            "input_tokens") for call in self.paid.calls[2:]], [100] * 20)
+        self.assertEqual(self.events[:6], [
             "private_selection_manifest_checked",
             "paid_storage_application_reserved", "local_capacity_reserved",
-            "paid_tinker_reserved", "local_batch_open",
+            "paid_tinker_reserved", "fake_sampler_open",
+            "local_batch_open",
         ])
         self.assertEqual(len(self.environment.cases), 20)
         self.assertEqual(self.sampler.calls, 20)
-        self.assertEqual(len(outcome["paid_attempt_ids"]), 2)
+        self.assertEqual(len(outcome["paid_attempt_ids"]), 22)
         self.assertEqual(outcome["task_ledger_path"], str(self.out /
                          "task-ledger.private.json"))
         self.assertEqual(outcome["task_ledger_sha256"], digest((self.out /
@@ -268,6 +288,8 @@ class SelectionWorkerTests(unittest.TestCase):
         self.assertEqual(len(ledger["rows"]), 20)
         self.assertTrue(all(row["checkpoint_sha256"] ==
                             self.started["checkpoint_path_sha256"]
+                            for row in ledger["rows"]))
+        self.assertTrue(all(len(row["sample_paid_attempt_ids"]) == 1
                             for row in ledger["rows"]))
         self.assertEqual(ledger["paid_attempt_ids"],
                          outcome["paid_attempt_ids"])
@@ -299,7 +321,7 @@ class SelectionWorkerTests(unittest.TestCase):
                          .stat().st_mode & 0o077, 0)
 
     def test_uncertain_sample_is_invalid_not_model_zero(self):
-        self.environment.fail_at_task = 3
+        self.sampler.fail_at_task = 3
         outcome = self.run_fake()
         self.assertEqual(outcome["status"], "invalid")
         self.assertEqual(outcome["failure_type"], "provider")
@@ -313,7 +335,10 @@ class SelectionWorkerTests(unittest.TestCase):
         self.assertFalse(invalid["automatic_replay_authorized"])
         self.assertEqual(invalid["paid_attempt_ids_declared"], [
             "odoo-selection-001-local-service",
-            "odoo-selection-001-tinker-batch"])
+            "odoo-selection-001-tinker-setup",
+            "odoo-selection-001-sample-01-000",
+            "odoo-selection-001-sample-02-000",
+            "odoo-selection-001-sample-03-000"])
 
     def test_uncertain_local_reset_is_environment_invalid(self):
         self.environment.fail_reset = True
@@ -359,6 +384,116 @@ class SelectionWorkerTests(unittest.TestCase):
             with self.assertRaisesRegex(selection.SelectionWorkerError,
                                         "selection_private_manifest_mismatch"):
                 self.worker.environment.validate_tasks(changed)
+
+    def test_real_case_evaluator_path_uses_rendered_not_billed_usage(self):
+        task = self.started["selection_tasks"][0]
+        private = self.root / "selection" / "private"
+        private.mkdir(parents=True, mode=0o700)
+        private_json(private / "checkpoint_receipt.json", {
+            "db_sha256": "a" * 64, "filestore_sha256": "b" * 64})
+        private_json(private / "actor_credentials.json", {
+            "login": "synthetic-actor", "password": "synthetic-only"})
+        calls = {"score": 0, "snapshot": 0, "restore": 0}
+
+        def score(_case):
+            calls["score"] += 1
+            return ({"reward": 0.0, "checks_passed": False,
+                     "difference_codes": ["target_missing"]}
+                    if calls["score"] == 1 else
+                    {"reward": 1.0, "checks_passed": True,
+                     "difference_codes": []})
+
+        def snapshot():
+            calls["snapshot"] += 1
+            return ({"state": "saved"} if calls["snapshot"] == 2
+                    else {"state": "baseline"})
+
+        def restore():
+            calls["restore"] += 1
+            return {"business_snapshot_equal": True,
+                    "physical_filestore_equal_before_web_restart": True}
+
+        png = io.BytesIO()
+        Image.new("RGB", (160, 120), (80, 100, 120)).save(png, "PNG")
+
+        class Page:
+            url = "http://127.0.0.1:8093/odoo/purchase"
+            viewport_size = selection.VIEWPORT
+            def goto(self, url): self.url = url
+            def locator(self, _selector):
+                return SimpleNamespace(wait_for=lambda: None)
+            def screenshot(self, **_kwargs): return png.getvalue()
+            def reload(self, **_kwargs): return None
+
+        class Browser:
+            def __init__(self): self.page = Page()
+            def new_page(self, **_kwargs): return self.page
+            def close(self): return None
+
+        class Playwright:
+            def __enter__(self):
+                self.chromium = SimpleNamespace(
+                    launch=lambda **_kwargs: Browser())
+                return self
+            def __exit__(self, *_args): return False
+
+        class Adapter:
+            def __init__(self, page, **_kwargs):
+                self.finished = False
+            def observe_for_model(self, *, memory):
+                observation = make_observation(
+                    task_id=task["task_id"],
+                    task_binding_sha256=task["package_sha256"],
+                    instruction="Synthetic selection.", step=0,
+                    screenshot_bytes=png.getvalue(), memory=memory)
+                return observation, selection.output_v066.render_for_model(
+                    observation)
+            def dispatch(self, action):
+                self.finished = action["type"] == "finish"
+                return {"finished": self.finished,
+                        "public_contract_receipt": {"type": "finish"}}
+
+        class Sampler:
+            def sample(self, _observation, *, task_index, step, task_dir):
+                journal = task_dir / "sampling-journal" / "requests.sqlite3"
+                journal.parent.mkdir(mode=0o700)
+                journal.write_bytes(b"synthetic journal")
+                journal.chmod(0o600)
+                return {"status": "completed", "text": '{"type":"finish"}',
+                        "rendered_usage": {"input_tokens": 100,
+                                           "output_tokens": 10},
+                        "usage": {"provider_billed_tokens": None},
+                        "paid_attempt_id": "odoo-selection-001-sample-01-000",
+                        "request_id": "synthetic-request",
+                        "error_subtype": None}
+
+        factory = SimpleNamespace(PRIVATE=private,
+                                  local_config=lambda: {"ODOO_PORT": "8093"})
+        gui = SimpleNamespace(browser_login=lambda *_args: None)
+        reset = SimpleNamespace(restore=restore)
+        verify = SimpleNamespace(score=score, snapshot=snapshot)
+        self.worker.environment._cases = {
+            task["task_id"]: ("purchase", {"id": task["task_id"],
+                                            "prompt": "Synthetic selection."})}
+        self.worker.environment._package_by_id = {
+            task["task_id"]: task["package_sha256"]}
+        task_dir = self.work / "task-001"
+        task_dir.mkdir(mode=0o700)
+        with patch.object(self.worker.environment, "_module_boundary",
+                          return_value=(factory, gui, reset, verify, None)), \
+             patch("playwright.sync_api.sync_playwright",
+                   return_value=Playwright()), \
+             patch.object(selection, "OdooV066TrainAdapter", Adapter):
+            row = self.worker.environment.run_case(
+                task, 1, Sampler(), task_dir)
+        selection._audit_task_artifacts(task_dir, task, row)
+        self.assertEqual(row["score"], 1)
+        self.assertEqual(row["rendered_input_tokens"], 100)
+        self.assertEqual(row["sampled_output_tokens"], 10)
+        self.assertEqual(row["sample_paid_attempt_ids"],
+                         ["odoo-selection-001-sample-01-000"])
+        self.assertEqual(calls, {"score": 2, "snapshot": 3,
+                                 "restore": 2})
 
     def test_checkpoint_task_and_training_config_tamper_precede_paid_work(self):
         for started, checkpoint, raw, sha in (
