@@ -9,10 +9,16 @@ import io
 import json
 from pathlib import Path
 import stat
+import sys
 import tempfile
 import unittest
 
 from PIL import Image
+
+# The original Odoo worker modules retain script-style sibling imports.
+ODOO_SOURCE = Path(__file__).resolve().parents[1] / "enterprise_fallback/odoo18"
+if str(ODOO_SOURCE) not in sys.path:
+    sys.path.insert(0, str(ODOO_SOURCE))
 
 from enterprise_fallback.odoo18 import v066_requalification_plan as plan
 from enterprise_fallback.odoo18 import v066_requalification_pilot as pilot
