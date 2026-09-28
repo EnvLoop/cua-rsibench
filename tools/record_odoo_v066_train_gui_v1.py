@@ -23,9 +23,9 @@ import time
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = "envloop-odoo-v066-train-gui-recorder-v1"
-BINDING_SCHEMA = "envloop-odoo-v066-train-pilot-binding-v1"
-FREEZE_SCHEMA = "envloop-odoo-v066-train-recorder-code-freeze-v1"
+SCHEMA = "envloop-odoo-v066-train-gui-recorder-v2"
+BINDING_SCHEMA = "envloop-odoo-v066-train-pilot-binding-v2"
+FREEZE_SCHEMA = "envloop-odoo-v066-train-recorder-code-freeze-v2"
 GUI_SCHEMA = "envloop-odoo-v066-gui-control-trace-v1"
 ATTEMPT_SCHEMA = "envloop-odoo-v066-gui-control-attempt-v1"
 REVIEW_SCHEMA = "envloop-odoo-v066-independent-source-frame-review-v1"
@@ -35,6 +35,10 @@ RATIFICATION_SHA = "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c4
 CONTROLLER_SHA = hashlib.sha256(b"envloop-odoo-v066-known-answer-gui-controller-v1").hexdigest()
 MAX_ACTIONS = 90
 WALL_SECONDS = 720
+MAX_PRE_INTENT_STALE_OBSERVATIONS = 3
+STALE_RESAMPLE_WAIT_MS = 150
+AMENDMENT_ID = "odoo-v066-bounded-pre-intent-stale-resampling-2026-09-28"
+NEW_ATTEMPT_BASENAME = "first-current-source-pilot-pre-intent-resample-01"
 ODOO_SOURCE_FILES = (
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
     "enterprise_fallback/odoo18/odoo_native_adapter.py",
@@ -133,7 +137,9 @@ def _source_hashes() -> tuple[dict, dict]:
 
 
 def prepare_binding(private_plan_path: Path, public_plan_path: Path,
-                    out: Path) -> dict:
+                    out: Path, *, prior_binding_path: Path,
+                    prior_code_freeze_path: Path,
+                    failure_audit_public_path: Path) -> dict:
     """Evaluator-side projection; the live recorder never parses all 140 IDs."""
     private = _json(private_plan_path)
     public = _json(public_plan_path, private=False)
@@ -158,9 +164,40 @@ def prepare_binding(private_plan_path: Path, public_plan_path: Path,
     require(private["odoo_source_sha256s"] == own and
             private["common_action_source_sha256s"] == common,
             "train_pilot_current_source_changed")
+    _private(Path(prior_binding_path).parent, directory=True)
+    prior_binding = _json(prior_binding_path)
+    prior_freeze = _json(prior_code_freeze_path, private=False)
+    failure_audit = _json(failure_audit_public_path, private=False)
+    prior_binding_sha = sha(prior_binding_path.read_bytes())
+    prior_freeze_sha = sha(prior_code_freeze_path.read_bytes())
+    failure_audit_sha = sha(failure_audit_public_path.read_bytes())
+    require(prior_binding.get("schema") ==
+            "envloop-odoo-v066-train-pilot-binding-v1" and
+            prior_binding.get("task") == rows[0] and
+            prior_binding.get("private_plan_sha256") == private_sha and
+            prior_freeze.get("schema") ==
+            "envloop-odoo-v066-train-recorder-code-freeze-v1" and
+            prior_freeze.get("train_pilot_binding_sha256") == prior_binding_sha and
+            prior_freeze.get("private_plan_sha256") == private_sha and
+            prior_freeze.get("official_final_tasks_admitted") == 0 and
+            failure_audit.get("schema") ==
+            "envloop-odoo-v066-failed-train-pilot-source-bound-audit-v1" and
+            failure_audit.get("status") ==
+            "source_bound_failed_train_pilot_pre_intent" and
+            failure_audit.get("specific_contract_error_code_verified") is False and
+            failure_audit.get("old_code_freeze_sha256") == prior_freeze_sha and
+            failure_audit.get("official_final_tasks_admitted") == 0 and
+            failure_audit.get("model_attempts") == 0,
+            "pre_result_failed_attempt_provenance_unbound")
     binding = {
         "schema": BINDING_SCHEMA,
-        "status": "train_only_no_gui_attempt",
+        "status": "manual_pre_result_same_train_task_recovery_no_gui_attempt",
+        "amendment_id": AMENDMENT_ID,
+        "max_pre_intent_stale_observations": MAX_PRE_INTENT_STALE_OBSERVATIONS,
+        "new_attempt_dir_basename": NEW_ATTEMPT_BASENAME,
+        "supersedes_binding_sha256": prior_binding_sha,
+        "supersedes_code_freeze_sha256": prior_freeze_sha,
+        "failure_audit_public_sha256": failure_audit_sha,
         "private_plan_sha256": private_sha,
         "public_plan_sha256": sha(public_plan_path.read_bytes()),
         "ratification_sha256": RATIFICATION_SHA,
@@ -182,7 +219,7 @@ def prepare_binding(private_plan_path: Path, public_plan_path: Path,
 
 def preflight(*, worker_dir: Path, binding_path: Path,
               public_plan_path: Path, freeze_path: Path,
-              out_dir: Path) -> tuple[dict, dict, dict]:
+              failure_audit_public_path: Path, out_dir: Path) -> tuple[dict, dict, dict]:
     """Check all identities and bytes before opening Docker or a browser."""
     worker = Path(worker_dir).resolve()
     require(worker.name == "train" and
@@ -191,15 +228,32 @@ def preflight(*, worker_dir: Path, binding_path: Path,
     private = worker / "private"
     _private(private, directory=True)
     require(out_dir.parent.resolve() == (private / "v066_requalification_runs").resolve()
-            and not out_dir.exists() and not out_dir.is_symlink(),
+            and out_dir.name == NEW_ATTEMPT_BASENAME and
+            not out_dir.exists() and not out_dir.is_symlink(),
             "fresh_train_attempt_directory_required")
     _private(Path(binding_path).parent, directory=True)
     binding = _json(binding_path)
     public = _json(public_plan_path, private=False)
     freeze = _json(freeze_path, private=False)
+    failure_audit = _json(failure_audit_public_path, private=False)
     own, common = _source_hashes()
     require(binding.get("schema") == BINDING_SCHEMA and
-            binding.get("status") == "train_only_no_gui_attempt" and
+            binding.get("status") ==
+            "manual_pre_result_same_train_task_recovery_no_gui_attempt" and
+            binding.get("amendment_id") == AMENDMENT_ID and
+            binding.get("new_attempt_dir_basename") == NEW_ATTEMPT_BASENAME and
+            binding.get("max_pre_intent_stale_observations") ==
+            MAX_PRE_INTENT_STALE_OBSERVATIONS and
+            binding.get("failure_audit_public_sha256") ==
+            sha(failure_audit_public_path.read_bytes()) and
+            failure_audit.get("schema") ==
+            "envloop-odoo-v066-failed-train-pilot-source-bound-audit-v1" and
+            failure_audit.get("status") ==
+            "source_bound_failed_train_pilot_pre_intent" and
+            failure_audit.get("specific_contract_error_code_verified") is False and
+            failure_audit.get("old_code_freeze_sha256") ==
+            binding.get("supersedes_code_freeze_sha256") and
+            failure_audit.get("official_final_tasks_admitted") == 0 and
             binding.get("ratification_sha256") == RATIFICATION_SHA and
             binding.get("selection_or_hidden_task_values_included") is False and
             binding.get("official_final_tasks_admitted") == 0 and
@@ -214,7 +268,18 @@ def preflight(*, worker_dir: Path, binding_path: Path,
             public.get("pilot_auditor_source_sha256") ==
             binding.get("pilot_auditor_source_sha256") and
             freeze.get("schema") == FREEZE_SCHEMA and
-            freeze.get("status") == "frozen_before_first_live_train_gui_attempt" and
+            freeze.get("status") ==
+            "frozen_before_manual_pre_result_train_gui_recovery" and
+            freeze.get("amendment_id") == AMENDMENT_ID and
+            freeze.get("new_attempt_dir_basename") == NEW_ATTEMPT_BASENAME and
+            freeze.get("max_pre_intent_stale_observations") ==
+            MAX_PRE_INTENT_STALE_OBSERVATIONS and
+            freeze.get("supersedes_binding_sha256") ==
+            binding.get("supersedes_binding_sha256") and
+            freeze.get("supersedes_code_freeze_sha256") ==
+            binding.get("supersedes_code_freeze_sha256") and
+            freeze.get("failure_audit_public_sha256") ==
+            binding.get("failure_audit_public_sha256") and
             freeze.get("recorder_source_sha256") == sha(Path(__file__).read_bytes()) and
             freeze.get("train_pilot_binding_sha256") == sha(binding_path.read_bytes()) and
             freeze.get("public_plan_sha256") == sha(public_plan_path.read_bytes()) and
@@ -224,7 +289,7 @@ def preflight(*, worker_dir: Path, binding_path: Path,
             freeze.get("host_runtime") == host_runtime() and
             freeze.get("ratification_sha256") == RATIFICATION_SHA and
             freeze.get("official_final_tasks_admitted") == 0 and
-            freeze.get("live_gui_attempts_before_freeze") == 0 and
+            freeze.get("live_gui_attempts_before_freeze") == 1 and
             freeze.get("provider_calls_before_freeze") == 0,
             "recorder_code_or_plan_freeze_changed")
     task = binding.get("task")
@@ -284,95 +349,151 @@ class ActionJournal:
         self.out = out
         self.trace: list[dict] = []
         self.sft: list[dict] = []
+        self.pre_intent_rejections: list[dict] = []
         (out / "frames").mkdir(mode=0o700)
         (out / "actions").mkdir(mode=0o700)
         self.started = time.monotonic()
 
     def act(self, kind: str, *, phase: str, locator=None,
             ref: str | None = None, memory: str = "", **fields) -> dict:
+        from cursibench.scale_action_contract import ContractError
+
         require(phase in ("positive", "negative") and
                 len(self.trace) < MAX_ACTIONS and
                 time.monotonic() - self.started < WALL_SECONDS,
                 "train_gui_action_or_wall_budget_exceeded")
-        observation, rendered = self.adapter.observe_for_model(memory=memory)
         index = len(self.trace)
-        require(observation.step == index and
-                type(rendered.get("instruction")) is str and
-                type(rendered.get("image_bytes")) is bytes and
-                rendered["image_bytes"] == observation.screenshot_bytes,
-                "current_gui_observation_or_renderer_invalid")
-        frame_path = self.out / "frames" / f"step-{index:03d}.png"
-        frame = _write(frame_path, observation.screenshot_bytes)
-        frame["path"] = "frames/" + frame["path"]
-        instruction = _write(self.out / "actions" /
-                             f"step-{index:03d}-instruction.txt",
-                             rendered["instruction"].encode())
-        instruction["path"] = "actions/" + instruction["path"]
-        visible = _write(self.out / "actions" /
-                         f"step-{index:03d}-visible.txt",
-                         rendered["visible_text"].encode())
-        visible["path"] = "actions/" + visible["path"]
-        payload = {"type": kind, **fields}
-        if ref is not None:
-            require(len([item for item in observation.controls
-                         if item.ref == ref and item.visible and item.enabled]) == 1,
-                    "visible_control_ref_not_unique")
-            payload["target"] = {"ref": ref}
-        elif locator is not None:
-            box = locator.bounding_box()
-            require(box is not None and box["width"] > 0 and box["height"] > 0,
-                    "gui_locator_not_visible")
-            payload["target"] = {"x": int(box["x"] + box["width"] / 2),
-                                 "y": int(box["y"] + box["height"] / 2)}
-        raw_action = json.dumps(payload, ensure_ascii=False,
-                                sort_keys=True, separators=(",", ":"))
-        action_ref = _write(self.out / "actions" /
-                            f"step-{index:03d}-assistant.json",
-                            raw_action.encode())
-        action_ref["path"] = "actions/" + action_ref["path"]
-        # No dispatch occurs if parsing rejects the current frame.
-        normalized = self.adapter.parse_current_action(raw_action)
-        intent = {"schema": "envloop-odoo-v066-pre-dispatch-action-intent-v1",
-                  "phase": phase, "step": index, "task_id": observation.task_id,
-                  "task_binding_sha256": observation.task_binding_sha256,
-                  "frame_id": observation.frame_id,
-                  "frame_sha256": frame["sha256"],
-                  "frame_ref": frame,
-                  "instruction_ref": instruction,
-                  "visible_text_ref": visible,
-                  "assistant_action_ref": action_ref,
-                  "normalized_action": normalized,
-                  "dispatch_state": "intent_durable_before_gui_action"}
-        intent_ref = _write(self.out / "actions" /
-                            f"step-{index:03d}-intent.private.json",
-                            canonical(intent))
-        intent_ref["path"] = "actions/" + intent_ref["path"]
-        # Any exception here is uncertain; it is retained and never retried.
-        applied = self.adapter.dispatch(normalized)
-        require(applied.get("action") == normalized and
-                applied.get("public_contract_receipt", {}).get("screenshot", {}).get(
-                    "sha256") == frame["sha256"],
-                "gui_dispatch_receipt_not_bound_to_frame")
-        result = {"schema": "envloop-odoo-v066-dispatch-result-v1",
-                  "phase": phase, "step": index,
-                  "intent_sha256": intent_ref["sha256"],
-                  "applied_action": applied["action"],
-                  "contract_receipt": applied["public_contract_receipt"]}
-        result_ref = _write(self.out / "actions" /
-                            f"step-{index:03d}-result.private.json",
-                            canonical(result))
-        result_ref["path"] = "actions/" + result_ref["path"]
-        self.trace.append({"phase": phase, "step": index,
-                           "frame": frame,
-                           "contract_receipt": applied["public_contract_receipt"]})
-        if phase == "positive":
-            self.sft.append({"step": index, "frame": frame,
-                             "rendered_instruction": instruction,
-                             "visible_text": visible,
-                             "assistant_action": action_ref,
-                             "normalized_action_intent": intent_ref,
-                             "dispatch_result": result_ref})
-        return frame
+        for attempt in range(MAX_PRE_INTENT_STALE_OBSERVATIONS):
+            require(time.monotonic() - self.started < WALL_SECONDS,
+                    "train_gui_wall_budget_exceeded_before_dispatch")
+            observation, rendered = self.adapter.observe_for_model(memory=memory)
+            require(observation.step == index and
+                    type(rendered.get("instruction")) is str and
+                    type(rendered.get("image_bytes")) is bytes and
+                    rendered["image_bytes"] == observation.screenshot_bytes,
+                    "current_gui_observation_or_renderer_invalid")
+            prefix = (f"step-{index:03d}" if attempt == 0 else
+                      f"step-{index:03d}-resample-{attempt:02d}")
+            frame_path = self.out / "frames" / (prefix + ".png")
+            frame = _write(frame_path, observation.screenshot_bytes)
+            frame["path"] = "frames/" + frame["path"]
+            instruction = _write(self.out / "actions" /
+                                 (prefix + "-instruction.txt"),
+                                 rendered["instruction"].encode())
+            instruction["path"] = "actions/" + instruction["path"]
+            visible = _write(self.out / "actions" /
+                             (prefix + "-visible.txt"),
+                             rendered["visible_text"].encode())
+            visible["path"] = "actions/" + visible["path"]
+            payload = {"type": kind, **fields}
+            if ref is not None:
+                require(len([item for item in observation.controls
+                             if item.ref == ref and item.visible and item.enabled]) == 1,
+                        "visible_control_ref_not_unique")
+                payload["target"] = {"ref": ref}
+            elif locator is not None:
+                box = locator.bounding_box()
+                require(box is not None and box["width"] > 0 and box["height"] > 0,
+                        "gui_locator_not_visible")
+                payload["target"] = {"x": int(box["x"] + box["width"] / 2),
+                                     "y": int(box["y"] + box["height"] / 2)}
+            raw_action = json.dumps(payload, ensure_ascii=False,
+                                    sort_keys=True, separators=(",", ":"))
+            action_ref = _write(self.out / "actions" /
+                                (prefix + "-assistant.json"),
+                                raw_action.encode())
+            action_ref["path"] = "actions/" + action_ref["path"]
+            # Only parsing a current frame is repeatable. No intent exists yet.
+            try:
+                normalized = self.adapter.parse_current_action(raw_action)
+            except ContractError as exc:
+                current_ref = None
+                try:
+                    current_png = self.page.screenshot(type="png")
+                    current_ref = _write(
+                        self.out / "frames" /
+                        (prefix + "-rejected-current.png"), current_png)
+                    current_ref["path"] = "frames/" + current_ref["path"]
+                except Exception:
+                    # The observed frame and assistant bytes remain durable.
+                    pass
+                rejection = {
+                    "schema": "envloop-odoo-v066-pre-intent-frame-rejection-v1",
+                    "phase": phase, "step": index,
+                    "observation_attempt": attempt,
+                    "error_code": exc.code,
+                    "frame_id_sha256": sha(observation.frame_id.encode()),
+                    "observed_frame_ref": frame,
+                    "assistant_action_ref": action_ref,
+                    "current_frame_ref": current_ref,
+                    "pre_dispatch_intent_created": False,
+                    "gui_action_dispatched": False,
+                }
+                rejection_ref = _write(
+                    self.out / "actions" /
+                    (prefix + "-rejection.private.json"),
+                    canonical(rejection))
+                rejection_ref["path"] = "actions/" + rejection_ref["path"]
+                self.pre_intent_rejections.append(rejection_ref)
+                require(not (self.out / "actions" /
+                             (prefix + "-intent.private.json")).exists(),
+                        "pre_intent_rejection_has_intent")
+                if (exc.code != "stale_frame" or
+                        attempt + 1 >= MAX_PRE_INTENT_STALE_OBSERVATIONS):
+                    raise
+                self.page.wait_for_timeout(STALE_RESAMPLE_WAIT_MS)
+                continue
+            intent = {
+                "schema": "envloop-odoo-v066-pre-dispatch-action-intent-v1",
+                "phase": phase, "step": index, "task_id": observation.task_id,
+                "task_binding_sha256": observation.task_binding_sha256,
+                "frame_id": observation.frame_id,
+                "frame_sha256": frame["sha256"],
+                "frame_ref": frame,
+                "instruction_ref": instruction,
+                "visible_text_ref": visible,
+                "assistant_action_ref": action_ref,
+                "normalized_action": normalized,
+                "dispatch_state": "intent_durable_before_gui_action",
+                "pre_intent_stale_resamples": attempt,
+            }
+            intent_ref = _write(self.out / "actions" /
+                                (prefix + "-intent.private.json"),
+                                canonical(intent))
+            intent_ref["path"] = "actions/" + intent_ref["path"]
+            # Exceptions after this point are uncertain and are NEVER replayed.
+            applied = self.adapter.dispatch(normalized)
+            require(applied.get("action") == normalized and
+                    applied.get("public_contract_receipt", {}).get(
+                        "screenshot", {}).get("sha256") == frame["sha256"],
+                    "gui_dispatch_receipt_not_bound_to_frame")
+            result = {
+                "schema": "envloop-odoo-v066-dispatch-result-v1",
+                "phase": phase, "step": index,
+                "intent_sha256": intent_ref["sha256"],
+                "applied_action": applied["action"],
+                "contract_receipt": applied["public_contract_receipt"],
+            }
+            result_ref = _write(self.out / "actions" /
+                                (prefix + "-result.private.json"),
+                                canonical(result))
+            result_ref["path"] = "actions/" + result_ref["path"]
+            self.trace.append({
+                "phase": phase, "step": index,
+                "frame": frame,
+                "contract_receipt": applied["public_contract_receipt"],
+            })
+            if phase == "positive":
+                self.sft.append({
+                    "step": index, "frame": frame,
+                    "rendered_instruction": instruction,
+                    "visible_text": visible,
+                    "assistant_action": action_ref,
+                    "normalized_action_intent": intent_ref,
+                    "dispatch_result": result_ref,
+                })
+            return frame
+        raise RecorderError("pre_intent_resample_exhausted")
 
 
 def _compose(worker: Path, *args: str) -> subprocess.CompletedProcess:
@@ -434,8 +555,10 @@ def _safe_failure(out: Path, stage: str, exc: BaseException,
     _artifact(out, "failure.private.json", {
         "schema": SCHEMA,
         "status": "failed_preserve_original_attempt_no_automatic_retry",
+        "amendment_id": AMENDMENT_ID,
         "stage": stage,
         "error_type": type(exc).__name__,
+        "error_code": getattr(exc, "code", None),
         "reset_exact": reset_exact,
         "services_restored": services_restored,
         "official_final_tasks_admitted": 0,
@@ -445,7 +568,7 @@ def _safe_failure(out: Path, stage: str, exc: BaseException,
 
 def record(*, worker_dir: Path, binding_path: Path,
            public_plan_path: Path, freeze_path: Path,
-           out_dir: Path) -> dict:
+           failure_audit_public_path: Path, out_dir: Path) -> dict:
     """Run one known-answer train control only after an explicit CLI switch."""
     from playwright.sync_api import sync_playwright
     from enterprise_fallback.odoo18.odoo_v066_train_adapter import (
@@ -481,6 +604,7 @@ def record(*, worker_dir: Path, binding_path: Path,
         binding, case, wrong = preflight(
             worker_dir=worker, binding_path=binding_path,
             public_plan_path=public_plan_path, freeze_path=freeze_path,
+            failure_audit_public_path=failure_audit_public_path,
             out_dir=out)
         task = binding["task"]
         require(not out.exists(), "recorder_refuses_existing_attempt")
@@ -491,6 +615,13 @@ def record(*, worker_dir: Path, binding_path: Path,
             "binding_sha256": sha(binding_path.read_bytes()),
             "public_plan_sha256": sha(public_plan_path.read_bytes()),
             "recorder_source_sha256": sha(Path(__file__).read_bytes()),
+            "amendment_id": AMENDMENT_ID,
+            "max_pre_intent_stale_observations":
+                MAX_PRE_INTENT_STALE_OBSERVATIONS,
+            "supersedes_binding_sha256":
+                binding["supersedes_binding_sha256"],
+            "prior_failure_audit_public_sha256":
+                binding["failure_audit_public_sha256"],
             "task_binding_sha256": task["task_binding_sha256"],
             "started_at_utc": utc(),
             "official_final_tasks_admitted": 0,
@@ -673,7 +804,8 @@ def record(*, worker_dir: Path, binding_path: Path,
                 refs["gui_trace"] = _artifact(out, "gui_trace.json", {
                     "schema": GUI_SCHEMA,
                     "task_binding_sha256": task["task_binding_sha256"],
-                    "actions": journal.trace})
+                    "actions": journal.trace,
+                    "pre_intent_rejections": journal.pre_intent_rejections})
             if time.monotonic() - started_monotonic > WALL_SECONDS and failure is None:
                 failure = RecorderError("train_pilot_wall_budget_exceeded")
                 failure_stage = "task_wall_budget"
@@ -743,6 +875,7 @@ def record(*, worker_dir: Path, binding_path: Path,
                 "status": "raw_train_evidence_recorded_review_pending",
                 "action_count": len(journal.trace),
                 "positive_sft_candidate_steps": len(journal.sft),
+                "pre_intent_rejections": len(journal.pre_intent_rejections),
                 "post_reset_exact": reset_exact,
                 "services_restored": restored_services,
                 "official_final_tasks_admitted": 0,
@@ -916,11 +1049,15 @@ def main() -> None:
     prep.add_argument("--private-plan", type=Path, required=True)
     prep.add_argument("--public-plan", type=Path, required=True)
     prep.add_argument("--out", type=Path, required=True)
+    prep.add_argument("--prior-binding", type=Path, required=True)
+    prep.add_argument("--prior-code-freeze", type=Path, required=True)
+    prep.add_argument("--failure-audit", type=Path, required=True)
     live = commands.add_parser("record")
     live.add_argument("--worker-dir", type=Path, required=True)
     live.add_argument("--pilot-binding", type=Path, required=True)
     live.add_argument("--public-plan", type=Path, required=True)
     live.add_argument("--code-freeze", type=Path, required=True)
+    live.add_argument("--failure-audit", type=Path, required=True)
     live.add_argument("--out-dir", type=Path, required=True)
     live.add_argument("--execute", action="store_true")
     seal = commands.add_parser("finalize")
@@ -933,13 +1070,18 @@ def main() -> None:
     sft.add_argument("--pilot-audit", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "prepare":
-        result = prepare_binding(args.private_plan, args.public_plan, args.out)
+        result = prepare_binding(
+            args.private_plan, args.public_plan, args.out,
+            prior_binding_path=args.prior_binding,
+            prior_code_freeze_path=args.prior_code_freeze,
+            failure_audit_public_path=args.failure_audit)
     elif args.command == "record":
         require(args.execute, "explicit_live_execute_flag_required")
         result = record(worker_dir=args.worker_dir,
                         binding_path=args.pilot_binding,
                         public_plan_path=args.public_plan,
                         freeze_path=args.code_freeze,
+                        failure_audit_public_path=args.failure_audit,
                         out_dir=args.out_dir)
     elif args.command == "finalize":
         result = finalize(out_dir=args.out_dir,

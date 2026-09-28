@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from cursibench.scale_action_contract import make_observation
+from cursibench.scale_action_contract import ContractError, make_observation
 from cursibench.scale_action_contract_v066 import public_receipt
 from cursibench.scale_action_output_v066 import (
     normalize_model_action, render_for_model)
@@ -35,15 +35,27 @@ def private_json(path, value):
 
 
 class FakePage:
-    pass
+    def __init__(self):
+        self.waits = 0
+
+    def screenshot(self, *, type):
+        assert type == "png"
+        return png((21, 31, 41))
+
+    def wait_for_timeout(self, milliseconds):
+        self.waits += 1
 
 
 class FakeAdapter:
-    def __init__(self, output, *, fail_dispatch=False):
+    def __init__(self, output, *, fail_dispatch=False,
+                 stale_before_intent=0, stale_after_intent=False):
         self.output = output
         self.step = 0
         self.latest = None
         self.fail_dispatch = fail_dispatch
+        self.stale_before_intent = stale_before_intent
+        self.stale_after_intent = stale_after_intent
+        self.parse_calls = 0
         self.dispatch_calls = 0
 
     def observe_for_model(self, *, memory=""):
@@ -58,16 +70,23 @@ class FakeAdapter:
         return observation, render_for_model(observation)
 
     def parse_current_action(self, raw):
+        self.parse_calls += 1
+        if self.parse_calls <= self.stale_before_intent:
+            raise ContractError("stale_frame")
         return normalize_model_action(
             raw, self.latest, current_frame_id=self.latest.frame_id)
 
     def dispatch(self, normalized):
         self.dispatch_calls += 1
-        intent = self.output / "actions" / f"step-{self.step:03d}-intent.private.json"
-        assert intent.is_file(), "normalized action intent must exist before dispatch"
+        intents = sorted((self.output / "actions").glob(
+            f"step-{self.step:03d}*-intent.private.json"))
+        assert len(intents) == 1, "one normalized intent must exist before dispatch"
+        intent = intents[0]
         saved = json.loads(intent.read_text())
         assert saved["normalized_action"] == normalized
         assert saved["frame_id"] == self.latest.frame_id
+        if self.stale_after_intent:
+            raise ContractError("stale_frame")
         if self.fail_dispatch:
             raise RuntimeError("fake uncertain GUI dispatch")
         receipt = public_receipt(self.latest, action=normalized)
@@ -107,6 +126,53 @@ class RecorderTests(unittest.TestCase):
         journal.act("wait", phase="negative", duration_ms=50)
         self.assertEqual(len(journal.trace), 2)
         self.assertEqual(len(journal.sft), 1, "wrong-object actions cannot enter SFT")
+
+    def test_bounded_fresh_frames_only_before_intent(self):
+        out = self.root / "attempt"
+        out.mkdir(mode=0o700)
+        page = FakePage()
+        adapter = FakeAdapter(out, stale_before_intent=2)
+        journal = rec.ActionJournal(adapter, page, out)
+        journal.act("wait", phase="positive", duration_ms=50)
+        self.assertEqual(adapter.parse_calls, 3)
+        self.assertEqual(adapter.dispatch_calls, 1)
+        self.assertEqual(page.waits, 2)
+        self.assertEqual(len(journal.pre_intent_rejections), 2)
+        self.assertEqual(len(journal.trace), 1)
+        self.assertEqual(len(journal.sft), 1)
+        for reference in journal.pre_intent_rejections:
+            receipt = json.loads((out / reference["path"]).read_text())
+            self.assertEqual(receipt["error_code"], "stale_frame")
+            self.assertFalse(receipt["pre_dispatch_intent_created"])
+            self.assertFalse(receipt["gui_action_dispatched"])
+            self.assertEqual(rec.sha((out / receipt["observed_frame_ref"]["path"]).read_bytes()),
+                             receipt["observed_frame_ref"]["sha256"])
+            self.assertEqual(rec.sha((out / receipt["assistant_action_ref"]["path"]).read_bytes()),
+                             receipt["assistant_action_ref"]["sha256"])
+        self.assertEqual(len(list((out / "actions").glob("*intent.private.json"))), 1)
+
+    def test_exhausted_pre_intent_frames_and_post_intent_stale_never_replay(self):
+        out = self.root / "pre-intent"
+        out.mkdir(mode=0o700)
+        adapter = FakeAdapter(out, stale_before_intent=3)
+        journal = rec.ActionJournal(adapter, FakePage(), out)
+        with self.assertRaises(ContractError):
+            journal.act("wait", phase="positive", duration_ms=50)
+        self.assertEqual(adapter.parse_calls, 3)
+        self.assertEqual(adapter.dispatch_calls, 0)
+        self.assertEqual(len(journal.pre_intent_rejections), 3)
+        self.assertFalse(list((out / "actions").glob("*intent.private.json")))
+        out2 = self.root / "post-intent"
+        out2.mkdir(mode=0o700)
+        adapter2 = FakeAdapter(out2, stale_after_intent=True)
+        journal2 = rec.ActionJournal(adapter2, FakePage(), out2)
+        with self.assertRaises(ContractError):
+            journal2.act("wait", phase="positive", duration_ms=50)
+        self.assertEqual(adapter2.parse_calls, 1)
+        self.assertEqual(adapter2.dispatch_calls, 1)
+        self.assertEqual(journal2.pre_intent_rejections, [])
+        self.assertEqual(len(list((out2 / "actions").glob("*intent.private.json"))), 1)
+        self.assertEqual(journal2.trace, [])
 
     def test_exact_sft_gate_requires_positive_only_and_pilot_audit(self):
         out = self.root / "attempt"
@@ -229,9 +295,29 @@ class RecorderTests(unittest.TestCase):
                                  "official_hidden": 100},
             "official_final_tasks_admitted": 0,
             "pilot_auditor_source_sha256": "8" * 64}))
+        prior_binding = plan_dir / "prior-pilot.private.json"
+        private_json(prior_binding, {
+            "schema": "envloop-odoo-v066-train-pilot-binding-v1",
+            "task": task, "private_plan_sha256": rec.sha(plan_path.read_bytes())})
+        prior_freeze = self.root / "prior-freeze.json"
+        prior_freeze.write_bytes(rec.canonical({
+            "schema": "envloop-odoo-v066-train-recorder-code-freeze-v1",
+            "train_pilot_binding_sha256": rec.sha(prior_binding.read_bytes()),
+            "private_plan_sha256": rec.sha(plan_path.read_bytes()),
+            "official_final_tasks_admitted": 0}))
+        failure_audit = self.root / "failure-audit.json"
+        failure_audit.write_bytes(rec.canonical({
+            "schema": "envloop-odoo-v066-failed-train-pilot-source-bound-audit-v1",
+            "status": "source_bound_failed_train_pilot_pre_intent",
+            "specific_contract_error_code_verified": False,
+            "old_code_freeze_sha256": rec.sha(prior_freeze.read_bytes()),
+            "official_final_tasks_admitted": 0, "model_attempts": 0}))
         pilot_binding = plan_dir / "pilot.private.json"
-        public_summary = rec.prepare_binding(plan_path, public_path,
-                                             pilot_binding)
+        public_summary = rec.prepare_binding(
+            plan_path, public_path, pilot_binding,
+            prior_binding_path=prior_binding,
+            prior_code_freeze_path=prior_freeze,
+            failure_audit_public_path=failure_audit)
         self.assertFalse(public_summary["selection_or_hidden_task_values_included"])
         self.assertEqual(stat.S_IMODE(pilot_binding.stat().st_mode), 0o600)
         self.assertNotIn("HID-FILLER", pilot_binding.read_text())
@@ -239,7 +325,14 @@ class RecorderTests(unittest.TestCase):
         freeze_path = self.root / "freeze.json"
         freeze_path.write_bytes(rec.canonical({
             "schema": rec.FREEZE_SCHEMA,
-            "status": "frozen_before_first_live_train_gui_attempt",
+            "status": "frozen_before_manual_pre_result_train_gui_recovery",
+            "amendment_id": rec.AMENDMENT_ID,
+            "new_attempt_dir_basename": rec.NEW_ATTEMPT_BASENAME,
+            "max_pre_intent_stale_observations":
+                rec.MAX_PRE_INTENT_STALE_OBSERVATIONS,
+            "supersedes_binding_sha256": rec.sha(prior_binding.read_bytes()),
+            "supersedes_code_freeze_sha256": rec.sha(prior_freeze.read_bytes()),
+            "failure_audit_public_sha256": rec.sha(failure_audit.read_bytes()),
             "recorder_source_sha256": rec.sha(Path(rec.__file__).read_bytes()),
             "train_pilot_binding_sha256": rec.sha(pilot_binding.read_bytes()),
             "public_plan_sha256": rec.sha(public_path.read_bytes()),
@@ -248,31 +341,42 @@ class RecorderTests(unittest.TestCase):
             "host_runtime": rec.host_runtime(),
             "ratification_sha256": rec.RATIFICATION_SHA,
             "official_final_tasks_admitted": 0,
-            "live_gui_attempts_before_freeze": 0,
+            "live_gui_attempts_before_freeze": 1,
             "provider_calls_before_freeze": 0}))
-        out = private / "v066_requalification_runs" / "first-live-pilot"
+        out = private / "v066_requalification_runs" / rec.NEW_ATTEMPT_BASENAME
         with patch.dict(os.environ, {"ENVLOOP_ODOO_WORKER_DIR": str(worker.resolve())}):
             selected, loaded, wrong = rec.preflight(
                 worker_dir=worker, binding_path=pilot_binding,
                 public_plan_path=public_path, freeze_path=freeze_path,
-                out_dir=out)
+                failure_audit_public_path=failure_audit, out_dir=out)
         self.assertEqual(selected["task"]["task_id"], case["id"])
         self.assertEqual(loaded["id"], case["id"])
         self.assertNotEqual(wrong["id"], case["id"])
         self.assertFalse(out.exists(), "preflight must not create a run")
+        with patch.dict(os.environ, {"ENVLOOP_ODOO_WORKER_DIR": str(worker.resolve())}):
+            with self.assertRaisesRegex(rec.RecorderError,
+                                        "fresh_train_attempt_directory_required"):
+                rec.preflight(worker_dir=worker, binding_path=pilot_binding,
+                              public_plan_path=public_path,
+                              freeze_path=freeze_path,
+                              failure_audit_public_path=failure_audit,
+                              out_dir=private / "v066_requalification_runs" /
+                              "first-current-source-pilot")
         freeze_path.write_text("{}")
         with patch.dict(os.environ, {"ENVLOOP_ODOO_WORKER_DIR": str(worker.resolve())}):
             with self.assertRaisesRegex(rec.RecorderError,
                                         "recorder_code_or_plan_freeze_changed"):
                 rec.preflight(worker_dir=worker, binding_path=pilot_binding,
                               public_plan_path=public_path,
-                              freeze_path=freeze_path, out_dir=out)
+                              freeze_path=freeze_path,
+                              failure_audit_public_path=failure_audit, out_dir=out)
 
     def test_live_command_requires_explicit_execute_before_any_docker(self):
         argv = ["record-odoo", "record", "--worker-dir", "/missing/train",
                 "--pilot-binding", "/missing/binding",
                 "--public-plan", "/missing/plan",
                 "--code-freeze", "/missing/freeze",
+                "--failure-audit", "/missing/audit",
                 "--out-dir", "/missing/output"]
         with patch.object(rec.sys, "argv", argv), patch.object(
                 rec, "_compose", side_effect=AssertionError("Docker called")):
