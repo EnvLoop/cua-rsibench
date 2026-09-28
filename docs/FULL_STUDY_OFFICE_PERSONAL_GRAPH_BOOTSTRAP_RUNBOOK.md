@@ -5,6 +5,11 @@ Graph, Office browser, E2B, Tinker, or model call was made for this runbook.
 The repo still has zero official Office final admissions and zero Office
 selection scores. This pilot never opens selection or final items.
 
+The [self-service delegated OAuth guide](FULL_STUDY_OFFICE_PERSONAL_DELEGATED_OAUTH.md)
+describes the user-owned app registration, two explicit device-code sign-ins
+and private token wrapper that can supply this pilot without copying tokens
+into shell arguments.
+
 The existing one-file Graph controller needs a valid personal-account
 capability receipt before its first invite. The new evaluator-only
 [`PersonalGraphBootstrapPilot`](../tools/office_graph_personal_bootstrap_pilot_v1.py)
