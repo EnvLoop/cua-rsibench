@@ -40,8 +40,10 @@ class ExcelTransferSkillCardTests(unittest.TestCase):
         for i in range(13):
             atoms = [f"Select original source scope graph {i}",
                      f"Compute causal reconciliation graph {i}",
+                     f"Propagate synthetic scenario graph {i}",
                      f"Validate independent identity graph {i}"]
-            edges = [[atoms[0], atoms[1]], [atoms[1], atoms[2]]]
+            edges = [[atoms[0], atoms[1]], [atoms[1], atoms[2]],
+                     [atoms[2], atoms[3]]]
             rel = f"work/private-excel/source_graph_{i}.mjs"
             path = self.root / rel
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -116,7 +118,7 @@ class ExcelTransferSkillCardTests(unittest.TestCase):
 
     def test_dependency_cycle_and_extra_field_fail_closed(self):
         card = self.data["cards"][0]
-        card["dependency_edges"].append([card["causal_skill_atoms"][2],
+        card["dependency_edges"].append([card["causal_skill_atoms"][3],
                                           card["causal_skill_atoms"][0]])
         self.save()
         with self.assertRaisesRegex(ValueError, "dependency_graph_invalid"):
@@ -125,6 +127,17 @@ class ExcelTransferSkillCardTests(unittest.TestCase):
         card["final_answer"] = "forbidden"
         self.save()
         with self.assertRaisesRegex(ValueError, "unexpected_or_missing_field"):
+            self.run_audit()
+
+    def test_shallow_dependency_graph_fails_closed(self):
+        card = self.data["cards"][0]
+        atoms = card["causal_skill_atoms"]
+        card["dependency_edges"] = [[atoms[0], atoms[1]],
+                                    [atoms[0], atoms[2]],
+                                    [atoms[1], atoms[3]],
+                                    [atoms[2], atoms[3]]]
+        self.save()
+        with self.assertRaisesRegex(ValueError, "dependency_graph_invalid"):
             self.run_audit()
 
     def test_numeric_review_flag_cannot_impersonate_independent_review(self):

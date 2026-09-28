@@ -64,10 +64,12 @@ def _connected_dag(atoms: list[str], edges: list[list[str]]) -> bool:
         undirected[right].add(left)
     queue = [atom for atom, degree in indegree.items() if degree == 0]
     seen = 0
+    longest = {atom: 0 for atom in atoms}
     while queue:
         node = queue.pop()
         seen += 1
         for child in children[node]:
+            longest[child] = max(longest[child], longest[node] + 1)
             indegree[child] -= 1
             if indegree[child] == 0:
                 queue.append(child)
@@ -77,7 +79,8 @@ def _connected_dag(atoms: list[str], edges: list[list[str]]) -> bool:
         for neighbor in undirected[pending.pop()] - reachable:
             reachable.add(neighbor)
             pending.append(neighbor)
-    return seen == len(atoms) and reachable == vertices
+    return (seen == len(atoms) and reachable == vertices and
+            max(longest.values()) >= 3)
 
 
 def validate(*, registry_path: Path, cards_path: Path,
