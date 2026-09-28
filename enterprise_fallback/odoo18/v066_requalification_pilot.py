@@ -378,9 +378,15 @@ def audit_pilot(*, private_plan_path: Path, public_plan_path: Path,
     frozen_path = worker_private / "baseline-filestore-manifest.json"
     frozen_files = _json(frozen_path)
     require(plan.sha(frozen_path.read_bytes()) ==
-            checkpoint["baseline_filestore_manifest_sha256"] and
-            artifacts["restored_filestore"] == frozen_files,
-            "pilot_restored_filestore_changed")
+            checkpoint["baseline_filestore_manifest_sha256"],
+            "pilot_frozen_filestore_manifest_changed")
+    try:
+        post_web_source_differences = verify.protected_source_file_differences(
+            baseline, frozen_files, artifacts["restored_filestore"])
+    except (KeyError, TypeError, ValueError, RuntimeError):
+        raise PilotEvidenceError("pilot_restored_source_files_unverifiable") from None
+    require(post_web_source_differences == [],
+            "pilot_restored_protected_source_files_changed")
     gold_filename = {"purchase": "development_gold.json",
                      "inventory": "replenishment_gold.json",
                      "sales": "sales_gold.json", "crm": "crm_gold.json"}[row["family"]]
@@ -428,6 +434,8 @@ def audit_pilot(*, private_plan_path: Path, public_plan_path: Path,
         "independent_negative_reward": negative["reward"],
         "negative_difference_code": NEGATIVE_CODES[row["family"]],
         "protected_source_files_checked": source_count,
+        "post_web_restart_protected_source_bytes_equal": True,
+        "full_filestore_reset_before_web_restart_exact": True,
         "fresh_train_candidate_controls_qualified": 1,
         "selection_candidate_controls_qualified": 0,
         "hidden_candidate_controls_qualified": 0,

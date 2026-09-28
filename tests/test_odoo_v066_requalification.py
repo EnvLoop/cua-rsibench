@@ -391,6 +391,22 @@ class PilotTests(unittest.TestCase):
                                     "pilot_v066_current_frame_action_binding_invalid"):
             self.audit()
 
+    def test_post_restart_runtime_cache_is_ignored_but_source_tamper_fails(self):
+        restored = dict(self.frozen)
+        restored["filestore/bench/runtime-cache-only"] = "cache-digest"
+        self.receipt["refs"]["restored_filestore"] = put(
+            self.attempt / "restored_filestore.json", restored)
+        put(self.attempt_path, self.receipt)
+        self.assertTrue(self.audit()["post_web_restart_protected_source_bytes_equal"])
+        protected = next(iter(self.frozen))
+        restored[protected] = "changed"
+        self.receipt["refs"]["restored_filestore"] = put(
+            self.attempt / "restored_filestore.json", restored)
+        put(self.attempt_path, self.receipt)
+        with self.assertRaisesRegex(pilot.PilotEvidenceError,
+                                    "pilot_restored_protected_source_files_changed"):
+            self.audit()
+
     def test_public_plan_or_frame_tamper_fails_closed(self):
         self.public_plan_path.write_text("{}")
         with self.assertRaisesRegex(pilot.PilotEvidenceError,
