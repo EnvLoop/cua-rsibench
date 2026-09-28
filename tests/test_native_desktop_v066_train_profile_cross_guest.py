@@ -85,6 +85,19 @@ class TrainProfileCrossGuestTests(unittest.TestCase):
         self.assertFalse(public["generic_acceptance_rule_changed"])
         self.assertEqual(public["official_final_admissions"], 0)
 
+    def test_public_calibration_receipt_binds_auditor_without_final_claim(self):
+        root = Path(__file__).resolve().parents[1]
+        public = json.loads((root / "docs/evidence" /
+            "native-wdi-v066-train-profile-cross-guest-2026-09-28.json"
+            ).read_bytes())
+        self.assertEqual(public["calibration_source_sha256"],
+                         digest(Path(train.__file__).read_bytes()))
+        self.assertEqual(public["independent_calibration_audit_source_sha256"],
+                         digest(Path(audit.__file__).read_bytes()))
+        self.assertEqual(public["same_application_cross_guest_pairs_passed"], 3)
+        self.assertFalse(public["generic_final_acceptance_rule_changed"])
+        self.assertEqual(public["official_final_admissions"], 0)
+
     def test_only_public_train_calc_writer_impress_packages(self):
         self.assertEqual(len(train.PLAN), 5)
         self.assertEqual([kind for _label, kind in train.PLAN],
