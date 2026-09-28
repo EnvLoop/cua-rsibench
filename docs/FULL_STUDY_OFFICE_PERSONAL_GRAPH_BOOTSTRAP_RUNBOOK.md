@@ -44,6 +44,28 @@ The evaluator must prepare these **private, mode-0600** inputs under `work/`:
    assertion tied to the exact token hashes, not a cryptographic Graph
    attestation; the pilot's authenticated operations must also succeed.
 
+The OAuth observation must use schema
+`cua-office-graph-delegated-scope-observation-v1`, status
+`observed_in_oauth_client_token_response`, and source
+`evaluator_private_oauth_client`. Its remaining keys are
+`owner_user_id`, `actor_user_id`, `owner_token_sha256`,
+`actor_token_sha256`, `owner_delegated_scopes`,
+`actor_delegated_scopes`, `recorded_at_utc`, and `expires_at_utc`.
+Compute token fingerprints inside the evaluator's OAuth client without
+writing the bearer values. The owner scope list must contain
+`Files.ReadWrite`; the actor list must contain `Files.Read`.
+
+The bootstrap spec's exact remaining keys are `cell_id` (`powerpoint-web`
+or `excel-web`), `split` (`train`), `task_package_sha256`,
+`source_seed_sha256`, `action_ratification_sha256`,
+`owner_user_id`, `actor_user_id`, `owner_email`, `actor_email`,
+`drive_id`, `item_id`, `parent_item_id`, `sentinel_item_id`,
+`expected_name`, `ratification_ref`, `source_ref`,
+`scope_receipt_ref`, and `hidden_final_model_attempts` (`0`).
+Each reference has exactly `path` (relative to `work/`) and `sha256`.
+All filenames must be `EL-PPT-Train-*.pptx` or
+`EL-Excel-Train-*.xlsx` for the matching cell.
+
 Run each command explicitly, with a new private output directory. Paths
 below are placeholders for evaluator-owned files; they contain no account
 locator or credential:
