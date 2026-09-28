@@ -1,0 +1,7 @@
+# Magento v3 original-GUI release guard training control
+
+The [source-bound train-only receipt](magento-v3-release-guard-train-pilot-2026-09-28.json) was independently reopened after one original Magento admin task ran on fresh application and native-search pairs. Four pre-edit SQL/search readbacks matched their respective saved baselines exactly. The GUI saved-state positive scored **1**, the wrong-variant negative scored **0**, and a separate fresh pair passed material reset. A real release-notification loading mask was observed before the neutral GUI step; the v3 guard waited for the obstruction to clear before navigation and confirmed that monitored business state had not changed.
+
+The pinned project Python imported Playwright and launched the matching local headless Chromium **before** either application clone was created. The pilot used the separate four-case training plan, not the 100 final-candidate plan. It made no model call and admits no final task. Its private frame, GUI, SQL, search, runtime, container, and cleanup receipts remain in evaluator storage. The historical stopped v2 run and its 14 partial controls are excluded from the prospective v3 denominator.
+
+This train control supports freezing a **new** v3 100-case evaluator sweep from index zero. That sweep and its independent final audit are still required before any Magento final-candidate environment qualification; official full-study admission remains zero.
