@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="620" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
+  <title id="title">28 September evaluator-control interruption snapshot</title>
+  <desc id="desc">LibreOffice Desktop has seven complete evaluator trios, one retained failed partial attempt, and 92 candidates not attempted. Revised Magento has ten complete evaluator controls and 90 candidates without a complete control. Official final admissions, researcher campaigns, and final model outcomes are all zero.</desc>
+  <rect width="1280" height="580" fill="#f7faf8"/>
+  <text x="56" y="55" font-family="Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="2" fill="#247169">ENVLOOP / DEVELOPMENT EVIDENCE</text>
+  <text x="56" y="101" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#173b43">Two evaluator-control lanes at an interruption</text>
+  <text x="56" y="131" font-family="Arial,sans-serif" font-size="16" fill="#536d73">28 September 2026 snapshot · 100 offline final candidates per lane · no model outcomes</text>
+
+  <rect x="50" y="165" width="1180" height="310" rx="15" fill="#fff" stroke="#c9d9d5"/>
+  <text x="73" y="204" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#173b43">LibreOffice Desktop</text>
+  <text x="73" y="227" font-family="Arial,sans-serif" font-size="14" fill="#536d73">Current v0.6.6 E2B positive / near-miss / reset trios</text>
+  <rect x="73" y="242" width="1080" height="38" rx="7" fill="#e4eae8"/>
+  <path d="M80 242 H149 V280 H80 Q73 280 73 273 V249 Q73 242 80 242" fill="#247c78"/>
+  <rect x="149" y="242" width="11" height="38" fill="#d48a36"/>
+  <text x="73" y="302" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#247c78">7 complete</text>
+  <text x="203" y="302" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#a56325">1 failed partial</text>
+  <text x="371" y="302" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#63787b">92 not attempted</text>
+
+  <line x1="73" y1="317" x2="1207" y2="317" stroke="#dce6e2"/>
+  <text x="73" y="348" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#173b43">Magento administration</text>
+  <text x="73" y="371" font-family="Arial,sans-serif" font-size="14" fill="#536d73">Revised v2 runtime, saved positive / wrong variant / fresh reset</text>
+  <rect x="73" y="385" width="1080" height="38" rx="7" fill="#e4eae8"/>
+  <path d="M80 385 H181 V423 H80 Q73 423 73 416 V392 Q73 385 80 385" fill="#247c78"/>
+  <text x="73" y="445" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#247c78">10 complete</text>
+  <text x="217" y="445" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#63787b">90 without complete control; one attempt in progress at snapshot</text>
+  <text x="73" y="466" font-family="Arial,sans-serif" font-size="13" fill="#536d73">Control outcomes have different units and are not pooled as a model success rate.</text>
+
+  <rect x="50" y="493" width="1180" height="80" rx="12" fill="#173b43"/>
+  <text x="73" y="525" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#fff">Full-study result gate remains closed</text>
+  <text x="73" y="554" font-family="Arial,sans-serif" font-size="18" fill="#dcece7">0 / 600 official admissions     0 / 24 researcher campaigns     0 / 3,000 matched final outcomes</text>
+  <text x="52" y="599" font-family="Arial,sans-serif" font-size="12" fill="#60787d">Sources: Desktop interruption final-control audit + lease reconciliation; Magento v2 partial-10 audit. See docs/evidence/full-study-control-status-2026-09-28.md.</text>
+</svg>

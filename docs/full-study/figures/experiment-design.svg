@@ -96,5 +96,5 @@
 
   <rect x="70" y="647" width="1300" height="74" rx="12" fill="#143c44"/>
   <text x="96" y="677" style="font:700 17px Helvetica,Arial,sans-serif;fill:#fff">Publication gate</text>
-  <text x="96" y="703" style="font:400 15px Helvetica,Arial,sans-serif;fill:#d8ece8">All 600 tasks admitted · 24 lineages frozen · every cost/failure reconciled · 24 paired comparisons independently audited</text>
+  <text x="96" y="703" style="font:400 15px Helvetica,Arial,sans-serif;fill:#d8ece8">Requires 600 admitted tasks · 24 frozen lineages · reconciled costs/failures · 24 independently audited paired comparisons</text>
 </svg>
