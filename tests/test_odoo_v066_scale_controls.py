@@ -107,7 +107,7 @@ class ScalePlanTests(unittest.TestCase):
         self.freeze = self.root / "freeze.public.json"
         write(self.freeze, {
             "schema": protocol.SOURCE_FREEZE_SCHEMA,
-            "status": "frozen_after_selection_blank_compose_service_fix",
+            "status": "frozen_after_pinned_border_dispatch_and_second_failure_audit",
             "ratification_sha256": protocol.RATIFICATION_SHA,
             "source_sha256s": protocol.current_source_hashes(),
             "host_runtime": protocol.host_runtime(),
@@ -119,12 +119,17 @@ class ScalePlanTests(unittest.TestCase):
                 protocol.EXACT_RETURN_DRAFT_SHA256,
             "old_selection_gate_audit_freeze_sha256":
                 protocol.SELECTION_GATE_AUDIT_FREEZE_SHA256,
+            "old_blank_compose_freeze_sha256":
+                protocol.BLANK_COMPOSE_FREEZE_SHA256,
+            "selection_second_failure_public_sha256": protocol.digest((
+                protocol.ROOT / "docs/evidence/odoo-v066-selection-second-post-intent-stale-2026-09-29.json").read_bytes()),
+            "physical_dispatch_profile": protocol.PINNED_BORDER_PROFILE,
             "selection_preflight_incident_public_sha256": protocol.digest((
                 protocol.ROOT / "docs/evidence/odoo-v066-selection-blank-compose-preflight-2026-09-29.json").read_bytes()),
             "frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT,
             "selection_failure_public_sha256": protocol.digest((
                 protocol.ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json").read_bytes()),
-            "retained_selection_failed_controls_before_freeze": 1,
+            "retained_selection_failed_controls_before_freeze": 2,
             "official_final_gui_controls_before_freeze": 0,
             "official_final_tasks_admitted": 0,
             "model_attempts": 0}, private=False)
@@ -159,6 +164,8 @@ class ScalePlanTests(unittest.TestCase):
                 split=split, private_path=out_private,
                 public_path=out_public, source_freeze_path=self.freeze)
             self.assertEqual(validated["task_count"], count)
+            self.assertEqual(validated["physical_dispatch_profile"],
+                             protocol.PINNED_BORDER_PROFILE)
 
     def test_source_or_checkpoint_drift_closes_plan(self):
         target = self.workers / "selection" / "private" / "baseline.pgcustom"
@@ -300,7 +307,8 @@ class HoldoutActionTests(unittest.TestCase):
     def test_train_exact_return_cannot_replay_without_source_transition(self):
         from unittest.mock import patch
         with patch.object(controller, "_preflight", return_value=(
-                {"frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT},
+                {"frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT,
+                 "physical_dispatch_profile": protocol.PINNED_BORDER_PROFILE},
                 Path("/unused/private"))), patch.object(
                     controller, "_modules", side_effect=AssertionError(
                         "modules must not load")):

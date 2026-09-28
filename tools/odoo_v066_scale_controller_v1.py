@@ -31,6 +31,7 @@ INTENT_SCHEMA = "envloop-odoo-v066-scale-case-intent-v1"
 JOURNAL_SCHEMA = "envloop-odoo-v066-scale-control-journal-event-v1"
 TRACE_SCHEMA = "envloop-odoo-v066-gui-control-trace-v1"
 SELECTION_RETRY_GATE_SCHEMA = "envloop-odoo-v066-selection-exact-frame-return-retry-gate-v1"
+PINNED_RETRY_GATE_SCHEMA = "envloop-odoo-v066-selection-pinned-border-retry-gate-v1"
 STAGES = ("pre_restore", "source_observed", "positive_reload",
           "positive_sql", "negative_reload", "negative_sql", "post_restore")
 
@@ -92,6 +93,12 @@ def read_journal(path: Path) -> tuple[list[dict], str, int]:
 
 def next_case_index(run_dir: Path, plan: dict) -> int:
     rows, _last, _count = read_journal(run_dir / "journal.private.jsonl")
+    if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
+        batch_path = run_dir / "batch-intent.private.json"
+        protocol._private(batch_path)
+        batch_sha = protocol.digest(batch_path.read_bytes())
+        require(all(row.get("run_intent_sha256") == batch_sha for row in rows),
+                "scale_pinned_journal_not_bound_to_run_intent")
     completed = 0
     pending = None
     failed = None
@@ -281,6 +288,8 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
     from enterprise_fallback.odoo18.odoo_v066_train_adapter import VIEWPORT
     from enterprise_fallback.odoo18.odoo_v066_scale_exact_return_adapter import (
         OdooV066ScaleExactReturnAdapter)
+    from enterprise_fallback.odoo18.odoo_v066_scale_pinned_border_adapter import (
+        OdooV066ScalePinnedBorderAdapter)
     factory, gui_controls, reset, verify, _lease = modules
     private = factory.PRIVATE
     attempt = run_dir / f"attempt-{ordinal:03d}"
@@ -334,7 +343,11 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
                                        credentials["login"])
             page.goto(f"http://127.0.0.1:{config['ODOO_PORT']}" +
                       recipes.ROUTES[family])
-            adapter = OdooV066ScaleExactReturnAdapter(
+            adapter_class = (OdooV066ScalePinnedBorderAdapter
+                             if row.get("physical_dispatch_profile") ==
+                             protocol.PINNED_BORDER_PROFILE else
+                             OdooV066ScaleExactReturnAdapter)
+            adapter = adapter_class(
                 page, task_id=case["id"],
                 task_binding_sha256=row["package_sha256"],
                 instruction=case["prompt"])
@@ -550,6 +563,14 @@ def _selection_retry_gate(*, gate_path: Path, worker: Path, plan: dict,
                           private_plan_path: Path, source_freeze_path: Path,
                           old_run_dir: Path, incident_public_path: Path,
                           require_unchanged_lease_log: bool) -> dict:
+    if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
+        return _pinned_selection_retry_gate(
+            gate_path=gate_path, worker=worker, plan=plan,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            old_run_dir=old_run_dir,
+            incident_public_path=incident_public_path,
+            require_unchanged_lease_log=require_unchanged_lease_log)
     root = worker / "private" / "v066_scale_controls"
     require(old_run_dir.resolve() ==
             (root / "controls-20260928-v1").resolve() and
@@ -613,6 +634,85 @@ def _selection_retry_gate(*, gate_path: Path, worker: Path, plan: dict,
     return gate
 
 
+def _pinned_selection_retry_gate(*, gate_path: Path, worker: Path,
+                                 plan: dict, private_plan_path: Path,
+                                 source_freeze_path: Path,
+                                 old_run_dir: Path,
+                                 incident_public_path: Path,
+                                 require_unchanged_lease_log: bool) -> dict:
+    root = worker / "private" / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-exact-return-01").resolve() and
+            not old_run_dir.is_symlink() and
+            gate_path.parent.resolve() == root.resolve() and
+            gate_path.name == "selection-pinned-border-retry-gate.private.json",
+            "scale_pinned_retry_original_run_or_gate_path_invalid")
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_batch = old_run_dir / "batch-intent.private.json"
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_attempt = old_run_dir / "attempt-000"
+    rows, tail, count = read_journal(old_journal)
+    require(gate.get("schema") == PINNED_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "two_failed_attempts_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("physical_dispatch_profile") ==
+            protocol.PINNED_BORDER_PROFILE and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("second_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_batch_intent_sha256") ==
+            protocol.digest(old_batch.read_bytes()) ==
+            incident.get("batch_intent_sha256") and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()) ==
+            incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("private_gui_trace_sha256") and
+            gate.get("old_step_eight_intent_sha256") == protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes())
+            == incident.get("private_step_eight_intent_sha256") and
+            gate.get("old_step_eight_result_exists") is False and
+            not (old_attempt /
+                 "actions/step-008-result.private.json").exists() and
+            gate.get("prior_failed_control_count") == 2 and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0 and
+            gate.get("model_attempts") == 0 and
+            rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"],
+            "scale_pinned_retry_prior_failure_or_authority_changed")
+    sql_path = root / "selection-pinned-border-current-sql.private.json"
+    files_path = root / "selection-pinned-border-current-filestore.private.json"
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) == protocol.private_json(
+                worker / "private/baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker / "private/baseline-filestore-manifest.json"),
+            "scale_pinned_retry_current_baseline_not_exact")
+    if require_unchanged_lease_log:
+        events = worker / "private/worker-lease-events.jsonl"
+        require(protocol.digest(events.read_bytes()) ==
+                gate.get("worker_lease_events_sha256"),
+                "scale_pinned_retry_gate_stale_worker_activity")
+    return gate
+
+
 def _running_services_without_compose_blank(worker: Path) -> set[str]:
     """Compose prints a blank line for zero running services on this host."""
     return {name for name in train_recorder._running(worker) if name.strip()}
@@ -642,6 +742,18 @@ def prepare_selection_retry_gate(*, worker_dir: Path,
     require(plan.get("frame_guard_amendment") ==
             protocol.EXACT_RETURN_AMENDMENT,
             "scale_selection_retry_new_source_not_bound")
+    if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
+        return _prepare_pinned_selection_retry_gate(
+            worker=worker, plan=plan, private=private,
+            new_private_plan_path=new_private_plan_path,
+            new_public_plan_path=new_public_plan_path,
+            new_source_freeze_path=new_source_freeze_path,
+            old_run_dir=old_run_dir,
+            old_private_plan_path=old_private_plan_path,
+            old_public_plan_path=old_public_plan_path,
+            old_source_freeze_path=old_source_freeze_path,
+            incident_public_path=incident_public_path,
+            new_run_dir=new_run_dir)
     from tools import audit_odoo_v066_selection_flicker_v1 as incident_audit
     incident = incident_audit.audit(
         repo=protocol.ROOT, worker=worker,
@@ -747,6 +859,153 @@ def prepare_selection_retry_gate(*, worker_dir: Path,
             require_unchanged_lease_log=True)
         return {
             "schema": SELECTION_RETRY_GATE_SCHEMA,
+            "status": "same_id_retry_preflight_ready_no_gui_dispatched",
+            "gate_sha256": protocol.digest(gate_path.read_bytes()),
+            "old_journal_tail_sha256": old_tail,
+            "current_sql_sha256": sql_ref["sha256"],
+            "current_full_filestore_sha256": files_ref["sha256"],
+            "official_final_tasks_admitted": 0,
+            "model_attempts": 0,
+        }
+
+
+def _prepare_pinned_selection_retry_gate(*, worker: Path, plan: dict,
+                                         private: Path,
+                                         new_private_plan_path: Path,
+                                         new_public_plan_path: Path,
+                                         new_source_freeze_path: Path,
+                                         old_run_dir: Path,
+                                         old_private_plan_path: Path,
+                                         old_public_plan_path: Path,
+                                         old_source_freeze_path: Path,
+                                         incident_public_path: Path,
+                                         new_run_dir: Path) -> dict:
+    """Separate no-GUI authority after the retained post-intent failure."""
+    from tools import audit_odoo_v066_selection_post_intent_stale_v1 as second
+    root = private / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-exact-return-01").resolve() and
+            not old_run_dir.is_symlink(),
+            "scale_pinned_retry_second_failure_not_selected")
+    observed = second.audit(
+        repo=protocol.ROOT, worker=worker, run_dir=old_run_dir,
+        old_run_dir=root / "controls-20260928-v1",
+        private_plan_path=old_private_plan_path,
+        public_plan_path=old_public_plan_path,
+        source_freeze_path=old_source_freeze_path,
+        incident_public_path=(protocol.ROOT / "docs/evidence" /
+            "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json"),
+        verify_services=True)
+    published = protocol.public_json(incident_public_path)
+    require(observed == published and
+            observed.get("status") ==
+            "post_intent_exact_return_exhausted_before_double_click_dispatch" and
+            observed.get("post_intent_mouse_action_dispatched") is False and
+            observed.get("old_and_new_failed_attempts_preserved") is True,
+            "scale_pinned_retry_second_failure_not_independently_unchanged")
+    gate_path = root / "selection-pinned-border-retry-gate.private.json"
+    sql_path = root / "selection-pinned-border-current-sql.private.json"
+    files_path = root / "selection-pinned-border-current-filestore.private.json"
+    require(not any(path.exists() for path in (gate_path, sql_path, files_path)),
+            "scale_pinned_retry_gate_refuses_overwrite")
+    factory, _gui, reset, verify, lease = _modules(worker)
+    failure = None
+    sql = files = None
+    restored = False
+    with _run_lock(root):
+        with lease.exclusive_worker_operation("v066_selection_pinned_baseline"):
+            require(_running_services_without_compose_blank(worker) == set(),
+                    "scale_pinned_retry_services_not_cold")
+            try:
+                train_recorder._compose(worker, "up", "-d", "db")
+                sql = verify.snapshot()
+                config = factory.local_config()
+                files = reset.filestore_manifest(
+                    config["ODOO_PROJECT"] + "_filestore")
+            except BaseException as error:
+                failure = error
+            finally:
+                try:
+                    train_recorder._compose(worker, "stop", "db")
+                    restored = (_running_services_without_compose_blank(worker)
+                                == set())
+                except BaseException as error:
+                    if failure is None:
+                        failure = error
+        if failure is not None:
+            raise ScaleControlError(
+                "scale_pinned_retry_live_baseline_query_failed") from failure
+        require(sql == protocol.private_json(private / "baseline_snapshot.json")
+                and files == protocol.private_json(
+                    private / "baseline-filestore-manifest.json") and restored,
+                "scale_pinned_retry_live_baseline_not_exact")
+        old_attempt = old_run_dir / "attempt-000"
+        old_journal = old_run_dir / "journal.private.jsonl"
+        old_batch = old_run_dir / "batch-intent.private.json"
+        step_frame = old_attempt / "frames/step-008.png"
+        trace = protocol.private_json(old_attempt / "gui_trace.json")
+        require(protocol.digest(old_batch.read_bytes()) ==
+                published["batch_intent_sha256"] and
+                protocol.digest(old_journal.read_bytes()) ==
+                published["journal_sha256"] and
+                protocol.digest((old_attempt / "failure.private.json").read_bytes())
+                == published["private_failure_sha256"] and
+                protocol.digest((old_attempt / "gui_trace.json").read_bytes())
+                == published["private_gui_trace_sha256"] and
+                protocol.digest((old_attempt /
+                    "actions/step-008-intent.private.json").read_bytes()) ==
+                published["private_step_eight_intent_sha256"] and
+                len(trace.get("exact_return_guard_samples", [])) == 23 and
+                all(second._two_pinned_pixels(
+                    step_frame, old_attempt /
+                    trace["exact_return_guard_samples"][index]
+                    ["sampled_frame_ref"]["path"])
+                    for index in range(17, 23)),
+                "scale_pinned_retry_second_failure_changed_during_baseline")
+        sql_ref = _save(sql_path, sql)
+        files_ref = _save(files_path, files)
+        _rows, old_tail, _length = read_journal(old_journal)
+        events = private / "worker-lease-events.jsonl"
+        protocol._private(events)
+        gate = {
+            "schema": PINNED_RETRY_GATE_SCHEMA,
+            "status":
+                "two_failed_attempts_retained_current_baseline_exact_no_gui_replay",
+            "physical_dispatch_profile": protocol.PINNED_BORDER_PROFILE,
+            "new_private_plan_sha256":
+                protocol.digest(new_private_plan_path.read_bytes()),
+            "new_source_freeze_sha256":
+                protocol.digest(new_source_freeze_path.read_bytes()),
+            "second_failure_public_sha256":
+                protocol.digest(incident_public_path.read_bytes()),
+            "old_batch_intent_sha256": protocol.digest(old_batch.read_bytes()),
+            "old_journal_sha256": protocol.digest(old_journal.read_bytes()),
+            "old_journal_tail_sha256": old_tail,
+            "old_failure_sha256": protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()),
+            "old_gui_trace_sha256": protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()),
+            "old_step_eight_intent_sha256": protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes()),
+            "old_step_eight_result_exists": False,
+            "prior_failed_control_count": 2,
+            "current_sql_sha256": sql_ref["sha256"],
+            "current_filestore_sha256": files_ref["sha256"],
+            "worker_lease_events_sha256": protocol.digest(events.read_bytes()),
+            "service_state_restored": True,
+            "official_final_tasks_admitted": 0,
+            "model_attempts": 0,
+        }
+        _save(gate_path, gate)
+        _pinned_selection_retry_gate(
+            gate_path=gate_path, worker=worker, plan=plan,
+            private_plan_path=new_private_plan_path,
+            source_freeze_path=new_source_freeze_path,
+            old_run_dir=old_run_dir,
+            incident_public_path=incident_public_path,
+            require_unchanged_lease_log=True)
+        return {
+            "schema": PINNED_RETRY_GATE_SCHEMA,
             "status": "same_id_retry_preflight_ready_no_gui_dispatched",
             "gate_sha256": protocol.digest(gate_path.read_bytes()),
             "old_journal_tail_sha256": old_tail,
@@ -973,7 +1232,8 @@ def _execute_case_then_audit_after_release(*, lease, run_dir: Path,
                                            case: dict, wrong: dict,
                                            family: str, modules,
                                            plan: dict, worker_private: Path,
-                                           selection_retry_lease_sha: str | None = None) -> None:
+                                           selection_retry_lease_sha: str | None = None,
+                                           run_intent_sha256: str | None = None) -> None:
     attempt_name = f"attempt-{ordinal:03d}"
     with lease.exclusive_worker_operation(LEASE_OPERATION):
         if selection_retry_lease_sha is not None:
@@ -992,6 +1252,8 @@ def _execute_case_then_audit_after_release(*, lease, run_dir: Path,
             "task_id": row["task_id"],
             "package_sha256": row["package_sha256"],
             "attempt_dir": attempt_name,
+            **({"run_intent_sha256": run_intent_sha256}
+               if run_intent_sha256 is not None else {}),
         })
         _case_evidence(
             run_dir=run_dir, ordinal=ordinal, row=row, case=case,
@@ -1024,6 +1286,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
     require(plan.get("frame_guard_amendment") ==
             protocol.EXACT_RETURN_AMENDMENT,
             "scale_current_dispatch_requires_exact_return_freeze")
+    require(plan.get("physical_dispatch_profile") ==
+            protocol.PINNED_BORDER_PROFILE,
+            "scale_current_dispatch_requires_pinned_border_profile")
     require(split != "train",
             "scale_train_requires_separate_source_transition")
     worker = Path(worker_dir).resolve()
@@ -1086,6 +1351,8 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                         intent.get("source_freeze_sha256") ==
                         adoption["old_source_freeze_sha256"],
                         "scale_batch_intent_old_source_not_adopted")
+        batch_intent_sha = protocol.digest((
+            run_dir / "batch-intent.private.json").read_bytes())
         index = next_case_index(run_dir, plan)
         if resume and index:
             from tools import odoo_v066_scale_audit_v1 as independent
@@ -1115,6 +1382,8 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
             row = dict(plan["tasks"][index])
             row["source_freeze_sha256"] = plan["source_freeze_sha256"]
             row["cell_plan_sha256"] = protocol.digest(private_plan_path.read_bytes())
+            row["physical_dispatch_profile"] = plan.get(
+                "physical_dispatch_profile")
             attempt_name = f"attempt-{index:03d}"
             require(not (run_dir / attempt_name).exists(),
                     "scale_next_attempt_dir_exists_reconcile_first")
@@ -1127,6 +1396,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                     row=row, case=case, wrong=wrong, family=family,
                     modules=(factory, gui_controls, reset, verify, lease),
                     plan=plan, worker_private=private,
+                    run_intent_sha256=(batch_intent_sha if
+                        plan.get("physical_dispatch_profile") ==
+                        protocol.PINNED_BORDER_PROFILE else None),
                     selection_retry_lease_sha=(
                         selection_gate["worker_lease_events_sha256"]
                         if selection_gate is not None and index == 0 and
@@ -1141,6 +1413,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                         "task_id": row["task_id"],
                         "package_sha256": row["package_sha256"],
                         "attempt_dir": attempt_name,
+                        **({"run_intent_sha256": batch_intent_sha}
+                           if plan.get("physical_dispatch_profile") ==
+                           protocol.PINNED_BORDER_PROFILE else {}),
                     })
                 raise
             _event(run_dir / "journal.private.jsonl", {
@@ -1150,6 +1425,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                 "attempt_dir": attempt_name,
                 "attempt_receipt_sha256": protocol.digest(
                     (run_dir / attempt_name / "attempt.private.json").read_bytes()),
+                **({"run_intent_sha256": batch_intent_sha}
+                   if plan.get("physical_dispatch_profile") ==
+                   protocol.PINNED_BORDER_PROFILE else {}),
             })
             index += 1
         return {"schema": protocol.BATCH_SCHEMA,

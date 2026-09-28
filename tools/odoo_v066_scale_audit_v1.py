@@ -103,7 +103,8 @@ def _micro_alternate_independent(first: bytes, second: bytes) -> bool:
         for pair in changes.values())
 
 
-def _exact_return_chain(attempt: Path, trace: dict) -> None:
+def _exact_return_chain(attempt: Path, trace: dict,
+                        *, require_pinned_profile: bool = False) -> None:
     samples = trace.get("exact_return_guard_samples")
     require(type(samples) is list and samples,
             "scale_exact_return_guard_missing")
@@ -136,7 +137,8 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
                 sample.get("sample") in range(6) and
                 source_key in observed and
                 sample.get("classification") in (
-                    "exact_return", "one_recurring_micro_raster_alternate"),
+                    "exact_return", "one_recurring_micro_raster_alternate",
+                    "pinned_border_equivalence_accepted"),
                 "scale_exact_return_sample_order_or_class_invalid")
         prior_step = step
         ref = sample.get("sampled_frame_ref")
@@ -149,7 +151,8 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
         group = grouped.setdefault((step, source_key, stage), [])
         require(sample["sample"] == len(group) and
                 len(group) < 6 and
-                (not group or group[-1][1] != "exact_return"),
+                (not group or group[-1][1] not in (
+                    "exact_return", "pinned_border_equivalence_accepted")),
                 "scale_exact_return_sample_bounded_sequence_invalid")
         group.append((sampled_sha, sample["classification"]))
         if sample["classification"] == "exact_return":
@@ -163,7 +166,9 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
     for (step, source_key, _stage), group in grouped.items():
         alternatives_by_observation.setdefault((step, source_key), set()).update(
             digest for digest, classification in group
-            if classification == "one_recurring_micro_raster_alternate")
+            if classification in (
+                "one_recurring_micro_raster_alternate",
+                "pinned_border_equivalence_accepted"))
     require(all(len(alternatives) <= 1 for alternatives in
                 alternatives_by_observation.values()),
             "scale_exact_return_third_frame_present")
@@ -173,7 +178,9 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
         parse = grouped.get((step, source_key, "parse"), [])
         dispatch = grouped.get((step, source_key, "dispatch"), [])
         require(parse and dispatch and
-                parse[-1][1] == dispatch[-1][1] == "exact_return" and
+                parse[-1][1] == "exact_return" and
+                dispatch[-1][1] in (
+                    "exact_return", "pinned_border_equivalence_accepted") and
                 next(index for index, sample in enumerate(samples)
                      if sample.get("step") == step and
                      sample.get("observed_frame_id_sha256") == source_key[1] and
@@ -183,8 +190,59 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
                      if sample.get("step") == step and
                      sample.get("observed_frame_id_sha256") == source_key[1] and
                      sample.get("stage") == "dispatch" and
-                     sample.get("classification") == "exact_return"),
+                     sample.get("classification") in (
+                         "exact_return", "pinned_border_equivalence_accepted")),
                 "scale_action_not_guarded_by_exact_return")
+        if require_pinned_profile:
+            physical = action.get("contract_receipt", {}).get(
+                "physical_dispatch_guard")
+            require(type(physical) is dict and
+                    physical.get("profile") ==
+                    protocol.PINNED_BORDER_PROFILE and
+                    physical.get("observed_frame_sha256") == source_key[0] and
+                    physical.get("observed_frame_id_sha256") == source_key[1] and
+                    physical.get("physical_frame_ref") ==
+                    next(sample["sampled_frame_ref"] for sample in
+                         reversed(samples)
+                         if sample.get("step") == step and
+                         sample.get("stage") == "dispatch" and
+                         sample.get("observed_frame_id_sha256") == source_key[1]),
+                    "scale_physical_dispatch_receipt_unbound")
+            if dispatch[-1][1] == "exact_return":
+                require(physical.get("classification") ==
+                        "exact_physical_frame" and
+                        physical.get("target_control") is None and
+                        physical.get("pinned_pixel_coordinates") == [],
+                        "scale_exact_physical_receipt_changed")
+            else:
+                candidates = sorted((attempt / "actions").glob(
+                    f"step-{step:03d}*-intent.private.json"))
+                intent = protocol.private_json(candidates[0])
+                target = intent.get("normalized_action", {}).get("target")
+                control = physical.get("target_control")
+                bounds = control.get("bounds") if type(control) is dict else None
+                require(len(dispatch) == 6 and
+                        all(classification ==
+                            "one_recurring_micro_raster_alternate"
+                            for _, classification in dispatch[:-1]) and
+                        physical.get("classification") ==
+                        "pinned_border_equivalence_accepted" and
+                        physical.get("pinned_pixel_coordinates") ==
+                        [[41, 419], [132, 419]] and
+                        intent.get("normalized_action", {}).get("type") in
+                        ("click", "double_click", "type") and
+                        type(target) is dict and
+                        set(target) == {"x", "y"} and
+                        type(bounds) is list and len(bounds) == 4 and
+                        control.get("visible") is True and
+                        type(control.get("ref")) is str and
+                        type(control.get("role")) is str and
+                        bounds[0] <= target["x"] <= bounds[2] and
+                        bounds[1] <= target["y"] <= bounds[3] and
+                        all(not (bounds[0] - 8 <= x <= bounds[2] + 8 and
+                                 bounds[1] - 8 <= y <= bounds[3] + 8)
+                            for x, y in ((41, 419), (132, 419))),
+                        "scale_pinned_physical_dispatch_target_or_pixels_invalid")
 
 
 def _selection_retry_gate_independent(*, worker_private: Path,
@@ -193,6 +251,14 @@ def _selection_retry_gate_independent(*, worker_private: Path,
                                       source_freeze_path: Path,
                                       incident_public_path: Path,
                                       old_run_dir: Path) -> None:
+    if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
+        return _pinned_retry_gate_independent(
+            worker_private=worker_private, plan=plan,
+            batch_intent=batch_intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=incident_public_path,
+            old_run_dir=old_run_dir)
     gate_path = (worker_private / "v066_scale_controls" /
                  "selection-exact-return-retry-gate.private.json")
     gate = protocol.private_json(gate_path)
@@ -252,8 +318,81 @@ def _selection_retry_gate_independent(*, worker_private: Path,
             "scale_independent_selection_retry_current_baseline_inexact")
 
 
+def _pinned_retry_gate_independent(*, worker_private: Path, plan: dict,
+                                   batch_intent: dict,
+                                   private_plan_path: Path,
+                                   source_freeze_path: Path,
+                                   incident_public_path: Path,
+                                   old_run_dir: Path) -> None:
+    root = worker_private / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-exact-return-01").resolve(),
+            "scale_independent_pinned_prior_run_invalid")
+    gate_path = root / "selection-pinned-border-retry-gate.private.json"
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_batch = old_run_dir / "batch-intent.private.json"
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_attempt = old_run_dir / "attempt-000"
+    rows, tail, count = controller.read_journal(old_journal)
+    require(gate.get("schema") == controller.PINNED_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "two_failed_attempts_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("physical_dispatch_profile") ==
+            protocol.PINNED_BORDER_PROFILE and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("second_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_batch_intent_sha256") ==
+            protocol.digest(old_batch.read_bytes()) ==
+            incident.get("batch_intent_sha256") and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()) ==
+            incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("private_gui_trace_sha256") and
+            gate.get("old_step_eight_intent_sha256") == protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes())
+            == incident.get("private_step_eight_intent_sha256") and
+            gate.get("old_step_eight_result_exists") is False and
+            not (old_attempt /
+                 "actions/step-008-result.private.json").exists() and
+            gate.get("prior_failed_control_count") == 2 and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0,
+            "scale_independent_pinned_retry_gate_unbound")
+    sql_path = root / "selection-pinned-border-current-sql.private.json"
+    files_path = root / "selection-pinned-border-current-filestore.private.json"
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) == protocol.private_json(
+                worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_pinned_retry_current_baseline_inexact")
+
+
 def _action_chain(attempt: Path, trace: dict, row: dict,
-                  *, require_exact_return_guard: bool = False) -> tuple[int, int, int]:
+                  *, require_exact_return_guard: bool = False,
+                  require_pinned_profile: bool = False) -> tuple[int, int, int]:
     actions = trace.get("actions")
     rejections = trace.get("pre_intent_rejections")
     require(trace.get("schema") == controller.TRACE_SCHEMA and
@@ -324,7 +463,8 @@ def _action_chain(attempt: Path, trace: dict, row: dict,
         pilot._ref(attempt, rejected["observed_frame_ref"], image=True)
         pilot._ref(attempt, rejected["assistant_action_ref"])
     if require_exact_return_guard:
-        _exact_return_chain(attempt, trace)
+        _exact_return_chain(
+            attempt, trace, require_pinned_profile=require_pinned_profile)
     require(positive > 0 and negative > 0,
             "scale_positive_or_negative_gui_phase_missing")
     return positive, negative, len(rejections)
@@ -379,7 +519,9 @@ def audit_case(*, plan: dict, row: dict, attempt: Path,
     positive_actions, negative_actions, rejected = _action_chain(
         attempt, trace, row,
         require_exact_return_guard=(plan.get("frame_guard_amendment") ==
-                                    "exact-frame-return-2026-09-28"))
+                                    "exact-frame-return-2026-09-28"),
+        require_pinned_profile=(plan.get("physical_dispatch_profile") ==
+                                protocol.PINNED_BORDER_PROFILE))
     require(refs["source_frame"]["sha256"] in {
         action["frame"]["sha256"] for action in trace["actions"]},
         "scale_source_not_in_native_gui_trace")
@@ -502,14 +644,19 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
             "scale_batch_intent_unbound")
     if split == "selection" and plan.get("frame_guard_amendment") == \
             protocol.EXACT_RETURN_AMENDMENT:
+        pinned = (plan.get("physical_dispatch_profile") ==
+                  protocol.PINNED_BORDER_PROFILE)
         _selection_retry_gate_independent(
             worker_private=private, plan=plan, batch_intent=intent,
             private_plan_path=private_plan_path,
             source_freeze_path=source_freeze_path,
             incident_public_path=(protocol.ROOT / "docs/evidence" /
-                "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json"),
+                ("odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
+                 if pinned else
+                 "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json")),
             old_run_dir=(private / "v066_scale_controls" /
-                         "controls-20260928-v1"))
+                         ("controls-20260929-exact-return-01" if pinned else
+                          "controls-20260928-v1")))
     old_plan = None
     current_binding = (intent.get("private_plan_sha256") ==
                        protocol.digest(private_plan_path.read_bytes()) and

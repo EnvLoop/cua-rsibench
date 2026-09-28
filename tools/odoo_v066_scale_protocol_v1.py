@@ -21,6 +21,8 @@ SOURCE_FREEZE_SCHEMA = "envloop-odoo-v066-scale-gui-source-freeze-v1"
 OLD_LEASE_FREEZE_SHA256 = "f32a309bffddc411e8c317e23b322a7707bedc27e64f20b14c5be2fefbc8179c"
 EXACT_RETURN_DRAFT_SHA256 = "4b4e8bf2f1f36fb4b04c7867be50cbc540f8a0fa30c3badad07b1293366fdaf0"
 SELECTION_GATE_AUDIT_FREEZE_SHA256 = "4c2729791c5adc4aaa817029afbd518e30514f8a66cbe64dcb31e0cd2e58d931"
+BLANK_COMPOSE_FREEZE_SHA256 = "cf1344cf5a8640cec013ec982000b20852a78f6a611e1e9c2b3e8a499ee087ee"
+PINNED_BORDER_PROFILE = "pinned-noninteractive-border-dispatch-2026-09-29"
 EXACT_RETURN_AMENDMENT = "exact-frame-return-2026-09-28"
 PRIVATE_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-v1"
 PUBLIC_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-public-v1"
@@ -36,11 +38,13 @@ SOURCE_FILES = (
     "tools/odoo_v066_scale_controller_v1.py",
     "tools/odoo_v066_scale_audit_v1.py",
     "tools/audit_odoo_v066_selection_flicker_v1.py",
+    "tools/audit_odoo_v066_selection_post_intent_stale_v1.py",
     "tools/audit_odoo_v066_inline_lease_incident_v1.py",
     "tools/prepare_odoo_v066_lease_timing_adoption_v1.py",
     "tools/record_odoo_v066_train_gui_v1.py",
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
     "enterprise_fallback/odoo18/odoo_v066_scale_exact_return_adapter.py",
+    "enterprise_fallback/odoo18/odoo_v066_scale_pinned_border_adapter.py",
     "enterprise_fallback/odoo18/odoo_native_adapter.py",
     "enterprise_fallback/odoo18/verify.py",
     "enterprise_fallback/odoo18/reset.py",
@@ -133,14 +137,22 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 "scale_historical_source_freeze_changed")
     else:
         require(value.get("status") ==
-                "frozen_after_selection_blank_compose_service_fix" and
+                "frozen_after_pinned_border_dispatch_and_second_failure_audit" and
                 value.get("frame_guard_amendment") == EXACT_RETURN_AMENDMENT and
+                value.get("physical_dispatch_profile") ==
+                PINNED_BORDER_PROFILE and
                 value.get("old_source_freeze_sha256") ==
                 OLD_LEASE_FREEZE_SHA256 and
                 value.get("old_exact_return_draft_sha256") ==
                 EXACT_RETURN_DRAFT_SHA256 and
                 value.get("old_selection_gate_audit_freeze_sha256") ==
                 SELECTION_GATE_AUDIT_FREEZE_SHA256 and
+                value.get("old_blank_compose_freeze_sha256") ==
+                BLANK_COMPOSE_FREEZE_SHA256 and
+                value.get("selection_second_failure_public_sha256") ==
+                digest((ROOT / "docs/evidence" /
+                    "odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
+                ).read_bytes()) and
                 value.get("selection_preflight_incident_public_sha256") ==
                 digest((ROOT / "docs/evidence" /
                     "odoo-v066-selection-blank-compose-preflight-2026-09-29.json"
@@ -151,7 +163,7 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 value.get("source_sha256s") == current_source_hashes() and
                 value.get("host_runtime") == host_runtime() and
                 value.get("accepted_train_pilot_count") == 1 and
-                value.get("retained_selection_failed_controls_before_freeze") == 1 and
+                value.get("retained_selection_failed_controls_before_freeze") == 2 and
                 value.get("official_final_gui_controls_before_freeze") == 0,
                 "scale_exact_return_source_freeze_changed_or_nonzero")
     return value, digest(raw)
@@ -258,6 +270,8 @@ def build_split_plan(*, split: str, worker_dir: Path,
         "checkpoint": full["checkpoints"][split],
         "source_sha256s": source_freeze["source_sha256s"],
         "frame_guard_amendment": source_freeze.get("frame_guard_amendment"),
+        "physical_dispatch_profile":
+            source_freeze.get("physical_dispatch_profile"),
         "task_count": count,
         "world_case_count": world_count,
         "accepted_train_pilot_excluded": split == "train",
@@ -273,6 +287,8 @@ def build_split_plan(*, split: str, worker_dir: Path,
         "cell": "odoo-community",
         "ratification_sha256": RATIFICATION_SHA,
         "source_freeze_sha256": source_freeze_sha,
+        "physical_dispatch_profile":
+            source_freeze.get("physical_dispatch_profile"),
         "private_plan_sha256": digest(canonical(plan)),
         "candidate_count": count,
         "family_candidate_counts": {family: sum(
@@ -299,6 +315,8 @@ def validate_split_plan(*, split: str, private_path: Path,
             private.get("source_sha256s") == source_freeze["source_sha256s"] and
             private.get("frame_guard_amendment") ==
             source_freeze.get("frame_guard_amendment") and
+            private.get("physical_dispatch_profile") ==
+            source_freeze.get("physical_dispatch_profile") and
             private.get("task_count") == count and
             private.get("world_case_count") == SPLITS[split][3] and
             private.get("accepted_train_pilot_excluded") is (split == "train") and
@@ -308,6 +326,8 @@ def validate_split_plan(*, split: str, private_path: Path,
             public.get("split") == split and
             public.get("private_plan_sha256") == digest(private_path.read_bytes()) and
             public.get("candidate_count") == count and
+            public.get("physical_dispatch_profile") ==
+            source_freeze.get("physical_dispatch_profile") and
             public.get("fresh_current_profile_gui_controls") == 0 and
             public.get("official_final_tasks_admitted") == 0 and
             private.get("official_final_tasks_admitted") == 0,
