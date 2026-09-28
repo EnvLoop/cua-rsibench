@@ -1,0 +1,17 @@
+{
+  "auditor_source_sha256": "48fd7bf37cbc076f541cbed47f3a0d77b76e2bc5537f45fbe3538470bb15ba14",
+  "counts": {
+    "near_miss_rejected": 8,
+    "positive_pass": 8,
+    "unrelated_change_rejected": 8,
+    "unsolved_baseline": 8
+  },
+  "gui_qualified_count": 0,
+  "model_results": 0,
+  "official_final_admitted": 0,
+  "private_shadow_audit_sha256": "f157fa919ad041769915b4744718bb4cce54931969a7ba696af3855e878385bf",
+  "schema": "envloop-odoo-train-transfer-shadow-audit-v1",
+  "scoring_scope": "in-memory SQL-shaped shadow states; no original Odoo save or reset",
+  "staged_sha256": "f3d707fc117a9e3f228ea436485e1fe8e132918763409149f2db241354207a67",
+  "status": "synthetic_state_shadow_controls_passed"
+}
