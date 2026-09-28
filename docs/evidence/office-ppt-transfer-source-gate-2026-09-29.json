@@ -3,13 +3,12 @@
   "additional_train_specs_built": 0,
   "amendment_did_not_modify_original_anchors": true,
   "errors": [
-    "private_calibration_80_manifest_missing",
-    "2_new_official_wdi_csv_source_families_missing"
+    "authentic_private_calibration_80_manifest_missing_or_changed"
   ],
   "existing_calibration_cases_retained_as_calibration": 80,
   "expected_additional_train_source_families_for_stage": 2,
   "full_expansion_target_source_families": 8,
-  "new_source_dirs_present_unverified": 0,
+  "new_source_dirs_present_unverified": 2,
   "office_web_gui_admitted": 0,
   "official_final_admitted": 0,
   "offline_controls_passed": 0,

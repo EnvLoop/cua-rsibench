@@ -54,7 +54,11 @@ class PowerPointTransferTests(unittest.TestCase):
             (directory / "source-snapshot.private.json").write_bytes(snapshot_raw)
             provenance = {"schema":
                           "envloop-wdi-official-country-csv-extract-private-v1",
+                          "source_type": "worldbank_official_country_csv_zip",
                           "country_iso": iso, "country_name": "Test " + iso,
+                          "official_download_url":
+                          f"https://api.worldbank.org/v2/en/country/{iso}?downloadformat=csv",
+                          "official_page_url": f"https://data.worldbank.org/country/{iso.lower()}",
                           "catalog_license": "CC BY 4.0",
                           "zip_sha256": gate.digest(zip_raw),
                           "snapshot_sha256": gate.digest(snapshot_raw),
@@ -76,6 +80,7 @@ class PowerPointTransferTests(unittest.TestCase):
                         "years": old["years"]}
 
             with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "CALIBRATION_80_SHA", gate.digest(cal.read_bytes())), \
                  patch.object(gate, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
                  patch.object(calibration, "PLAN_SHA", gate.digest(original.read_bytes())), \
                  patch.object(calibration, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
@@ -125,6 +130,7 @@ class PowerPointTransferTests(unittest.TestCase):
             (sources / sorted(path.name for path in sources.iterdir() if path.is_dir())[0] /
              "source-provenance.private.json").unlink()
             with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "CALIBRATION_80_SHA", gate.digest(cal.read_bytes())), \
                  patch.object(gate, "extract",
                               side_effect=lambda _raw, iso: (iso.encode(),
                                                               {"numeric_observation_count": 30})), \
@@ -148,6 +154,7 @@ class PowerPointTransferTests(unittest.TestCase):
                         "years": old["years"]}
 
             with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "CALIBRATION_80_SHA", gate.digest(cal.read_bytes())), \
                  patch.object(gate, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
                  patch.object(calibration, "PLAN_SHA", gate.digest(original.read_bytes())), \
                  patch.object(calibration, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
@@ -169,14 +176,55 @@ class PowerPointTransferTests(unittest.TestCase):
     def test_ppt_preflight_reports_missing_inputs_without_source_names(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            original, _queue, _cal, _sources, _history, _unused = self._fixture(root)
+            original, _queue, cal, sources, _history, _unused = self._fixture(root)
             with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())):
                 receipt = gate.ppt_source_preflight(original, None, None)
+                spoofed = gate.ppt_source_preflight(
+                    original, cal, sources, stage="expansion")
             self.assertEqual(receipt["status"], "blocked")
             self.assertTrue(receipt["active_v13_plan_sha256_matches"])
             self.assertEqual(receipt["additional_train_specs_built"], 0)
             self.assertEqual(receipt["office_web_gui_admitted"], 0)
             self.assertNotIn("source_group", json.dumps(receipt))
+            self.assertEqual(spoofed["new_source_dirs_present_unverified"], 8)
+            self.assertIn("authentic_private_calibration_80_manifest_missing_or_changed",
+                          spoofed["errors"])
+
+    def test_real_source_capture_stays_blocked_without_authentic_calibration(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original, queue, cal, sources, history, unused = self._fixture(root)
+            for directory in sorted(path for path in sources.iterdir() if path.is_dir())[2:]:
+                (sources / f"{directory.name}-country.private.zip").unlink()
+                shutil.rmtree(directory)
+            old = wdi.country_facts(wdi.load(), sorted(wdi.COUNTRIES)[0])
+            with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(calibration, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(calibration, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(gate, "extract", side_effect=lambda _raw, iso: (
+                     iso.encode(), {"numeric_observation_count": 30,
+                                    "data_last_updated": "2026-09-01",
+                                    "country_name": "Test " + iso})), \
+                 patch.object(gate, "facts_from_official_response",
+                              side_effect=lambda raw: {"iso3": raw.decode(),
+                                                       "name": "Test " + raw.decode(),
+                                                       "years": old["years"]}):
+                blocked = gate.ppt_source_capture_audit(
+                    original, queue, history, sources, b"s" * 32)
+                self.assertIn("missing_blocked", blocked["status"])
+                self.assertEqual(blocked["numeric_observations_checked"], 60)
+                self.assertIsNone(blocked["calibration_source_overlap_count"])
+                with self.assertRaisesRegex(ValueError, "authentic_calibration_80"):
+                    gate.ppt_source_capture_audit(
+                        original, queue, history, sources, b"s" * 32, cal)
+                with patch.object(gate, "CALIBRATION_80_SHA",
+                                  gate.digest(cal.read_bytes())):
+                    passed = gate.ppt_source_capture_audit(
+                        original, queue, history, sources, b"s" * 32, cal)
+            self.assertTrue(passed["authentic_calibration_80_manifest_sha256_matches"])
+            self.assertEqual(passed["calibration_source_overlap_count"], 0)
+            self.assertNotIn(unused[3], json.dumps(blocked))
 
 
 class ExcelTransferTests(unittest.TestCase):

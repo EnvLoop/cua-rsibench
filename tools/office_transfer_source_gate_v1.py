@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from datetime import date
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ import re
 import secrets
 import shutil
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlparse
 
 from ppt_wdi_factory import verify as ppt_verify
 from ppt_wdi_factory.build import (
@@ -38,6 +40,7 @@ PPT_SCHEMA = "envloop-ppt-wdi-transfer-source-plan-private-v1"
 EXCEL_SCHEMA = "envloop-sec-excel-transfer-skill-cards-private-v1"
 EXCEL_CASE_SCHEMA = "envloop-sec-excel-transfer-analogues-private-v1"
 EXCEL_SPLIT_SHA = "3459c1e2fbc4a02dbece31379849c28d52d12bf17b3d188a709590c1ee7df937"
+CALIBRATION_80_SHA = "bb5baafdded0384a3069be5d22707269e191744a995f83b2512a58b9afdda2c7"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 ACCESSION = re.compile(r"^\d{10}-\d{2}-\d{6}$")
 RIGHTS_WDI = "wdi_cc_by_4_0_facts_plus_authored_simulation"
@@ -93,7 +96,8 @@ def ppt_transfer_plan(seed: bytes, official_csv_root: Path,
     require(digest(original_raw) == PLAN_SHA and
             original_train_plan.resolve() == heldout_plan.resolve(),
             "active_v13_plan_hash_or_path_changed")
-    require(calibration.get("schema") ==
+    require(digest(calibration_raw) == CALIBRATION_80_SHA and
+            calibration.get("schema") ==
             "envloop-ppt-wdi-train-calibration-80-private-v1" and
             len(calibration.get("rows", [])) == 80,
             "calibration_80_manifest_missing_or_changed")
@@ -227,14 +231,16 @@ def ppt_source_preflight(original_v13_plan: Path, calibration_manifest: Path | N
     source_count = STAGE_SOURCE_FAMILIES[stage]
     original_ok = original_v13_plan.is_file() and digest(
         original_v13_plan.read_bytes()) == PLAN_SHA
-    calibration_ok = calibration_manifest is not None and calibration_manifest.is_file()
+    calibration_ok = (calibration_manifest is not None and
+                      calibration_manifest.is_file() and
+                      digest(calibration_manifest.read_bytes()) == CALIBRATION_80_SHA)
     source_dirs = (sum(path.is_dir() for path in official_csv_root.iterdir())
                    if official_csv_root is not None and official_csv_root.is_dir() else 0)
     errors = []
     if not original_ok:
         errors.append("active_v13_20_20_100_plan_missing_or_changed")
     if not calibration_ok:
-        errors.append("private_calibration_80_manifest_missing")
+        errors.append("authentic_private_calibration_80_manifest_missing_or_changed")
     if source_dirs != source_count:
         errors.append(f"{source_count}_new_official_wdi_csv_source_families_missing")
     return {"schema": "envloop-office-transfer-ppt-preflight-public-v1",
@@ -252,6 +258,117 @@ def ppt_source_preflight(original_v13_plan: Path, calibration_manifest: Path | N
             "official_final_admitted": 0,
             "rights_tier": RIGHTS_WDI,
             "errors": errors}
+
+
+def ppt_source_capture_audit(original_v13_plan: Path, future_queue: Path,
+                             historical_plan_dir: Path, official_csv_root: Path,
+                             commitment_salt: bytes,
+                             calibration_manifest: Path | None = None) -> dict:
+    """Reopen two genuine CSV captures without releasing their identities.
+
+    A missing original calibration manifest is reported as a hard blocker.  It
+    cannot be recreated from the aggregate public receipt or a fabricated
+    eight-source list.
+    """
+    require(len(commitment_salt) == 32, "private_source_commitment_salt_must_be_32_bytes")
+    original, raw = private_read(original_v13_plan)
+    require(digest(raw) == PLAN_SHA and original.get("schema") == ppt.SCHEMA and
+            {key: len(original.get("sets", {}).get(key, [])) for key in
+             ("train", "selection", "final_candidate")} ==
+            {"train": 20, "selection": 20, "final_candidate": 100},
+            "active_v13_20_20_100_plan_changed")
+    dirs = sorted(path for path in official_csv_root.iterdir() if path.is_dir())
+    require(len(dirs) == 2, "two_new_official_wdi_country_csvs_required")
+    proposed: set[str] = set()
+    update_dates: set[str] = set()
+    source_commitments: list[dict] = []
+    for directory in dirs:
+        iso = directory.name
+        require(re.fullmatch(r"[A-Z]{3}", iso) is not None and
+                iso not in wdi.COUNTRIES, "source_hits_original_35")
+        zip_raw = (official_csv_root / f"{iso}-country.private.zip").read_bytes()
+        snapshot_raw = (directory / "source-snapshot.private.json").read_bytes()
+        provenance_raw = (directory / "source-provenance.private.json").read_bytes()
+        provenance = json.loads(provenance_raw)
+        extracted, detail = extract(zip_raw, iso)
+        require(extracted == snapshot_raw and
+                provenance.get("schema") ==
+                "envloop-wdi-official-country-csv-extract-private-v1" and
+                provenance.get("country_iso") == iso and
+                provenance.get("source_type") ==
+                "worldbank_official_country_csv_zip" and
+                provenance.get("catalog_license") == "CC BY 4.0" and
+                provenance.get("official_download_url") ==
+                f"https://api.worldbank.org/v2/en/country/{iso}?downloadformat=csv" and
+                urlparse(provenance.get("official_page_url", "")).hostname ==
+                "data.worldbank.org" and
+                provenance.get("zip_sha256") == digest(zip_raw) and
+                provenance.get("snapshot_sha256") == digest(snapshot_raw) and
+                provenance.get("data_last_updated") == detail["data_last_updated"] and
+                provenance.get("country_name") == detail["country_name"] and
+                detail["numeric_observation_count"] == 30,
+                "official_wdi_csv_or_provenance_changed")
+        date.fromisoformat(provenance["download_date"])
+        facts = facts_from_official_response(snapshot_raw)
+        require(facts["iso3"] == iso and
+                facts["name"] == detail["country_name"],
+                "official_csv_country_identity_changed")
+        proposed.add(iso)
+        update_dates.add(detail["data_last_updated"])
+        source_commitments.append({"iso": iso,
+                                   "zip_sha256": digest(zip_raw),
+                                   "snapshot_sha256": digest(snapshot_raw),
+                                   "provenance_sha256": digest(provenance_raw)})
+    require(len(proposed) == 2, "country_family_duplicate")
+    train = {row["source_group"] for row in original["sets"]["train"]}
+    require(not proposed & train, "source_hits_original_train")
+    heldout = blind_heldout_collision(original_v13_plan, future_queue, proposed)
+    require(not heldout["any_collision"], "source_hits_heldout_or_reserve")
+    historical = historical_collision(historical_plan_dir, proposed)
+    require(historical["historical_plan_revisions_checked"] >= 12 and
+            historical["historical_final_source_collision_count"] == 0,
+            "source_hits_historical_final_or_history_incomplete")
+    calibration_checked = calibration_manifest is not None and calibration_manifest.is_file()
+    if calibration_checked:
+        calibration, calibration_raw = private_read(calibration_manifest)
+        rows = calibration.get("rows", [])
+        require(digest(calibration_raw) == CALIBRATION_80_SHA and
+                calibration.get("schema") ==
+                "envloop-ppt-wdi-train-calibration-80-private-v1" and
+                len(rows) == 80 and
+                len({row["source_group"] for row in rows}) == 8 and
+                all(row.get("calibration_role") ==
+                    "nonfinal_train_only_four_target_analogue" for row in rows) and
+                not proposed & {row["source_group"] for row in rows},
+                "authentic_calibration_80_missing_changed_or_collision")
+    return {"schema": "envloop-office-transfer-ppt-source-capture-public-v1",
+            "status": "source_checked_calibration_gate_passed_artifacts_unbuilt"
+                      if calibration_checked else
+                      "source_checked_authentic_calibration_80_missing_blocked",
+            "official_wdi_csv_source_families_checked": 2,
+            "numeric_observations_checked": 60,
+            "csv_data_update_dates_distinct": len(update_dates),
+            "retrieval_date_recorded_per_source": True,
+            "source_package_commitment_sha256": digest(
+                commitment_salt + ppt.canonical(source_commitments)),
+            "source_package_commitment_method":
+                "sha256_private_32_byte_salt_plus_canonical_source_hashes",
+            "original_35_overlap_count": 0,
+            "active_train_overlap_count": 0,
+            "selection_final_overlap_count": 0,
+            "future_reserve_overlap_count": 0,
+            "historical_final_overlap_count": 0,
+            "historical_plan_revisions_checked":
+                historical["historical_plan_revisions_checked"],
+            "authentic_calibration_80_manifest_sha256_matches":
+                calibration_checked,
+            "calibration_source_overlap_count": 0 if calibration_checked else None,
+            "rights_tier": RIGHTS_WDI,
+            "additional_train_specs_built": 0,
+            "offline_controls_passed": 0,
+            "office_web_gui_admitted": 0,
+            "official_final_admitted": 0,
+            "model_calls": 0}
 
 
 def materialize_ppt_transfer(plan: dict, csv_root: Path, private_out: Path,
@@ -520,7 +637,29 @@ def main() -> None:
     preflight.add_argument("--public-out", type=Path, required=True)
     preflight.add_argument("--stage", choices=tuple(STAGE_SOURCE_FAMILIES),
                            default="pilot")
+    capture = sub.add_parser("ppt-source-audit")
+    capture.add_argument("--official-csv-root", type=Path, required=True)
+    capture.add_argument("--original-v13-plan", type=Path, required=True)
+    capture.add_argument("--future-reserve-queue", type=Path, required=True)
+    capture.add_argument("--historical-plan-dir", type=Path, required=True)
+    capture.add_argument("--calibration-80-manifest", type=Path)
+    capture.add_argument("--private-commitment-salt", type=Path, required=True)
+    capture.add_argument("--public-out", type=Path, required=True)
     args = p.parse_args()
+    if args.mode == "ppt-source-audit":
+        require(not args.public_out.exists(), "fresh_public_source_receipt_required")
+        result = ppt_source_capture_audit(
+            args.original_v13_plan, args.future_reserve_queue,
+            args.historical_plan_dir, args.official_csv_root,
+            args.private_commitment_salt.read_bytes(),
+            args.calibration_80_manifest)
+        args.public_out.parent.mkdir(parents=True, exist_ok=True)
+        args.public_out.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
+        print(json.dumps({"status": result["status"],
+                          "official_wdi_csv_source_families_checked": 2,
+                          "additional_train_specs_built": 0}, sort_keys=True))
+        raise SystemExit(0 if result["authentic_calibration_80_manifest_sha256_matches"]
+                         else 1)
     if args.mode == "excel-screen":
         split = private_read(args.private_split_registry) if args.private_split_registry else None
         cards = private_read(args.private_skill_cards)[0] if args.private_skill_cards else None
