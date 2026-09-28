@@ -11,13 +11,9 @@ workbook, fault, answer, GUI episode, or model output was created.
 
 For each candidate, the evaluator opened the SEC filing-detail page and its
 listed original 10-K HTML, then inspected two comparable annual periods of the
-fields required by that graph. The first graph's two filings expose reported
-cash-flow components, foreign-exchange effect, change, beginning and ending
-cash, and the cash/restricted-cash scope reconciliation. The second graph's
-two filings expose operating income, separately reported gross interest
-expense, operating cash flow, and debt components. The read-only
+fields required by the privately signed graph card. The read-only
 [`source-availability screen`](../../tools/sec_excel_transfer_source_availability_v1.py)
-recomputes both years' cash and debt identities, validates the SEC URL/CIK/
+recomputes the two profiled accounting identities in both years, validates the SEC URL/CIK/
 accession structure, signed-card mapping, two-per-graph allocation, and
 issuer/accession/template disjointness. Six synthetic unit tests, including
 five fail-closed mutations, pass. Its [field-limited receipt](sec-excel-transfer-two-graph-source-availability-2026-09-29.json)

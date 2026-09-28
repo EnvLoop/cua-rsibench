@@ -207,6 +207,7 @@ def audit(*, registry_path: Path, cards_path: Path, pilot_path: Path,
         "original_registry_sha256": sha256(registry_raw).hexdigest(),
         "private_source_availability_salted_commitment":
             hmac.new(salt, raw, "sha256").hexdigest(),
+        "rights_tier": "derived_filing_facts_and_authored_scenarios_only",
         "source_access": "SEC original 10-K HTML browser research; host raw byte capture pending",
         "original_filing_bytes_captured": 0,
         "companyfacts_snapshots_captured": 0,
