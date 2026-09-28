@@ -1,0 +1,53 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "batch_size_preregistered": 2,
+  "benchmark_score": null,
+  "blocked_reason": "diagnostic_distinct_train_workflows_not_ready",
+  "builder_sha256": "e0ff9eb94acdfc95853ff1d0e28101f0684ebe8525671f45dc44ec66ad6653cd",
+  "caret_amended_public_ratification_receipt": {
+    "path": "docs/evidence/full-study-v066-caret-amended-control-ratification-2026-09-28.json",
+    "sha256": "80974630920354dd4d5b0277efd3091cdbbf9849d4c796bd9ee04b0c11c0dbf9"
+  },
+  "cost_audit_status": "pending_no_paid_diagnostic_run",
+  "fake_provider_test_count": 16,
+  "final_tasks_used": 0,
+  "impress_public_train_render_receipt": {
+    "path": "docs/evidence/desktop-v066-public-train-sft-render-2026-09-28.json",
+    "sha256": "4ad3759bcc661338ad7f5200a2d69c61179263205fb50808a771f0a2d8bbff4d"
+  },
+  "model": "Qwen/Qwen3.8-27B",
+  "official_model_outcomes": 0,
+  "official_researcher_campaigns": 0,
+  "optimizer_steps_preregistered": 64,
+  "paid_tinker_calls": 0,
+  "prereg_sha256": "8011469aca87ff324c4e1e66b317c9e3ad8e9ff21dd7d9762f3c2fbc18daf9b2",
+  "pricing_quote_is_dispatch_gate": false,
+  "provider_credentials_supplied_to_tests": false,
+  "provider_invoice_required_for_cost_claim": true,
+  "python_socket_connections_permitted_during_tests": false,
+  "ratification_sha256": "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359",
+  "required_distinct_train_tasks": 3,
+  "required_distinct_train_workflows": 3,
+  "schema": "envloop-qwen38-real-gui-diagnostic-prereg-public-v1",
+  "selection_tasks_used": 0,
+  "source_manifest_sha256": "8baaf0167a4faafec1b689e406babac601ad192a9d5a8ca8a4bbb2e36bb4686c",
+  "source_sha256s": {
+    "native_desktop_factory/qwen_v066_adapter.py": "628f3f5383f265ecb781386d0a7ac5ab335d56238f9dec5c375f73c7baefb480",
+    "runtime/qwen38-vision/real-gui-diagnostic-prereg-v1.json": "8011469aca87ff324c4e1e66b317c9e3ad8e9ff21dd7d9762f3c2fbc18daf9b2",
+    "src/cursibench/qwen38_real_gui_diagnostic_run_v1.py": "532dc8ee25f171275c2e505f2726974b830b516afd6204c478440b6371f2d39f",
+    "src/cursibench/qwen38_real_gui_diagnostic_usage_v1.py": "f9a91235689bb83cfead6419a629cc73f62ebe44f6a95cd094b3c4f80f8ee4dd",
+    "src/cursibench/qwen38_real_gui_diagnostic_v1.py": "12daabcd9f8371f665df0f2c6a107ae8f147c65bf99da78f0cadb5a3f0e5748a",
+    "src/cursibench/scale_action_output_v066.py": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+    "tests/test_qwen38_real_gui_diagnostic_prereg_evidence_v1.py": "09f2245c1e1d1a6a5beb7e59fd3db8f234c7792190a894b1964b9e7553af5412",
+    "tests/test_qwen38_real_gui_diagnostic_usage_v1.py": "c9881791862429604d67d07567f9065adaad96bb1391f064ae68c5dbb5ecc5d5",
+    "tests/test_qwen38_real_gui_diagnostic_v1.py": "0625fd4cdf30357f0bb29f005803cfac4e13c009f9074f2ffb08f149cd0ef8e1",
+    "tools/audit_qwen38_real_gui_diagnostic_usage_v1.py": "343eaf92a8bcb94b5b27ae41e724a55f525115b0d3a8fe1f1c1ccdee5fb439eb",
+    "tools/export_desktop_v066_train_sft_v1.py": "f047ff5473aee65e4985b68e90f8eef81b6d4382d7980a0418d17ad6e6b89b19",
+    "tools/run_qwen38_real_gui_diagnostic_v1.py": "75c5c31ac8033e0e043660e24ee0ae98db00f51563ae730535493ecc95fe339f"
+  },
+  "status": "one_real_gui_train_source_validated_blocked_before_paid",
+  "validated_train_source_tasks": 1,
+  "validated_train_source_workflows": {
+    "impress": 1
+  }
+}
