@@ -1,0 +1,7 @@
+# Independent source review of Excel transfer skill cards
+
+An independent evaluator reviewed all **13** private skill cards against the **100** final graph reservations and **37** original generator-module paths. The review independently recomputed source hashes, each ordered generator-bundle commitment, skill signatures, connected acyclic dependency graphs, and the source-declared nine-fault guards. It also compared the causal atoms with the generator formula paths and corrected incomplete source coverage and shallow or inaccurate descriptions before acceptance.
+
+The [field-limited aggregate](sec-excel-transfer-skill-independent-source-review-2026-09-29.json) commits to the private, mode-0600 review and its locally verified detached Ed25519 signature. The signing key was created for this audit; its signature protects the review bytes and does not certify a human identity. The detailed per-graph decisions, source paths, filing identities, case text, and answers remain evaluator-private.
+
+This is a **source-level specification review**. It did not open final workbooks or per-ID gold, replay a case artifact, construct a train analogue, use Excel for the web, or call a model. The generator-bundle hash binds source-module paths and bytes; it is not a saved-workbook hash or proof that a particular reserved case used a specific builder. The nine-edit floor must still be tested against each future analogue's saved artifact and independent oracle. Official Excel-web final admission remains **0/100**.
