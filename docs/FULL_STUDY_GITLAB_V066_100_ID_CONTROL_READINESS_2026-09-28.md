@@ -21,13 +21,19 @@ screenshots, and persisted state readbacks. A hash-chained intent precedes
 each ID. A failed or uncertain ID becomes terminal for this plan and requires
 a separate source-bound amendment; it cannot be replayed automatically.
 
-The hard per-ID wall limit is 7,200 seconds, making the declared 100-ID
-ceiling **200 hours**. That is a cap, not a runtime prediction. No fresh
-v0.6.6 per-ID throughput exists yet. The 300 required GitLab cold resets and
-repeated audit of prior receipts will add substantial time; a one-ID bounded
-run on stable power should establish a measured rate before scheduling the
-remainder. The original demo has currently been restored healthy and the
-disposable world removed, so no background GitLab control job is active.
+The plan records 7,200 seconds per ID and checks elapsed time **after** the
+ID's GUI work returns. This is an acceptance limit, not a live timeout. The
+arithmetic 100 × 2 hours = 200 hours is therefore a nominal acceptance
+envelope, **not a hard runtime bound**; the controller has no outer watchdog
+that cancels a long-running ID. This was recorded in a separate
+[wall-cap clarification](evidence/gitlab-v066-prospective-wall-cap-clarification-2026-09-28.json)
+without changing the frozen plan bytes. No fresh v0.6.6 per-ID throughput
+exists yet. The 300 required GitLab cold resets and repeated audit of prior
+receipts will add substantial time. A supervised one-ID run on stable power
+should establish a measured rate, and a source-bound timeout/cleanup rule is
+needed before unattended 100-ID dispatch. The original demo has currently
+been restored healthy and the disposable world removed, so no background
+GitLab control job is active.
 
 After 100 passing GUI trios, the controller's independent audit only derives
 **unissued v0.6 reset and verifier proof material**. A separate source-bound
