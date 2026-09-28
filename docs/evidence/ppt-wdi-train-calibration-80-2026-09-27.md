@@ -1,5 +1,7 @@
 # PowerPoint final-shaped training calibration pool — 2026-09-27
 
+**Provenance update, 2026-09-29:** This page and its linked 80-case receipts are historical aggregate evidence. The published private-manifest SHA-256 is retained, but the private manifest and seed are unavailable in the current evaluator workspaces. The 80 cases therefore cannot presently be reopened for a new source-overlap audit. The [separate dated source-boundary rebase](ppt-wdi-calibration-source-rebase-2026-09-29.md) uses a fresh private seed and new countries; it neither recreates the old manifest nor relabels the old cases.
+
 The [aggregate receipt](ppt-wdi-train-calibration-80-2026-09-27.json) and
 [reopen audit](ppt-wdi-train-calibration-80-audit-2026-09-27.json) bind
 **80 nonfinal, train-source calibration analogues**: ten causal workflows ×

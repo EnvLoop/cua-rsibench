@@ -11,6 +11,7 @@ from native_desktop_factory import source as wdi
 from ppt_wdi_factory import plan as ppt
 from tools import office_transfer_source_gate_v1 as gate
 from tools import build_ppt_wdi_train_calibration_80_v1 as calibration
+from tools import ppt_wdi_calibration_rebase_20260929 as rebase
 
 
 class PowerPointTransferTests(unittest.TestCase):
@@ -225,6 +226,80 @@ class PowerPointTransferTests(unittest.TestCase):
             self.assertTrue(passed["authentic_calibration_80_manifest_sha256_matches"])
             self.assertEqual(passed["calibration_source_overlap_count"], 0)
             self.assertNotIn(unused[3], json.dumps(blocked))
+
+    def test_new_frozen_source_boundary_unlocks_only_transfer_specs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original, queue, _old_cal, sources, history, unused = self._fixture(root)
+            pilot_sources = root / "pilot_sources"
+            pilot_sources.mkdir()
+            for directory in sorted(path for path in sources.iterdir() if path.is_dir())[:2]:
+                shutil.copytree(directory, pilot_sources / directory.name)
+                shutil.copyfile(sources / f"{directory.name}-country.private.zip",
+                                pilot_sources / f"{directory.name}-country.private.zip")
+            new_sources = unused[11:19]
+            boundary = {"schema": rebase.SCHEMA,
+                        "boundary_date": rebase.DATE,
+                        "status": "source_checked_spec_plan_only_no_decks",
+                        "historical_80_private_provenance_status":
+                        "unavailable_not_reconstructed",
+                        "historical_80_published_private_manifest_sha256":
+                        rebase.OLD_PRIVATE_MANIFEST_SHA,
+                        "active_v13_plan_sha256": rebase.PLAN_SHA,
+                        "future_reserve_queue_sha256": rebase.QUEUE_SHA,
+                        "historical_80_source_overlap_count": None,
+                        "historical_plan_hashes": [{} for _ in range(12)],
+                        "transfer_source_packages": [{}, {}],
+                        "source_overlap_counts": {name: 0 for name in (
+                            "original_35", "active_v13_train", "active_v13_selection",
+                            "active_v13_final", "future_reserve", "historical_final",
+                            "new_transfer_pair")},
+                        "source_families": [{"iso3": iso,
+                                             "zip_sha256": "a" * 64,
+                                             "snapshot_sha256": "b" * 64,
+                                             "provenance_sha256": "c" * 64,
+                                             "numeric_observation_count": 30}
+                                            for iso in new_sources],
+                        "built_decks": 0, "office_web_gui_admitted": 0,
+                        "official_final_admitted": 0}
+            boundary_path = root / "rebase.private.json"
+            boundary_path.write_bytes(ppt.canonical(boundary))
+            old = wdi.country_facts(wdi.load(), sorted(wdi.COUNTRIES)[0])
+
+            def fake_facts(raw):
+                iso = raw.decode()
+                return {"iso3": iso, "name": "Test " + iso,
+                        "years": old["years"]}
+
+            with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(calibration, "PLAN_SHA",
+                              gate.digest(original.read_bytes())), \
+                 patch.object(calibration, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(gate, "CALIBRATION_REBASE_20260929_SHA",
+                              gate.digest(boundary_path.read_bytes())), \
+                 patch.object(gate, "extract", side_effect=lambda _raw, iso: (
+                     iso.encode(), {"numeric_observation_count": 30,
+                                    "data_last_updated": "2026-09-01",
+                                    "country_name": "Test " + iso})), \
+                 patch.object(gate, "facts_from_official_response",
+                              side_effect=fake_facts):
+                receipt = gate.ppt_source_capture_audit(
+                    original, queue, history, pilot_sources, b"s" * 32,
+                    boundary_path)
+                plan = gate.ppt_transfer_plan(
+                    b"b" * 32, pilot_sources, original, original,
+                    queue, boundary_path, history, stage="pilot")
+            self.assertTrue(receipt["rebased_calibration_source_boundary_sha256_matches"])
+            self.assertFalse(receipt["authentic_calibration_80_manifest_sha256_matches"])
+            self.assertFalse(receipt["historical_80_private_provenance_available"])
+            self.assertEqual(receipt["calibration_source_overlap_count"], 0)
+            self.assertEqual(len(plan["rows"]), 20)
+            self.assertEqual(plan["calibration_source_boundary_kind"],
+                             "rebased_source_only_20260929")
+            self.assertFalse(plan["historical_80_private_provenance_available"])
+            self.assertEqual(plan["offline_control_passed"], 0)
+            self.assertNotIn(new_sources[0], json.dumps(receipt))
 
 
 class ExcelTransferTests(unittest.TestCase):
