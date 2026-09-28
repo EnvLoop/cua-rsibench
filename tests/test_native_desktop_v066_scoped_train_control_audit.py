@@ -39,6 +39,18 @@ REGISTRY = (b'<?xml version="1.0"?><items '
 
 
 class ScopedTrainAuditTests(unittest.TestCase):
+    def test_public_real_trio_aggregate_binds_source_and_official_zero(self):
+        root = Path(__file__).resolve().parents[1]
+        public = json.loads((root / "docs/evidence" /
+            "native-wdi-v066-scoped-profile-train-trio-2026-09-28.json"
+            ).read_bytes())
+        self.assertEqual(public["train_control_source_sha256"],
+                         digest(Path(train.__file__).read_bytes()))
+        self.assertEqual(public["independent_train_control_audit_source_sha256"],
+                         digest(Path(audit.__file__).read_bytes()))
+        self.assertEqual(public["distinct_e2b_guests"], 3)
+        self.assertEqual(public["official_final_admissions"], 0)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
