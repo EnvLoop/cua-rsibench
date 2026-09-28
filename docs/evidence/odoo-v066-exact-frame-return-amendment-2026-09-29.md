@@ -22,11 +22,15 @@ the retained failure and query the *current* SQL and full physical filestore
 under the original worker lease. It must match the frozen baseline exactly,
 restore the prior stopped service state, and write a private immutable gate.
 The new run validates that gate, old journal tail, old failed step, and worker
-lease history before its first `case_started`. It uses a fresh run directory;
+lease history before its first `case_started`. The independent batch auditor
+also reopens the gate and compares its saved current SQL and full filestore
+against the frozen baseline. It uses a fresh run directory;
 there is no automatic replay. The 20 selection and 100 hidden candidates have
-new split-local private plans and field-limited [selection](odoo-v066-selection-control-plan-exact-frame-return-2026-09-29.json)
-and [hidden](odoo-v066-official_hidden-control-plan-exact-frame-return-2026-09-29.json)
-public plans bound to the [new source freeze](odoo-v066-scale-exact-frame-return-source-freeze-2026-09-29.json).
+new split-local private plans and field-limited [selection](odoo-v066-selection-control-plan-exact-frame-return-audit-gate-2026-09-29.json)
+and [hidden](odoo-v066-official_hidden-control-plan-exact-frame-return-audit-gate-2026-09-29.json)
+public plans bound to the [new source freeze](odoo-v066-scale-exact-frame-return-audit-gate-source-freeze-2026-09-29.json).
+The earlier exact-return freeze is retained as a pre-dispatch draft and is not
+valid for this current source revision.
 
 The old train batch, including its one reclassified raw control, remains
 under its prior source binding. The new runner refuses train dispatch until

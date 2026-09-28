@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RATIFICATION_SHA = "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359"
 SOURCE_FREEZE_SCHEMA = "envloop-odoo-v066-scale-gui-source-freeze-v1"
 OLD_LEASE_FREEZE_SHA256 = "f32a309bffddc411e8c317e23b322a7707bedc27e64f20b14c5be2fefbc8179c"
+EXACT_RETURN_DRAFT_SHA256 = "4b4e8bf2f1f36fb4b04c7867be50cbc540f8a0fa30c3badad07b1293366fdaf0"
 EXACT_RETURN_AMENDMENT = "exact-frame-return-2026-09-28"
 PRIVATE_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-v1"
 PUBLIC_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-public-v1"
@@ -131,10 +132,12 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 "scale_historical_source_freeze_changed")
     else:
         require(value.get("status") ==
-                "frozen_after_selection_exact_frame_return_amendment" and
+                "frozen_after_independent_selection_retry_gate_audit" and
                 value.get("frame_guard_amendment") == EXACT_RETURN_AMENDMENT and
                 value.get("old_source_freeze_sha256") ==
                 OLD_LEASE_FREEZE_SHA256 and
+                value.get("old_exact_return_draft_sha256") ==
+                EXACT_RETURN_DRAFT_SHA256 and
                 value.get("selection_failure_public_sha256") == digest((
                     ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json"
                 ).read_bytes()) and

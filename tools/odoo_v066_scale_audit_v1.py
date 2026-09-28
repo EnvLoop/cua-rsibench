@@ -187,6 +187,71 @@ def _exact_return_chain(attempt: Path, trace: dict) -> None:
                 "scale_action_not_guarded_by_exact_return")
 
 
+def _selection_retry_gate_independent(*, worker_private: Path,
+                                      plan: dict, batch_intent: dict,
+                                      private_plan_path: Path,
+                                      source_freeze_path: Path,
+                                      incident_public_path: Path,
+                                      old_run_dir: Path) -> None:
+    gate_path = (worker_private / "v066_scale_controls" /
+                 "selection-exact-return-retry-gate.private.json")
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_rows, old_tail, count = controller.read_journal(old_journal)
+    old_attempt = old_run_dir / "attempt-000"
+    require(gate.get("schema") ==
+            controller.SELECTION_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "old_failure_retained_current_baseline_exact_no_gui_replay" and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("selection_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == old_tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in old_rows] ==
+            ["case_started", "case_failed"] and
+            old_rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            old_rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") ==
+            protocol.digest((old_attempt / "failure.private.json").read_bytes())
+            == incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") ==
+            protocol.digest((old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("gui_trace_sha256") and
+            gate.get("old_step_three_intent_or_dispatch") is False and
+            not (old_attempt /
+                 "actions/step-003-intent.private.json").exists() and
+            not (old_attempt /
+                 "actions/step-003-result.private.json").exists() and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0 and
+            gate.get("model_attempts") == 0,
+            "scale_independent_selection_retry_gate_unbound")
+    sql_path = (worker_private / "v066_scale_controls" /
+                "selection-retry-current-sql.private.json")
+    files_path = (worker_private / "v066_scale_controls" /
+                  "selection-retry-current-filestore.private.json")
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) ==
+            protocol.private_json(worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_selection_retry_current_baseline_inexact")
+
+
 def _action_chain(attempt: Path, trace: dict, row: dict,
                   *, require_exact_return_guard: bool = False) -> tuple[int, int, int]:
     actions = trace.get("actions")
@@ -435,6 +500,16 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
             intent.get("split") == split and
             intent.get("expected_case_count") == plan["task_count"],
             "scale_batch_intent_unbound")
+    if split == "selection" and plan.get("frame_guard_amendment") == \
+            protocol.EXACT_RETURN_AMENDMENT:
+        _selection_retry_gate_independent(
+            worker_private=private, plan=plan, batch_intent=intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=(protocol.ROOT / "docs/evidence" /
+                "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json"),
+            old_run_dir=(private / "v066_scale_controls" /
+                         "controls-20260928-v1"))
     old_plan = None
     current_binding = (intent.get("private_plan_sha256") ==
                        protocol.digest(private_plan_path.read_bytes()) and

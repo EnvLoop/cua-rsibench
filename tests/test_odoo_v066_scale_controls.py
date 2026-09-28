@@ -107,7 +107,7 @@ class ScalePlanTests(unittest.TestCase):
         self.freeze = self.root / "freeze.public.json"
         write(self.freeze, {
             "schema": protocol.SOURCE_FREEZE_SCHEMA,
-            "status": "frozen_after_selection_exact_frame_return_amendment",
+            "status": "frozen_after_independent_selection_retry_gate_audit",
             "ratification_sha256": protocol.RATIFICATION_SHA,
             "source_sha256s": protocol.current_source_hashes(),
             "host_runtime": protocol.host_runtime(),
@@ -115,6 +115,8 @@ class ScalePlanTests(unittest.TestCase):
                 self.train_pilot.read_bytes()),
             "accepted_train_pilot_count": 1,
             "old_source_freeze_sha256": protocol.OLD_LEASE_FREEZE_SHA256,
+            "old_exact_return_draft_sha256":
+                protocol.EXACT_RETURN_DRAFT_SHA256,
             "frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT,
             "selection_failure_public_sha256": protocol.digest((
                 protocol.ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json").read_bytes()),

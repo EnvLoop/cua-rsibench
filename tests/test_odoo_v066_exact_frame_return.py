@@ -199,6 +199,8 @@ class SelectionRetryGateTests(unittest.TestCase):
             "journal_sha256": self._hash(
                 self.old_run / "journal.private.jsonl"),
             "journal_tail_sha256": self.tail,
+            "private_failure_sha256": self._hash(
+                self.attempt / "failure.private.json"),
             "gui_trace_sha256": self._hash(
                 self.attempt / "gui_trace.json"),
         })
@@ -280,6 +282,27 @@ class SelectionRetryGateTests(unittest.TestCase):
         with self.assertRaisesRegex(controller.ScaleControlError,
                                     "scale_selection_retry_live_baseline"):
             self.check()
+
+    def test_independent_auditor_binds_batch_intent_to_live_gate(self):
+        intent = {"selection_retry_gate_sha256": self._hash(self.gate_path)}
+        independent._selection_retry_gate_independent(
+            worker_private=self.private, plan=self.plan,
+            batch_intent=intent,
+            private_plan_path=self.plan_path,
+            source_freeze_path=self.freeze_path,
+            incident_public_path=self.incident_path,
+            old_run_dir=self.old_run)
+        intent["selection_retry_gate_sha256"] = "0" * 64
+        with self.assertRaisesRegex(
+                independent.ScaleAuditError,
+                "scale_independent_selection_retry_gate_unbound"):
+            independent._selection_retry_gate_independent(
+                worker_private=self.private, plan=self.plan,
+                batch_intent=intent,
+                private_plan_path=self.plan_path,
+                source_freeze_path=self.freeze_path,
+                incident_public_path=self.incident_path,
+                old_run_dir=self.old_run)
 
 
 if __name__ == "__main__":
