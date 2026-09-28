@@ -1,0 +1,12 @@
+{
+  "schema": "envloop-v066-odoo-historical-ratification-source-drift-v1",
+  "status": "historical_six_cell_caret_ratification_not_current_source_authority",
+  "source_path": "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
+  "historical_adapter_sha256": "bec076a3d8baff1e763734b774582ff5f5ae5d3a56225dadf68bfdb3702e34d6",
+  "current_adapter_sha256": "fb5b2cba08e7d9e71d372bad3cee6b38763ccb2a76033d6f89a5be37e92de168",
+  "historical_record_preserved": true,
+  "new_six_cell_ratification_required_before_campaign": true,
+  "official_final_admissions": 0,
+  "researcher_campaigns": 0,
+  "official_model_results": 0
+}
