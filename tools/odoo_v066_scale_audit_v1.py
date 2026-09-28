@@ -326,6 +326,14 @@ def _selection_retry_gate_independent(*, worker_private: Path,
                                       source_freeze_path: Path,
                                       incident_public_path: Path,
                                       old_run_dir: Path) -> None:
+    if plan.get("validator_amendment") == protocol.VALIDATOR_V066_AMENDMENT:
+        return _validator_retry_gate_independent(
+            worker_private=worker_private, plan=plan,
+            batch_intent=batch_intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=incident_public_path,
+            old_run_dir=old_run_dir)
     if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
         return _pinned_retry_gate_independent(
             worker_private=worker_private, plan=plan,
@@ -463,6 +471,80 @@ def _pinned_retry_gate_independent(*, worker_private: Path, plan: dict,
             protocol.private_json(files_path) == protocol.private_json(
                 worker_private / "baseline-filestore-manifest.json"),
             "scale_independent_pinned_retry_current_baseline_inexact")
+
+
+def _validator_retry_gate_independent(*, worker_private: Path, plan: dict,
+                                      batch_intent: dict,
+                                      private_plan_path: Path,
+                                      source_freeze_path: Path,
+                                      incident_public_path: Path,
+                                      old_run_dir: Path) -> None:
+    root = worker_private / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-pinned-border-01").resolve(),
+            "scale_independent_validator_prior_run_invalid")
+    gate_path = root / "selection-v066-validator-retry-gate.private.json"
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_batch = old_run_dir / "batch-intent.private.json"
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_attempt = old_run_dir / "attempt-000"
+    rows, tail, count = controller.read_journal(old_journal)
+    require(gate.get("schema") == controller.VALIDATOR_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "three_failed_attempts_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("validator_amendment") ==
+            protocol.VALIDATOR_V066_AMENDMENT and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("third_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_batch_intent_sha256") ==
+            protocol.digest(old_batch.read_bytes()) ==
+            incident.get("batch_intent_sha256") and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            all(row.get("run_intent_sha256") ==
+                protocol.digest(old_batch.read_bytes()) for row in rows) and
+            rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()) ==
+            incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("private_gui_trace_sha256") and
+            gate.get("old_step_eight_intent_sha256") == protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes())
+            == incident.get("private_step_eight_intent_sha256") and
+            gate.get("old_step_eight_result_exists") is False and
+            not (old_attempt /
+                 "actions/step-008-result.private.json").exists() and
+            gate.get("prior_failed_control_count") == 3 and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0,
+            "scale_independent_validator_retry_gate_unbound")
+    sql_path = root / "selection-v066-validator-current-sql.private.json"
+    files_path = root / "selection-v066-validator-current-filestore.private.json"
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) == protocol.private_json(
+                worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_validator_retry_current_baseline_inexact")
 
 
 def _action_chain(attempt: Path, trace: dict, row: dict,
@@ -730,6 +812,8 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
             "scale_batch_intent_unbound")
     if split == "selection" and plan.get("frame_guard_amendment") == \
             protocol.EXACT_RETURN_AMENDMENT:
+        validator_fixed = (plan.get("validator_amendment") ==
+                           protocol.VALIDATOR_V066_AMENDMENT)
         pinned = (plan.get("physical_dispatch_profile") ==
                   protocol.PINNED_BORDER_PROFILE)
         _selection_retry_gate_independent(
@@ -737,11 +821,15 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
             private_plan_path=private_plan_path,
             source_freeze_path=source_freeze_path,
             incident_public_path=(protocol.ROOT / "docs/evidence" /
-                ("odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
+                ("odoo-v066-selection-third-validator-mismatch-2026-09-29.json"
+                 if validator_fixed else
+                 "odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
                  if pinned else
                  "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json")),
             old_run_dir=(private / "v066_scale_controls" /
-                         ("controls-20260929-exact-return-01" if pinned else
+                         ("controls-20260929-pinned-border-01"
+                          if validator_fixed else
+                          "controls-20260929-exact-return-01" if pinned else
                           "controls-20260928-v1")))
     old_plan = None
     current_binding = (intent.get("private_plan_sha256") ==

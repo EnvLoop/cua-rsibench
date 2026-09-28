@@ -567,5 +567,53 @@ class PinnedRetryGateTests(unittest.TestCase):
             ["prior_failed_control_count"], 2)
 
 
+class ValidatorRunIdentityTests(unittest.TestCase):
+    def test_nonce_and_failure_receipt_bind_new_failed_journal(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            run = Path(scratch) / "run"
+            attempt = run / "attempt-000"
+            attempt.mkdir(parents=True, mode=0o700)
+            for path in (run, attempt):
+                path.chmod(0o700)
+            batch_path = run / "batch-intent.private.json"
+            batch_path.write_bytes(protocol.canonical({
+                "run_nonce_hex": "a" * 32}))
+            batch_path.chmod(0o600)
+            failure_path = attempt / "failure.private.json"
+            failure_path.write_bytes(protocol.canonical({"status": "failed"}))
+            failure_path.chmod(0o600)
+            batch_sha = sha256(batch_path.read_bytes()).hexdigest()
+            case = {"ordinal": 0, "task_id": "case-1",
+                    "package_sha256": "b" * 64,
+                    "attempt_dir": "attempt-000",
+                    "run_intent_sha256": batch_sha}
+            controller._event(run / "journal.private.jsonl",
+                              {"event": "case_started", **case})
+            controller._event(run / "journal.private.jsonl", {
+                "event": "case_failed", **case,
+                "failure_receipt_sha256": sha256(
+                    failure_path.read_bytes()).hexdigest()})
+            plan = {"physical_dispatch_profile":
+                    protocol.PINNED_BORDER_PROFILE,
+                    "validator_amendment": protocol.VALIDATOR_V066_AMENDMENT,
+                    "task_count": 1,
+                    "tasks": [{"task_id": "case-1",
+                               "package_sha256": "b" * 64}]}
+            with self.assertRaisesRegex(
+                    controller.ScaleControlError,
+                    "scale_failed_case_requires_manual_reconciliation"):
+                controller.next_case_index(run, plan)
+            failure_path.write_bytes(protocol.canonical({"status": "changed"}))
+            with self.assertRaisesRegex(
+                    controller.ScaleControlError,
+                    "scale_validator_failed_case_receipt_unbound"):
+                controller.next_case_index(run, plan)
+            batch_path.write_bytes(protocol.canonical({"run_nonce_hex": "bad"}))
+            with self.assertRaisesRegex(
+                    controller.ScaleControlError,
+                    "scale_validator_run_nonce_missing"):
+                controller.next_case_index(run, plan)
+
+
 if __name__ == "__main__":
     unittest.main()

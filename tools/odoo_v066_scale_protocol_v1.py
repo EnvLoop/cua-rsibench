@@ -24,7 +24,9 @@ SELECTION_GATE_AUDIT_FREEZE_SHA256 = "4c2729791c5adc4aaa817029afbd518e30514f8a66
 BLANK_COMPOSE_FREEZE_SHA256 = "cf1344cf5a8640cec013ec982000b20852a78f6a611e1e9c2b3e8a499ee087ee"
 PINNED_BORDER_DRAFT_SHA256 = "43e6cae93cfc4d8b7d231ccc9118dc316e56d0db3a453810b24acfef71e31f8b"
 OBSERVATION_BOUND_DRAFT_SHA256 = "a7f8c8f3f9570961cdfe2c070941f79a69c348367fce165712f922109fb1e01f"
+RFQ_VIEW_FREEZE_SHA256 = "737cb124d0a4fd87235f3090bec3a71ec5a7add09aa6d9ade4220d56e73bfa36"
 PINNED_BORDER_PROFILE = "pinned-noninteractive-border-dispatch-2026-09-29"
+VALIDATOR_V066_AMENDMENT = "v066-pre-dispatch-validation-2026-09-29"
 EXACT_RETURN_AMENDMENT = "exact-frame-return-2026-09-28"
 PRIVATE_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-v1"
 PUBLIC_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-public-v1"
@@ -41,6 +43,7 @@ SOURCE_FILES = (
     "tools/odoo_v066_scale_audit_v1.py",
     "tools/audit_odoo_v066_selection_flicker_v1.py",
     "tools/audit_odoo_v066_selection_post_intent_stale_v1.py",
+    "tools/audit_odoo_v066_selection_third_invalid_action_v1.py",
     "tools/audit_odoo_v066_inline_lease_incident_v1.py",
     "tools/prepare_odoo_v066_lease_timing_adoption_v1.py",
     "tools/record_odoo_v066_train_gui_v1.py",
@@ -139,10 +142,12 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 "scale_historical_source_freeze_changed")
     else:
         require(value.get("status") ==
-                "frozen_after_visible_control_and_final_physical_frame_audit" and
+                "frozen_after_v066_pre_dispatch_validator_correction" and
                 value.get("frame_guard_amendment") == EXACT_RETURN_AMENDMENT and
                 value.get("physical_dispatch_profile") ==
                 PINNED_BORDER_PROFILE and
+                value.get("validator_amendment") ==
+                VALIDATOR_V066_AMENDMENT and
                 value.get("old_source_freeze_sha256") ==
                 OLD_LEASE_FREEZE_SHA256 and
                 value.get("old_exact_return_draft_sha256") ==
@@ -155,6 +160,12 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 PINNED_BORDER_DRAFT_SHA256 and
                 value.get("old_observation_bound_draft_sha256") ==
                 OBSERVATION_BOUND_DRAFT_SHA256 and
+                value.get("old_rfq_view_freeze_sha256") ==
+                RFQ_VIEW_FREEZE_SHA256 and
+                value.get("selection_third_failure_public_sha256") ==
+                digest((ROOT / "docs/evidence" /
+                    "odoo-v066-selection-third-validator-mismatch-2026-09-29.json"
+                ).read_bytes()) and
                 value.get("selection_second_failure_public_sha256") ==
                 digest((ROOT / "docs/evidence" /
                     "odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
@@ -169,7 +180,7 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 value.get("source_sha256s") == current_source_hashes() and
                 value.get("host_runtime") == host_runtime() and
                 value.get("accepted_train_pilot_count") == 1 and
-                value.get("retained_selection_failed_controls_before_freeze") == 2 and
+                value.get("retained_selection_failed_controls_before_freeze") == 3 and
                 value.get("official_final_gui_controls_before_freeze") == 0,
                 "scale_exact_return_source_freeze_changed_or_nonzero")
     return value, digest(raw)
@@ -278,6 +289,7 @@ def build_split_plan(*, split: str, worker_dir: Path,
         "frame_guard_amendment": source_freeze.get("frame_guard_amendment"),
         "physical_dispatch_profile":
             source_freeze.get("physical_dispatch_profile"),
+        "validator_amendment": source_freeze.get("validator_amendment"),
         "task_count": count,
         "world_case_count": world_count,
         "accepted_train_pilot_excluded": split == "train",
@@ -295,6 +307,7 @@ def build_split_plan(*, split: str, worker_dir: Path,
         "source_freeze_sha256": source_freeze_sha,
         "physical_dispatch_profile":
             source_freeze.get("physical_dispatch_profile"),
+        "validator_amendment": source_freeze.get("validator_amendment"),
         "private_plan_sha256": digest(canonical(plan)),
         "candidate_count": count,
         "family_candidate_counts": {family: sum(
@@ -323,6 +336,8 @@ def validate_split_plan(*, split: str, private_path: Path,
             source_freeze.get("frame_guard_amendment") and
             private.get("physical_dispatch_profile") ==
             source_freeze.get("physical_dispatch_profile") and
+            private.get("validator_amendment") ==
+            source_freeze.get("validator_amendment") and
             private.get("task_count") == count and
             private.get("world_case_count") == SPLITS[split][3] and
             private.get("accepted_train_pilot_excluded") is (split == "train") and
@@ -334,6 +349,8 @@ def validate_split_plan(*, split: str, private_path: Path,
             public.get("candidate_count") == count and
             public.get("physical_dispatch_profile") ==
             source_freeze.get("physical_dispatch_profile") and
+            public.get("validator_amendment") ==
+            source_freeze.get("validator_amendment") and
             public.get("fresh_current_profile_gui_controls") == 0 and
             public.get("official_final_tasks_admitted") == 0 and
             private.get("official_final_tasks_admitted") == 0,

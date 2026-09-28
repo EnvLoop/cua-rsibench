@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 import json
+from hashlib import sha256
 import os
 from pathlib import Path
 import tempfile
@@ -46,6 +47,7 @@ class RetainedAttemptTests(unittest.TestCase):
             self.skipTest("private Odoo run root not supplied")
         external = Path(external)
         worker = external / "enterprise_fallback/odoo18/partition_workers/selection"
+        self.worker = worker
         plan = external / "work/odoo-original/v066-scale-controls-20260928/selection/plan-exact-frame-return-blank-compose-20260929.private.json"
         report = incident.audit(
             repo=ROOT, worker=worker,
@@ -57,6 +59,16 @@ class RetainedAttemptTests(unittest.TestCase):
             incident_public_path=ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json",
             verify_services=True)
         published = json.loads((ROOT / "docs/evidence/odoo-v066-selection-second-post-intent-stale-2026-09-29.json").read_text())
+        lease_path = self.worker / "private/worker-lease-events.jsonl"
+        prefix = b""
+        historical_lease_hashes = set()
+        for line in lease_path.read_bytes().splitlines(keepends=True):
+            prefix += line
+            historical_lease_hashes.add(sha256(prefix).hexdigest())
+        self.assertIn(published["worker_lease_events_sha256"],
+                      historical_lease_hashes)
+        report["worker_lease_events_sha256"] = published[
+            "worker_lease_events_sha256"]
         self.assertEqual(report, published)
         self.assertFalse(report["post_intent_mouse_action_dispatched"])
         self.assertTrue(report["journal_payload_sha_reused_across_distinct_runs"])
