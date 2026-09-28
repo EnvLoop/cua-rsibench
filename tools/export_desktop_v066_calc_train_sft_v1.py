@@ -9,7 +9,7 @@ from pathlib import Path
 from . import export_desktop_v066_calc_writer_train_sft_common_v1 as common
 
 
-HELPER_SHA256 = "8e770aeabc2f2136ad12d609767168ca76eba02288639314b6a783864ff829ea"
+HELPER_SHA256 = "6930d2473b31118ebc0b2dbaf779cf7a69f7c14c80b89c8fb6469a63c642115f"
 
 
 def _pinned() -> None:

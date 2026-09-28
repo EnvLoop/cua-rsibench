@@ -253,10 +253,14 @@ def publish(*, kind: str, episode_dir: Path, ratification: Path,
             exporter_source: Path, private_out: Path,
             public_out: Path) -> dict:
     private_out, public_out = private_out.absolute(), public_out.absolute()
+    durable_work_root = Path(episode_dir).absolute().parents[2]
+    durable_render_root = durable_work_root / "sft-renders"
     require(not private_out.exists() and not private_out.is_symlink() and
             not public_out.exists() and not public_out.is_symlink() and
-            private_out.parent.resolve().is_relative_to(
-                (ROOT / "work/full-study").resolve()) and
+            (private_out.parent.resolve().is_relative_to(
+                (ROOT / "work/full-study").resolve()) or
+             private_out.parent.resolve().is_relative_to(
+                durable_render_root.resolve())) and
             public_out.parent.resolve() ==
             (ROOT / "docs/evidence").resolve(),
             "new private/public Calc/Writer render paths required")
