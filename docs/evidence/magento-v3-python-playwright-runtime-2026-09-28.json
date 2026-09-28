@@ -1,0 +1,15 @@
+{
+  "docker_calls": 0,
+  "headless_binary_sha256": "a0bfe7b4da4787b66058477d696cd1d09065d25f06a548947722b9af77ee8282",
+  "headless_browser_version": "153.0.8010.12",
+  "headless_launch_passed": true,
+  "headless_revision": "1243",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "playwright_version": "1.63.0",
+  "private_runtime_sha256": "89675510b28990777b4d69538cd4e35c87ca69ef0a4c996835070b7cab047a65",
+  "python_path": "/Users/xiaoyong/Documents/Codex/2026-09-22/ya/.venv/bin/python",
+  "python_version": "3.14.7",
+  "schema": "envloop-magento-v3-python-playwright-runtime-public-v1",
+  "status": "local_runtime_only_no_application_clone_created"
+}
