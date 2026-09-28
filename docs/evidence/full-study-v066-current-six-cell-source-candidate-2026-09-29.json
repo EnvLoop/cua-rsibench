@@ -1,0 +1,35 @@
+{
+  "all_six_current_live_smokes_ratified": false,
+  "as_of_date": "2026-09-29",
+  "campaign_dispatch_authorized": false,
+  "cell_adapter_sha256s": {
+    "desktop-native": "628f3f5383f265ecb781386d0a7ac5ab335d56238f9dec5c375f73c7baefb480",
+    "excel-web": "dd81109c64802a188085a092a4e999a6d136f69af634d7602e0ff05a23e50966",
+    "gitlab": "f0c88a17a85a5e6dc96bb39202c77c65d7e64cebdd487e2bda63520463fb2599",
+    "magento-admin": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+    "odoo-community": "fb5b2cba08e7d9e71d372bad3cee6b38763ccb2a76033d6f89a5be37e92de168",
+    "powerpoint-web": "fc39b0853b7ad01d825feec97c6e393c0efb61e7810931d9ae9c97d80ea4d9c8"
+  },
+  "full_study_pre_campaign_witness_published": false,
+  "odoo_physical_dispatch_profile": "pinned-noninteractive-border-dispatch-2026-09-29",
+  "odoo_runtime_source_bundle_sha256": "934c436491fb224edce48226dd2760b19508b4d2272f4864f9337c344fae4410",
+  "odoo_validator_amendment": "v066-pre-dispatch-validation-2026-09-29",
+  "official_final_model_results": 0,
+  "private_candidate_sha256": "bd7225ea7b348d8a72a7e5dc951bdeacef159560b034e13c40a7680799e018a9",
+  "qualified_final_tasks": 0,
+  "researcher_campaigns": 0,
+  "retained_odoo_selection_failures": 3,
+  "schema": "cua-six-cell-v066-current-source-candidate-public-v1",
+  "shared_action_bundle_sha256": "60f1fc50990118da44c11df3d54b05e0ddf709464401308d9d8c9fa61cd43041",
+  "status": "source_bound_candidate_only_no_dispatch_authority",
+  "upstream_evidence_sha256s": {
+    "caret_amendment": "d48c9aa3f1a55f563c0ab04f68fca4c486fe466770e2c4c424cdda1e70cdf16d",
+    "caret_code_ratification": "80974630920354dd4d5b0277efd3091cdbbf9849d4c796bd9ee04b0c11c0dbf9",
+    "odoo_drift_audit": "d7c8def22898374eeb8ad95b76a411a95fc0cdaf8b3f44174f820dbde7edda9d",
+    "odoo_hidden_plan": "2c65d9d0bf13eb48332b963c6df676564e7914ec19adab9d3f2429439c76d517",
+    "odoo_selection_plan": "c5892f532b571907b3f50b282cfe0e019fdfab296f1559c2f9c4959b199eb4fa",
+    "odoo_validator_source_freeze": "14495b6b9851c9b425931b09c664a19efb0959b4889de6b7a5eb1cc3958e2c16",
+    "original_code_ratification": "e5171d0a38cfead6836e19f50d6116e2f74c3f8f3bb9cc5b0ec6feae67bd1a38",
+    "static_ledger": "f1a7c220cbe6208294cc07059ea2991aa73d651ae875020a7eeda7909f7211a2"
+  }
+}
