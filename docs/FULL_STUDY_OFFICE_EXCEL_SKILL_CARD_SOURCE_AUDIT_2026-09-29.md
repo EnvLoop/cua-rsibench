@@ -1,6 +1,6 @@
 # Excel transfer skill cards: source-only audit
 
-**Status: independently reviewed cards pending; no training case admitted.** The
+**Status: source-level cards independently reviewed; no training case admitted.** The
 evaluator-private 140-slot registry was reopened at its published SHA-256 and
 still contains 20 train, 20 selection, and 100 final offline candidates. Its
 final split contains exactly 13 distinct semantic graph reservations. The
@@ -19,13 +19,24 @@ private draft; the salt remains evaluator-held. The generator checks show a
 source-declared fault depth, not that an original Excel session can complete
 the edits or that a model can learn them.
 
-The [current transfer gate](evidence/office-excel-transfer-draft-gate-2026-09-29.json)
-remains **blocked**. A second reviewer must inspect every graph-to-code mapping,
-the causal dependencies, and whether the selected source modules cover the
-reserved graph. The draft deliberately retains
-`independent_skill_review=false` for all 13 cards. The gate now counts only
-cards with an actual affirmative review flag, so the public reviewed count is
-zero. Source hash checks cannot replace this semantic review.
+An [independent source review](evidence/sec-excel-transfer-skill-independent-source-review-2026-09-29.md)
+then examined all 13 graph-to-code mappings, causal edges, source variants,
+and minimum depths. It corrected the draft before signing its frozen V6 bytes.
+The [signed-review gate](evidence/office-excel-transfer-signed-review-gate-2026-09-29.json)
+reopens the evaluator-held review and verifies its detached Ed25519 signature,
+published commitments, registry, and 37 source modules. The signed V6 draft
+retains `independent_skill_review=false`; a separate private copy changes only
+those 13 flags. The verifier normalizes those flags back to the signed draft
+before accepting the promoted copy. The review signature protects audit bytes
+but is not an externally certified reviewer identity.
+
+The [current transfer gate](evidence/office-excel-transfer-reviewed-card-gate-2026-09-29.json)
+still reports **blocked**: it now confirms 13/13 reviewed source-level graph
+contracts but has no sourced train-only analogue pool. The earlier
+[draft gate](evidence/office-excel-transfer-draft-gate-2026-09-29.json) and
+[source receipt](evidence/office-excel-transfer-skill-cards-source-2026-09-29.json)
+remain immutable pre-review evidence. Source review does not establish
+per-case artifact lineage, task validity, or original Excel GUI solvability.
 
 A separate evaluator-private [sourcing plan
 commitment](evidence/office-excel-transfer-sourcing-plan-2026-09-29.json)

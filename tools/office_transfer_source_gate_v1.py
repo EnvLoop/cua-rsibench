@@ -517,6 +517,7 @@ def excel_transfer_screen(split_registry: dict | None,
                   if isinstance(card, dict)]
     if len(signatures) != len(set(signatures)):
         errors.append("distinct_final_graph_skills_collapsed_to_one_signature")
+    graph_skill_mapping_valid = not errors
     cases = case_pool.get("cases", []) if isinstance(case_pool, dict) else []
     if not isinstance(case_pool, dict) or case_pool.get("schema") != EXCEL_CASE_SCHEMA:
         errors.append("missing_private_train_only_analogue_pool")
@@ -628,7 +629,8 @@ def excel_transfer_screen(split_registry: dict | None,
                 card.get("independent_skill_review") is True
                 for card in cards),
             "train_only_analogues_submitted": len(cases),
-            "graph_to_skill_contract_coverage": len(final_graphs) if not errors else 0,
+            "graph_to_skill_contract_coverage":
+                len(final_graphs) if graph_skill_mapping_valid else 0,
             "source_issuer_overlap_count": len({c.get("issuer_cik") for c in cases
                                                if isinstance(c, dict)} & heldout_ciks),
             "source_accession_overlap_count": len({c.get("original_filing_accession") for c in cases

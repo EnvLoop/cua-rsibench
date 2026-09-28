@@ -1,0 +1,15 @@
+{
+  "detached_signature_sha256": "4d0865c0c503676e4d598a4ff84fdb57625a33dcd5b47f1aed2da4f238b70058",
+  "excel_web_gui_admitted": 0,
+  "frozen_draft_sha256": "568e771add18a350cfc140bc7ea2556f06ebaa268ba7d8674565bb9203291db3",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "review_flags_promoted": 13,
+  "reviewed_cards_salted_commitment_sha256": "1a7c88a139cc663140238577ce611b1d97fe563e6dca938177aba6e15c65689a",
+  "schema": "envloop-sec-excel-transfer-signed-review-gate-public-v1",
+  "signed_review_sha256": "44027f008e7672da883e907215fba75a0a94662080f5f0d259fe78c4e3def579",
+  "signed_source_level_verdicts": 13,
+  "source_modules_verified": 37,
+  "status": "source_review_attested_cards_promoted",
+  "train_only_analogues_sourced_or_admitted": 0
+}

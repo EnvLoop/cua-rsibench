@@ -405,6 +405,16 @@ class ExcelTransferTests(unittest.TestCase):
         self.assertEqual(result["independently_reviewed_skill_cards"], 0)
         self.assertIn("incomplete_or_unreviewed_graph_skill_card", result["errors"])
 
+    def test_reviewed_cards_keep_mapping_coverage_when_sources_are_missing(self):
+        registry, cards, _pool = self._fixture()
+        result = gate.excel_transfer_screen(registry, cards, None,
+                                            split_sha256=gate.EXCEL_SPLIT_SHA)
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(result["independently_reviewed_skill_cards"], 13)
+        self.assertEqual(result["graph_to_skill_contract_coverage"], 13)
+        self.assertEqual(result["train_only_analogues_submitted"], 0)
+        self.assertIn("missing_private_train_only_analogue_pool", result["errors"])
+
     def test_overlap_depth_negative_rights_and_registry_change_fail(self):
         registry, cards, pool = self._fixture()
         broken = pool["cases"][0]

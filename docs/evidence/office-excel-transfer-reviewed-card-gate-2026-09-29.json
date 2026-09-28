@@ -1,0 +1,27 @@
+{
+  "cases_required_per_graph_for_stage": 2,
+  "errors": [
+    "2_train_analogues_per_final_graph_required",
+    "distinct_train_template_families_missing",
+    "missing_private_train_only_analogue_pool",
+    "two_train_issuer_families_per_graph_required"
+  ],
+  "excel_web_gui_admitted": 0,
+  "final_graphs_declared_in_private_registry": 13,
+  "frozen_pilot_cases_retained": 0,
+  "full_expansion_target_cases": 104,
+  "graph_to_skill_contract_coverage": 13,
+  "independently_replayed_saved_ooxml_controls": 0,
+  "independently_reviewed_skill_cards": 13,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_20_20_100_anchors_unchanged": true,
+  "rights_tier": "original_sec_filing_facts_plus_authored_scenario_derived_facts_only",
+  "schema": "envloop-office-transfer-excel-public-gate-v1",
+  "source_accession_overlap_count": 0,
+  "source_issuer_overlap_count": 0,
+  "stage": "pilot",
+  "status": "blocked",
+  "template_family_overlap_count": 0,
+  "train_only_analogues_submitted": 0
+}
