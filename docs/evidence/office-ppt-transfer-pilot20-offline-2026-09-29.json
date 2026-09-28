@@ -1,0 +1,28 @@
+{
+  "analogue_specs": 20,
+  "calibration_source_boundary_kind": "rebased_source_only_20260929",
+  "cases_per_workflow": 2,
+  "full_expansion_target_specs": 80,
+  "historical_80_private_provenance_available": false,
+  "model_calls": 0,
+  "new_source_country_families": 2,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "offline_control_passed": 20,
+  "original_20_20_100_anchors_unchanged": true,
+  "private_offline_receipt_sha256": "0b1662ea8bb71505316fb0b4b1e8f1f79d95144c232e0f01a34c178d07855142",
+  "private_plan_sha256": "34a584f51ee2254d726c3a37e106e18efeaf3a41b515a72766b57407876a6499",
+  "rights_tier": "wdi_cc_by_4_0_facts_plus_authored_simulation",
+  "schema": "envloop-office-transfer-ppt-source-public-v1",
+  "source_overlap_counts": {
+    "calibration": 0,
+    "future_reserve": 0,
+    "historical_final": 0,
+    "original_train": 0,
+    "selection_final": 0
+  },
+  "stage": "pilot",
+  "status": "train_only_offline_controls_passed_not_gui_admitted",
+  "target_fields_per_case": 4,
+  "workflows": 10
+}
