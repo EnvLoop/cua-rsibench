@@ -5,7 +5,8 @@ from __future__ import annotations
 import io
 import json
 from pathlib import Path
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -159,6 +160,8 @@ class CalcWriterTrainDemoTests(unittest.TestCase):
             for kind in demo.KINDS:
                 package, _oracle, baseline, _instruction, _filename = demo._source(kind)
                 fake = FakeSandbox(baseline, guest, frame.getvalue())
+                fake_sdk = ModuleType("e2b_desktop")
+                fake_sdk.Sandbox = SimpleNamespace(create=lambda **_kwargs: fake)
 
                 def reserve(root, path, raw):
                     path.write_bytes(raw)
@@ -175,7 +178,8 @@ class CalcWriterTrainDemoTests(unittest.TestCase):
                         fake.saved = b"changed " + kind.encode()
                     return action["type"]
 
-                with (patch.dict(demo.os.environ, {"E2B_API_KEY": "fake"}),
+                with (patch.dict(sys.modules, {"e2b_desktop": fake_sdk}),
+                      patch.dict(demo.os.environ, {"E2B_API_KEY": "fake"}),
                       patch.object(demo, "validate_reference",
                                    return_value=(
                                        {"applications": {"calc": "c" * 64,
@@ -184,9 +188,11 @@ class CalcWriterTrainDemoTests(unittest.TestCase):
                       patch.object(demo, "budget_audit", return_value=budget),
                       patch.object(demo, "active_hashes",
                                    return_value=(set(), 0)),
+                      patch.object(demo.importlib.metadata, "version",
+                                   return_value="2.2.0"),
                       patch.object(demo, "storage_audit",
                                    return_value={"dispatch_storage_ready": True}),
-                      patch("e2b_desktop.Sandbox.create", return_value=fake),
+                      patch.object(fake_sdk.Sandbox, "create", return_value=fake),
                       patch.object(demo, "wait_for_document_ready",
                                    return_value={}),
                       patch.object(demo.scoped_guard, "attest",
