@@ -1,0 +1,21 @@
+{
+  "cleanup_authorized": false,
+  "completed_distinct_evaluator_controls": 14,
+  "container_count_still_live": 2,
+  "derived_price_changed_rows": 0,
+  "failed_same_id_attempts": 2,
+  "frozen_v2_sha256": "27c7103e1c66d2954eeedf9a7c0f001dc32e751e22f0b0c33630a00499984147",
+  "journal_sha256": "f15de422dd41c6eb53483716096494cc5616f0572d9ebaeeb55ff5aa0f4e5030",
+  "model_calls": 0,
+  "monitored_state_equal_to_first_pre_gui_snapshot_twice": true,
+  "official_final_admitted": 0,
+  "private_audit_sha256": "11802a51709a20e6abf16df2ef4810dcc2bff5ee6126fa4b05646e6a79f6257d",
+  "schema": "envloop-magento-v2-retry-runtime-failure-public-v1",
+  "second_failure_stage": "positive_neutral_before_browser_or_candidate_edit",
+  "second_failure_type": "missing_Playwright_in_operator_Python",
+  "source_sha256": "08be7f1da737d325270d7b93591a69243ccddd8af2a0692a66563ffcaf91990c",
+  "status": "v2_one_retry_exhausted_on_operator_python_dependency",
+  "supplement_source_sha256": "91e487a9547eae284498319dead582ea4e46d828b5752c127946fd66cfc3c15c",
+  "third_attempt_authorized": false,
+  "v2_run_complete": false
+}

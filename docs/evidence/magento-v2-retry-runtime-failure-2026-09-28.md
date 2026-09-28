@@ -1,0 +1,7 @@
+# Magento v2 retry stopped before browser work
+
+The [field-limited read-only audit](magento-v2-retry-runtime-failure-2026-09-28.json) records a second, separate interruption of the fifteenth revised-runtime evaluator control. The first attempt stopped when a release-notification modal intercepted the Content menu; its new pre-result infrastructure classification and exact disposable-pair cleanup remain in the retained journal.
+
+The one permitted same-ID whole-case retry used an operator Python environment without Playwright. The neutral-control child failed while importing the Playwright async API, before opening a browser or editing the candidate. This was an **operator runtime error**, not a task or model failure. The source-bound audit reopens the process stderr, the retained first-attempt seeded baseline, the current pair's exact container identities, and two independent live SQL/search readbacks. Both readbacks equal the first pre-GUI baseline, with no changed derived-price rows.
+
+The frozen v2 contract permits at most one same-ID retry. It has been consumed, so this audit authorizes **neither a third attempt nor a completed 100-case claim**. The disposable pair remains live until an exact, separately recorded cleanup. The 14 completed evaluator controls remain partial development evidence only; official final admissions and model results are zero. A future full 100-case attempt requires a newly frozen protocol and a pre-dispatch check of its pinned Python/Playwright runtime.
