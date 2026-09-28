@@ -623,7 +623,10 @@ def excel_transfer_screen(split_registry: dict | None,
             "original_20_20_100_anchors_unchanged": bool(slots) and
                 "original_excel_20_20_100_anchors_changed" not in errors,
             "final_graphs_declared_in_private_registry": len(final_graphs),
-            "independently_reviewed_skill_cards": len(cards),
+            "independently_reviewed_skill_cards": sum(
+                isinstance(card, dict) and
+                card.get("independent_skill_review") is True
+                for card in cards),
             "train_only_analogues_submitted": len(cases),
             "graph_to_skill_contract_coverage": len(final_graphs) if not errors else 0,
             "source_issuer_overlap_count": len({c.get("issuer_cik") for c in cases

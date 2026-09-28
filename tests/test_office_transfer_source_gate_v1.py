@@ -395,6 +395,16 @@ class ExcelTransferTests(unittest.TestCase):
         self.assertEqual(full["status"], "blocked")
         self.assertIn("8_train_analogues_per_final_graph_required", full["errors"])
 
+    def test_draft_cards_are_not_counted_as_independently_reviewed(self):
+        registry, cards, pool = self._fixture()
+        for card in cards["cards"]:
+            card["independent_skill_review"] = False
+        result = gate.excel_transfer_screen(registry, cards, pool,
+                                            split_sha256=gate.EXCEL_SPLIT_SHA)
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(result["independently_reviewed_skill_cards"], 0)
+        self.assertIn("incomplete_or_unreviewed_graph_skill_card", result["errors"])
+
     def test_overlap_depth_negative_rights_and_registry_change_fail(self):
         registry, cards, pool = self._fixture()
         broken = pool["cases"][0]

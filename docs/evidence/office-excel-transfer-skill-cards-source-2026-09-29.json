@@ -1,0 +1,15 @@
+{
+  "exact_final_graphs_covered": 13,
+  "independently_reviewed_skill_cards": 0,
+  "model_calls": 0,
+  "nine_fault_guards_verified": 35,
+  "official_final_admitted": 0,
+  "original_excel_gui_admitted": 0,
+  "private_registry_sha256": "3459c1e2fbc4a02dbece31379849c28d52d12bf17b3d188a709590c1ee7df937",
+  "private_skill_cards_salted_commitment_sha256": "9e7f6c5d4c269a1057f974e0d59c142f2c982cfb6531103770197ef7c391bb43",
+  "schema": "envloop-sec-excel-transfer-skill-cards-audit-public-v1",
+  "source_code_modules_bound": 35,
+  "status": "independent_review_pending",
+  "train_only_analogues_materialized": 0,
+  "unique_skill_signatures": 13
+}
