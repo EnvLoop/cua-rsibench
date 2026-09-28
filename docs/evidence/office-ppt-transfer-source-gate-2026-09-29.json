@@ -4,15 +4,17 @@
   "amendment_did_not_modify_original_anchors": true,
   "errors": [
     "private_calibration_80_manifest_missing",
-    "eight_new_official_wdi_csv_source_families_missing"
+    "2_new_official_wdi_csv_source_families_missing"
   ],
   "existing_calibration_cases_retained_as_calibration": 80,
-  "expected_additional_train_source_families": 8,
+  "expected_additional_train_source_families_for_stage": 2,
+  "full_expansion_target_source_families": 8,
   "new_source_dirs_present_unverified": 0,
   "office_web_gui_admitted": 0,
   "official_final_admitted": 0,
   "offline_controls_passed": 0,
   "rights_tier": "wdi_cc_by_4_0_facts_plus_authored_simulation",
   "schema": "envloop-office-transfer-ppt-preflight-public-v1",
+  "stage": "pilot",
   "status": "blocked"
 }

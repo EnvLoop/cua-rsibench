@@ -42,6 +42,7 @@ HEX64 = re.compile(r"^[0-9a-f]{64}$")
 ACCESSION = re.compile(r"^\d{10}-\d{2}-\d{6}$")
 RIGHTS_WDI = "wdi_cc_by_4_0_facts_plus_authored_simulation"
 RIGHTS_SEC = "original_sec_filing_facts_plus_authored_scenario_derived_facts_only"
+STAGE_SOURCE_FAMILIES = {"pilot": 2, "expansion": 8}
 
 
 def digest(raw: bytes) -> str:
@@ -63,13 +64,24 @@ def private_read(path: Path) -> tuple[dict, bytes]:
 def ppt_transfer_plan(seed: bytes, official_csv_root: Path,
                       original_train_plan: Path, heldout_plan: Path,
                       future_queue: Path, calibration_manifest: Path,
-                      historical_plan_dir: Path) -> dict:
-    """Make 80 distinct-country, four-target *specs*; never read held-out gold.
+                      historical_plan_dir: Path, *, stage: str = "pilot",
+                      pilot_plan: dict | None = None) -> dict:
+    """Make 20 or 80 distinct-country, four-target *specs*.
 
-    Eight new official CSV source families are required.  The prior 80-case
-    calibration inventory is treated as evaluation data and cannot be reused.
+    Two new official CSV families first test ten workflows.  Six more are
+    required only for the evidence-justified expansion.  The prior 80-case
+    calibration inventory is evaluation data and cannot be reused.
     """
+    require(stage in STAGE_SOURCE_FAMILIES, "unknown_transfer_stage")
+    source_count = STAGE_SOURCE_FAMILIES[stage]
     require(len(seed) == 32, "private_seed_must_have_32_bytes")
+    if stage == "expansion":
+        require(isinstance(pilot_plan, dict) and
+                pilot_plan.get("schema") == PPT_SCHEMA and
+                pilot_plan.get("stage") == "pilot" and
+                pilot_plan.get("seed_commitment_sha256") == digest(seed) and
+                len(pilot_plan.get("rows", [])) == 20,
+                "frozen_20_case_pilot_plan_and_seed_required_for_expansion")
     original, original_raw = private_read(original_train_plan)
     calibration, calibration_raw = private_read(calibration_manifest)
     require(original.get("schema") == ppt.SCHEMA and
@@ -93,7 +105,8 @@ def ppt_transfer_plan(seed: bytes, official_csv_root: Path,
     blocked_sources = ({row["source_group"] for row in rows} |
                        {row["source_group"] for row in original["sets"]["train"]})
     csv_dirs = sorted(path for path in official_csv_root.iterdir() if path.is_dir())
-    require(len(csv_dirs) == 8, "eight_new_official_wdi_country_csvs_required")
+    require(len(csv_dirs) == source_count,
+            f"{source_count}_new_official_wdi_country_csvs_required")
     sources = []
     for directory in csv_dirs:
         iso = directory.name
@@ -156,16 +169,26 @@ def ppt_transfer_plan(seed: bytes, official_csv_root: Path,
                         "rights_tier": RIGHTS_WDI,
                         "official_final_credit": 0})
             result.append(row)
-    require(len(result) == 80 and len({r["task_id"] for r in result}) == 80 and
-            set(Counter(r["workflow"] for r in result).values()) == {8} and
-            all(len({r["source_group"] for r in result if r["workflow"] == wf}) == 8
+    expected = 10 * source_count
+    require(len(result) == expected and
+            len({r["task_id"] for r in result}) == expected and
+            set(Counter(r["workflow"] for r in result).values()) == {source_count} and
+            all(len({r["source_group"] for r in result if r["workflow"] == wf}) == source_count
                 for wf in ppt.WORKFLOWS),
-            "ppt_80_case_balance_failed")
+            "ppt_stage_case_balance_failed")
+    if stage == "expansion":
+        full_rows = {row["task_id"]: ppt.canonical(row) for row in result}
+        require(all(full_rows.get(row["task_id"]) == ppt.canonical(row)
+                    for row in pilot_plan["rows"]),
+                "expansion_rewrites_or_drops_frozen_pilot_cases")
     return {"schema": PPT_SCHEMA, "status": "spec_only_unadmitted",
+            "stage": stage,
             "original_plan_sha256": digest(original_raw),
             "calibration_manifest_sha256": digest(calibration_raw),
             "future_queue_sha256": QUEUE_SHA,
             "seed_commitment_sha256": digest(seed),
+            "frozen_pilot_plan_sha256": digest(ppt.canonical(pilot_plan))
+                if pilot_plan is not None else None,
             "source_overlap_counts": {"original_train": 0, "calibration": 0,
                                       "selection_final": 0, "future_reserve": 0,
                                       "historical_final": 0},
@@ -176,13 +199,18 @@ def ppt_transfer_plan(seed: bytes, official_csv_root: Path,
 
 
 def ppt_public_receipt(plan: dict) -> dict:
-    require(plan.get("schema") == PPT_SCHEMA and len(plan.get("rows", [])) == 80,
+    stage = plan.get("stage")
+    count = STAGE_SOURCE_FAMILIES.get(stage)
+    require(plan.get("schema") == PPT_SCHEMA and count is not None and
+            len(plan.get("rows", [])) == 10 * count,
             "ppt_private_plan_not_ready")
     return {"schema": "envloop-office-transfer-ppt-source-public-v1",
-            "status": "80_train_only_specs_source_checked_artifacts_unbuilt",
+            "status": "train_only_specs_source_checked_artifacts_unbuilt",
+            "stage": stage,
             "original_20_20_100_anchors_unchanged": True,
-            "analogue_specs": 80, "workflows": 10,
-            "cases_per_workflow": 8, "new_source_country_families": 8,
+            "analogue_specs": 10 * count, "workflows": 10,
+            "cases_per_workflow": count, "new_source_country_families": count,
+            "full_expansion_target_specs": 80,
             "target_fields_per_case": 4,
             "source_overlap_counts": plan["source_overlap_counts"],
             "rights_tier": RIGHTS_WDI,
@@ -192,8 +220,11 @@ def ppt_public_receipt(plan: dict) -> dict:
 
 
 def ppt_source_preflight(original_v13_plan: Path, calibration_manifest: Path | None,
-                         official_csv_root: Path | None) -> dict:
+                         official_csv_root: Path | None,
+                         *, stage: str = "pilot") -> dict:
     """Publish missing inputs without exposing private countries or task data."""
+    require(stage in STAGE_SOURCE_FAMILIES, "unknown_transfer_stage")
+    source_count = STAGE_SOURCE_FAMILIES[stage]
     original_ok = original_v13_plan.is_file() and digest(
         original_v13_plan.read_bytes()) == PLAN_SHA
     calibration_ok = calibration_manifest is not None and calibration_manifest.is_file()
@@ -204,14 +235,16 @@ def ppt_source_preflight(original_v13_plan: Path, calibration_manifest: Path | N
         errors.append("active_v13_20_20_100_plan_missing_or_changed")
     if not calibration_ok:
         errors.append("private_calibration_80_manifest_missing")
-    if source_dirs != 8:
-        errors.append("eight_new_official_wdi_csv_source_families_missing")
+    if source_dirs != source_count:
+        errors.append(f"{source_count}_new_official_wdi_csv_source_families_missing")
     return {"schema": "envloop-office-transfer-ppt-preflight-public-v1",
             "status": "source_inputs_present_full_validation_pending" if not errors else "blocked",
+            "stage": stage,
             "active_v13_plan_sha256_matches": original_ok,
             "amendment_did_not_modify_original_anchors": True,
             "existing_calibration_cases_retained_as_calibration": 80,
-            "expected_additional_train_source_families": 8,
+            "expected_additional_train_source_families_for_stage": source_count,
+            "full_expansion_target_source_families": 8,
             "new_source_dirs_present_unverified": source_dirs,
             "additional_train_specs_built": 0,
             "offline_controls_passed": 0,
@@ -226,7 +259,9 @@ def materialize_ppt_transfer(plan: dict, csv_root: Path, private_out: Path,
     """Build editable decks and independent direct-file controls, never Office UI."""
     from tools.build_ppt_wdi_train_calibration_80_v1 import build_one
 
-    require(plan.get("schema") == PPT_SCHEMA and len(plan.get("rows", [])) == 80 and
+    expected = 10 * STAGE_SOURCE_FAMILIES.get(plan.get("stage"), 0)
+    require(plan.get("schema") == PPT_SCHEMA and expected in (20, 80) and
+            len(plan.get("rows", [])) == expected and
             1 <= workers <= 4 and
             private_out.resolve().is_relative_to((Path.cwd() / "work").resolve()),
             "private_ppt_plan_or_output_invalid")
@@ -261,7 +296,7 @@ def materialize_ppt_transfer(plan: dict, csv_root: Path, private_out: Path,
         results = list(pool.map(
             lambda row: build_one(private_out, row, csv_sources, builder,
                                   finalizer, env, tool_dir), plan["rows"]))
-    require(len(results) == 80 and all(result["task_id"] for result in results),
+    require(len(results) == expected and all(result["task_id"] for result in results),
             "ppt_transfer_offline_controls_incomplete")
     return results
 
@@ -269,12 +304,16 @@ def materialize_ppt_transfer(plan: dict, csv_root: Path, private_out: Path,
 def excel_transfer_screen(split_registry: dict | None,
                           skill_cards: dict | None,
                           case_pool: dict | None,
-                          *, split_sha256: str | None = None) -> dict:
+                          *, split_sha256: str | None = None,
+                          stage: str = "pilot",
+                          pilot_pool: dict | None = None) -> dict:
     """Require an evaluator-authored graph-to-skill map; names stay private.
 
     The aggregate 13-graph receipt cannot establish which causal dependencies
     a new workbook must exercise.  Missing cards therefore block admission.
     """
+    require(stage in STAGE_SOURCE_FAMILIES, "unknown_transfer_stage")
+    cases_per_graph = STAGE_SOURCE_FAMILIES[stage]
     errors: list[str] = []
     if split_registry is None or split_sha256 != EXCEL_SPLIT_SHA:
         errors.append("missing_or_changed_private_140_slot_registry")
@@ -330,10 +369,27 @@ def excel_transfer_screen(split_registry: dict | None,
     cases = case_pool.get("cases", []) if isinstance(case_pool, dict) else []
     if not isinstance(case_pool, dict) or case_pool.get("schema") != EXCEL_CASE_SCHEMA:
         errors.append("missing_private_train_only_analogue_pool")
+    pilot_retained = 0
+    if stage == "expansion":
+        old_cases = pilot_pool.get("cases", []) if isinstance(pilot_pool, dict) else []
+        old_counts = Counter(c.get("final_graph_reservation") for c in old_cases
+                             if isinstance(c, dict))
+        expanded_by_id = {c.get("analogue_id"): ppt.canonical(c) for c in cases
+                          if isinstance(c, dict)}
+        if (not isinstance(pilot_pool, dict) or
+                pilot_pool.get("schema") != EXCEL_CASE_SCHEMA or
+                len(old_cases) != 26 or set(old_counts) != final_graphs or
+                any(old_counts[key] != 2 for key in final_graphs) or
+                not all(expanded_by_id.get(c.get("analogue_id")) == ppt.canonical(c)
+                        for c in old_cases if isinstance(c, dict))):
+            errors.append("frozen_26_case_pilot_must_be_retained_exactly")
+        else:
+            pilot_retained = 26
     counts = Counter(case.get("final_graph_reservation") for case in cases
                      if isinstance(case, dict))
-    if len(cases) < 104 or set(counts) != final_graphs or any(counts[key] < 8 for key in final_graphs):
-        errors.append("eight_train_analogues_per_final_graph_required")
+    if (len(cases) < 13 * cases_per_graph or set(counts) != final_graphs or
+            any(counts[key] < cases_per_graph for key in final_graphs)):
+        errors.append(f"{cases_per_graph}_train_analogues_per_final_graph_required")
     heldout_ciks = {row.get("issuer_cik") for row in slots}
     heldout_accessions = {row.get("original_filing_accession") for row in slots}
     heldout_templates = {row.get("semantic_template_reservation") for row in slots}
@@ -376,6 +432,10 @@ def excel_transfer_screen(split_registry: dict | None,
                 not isinstance(case.get("target_formula_edits"), int) or
                 case["target_formula_edits"] < card.get("minimum_target_edits", 10**9)):
             errors.append("analogue_skill_or_target_depth_unverified")
+        if (not isinstance(case.get("near_miss_edit_count"), int) or
+                not isinstance(case.get("target_formula_edits"), int) or
+                case["near_miss_edit_count"] != case["target_formula_edits"] - 1):
+            errors.append("near_miss_must_omit_exactly_one_target_edit")
         if (case.get("rights_tier") != RIGHTS_SEC or
                 case.get("source_provenance_tier") !=
                 "independently_verified_exact_facts" or
@@ -405,6 +465,10 @@ def excel_transfer_screen(split_registry: dict | None,
     errors = sorted(set(errors))
     return {"schema": "envloop-office-transfer-excel-public-gate-v1",
             "status": "source_contract_complete_artifact_replay_pending" if not errors else "blocked",
+            "stage": stage,
+            "cases_required_per_graph_for_stage": cases_per_graph,
+            "full_expansion_target_cases": 104,
+            "frozen_pilot_cases_retained": pilot_retained,
             "original_20_20_100_anchors_unchanged": bool(slots) and
                 "original_excel_20_20_100_anchors_changed" not in errors,
             "final_graphs_declared_in_private_registry": len(final_graphs),
@@ -430,29 +494,41 @@ def main() -> None:
     excel.add_argument("--private-split-registry", type=Path)
     excel.add_argument("--private-skill-cards", type=Path)
     excel.add_argument("--private-case-pool", type=Path)
+    excel.add_argument("--pilot-case-pool", type=Path,
+                       help="Required in expansion to retain the frozen 26 pilot cases")
     excel.add_argument("--public-out", type=Path, required=True)
+    excel.add_argument("--stage", choices=tuple(STAGE_SOURCE_FAMILIES),
+                       default="pilot")
     powerpoint = sub.add_parser("ppt-plan")
     powerpoint.add_argument("--official-csv-root", type=Path, required=True)
     powerpoint.add_argument("--original-v13-plan", type=Path, required=True)
     powerpoint.add_argument("--future-reserve-queue", type=Path, required=True)
     powerpoint.add_argument("--historical-plan-dir", type=Path, required=True)
     powerpoint.add_argument("--calibration-80-manifest", type=Path, required=True)
+    powerpoint.add_argument("--pilot-private-root", type=Path,
+                            help="Required in expansion to retain the frozen 20 pilot cases")
     powerpoint.add_argument("--private-out", type=Path, required=True)
     powerpoint.add_argument("--public-out", type=Path, required=True)
     powerpoint.add_argument("--materialize-offline", action="store_true")
     powerpoint.add_argument("--workers", type=int, default=2)
+    powerpoint.add_argument("--stage", choices=tuple(STAGE_SOURCE_FAMILIES),
+                            default="pilot")
     preflight = sub.add_parser("ppt-preflight")
     preflight.add_argument("--original-v13-plan", type=Path, required=True)
     preflight.add_argument("--calibration-80-manifest", type=Path)
     preflight.add_argument("--official-csv-root", type=Path)
     preflight.add_argument("--public-out", type=Path, required=True)
+    preflight.add_argument("--stage", choices=tuple(STAGE_SOURCE_FAMILIES),
+                           default="pilot")
     args = p.parse_args()
     if args.mode == "excel-screen":
         split = private_read(args.private_split_registry) if args.private_split_registry else None
         cards = private_read(args.private_skill_cards)[0] if args.private_skill_cards else None
         cases = private_read(args.private_case_pool)[0] if args.private_case_pool else None
+        pilot = private_read(args.pilot_case_pool)[0] if args.pilot_case_pool else None
         result = excel_transfer_screen(split[0] if split else None, cards, cases,
-                                       split_sha256=digest(split[1]) if split else None)
+                                       split_sha256=digest(split[1]) if split else None,
+                                       stage=args.stage, pilot_pool=pilot)
         args.public_out.parent.mkdir(parents=True, exist_ok=True)
         args.public_out.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
         print(json.dumps({"status": result["status"], "errors": result["errors"],
@@ -463,12 +539,21 @@ def main() -> None:
         require(private_out.is_relative_to((Path.cwd() / "work").resolve()) and
                 not private_out.exists() and not args.public_out.exists(),
                 "fresh_ignored_private_output_and_public_receipt_required")
-        seed = secrets.token_bytes(32)
+        if args.stage == "expansion":
+            require(args.pilot_private_root is not None,
+                    "frozen_pilot_private_root_required_for_expansion")
+            seed = (args.pilot_private_root / "seed.private").read_bytes()
+            pilot_plan = private_read(args.pilot_private_root /
+                                      "manifest.private.json")[0]
+        else:
+            seed = secrets.token_bytes(32)
+            pilot_plan = None
         plan = ppt_transfer_plan(seed, args.official_csv_root,
                                  args.original_v13_plan, args.original_v13_plan,
                                  args.future_reserve_queue,
                                  args.calibration_80_manifest,
-                                 args.historical_plan_dir)
+                                 args.historical_plan_dir,
+                                 stage=args.stage, pilot_plan=pilot_plan)
         private_out.mkdir(parents=True, mode=0o700)
         (private_out / "seed.private").write_bytes(seed)
         (private_out / "seed.private").chmod(0o600)
@@ -484,23 +569,25 @@ def main() -> None:
                        "builder_sha256": digest(Path(
                            "ppt_wdi_factory/build_train_transfer_deck.mjs").read_bytes()),
                        "verifier_sha256": digest(Path(ppt_verify.__file__).read_bytes()),
-                       "results": rows, "offline_controls_passed": 80,
+                       "results": rows, "offline_controls_passed": len(rows),
                        "office_web_gui_admitted": 0}
             receipt_raw = ppt.canonical(receipt)
             (private_out / "offline-controls.private.json").write_bytes(receipt_raw)
             (private_out / "offline-controls.private.json").chmod(0o600)
-            result.update({"status": "80_train_only_offline_controls_passed_not_gui_admitted",
-                           "offline_control_passed": 80,
+            result.update({"status": "train_only_offline_controls_passed_not_gui_admitted",
+                           "offline_control_passed": len(rows),
                            "private_offline_receipt_sha256": digest(receipt_raw)})
         args.public_out.parent.mkdir(parents=True, exist_ok=True)
         args.public_out.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
-        print(json.dumps({"status": result["status"], "analogue_specs": 80,
+        print(json.dumps({"status": result["status"],
+                          "analogue_specs": result["analogue_specs"],
                           "offline_control_passed": result["offline_control_passed"],
                           "official_final_admitted": 0}, sort_keys=True))
     if args.mode == "ppt-preflight":
         result = ppt_source_preflight(args.original_v13_plan,
                                       args.calibration_80_manifest,
-                                      args.official_csv_root)
+                                      args.official_csv_root,
+                                      stage=args.stage)
         args.public_out.parent.mkdir(parents=True, exist_ok=True)
         args.public_out.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
         print(json.dumps({"status": result["status"], "errors": result["errors"],

@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -82,8 +83,18 @@ class PowerPointTransferTests(unittest.TestCase):
                               side_effect=lambda _raw, iso: (iso.encode(),
                                                               {"numeric_observation_count": 30})), \
                  patch.object(gate, "facts_from_official_response", side_effect=fake_facts):
+                pilot_sources = root / "pilot_sources"
+                pilot_sources.mkdir()
+                for directory in sorted(path for path in sources.iterdir() if path.is_dir())[:2]:
+                    shutil.copytree(directory, pilot_sources / directory.name)
+                    shutil.copyfile(sources / f"{directory.name}-country.private.zip",
+                                    pilot_sources / f"{directory.name}-country.private.zip")
+                pilot = gate.ppt_transfer_plan(b"b" * 32, pilot_sources,
+                                               original, original, queue, cal,
+                                               history, stage="pilot")
                 result = gate.ppt_transfer_plan(b"b" * 32, sources, original,
-                                                original, queue, cal, history)
+                                                original, queue, cal, history,
+                                                stage="expansion", pilot_plan=pilot)
             rows = result["rows"]
             self.assertEqual(len(rows), 80)
             self.assertEqual(len({r["task_id"] for r in rows}), 80)
@@ -95,6 +106,7 @@ class PowerPointTransferTests(unittest.TestCase):
                                 r["official_final_credit"] == 0 for r in rows))
             receipt = gate.ppt_public_receipt(result)
             self.assertEqual(receipt["analogue_specs"], 80)
+            self.assertEqual(receipt["full_expansion_target_specs"], 80)
             self.assertEqual(receipt["offline_control_passed"], 0)
             self.assertNotIn("Test ", json.dumps(receipt))
             self.assertNotIn(rows[0]["task_id"], json.dumps(receipt))
@@ -107,6 +119,9 @@ class PowerPointTransferTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             original, queue, cal, sources, history, _unused = self._fixture(root)
+            for directory in sorted(path for path in sources.iterdir() if path.is_dir())[2:]:
+                (sources / f"{directory.name}-country.private.zip").unlink()
+                shutil.rmtree(directory)
             (sources / sorted(path.name for path in sources.iterdir() if path.is_dir())[0] /
              "source-provenance.private.json").unlink()
             with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
@@ -115,7 +130,41 @@ class PowerPointTransferTests(unittest.TestCase):
                                                               {"numeric_observation_count": 30})), \
                  self.assertRaises(FileNotFoundError):
                 gate.ppt_transfer_plan(b"b" * 32, sources, original,
-                                       original, queue, cal, history)
+                                       original, queue, cal, history,
+                                       stage="pilot")
+
+    def test_two_source_pilot_covers_all_ten_workflows(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original, queue, cal, sources, history, _unused = self._fixture(root)
+            for directory in sorted(path for path in sources.iterdir() if path.is_dir())[2:]:
+                (sources / f"{directory.name}-country.private.zip").unlink()
+                shutil.rmtree(directory)
+            old = wdi.country_facts(wdi.load(), sorted(wdi.COUNTRIES)[0])
+
+            def fake_facts(raw):
+                iso = raw.decode()
+                return {"iso3": iso, "name": "Test " + iso,
+                        "years": old["years"]}
+
+            with patch.object(gate, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(gate, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(calibration, "PLAN_SHA", gate.digest(original.read_bytes())), \
+                 patch.object(calibration, "QUEUE_SHA", gate.digest(queue.read_bytes())), \
+                 patch.object(gate, "extract",
+                              side_effect=lambda _raw, iso: (iso.encode(),
+                                                              {"numeric_observation_count": 30})), \
+                 patch.object(gate, "facts_from_official_response", side_effect=fake_facts):
+                result = gate.ppt_transfer_plan(b"b" * 32, sources, original,
+                                                original, queue, cal, history,
+                                                stage="pilot")
+            self.assertEqual(len(result["rows"]), 20)
+            self.assertEqual({r["workflow"] for r in result["rows"]},
+                             set(ppt.WORKFLOWS))
+            self.assertTrue(all(len(r["target_keys"]) == 4 for r in result["rows"]))
+            receipt = gate.ppt_public_receipt(result)
+            self.assertEqual(receipt["cases_per_workflow"], 2)
+            self.assertEqual(receipt["analogue_specs"], 20)
 
     def test_ppt_preflight_reports_missing_inputs_without_source_names(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -167,6 +216,7 @@ class ExcelTransferTests(unittest.TestCase):
                         "train_template_family": f"train-graph-{graph_index}",
                         "skill_signature_sha256": signatures[graph_index],
                         "target_formula_edits": 9,
+                        "near_miss_edit_count": 8,
                         "rights_tier": gate.RIGHTS_SEC,
                         "source_provenance_tier": "independently_verified_exact_facts",
                         "independent_verifier_review": True}
@@ -185,12 +235,17 @@ class ExcelTransferTests(unittest.TestCase):
 
     def test_thirteen_graphs_need_reviewed_mapping_and_104_cases(self):
         registry, cards, pool = self._fixture()
+        pilot = {"schema": gate.EXCEL_CASE_SCHEMA,
+                 "cases": [case for case in pool["cases"]
+                           if case["analogue_id"].rsplit("-", 1)[1] in ("0", "4")]}
         good = gate.excel_transfer_screen(registry, cards, pool,
-                                          split_sha256=gate.EXCEL_SPLIT_SHA)
+                                          split_sha256=gate.EXCEL_SPLIT_SHA,
+                                          stage="expansion", pilot_pool=pilot)
         self.assertEqual(good["status"],
                          "source_contract_complete_artifact_replay_pending")
         self.assertEqual(good["graph_to_skill_contract_coverage"], 13)
         self.assertEqual(good["train_only_analogues_submitted"], 104)
+        self.assertEqual(good["cases_required_per_graph_for_stage"], 8)
         self.assertEqual(good["independently_replayed_saved_ooxml_controls"], 0)
         self.assertEqual(good["official_final_admitted"], 0)
         self.assertNotIn("sealed-graph", json.dumps(good))
@@ -198,6 +253,24 @@ class ExcelTransferTests(unittest.TestCase):
                                             split_sha256=gate.EXCEL_SPLIT_SHA)
         self.assertEqual(absent["status"], "blocked")
         self.assertIn("missing_private_graph_to_skill_mapping", absent["errors"])
+
+    def test_two_per_graph_pilot_does_not_require_full_104(self):
+        registry, cards, pool = self._fixture()
+        pilot = {"schema": gate.EXCEL_CASE_SCHEMA,
+                 "cases": [case for case in pool["cases"]
+                           if case["analogue_id"].rsplit("-", 1)[1] in ("0", "4")]}
+        result = gate.excel_transfer_screen(registry, cards, pilot,
+                                            split_sha256=gate.EXCEL_SPLIT_SHA,
+                                            stage="pilot")
+        self.assertEqual(result["status"],
+                         "source_contract_complete_artifact_replay_pending")
+        self.assertEqual(result["train_only_analogues_submitted"], 26)
+        self.assertEqual(result["cases_required_per_graph_for_stage"], 2)
+        full = gate.excel_transfer_screen(registry, cards, pilot,
+                                          split_sha256=gate.EXCEL_SPLIT_SHA,
+                                          stage="expansion")
+        self.assertEqual(full["status"], "blocked")
+        self.assertIn("8_train_analogues_per_final_graph_required", full["errors"])
 
     def test_overlap_depth_negative_rights_and_registry_change_fail(self):
         registry, cards, pool = self._fixture()
