@@ -1,0 +1,15 @@
+{
+  "authored_training_workbooks": 0,
+  "derived_debt_total_checks_replayed": 4,
+  "errors": [],
+  "four_source_identity_checks": 4,
+  "independent_semantic_fact_reviews": 0,
+  "numeric_literal_checks_replayed": 62,
+  "official_final_admissions": 0,
+  "private_capture_commitment_verified": true,
+  "private_capture_files_rehashed": 12,
+  "public_identity_leak_count": 0,
+  "schema": "envloop-sec-transfer-official-raw-capture-audit-public-v1",
+  "source_availability_commitment_verified": true,
+  "status": "verified_raw_source_capture_semantic_review_pending"
+}
