@@ -1,0 +1,26 @@
+{
+  "auditor_sha256": "bb9086bde189d1f86502d211e7c49d1da9993c9a0ead0b094d12d2baa8348c16",
+  "cross_split_identity_source_template_instance_overlap": 0,
+  "current_actor_acl_and_sql_privileges_retested": false,
+  "historical_candidate_counts": {
+    "official_hidden": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "historical_gui_positive_wrong_object_reset_receipts_reverified": 140,
+  "historical_pinned_source_bundle_sha256": "361d01e93133c33054ea8ba0b9ce61a62fac12a74d69db01eaf8a187d0c80d54",
+  "historical_source_assets_and_packages_rebuilt": 140,
+  "historical_task_set_manifest_sha256": "6418ffb542c684053577927336874930214ae6050237bc18b7e7c522664c181b",
+  "live_v066_model_action_and_application_retested": false,
+  "model_attempts": 0,
+  "official_final_tasks_admitted": 0,
+  "permission_violations_by_category": {},
+  "pre_campaign_admission_eligible": false,
+  "prior_public_aggregate_sha256": "4ba5d1c8a608a0ec4d60dd52314f7b23d0e083425335f633f6c596a262cf2b77",
+  "prior_public_boundary_sha256": "e50e64e1a3d84e065f5883758b67c5276375ae36adb171f0da6356e0d7b4c05d",
+  "private_evidence_owner_only_permissions": true,
+  "private_per_id_report_sha256": "e5e01350dd22baefa1dcd9187d43a684e831b21f27a263b6cf0a2d9fd30ab344",
+  "researcher_campaigns": 0,
+  "schema": "envloop-odoo-offline-candidate-evidence-audit-v1",
+  "status": "historical_evaluator_controls_reverified_offline"
+}
