@@ -172,19 +172,21 @@ def build_freeze(root: Path, old_path: Path, plan: Path,
                  plan_sha256: str, source: Path) -> dict:
     retired = retired_v2_binding(root)
     runtime, runtime_sha = runtime_gate.validate_receipt()
-    train, train_sha = guard_pilot.validate_receipt(plan, plan_sha256)
-    require(train['release_obstruction_observed_in_train'] is True and
-            train['all_four_pre_edit_states_exact'] is True and
-            train['positive_saved_state_passed'] is True and
-            train['wrong_variant_rejected'] is True and
-            train['fresh_reset_passed'] is True,
-            'real_train_gui_release_guard_and_no_regression_pilot_required')
     old, old_sha = old_contract.validate_freeze(
         old_path, root,
         root / PROBE_DIR.relative_to(ROOT),
         root / TRAIN_DIR.relative_to(ROOT))
     require(old['final_candidate_plan_sha256'] == plan_sha256,
             'historical cron-free freeze belongs to another plan')
+    train_plan = root / old_contract.TRAIN_PLAN
+    train, train_sha = guard_pilot.validate_receipt(
+        train_plan, old['training_plan_sha256'])
+    require(train['release_obstruction_observed_in_train'] is True and
+            train['all_four_pre_edit_states_exact'] is True and
+            train['positive_saved_state_passed'] is True and
+            train['wrong_variant_rejected'] is True and
+            train['fresh_reset_passed'] is True,
+            'real_train_gui_release_guard_and_no_regression_pilot_required')
     cases = validate_plan(plan, plan_sha256)
     revision = source_revision(source)
     return {'schema': SCHEMA, 'status': 'pre_result_evaluator_controls_only',

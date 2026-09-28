@@ -46,6 +46,12 @@ the train pilot **actually observe** a release mask or notification while
 maintaining exact business-state equality. If the transient UI condition
 cannot be reproduced on train, the freeze stays closed; the evaluator must
 publish another prospective calibration decision before a final run.
+The pilot uses the separate frozen four-case training plan at
+`work/magento-original/train-policy-development-four.private.json`
+(SHA-256 `5c5085b671c7f6ad6459907382420bbda2efef6923033b087664d4a8a2fb9994`);
+the eventual 100-case freeze uses
+`work/magento-original/candidate-plan-v2.private.json`
+(SHA-256 `1df41f027b5f284c7ff7ed162f42f075259960242a295e0a430bff1c8b479ae1`).
 
 The execution order is: source-bound local Python/Playwright runtime receipt;
 one train-only GUI pilot; a new private/public v3 freeze binding both receipts,

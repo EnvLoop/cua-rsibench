@@ -192,7 +192,7 @@ def run(*, plan: Path, plan_sha256: str, source: Path,
     _runtime, runtime_sha = runtime_gate.validate_receipt()
     old, parent_sha = old_contract.validate_freeze(
         parent_freeze, ROOT, PROBE_DIR, TRAIN_DIR)
-    require(old['final_candidate_plan_sha256'] == plan_sha256,
+    require(old['training_plan_sha256'] == plan_sha256,
             'train pilot parent runtime belongs to another frozen plan')
     task = _train_case(plan, plan_sha256)
     revision = _source_revision(source)

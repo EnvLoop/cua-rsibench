@@ -106,6 +106,7 @@ class MagentoClean100V3Tests(unittest.TestCase):
         cases = [{'task_id': f'candidate-{i:03d}',
                   'package_sha256': f'{i + 1:064x}'} for i in range(100)]
         old = {'final_candidate_plan_sha256': 'p',
+               'training_plan_sha256': 'q',
                'runtime_fingerprint_sha256': 'r'}
         train = {'release_obstruction_observed_in_train': False,
                  'all_four_pre_edit_states_exact': True,
@@ -122,7 +123,7 @@ class MagentoClean100V3Tests(unittest.TestCase):
                   patch.object(v3.runtime_gate, 'validate_receipt',
                                return_value=(runtime_value, 'r' * 64)),
                   patch.object(v3.guard_pilot, 'validate_receipt',
-                               return_value=(train, 't' * 64)),
+                               return_value=(train, 't' * 64)) as validate_train,
                   patch.object(v3.old_contract, 'validate_freeze',
                                return_value=(old, 'o' * 64)),
                   patch.object(v3, 'validate_plan', return_value=cases),
@@ -132,6 +133,8 @@ class MagentoClean100V3Tests(unittest.TestCase):
                     v3.build_freeze(root, Path('old'), Path('plan'), 'p', Path('source'))
                 train['release_obstruction_observed_in_train'] = True
                 frozen = v3.build_freeze(root, Path('old'), Path('plan'), 'p', Path('source'))
+                validate_train.assert_called_with(
+                    root / v3.old_contract.TRAIN_PLAN, 'q')
         self.assertEqual(frozen['ordered_case_count'], 100)
         self.assertEqual(frozen['v2_partial_controls_excluded'], 14)
         self.assertEqual(frozen['pinned_python_runtime_sha256'], 'r' * 64)
