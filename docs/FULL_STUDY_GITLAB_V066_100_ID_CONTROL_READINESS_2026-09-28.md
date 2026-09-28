@@ -24,16 +24,17 @@ a separate source-bound amendment; it cannot be replayed automatically.
 The plan records 7,200 seconds per ID and checks elapsed time **after** the
 ID's GUI work returns. This is an acceptance limit, not a live timeout. The
 arithmetic 100 × 2 hours = 200 hours is therefore a nominal acceptance
-envelope, **not a hard runtime bound**; the controller has no outer watchdog
-that cancels a long-running ID. This was recorded in a separate
+envelope, **not a hard runtime bound**; the original controller has no outer
+watchdog that cancels a long-running ID. This was recorded in a separate
 [wall-cap clarification](evidence/gitlab-v066-prospective-wall-cap-clarification-2026-09-28.json)
-without changing the frozen plan bytes. No fresh v0.6.6 per-ID throughput
-exists yet. The 300 required GitLab cold resets and repeated audit of prior
-receipts will add substantial time. A supervised one-ID run on stable power
-should establish a measured rate, and a source-bound timeout/cleanup rule is
-needed before unattended 100-ID dispatch. The original demo has currently
-been restored healthy and the disposable world removed, so no background
-GitLab control job is active.
+without changing the frozen plan bytes. A later
+[source-only one-ID supervisor](FULL_STUDY_GITLAB_V066_SUPERVISED_ONE_2026-09-28.md)
+adds a child-process deadline and exact cleanup, but has not run a live ID.
+No fresh v0.6.6 per-ID throughput exists yet. The 300 required GitLab cold
+resets and repeated audit of prior receipts will add substantial time. A
+supervised one-ID run on stable power should establish a measured rate before
+the remaining IDs. The original demo has currently been restored healthy and
+the disposable world removed, so no background GitLab control job is active.
 
 After 100 passing GUI trios, the controller's independent audit only derives
 **unissued v0.6 reset and verifier proof material**. A separate source-bound
