@@ -1,0 +1,27 @@
+{
+  "batch_size": 2,
+  "benchmark_score": null,
+  "final_tasks_used": 0,
+  "holdout_task_count": 1,
+  "holdout_turn_count": 8,
+  "nominal_quote_usd": "1.868022450",
+  "optimizer_steps": 64,
+  "plan_sha256": "cdd7998431924503d08a5dc3c57552a43d7263ba272daa6c443ad6b48f7c493e",
+  "prereg_sha256": "8011469aca87ff324c4e1e66b317c9e3ad8e9ff21dd7d9762f3c2fbc18daf9b2",
+  "pricing_quote_is_dispatch_gate": false,
+  "provider_calls": 0,
+  "provider_invoice_usd": null,
+  "ratification_sha256": "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359",
+  "scheduled_train_tokens": 212895,
+  "schema": "cua-qwen38-real-gui-diagnostic-proposal-public-v1",
+  "selection_tasks_used": 0,
+  "source_workflow_counts": {
+    "calc": 1,
+    "impress": 1,
+    "writer": 1
+  },
+  "sources_manifest_sha256": "a086f9196a3f46e729ce25afa7fe5eb6acc6f1d3db7094ca316186f4ecfdccaa",
+  "status": "awaiting_reviewer_freeze_no_paid_calls",
+  "train_task_count": 2,
+  "train_turn_count": 30
+}
