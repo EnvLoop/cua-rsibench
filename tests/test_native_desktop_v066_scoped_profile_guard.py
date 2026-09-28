@@ -140,7 +140,15 @@ class ScopedGuardTests(unittest.TestCase):
                 fair_public=self.root / "missing-fair",
                 ratification=self.root / "missing-rat",
                 reservation=self.root / "missing-reservation",
-                scoped_reference=self.reference)
+                scoped_reference=self.reference,
+                runtime_freeze=self.root / "missing-runtime",
+                three_root_bridge=self.root / "missing-bridge",
+                original_root=self.root / "missing-old",
+                failed_root=self.root / "missing-failed",
+                public_calibration=self.root / "missing-public-calibration",
+                private_calibration_audit=self.root / "missing-private-calibration",
+                failed_private_stop=self.root / "missing-stop",
+                failed_public_interruption=self.root / "missing-interruption")
 
     def test_setting_recovery_and_nonregistry_drift_reject(self):
         variants = [

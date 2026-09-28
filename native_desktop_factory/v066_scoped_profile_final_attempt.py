@@ -21,6 +21,7 @@ from cursibench.scale_action_contract import ContractError
 
 from . import admit, qwen_v066_adapter, runtime_fingerprint_probe
 from . import v066_scoped_profile_guard as scoped_guard
+from .v066_scoped_profile_bridge import validate as validate_bridge
 from .v066_scoped_profile_reference import (
     validate_reference, workflow_kind,
 )
@@ -92,9 +93,31 @@ def execute(*, candidate_root: Path, attempts_root: Path, task_id: str,
             attempt: str, private_map: Path, profile_private: Path,
             guest_public: Path, fair_public: Path, ratification: Path,
             reservation: Path, scoped_reference: Path,
+            runtime_freeze: Path, three_root_bridge: Path,
+            original_root: Path, failed_root: Path,
+            public_calibration: Path, private_calibration_audit: Path,
+            failed_private_stop: Path,
+            failed_public_interruption: Path,
             enable_paid_scoped_final: bool = False) -> dict:
     if enable_paid_scoped_final is not True:
         raise ValueError("Scoped final control is disabled before source freeze")
+    validate_bridge(
+        bridge_path=three_root_bridge,
+        candidate_root=candidate_root,
+        original_root=original_root,
+        failed_root=failed_root,
+        fresh_root=attempts_root,
+        action_ratification=ratification,
+        public_calibration=public_calibration,
+        private_calibration_audit=private_calibration_audit,
+        scoped_reference=scoped_reference,
+        runtime_freeze=runtime_freeze,
+        new_lane_reservation=reservation,
+        failed_private_stop=failed_private_stop,
+        failed_public_interruption=failed_public_interruption,
+        profile_private=profile_private,
+        guest_public=guest_public,
+        fair_public=fair_public)
     if attempt not in ATTEMPTS:
         raise ValueError("Unknown prospective control polarity")
     lane = validate_lane(
@@ -142,7 +165,13 @@ def execute(*, candidate_root: Path, attempts_root: Path, task_id: str,
             or intent.get("package_sha256") != row["package_sha256"]
             or intent.get("lease_seconds") != LEASE_SECONDS
             or intent.get("ratification_sha256") != digest(ratification.read_bytes())
-            or intent.get("reservation_sha256") != digest(reservation.read_bytes())):
+            or intent.get("reservation_sha256") != digest(reservation.read_bytes())
+            or intent.get("scoped_reference_sha256") !=
+            digest(scoped_reference.read_bytes())
+            or intent.get("scoped_runtime_freeze_sha256") !=
+            digest(runtime_freeze.read_bytes())
+            or intent.get("three_root_bridge_sha256") !=
+            digest(three_root_bridge.read_bytes())):
         raise ValueError("Prospective E2B create intent changed")
     if (storage_audit(attempts_root)["dispatch_storage_ready"] is not True
             or intent_budget(attempts_root)["combined_intents"] >
@@ -166,6 +195,8 @@ def execute(*, candidate_root: Path, attempts_root: Path, task_id: str,
         "profile_reference_private_sha256": reference_sha,
         "profile_scope_guard_source_sha256": digest(Path(scoped_guard.__file__).read_bytes()),
         "profile_application_kind": app_kind,
+        "scoped_runtime_freeze_sha256": digest(runtime_freeze.read_bytes()),
+        "three_root_bridge_sha256": digest(three_root_bridge.read_bytes()),
         "guest_identity_public_sha256": digest(guest_public.read_bytes()),
         "fair_scorer_public_sha256": digest(fair_public.read_bytes()),
         "runner_sha256": digest(Path(__file__).read_bytes()),
@@ -361,9 +392,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     for field in ("candidate-root", "attempts-root", "task-id", "attempt",
                   "private-map", "profile-private", "guest-public", "fair-public",
-                  "ratification", "reservation", "scoped-reference"):
+                  "ratification", "reservation", "scoped-reference",
+                  "runtime-freeze", "three-root-bridge", "original-root",
+                  "failed-root", "public-calibration",
+                  "private-calibration-audit", "failed-private-stop",
+                  "failed-public-interruption"):
         parser.add_argument("--" + field, type=Path if field not in
                             ("task-id", "attempt") else str, required=True)
+    parser.add_argument("--enable-paid-scoped-final", action="store_true")
     args = parser.parse_args()
     result = execute(candidate_root=args.candidate_root,
                      attempts_root=args.attempts_root,
@@ -374,7 +410,16 @@ def main() -> None:
                      fair_public=args.fair_public,
                      ratification=args.ratification,
                      reservation=args.reservation,
-                     scoped_reference=args.scoped_reference)
+                     scoped_reference=args.scoped_reference,
+                     runtime_freeze=args.runtime_freeze,
+                     three_root_bridge=args.three_root_bridge,
+                     original_root=args.original_root,
+                     failed_root=args.failed_root,
+                     public_calibration=args.public_calibration,
+                     private_calibration_audit=args.private_calibration_audit,
+                     failed_private_stop=args.failed_private_stop,
+                     failed_public_interruption=args.failed_public_interruption,
+                     enable_paid_scoped_final=args.enable_paid_scoped_final)
     print(json.dumps({
         "status": result["status"], "error_type": result.get("error_type"),
         "sandbox_id_observed": bool(result.get("sandbox_id_sha256")),
