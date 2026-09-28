@@ -3,9 +3,10 @@
 **Status: independently reviewed cards pending; no training case admitted.** The
 evaluator-private 140-slot registry was reopened at its published SHA-256 and
 still contains 20 train, 20 selection, and 100 final offline candidates. Its
-final split contains exactly 13 distinct semantic graph reservations. No final
-workbook, reference answer, task text, issuer, or filing accession was opened
-to draft the skill cards.
+final split contains exactly 13 distinct semantic graph reservations. The
+private registry also carries per-slot issuer and accession metadata, but
+only graph reservations and split counts were used to draft the cards. No
+final workbook, reference answer, or task text was opened.
 
 An evaluator-private draft now covers those exact 13 reservations. Each card
 contains causal skill atoms, dependency edges, and a minimum of nine target
