@@ -16,6 +16,18 @@ from native_desktop_factory.v066_final_freeze import digest
 
 
 class ScopedDemoAuditV2Tests(unittest.TestCase):
+    def test_public_real_demo_aggregate_binds_v2_source_before_sft(self):
+        root = Path(__file__).resolve().parents[1]
+        public = json.loads((root / "docs/evidence" /
+            "native-wdi-v066-calc-writer-train-demo-2026-09-28.json"
+            ).read_bytes())
+        self.assertEqual(public["corrected_read_only_v2_auditor_source_sha256"],
+                         digest(Path(audit.__file__).read_bytes()))
+        self.assertEqual(public["historical_bound_v1_auditor_source_sha256"],
+                         digest(Path(old_audit.__file__).read_bytes()))
+        self.assertFalse(public["source_bound_sft_exporters_completed"])
+        self.assertEqual(public["official_final_admissions"], 0)
+
     def test_full_envelope_matches_then_rejects_task_frame_step_or_extra_key(self):
         package, oracle, _raw, _instruction, _filename = demo._source("calc")
         expected = demo.actor_actions("calc", oracle)[0]
