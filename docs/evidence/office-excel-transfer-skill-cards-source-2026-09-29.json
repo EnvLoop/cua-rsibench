@@ -6,7 +6,7 @@
   "official_final_admitted": 0,
   "original_excel_gui_admitted": 0,
   "private_registry_sha256": "3459c1e2fbc4a02dbece31379849c28d52d12bf17b3d188a709590c1ee7df937",
-  "private_skill_cards_salted_commitment_sha256": "36f80b221bea09a6551c71f52621272557b0c1a83e82048303fe6400e65ddaf8",
+  "private_skill_cards_salted_commitment_sha256": "8d3ac04de876d8c17fde798f1c9d9c133720167f86be3adfcf26d4f0a03522d9",
   "schema": "envloop-sec-excel-transfer-skill-cards-audit-public-v1",
   "source_code_modules_bound": 37,
   "status": "independent_review_pending",
