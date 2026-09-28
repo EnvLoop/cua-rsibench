@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import subprocess
 
 from magento_catalog_factory.plan import ROOT, require
 from magento_catalog_factory.seed import load_case
@@ -52,6 +53,17 @@ def _train_case(plan: Path, plan_sha256: str) -> dict:
             load_case(plan, plan_sha256, task['task_id']) == task,
             'first train task changed or is not private train split')
     return task
+
+
+def _source_revision(source: Path) -> str:
+    require(source.resolve().is_relative_to((ROOT / 'work').resolve()),
+            'train_pilot_source_must_be_private_original_checkout')
+    result = subprocess.run(['git', '-C', str(source), 'rev-parse', 'HEAD'],
+                            capture_output=True, text=True, check=True, timeout=15)
+    revision = result.stdout.strip()
+    require(revision == sweep.IMAGE_SOURCE_COMMIT,
+            'train_pilot_original_magento_source_revision_changed')
+    return revision
 
 
 def _case_dir() -> Path:
@@ -149,6 +161,7 @@ def _read_controls(task: dict, plan_sha256: str,
             'train_task_id': task['task_id'],
             'package_sha256': task['package_sha256'],
             'runtime_receipt_sha256': runtime_sha256,
+            'original_magento_source_commit': sweep.IMAGE_SOURCE_COMMIT,
             'source_sha256s': source_sha256s,
             'calibration_sha256': sha((base / 'calibration.private.json').read_bytes()),
             'fresh_reset_sha256': sha((base / 'negative/fresh-reset.private.json').read_bytes()),
@@ -182,6 +195,7 @@ def run(*, plan: Path, plan_sha256: str, source: Path,
     require(old['final_candidate_plan_sha256'] == plan_sha256,
             'train pilot parent runtime belongs to another frozen plan')
     task = _train_case(plan, plan_sha256)
+    revision = _source_revision(source)
     # All checks above, including a real local headless browser launch, occur
     # before the following first possible application clone creation.
     sweep.assert_absent()
@@ -189,6 +203,7 @@ def run(*, plan: Path, plan_sha256: str, source: Path,
     intent = {'schema': 'envloop-magento-v3-guard-train-pilot-intent-v1',
               'task_id': task['task_id'], 'package_sha256': task['package_sha256'],
               'plan_sha256': plan_sha256, 'parent_cron_freeze_sha256': parent_sha,
+              'original_magento_source_commit': revision,
               'runtime_receipt_sha256': runtime_sha,
               'source_sha256s': source_sha256s(),
               'model_calls': 0, 'official_final_admitted': 0}
@@ -209,6 +224,7 @@ def run(*, plan: Path, plan_sha256: str, source: Path,
                   'private_pilot_sha256': private_sha,
                   'parent_cron_freeze_sha256': parent_sha,
                   'runtime_receipt_sha256': runtime_sha,
+                  'original_magento_source_commit': revision,
                   'source_sha256s': intent['source_sha256s'],
                   'gui_views': 4,
                   'all_four_pre_edit_states_exact': True,
@@ -240,6 +256,8 @@ def validate_receipt(plan: Path, plan_sha256: str) -> tuple[dict, str]:
     current['intent_sha256'] = intent_sha
     require(record == current and
             intent.get('source_sha256s') == current['source_sha256s'] and
+            intent.get('original_magento_source_commit') ==
+            record['original_magento_source_commit'] == sweep.IMAGE_SOURCE_COMMIT and
             intent.get('runtime_receipt_sha256') == runtime_sha and
             public.get('schema') == PUBLIC_SCHEMA and
             public.get('private_pilot_sha256') == sha(raw) and
