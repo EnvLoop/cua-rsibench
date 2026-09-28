@@ -67,6 +67,17 @@ class FakeSandbox:
 
 
 class ScopedTrainControlTests(unittest.TestCase):
+    def test_public_positive_receipt_binds_source_and_does_not_claim_trio(self):
+        root = Path(__file__).resolve().parents[1]
+        public = json.loads((root / "docs/evidence" /
+            "native-wdi-v066-scoped-profile-train-positive-2026-09-28.json"
+            ).read_bytes())
+        self.assertEqual(public["train_control_source_sha256"],
+                         train.digest(Path(train.__file__).read_bytes()))
+        self.assertFalse(public["near_miss_paid_control_run"])
+        self.assertFalse(public["cold_reset_paid_control_run"])
+        self.assertEqual(public["official_final_admissions"], 0)
+
     def test_fake_positive_near_miss_and_reset_have_expected_saved_verdicts(self):
         package, _oracle, baseline, _instruction, _filename = train._train_package()
         with tempfile.TemporaryDirectory() as scratch:
