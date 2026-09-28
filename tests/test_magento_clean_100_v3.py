@@ -145,6 +145,25 @@ class MagentoClean100V3Tests(unittest.TestCase):
                                 Path('freeze'), v3.V2_RUN, resume=False)
             absent.assert_not_called()
 
+    def test_dispatch_does_not_parse_train_or_retired_v2_journals(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            parent = root / 'work/magento-original'
+            for name in ('v3-release-guard-train-pilot-20260928',
+                         'cron-resumable-100-v2'):
+                folder = parent / name
+                folder.mkdir(parents=True)
+                (folder / 'journal.private.jsonl').write_bytes(b'{"legacy":true}\n')
+            with patch.object(v3, 'ROOT', root):
+                v3._check_single_dispatch(parent / 'clean-v3-100-20260928', 'f' * 64)
+                duplicate = parent / 'clean-v3-another'
+                duplicate.mkdir()
+                v3.append_event(duplicate / 'journal.private.jsonl', {
+                    'event': 'run_started', 'freeze_v3_sha256': 'f' * 64})
+                with self.assertRaisesRegex(ValueError, 'already dispatched elsewhere'):
+                    v3._check_single_dispatch(parent / 'clean-v3-100-20260928',
+                                              'f' * 64)
+
     def test_train_pilot_requires_four_exact_pre_edit_states(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

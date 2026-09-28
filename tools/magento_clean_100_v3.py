@@ -400,7 +400,7 @@ def _unlock(fd: int) -> None:
 
 def _check_single_dispatch(run_dir: Path, freeze_sha: str) -> None:
     for candidate in (ROOT / 'work/magento-original').glob(
-            '*/journal.private.jsonl'):
+            'clean-v3-*/journal.private.jsonl'):
         if candidate.resolve() == (run_dir / 'journal.private.jsonl').resolve():
             continue
         events = read_journal(candidate)
