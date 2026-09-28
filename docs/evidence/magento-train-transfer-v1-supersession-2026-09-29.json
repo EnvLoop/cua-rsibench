@@ -1,0 +1,12 @@
+{
+  "adopted_private_cases_sha256": "c245d88be61190468b0939951a7d99c0c899665fb109e970b4f73f6ec3649de8",
+  "adopted_public_receipt_sha256": "bf85c448507a5d56a44432cad048dd01a22b8e2a916b297597d4b069d4884f39",
+  "first_draft_gui_controls_passed": 0,
+  "first_draft_model_results": 0,
+  "official_final_admitted": 0,
+  "reason": "v2 adds exact inclusive stock threshold and non-nickel parity rounding source facts",
+  "schema": "envloop-magento-train-transfer-v1-supersession-v1",
+  "status": "first_source_only_draft_superseded_before_gui_or_model",
+  "superseded_private_cases_sha256": "6f8755117f2c340f0cf9ae922d99e72f8a52c7b298ed56eafc35291cd70c2b49",
+  "superseded_public_receipt_sha256": "4c63bdc4466eb7eefa291cb35df339af4b3a7317bacb5de80c4b3a8d8d76cac3"
+}
