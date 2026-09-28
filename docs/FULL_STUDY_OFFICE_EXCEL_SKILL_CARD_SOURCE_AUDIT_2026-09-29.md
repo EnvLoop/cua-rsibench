@@ -11,7 +11,7 @@ An evaluator-private draft now covers those exact 13 reservations. Each card
 contains causal skill atoms, dependency edges, and a minimum of nine target
 formula repairs, with source-code hash bindings. The [field-limited audit
 receipt](evidence/office-excel-transfer-skill-cards-source-2026-09-29.json)
-reports 13 distinct dependency signatures and 35 original generator modules
+reports 13 distinct dependency signatures and 37 original generator modules
 whose source code contains an explicit nine-fault guard. The receipt exposes
 neither private graph names nor per-case data. Its salted commitment binds the
 private draft; the salt remains evaluator-held. The generator checks show a
