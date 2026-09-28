@@ -1,0 +1,21 @@
+{
+  "cleanup_authorized": false,
+  "complete_100_case_audit": false,
+  "completed_distinct_evaluator_controls": 14,
+  "container_count_still_live": 2,
+  "derived_price_changed_rows": 0,
+  "derived_price_rows": 8156,
+  "failure_class": "release_notification_mask_and_confirm_modal_intercepted_content_menu",
+  "failure_stage": "positive_neutral_before_candidate_gui_edit",
+  "freeze_v2_sha256": "27c7103e1c66d2954eeedf9a7c0f001dc32e751e22f0b0c33630a00499984147",
+  "journal_sha256": "ae8ca0504a35531bb121a6bee61b4f32c3e432707635f9b5ead8f206825261cd",
+  "live_material_exact_on_two_reads": true,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "private_audit_sha256": "55e5b2016c3ed4c2725f9cebbcad7cb5fba8d184f05b4083f2e8babcd7f4d43b",
+  "retry_authorized": false,
+  "schema": "envloop-magento-v2-modal-stop-audit-public-v1",
+  "source_sha256": "efc1cee643b52c8f64aeddfc321cde1ba9230fc6296f889997f544ef821d6d0a",
+  "status": "fourteen_controls_then_pre_edit_modal_stop",
+  "stopped_case_ordinal": 15
+}
