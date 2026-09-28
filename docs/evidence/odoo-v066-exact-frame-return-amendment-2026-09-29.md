@@ -37,3 +37,12 @@ under its prior source binding. The new runner refuses train dispatch until
 a separate transition is ratified. Hidden dispatch should wait for a fresh
 selection retry and independent source-frame review. Current official final
 admissions and model attempts remain zero.
+
+Later on September 29, the first no-GUI retry preflight exposed a blank-line
+Docker Compose service listing. The [dated diagnosis](odoo-v066-selection-blank-compose-preflight-2026-09-29.md)
+and [replacement source freeze](odoo-v066-scale-exact-frame-return-blank-compose-source-freeze-2026-09-29.json)
+with replacement [selection](odoo-v066-selection-control-plan-exact-frame-return-blank-compose-2026-09-29.json)
+and [hidden](odoo-v066-official_hidden-control-plan-exact-frame-return-blank-compose-2026-09-29.json)
+plans supersede the audit-gate freeze above for any new dispatch. The earlier
+documented source revisions remain preserved as historical pre-dispatch
+artifacts.

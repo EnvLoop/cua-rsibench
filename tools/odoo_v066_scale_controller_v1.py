@@ -613,6 +613,11 @@ def _selection_retry_gate(*, gate_path: Path, worker: Path, plan: dict,
     return gate
 
 
+def _running_services_without_compose_blank(worker: Path) -> set[str]:
+    """Compose prints a blank line for zero running services on this host."""
+    return {name for name in train_recorder._running(worker) if name.strip()}
+
+
 def prepare_selection_retry_gate(*, worker_dir: Path,
                                  new_private_plan_path: Path,
                                  new_public_plan_path: Path,
@@ -663,7 +668,7 @@ def prepare_selection_retry_gate(*, worker_dir: Path,
     restored = False
     with _run_lock(root):
         with lease.exclusive_worker_operation("v066_selection_retry_baseline"):
-            running_before = train_recorder._running(worker)
+            running_before = _running_services_without_compose_blank(worker)
             require(running_before == set(),
                     "scale_selection_retry_services_not_cold")
             try:
@@ -677,7 +682,8 @@ def prepare_selection_retry_gate(*, worker_dir: Path,
             finally:
                 try:
                     train_recorder._compose(worker, "stop", "db")
-                    restored = (train_recorder._running(worker) == set())
+                    restored = (_running_services_without_compose_blank(worker)
+                                == set())
                 except BaseException as error:
                     if failure is None:
                         failure = error

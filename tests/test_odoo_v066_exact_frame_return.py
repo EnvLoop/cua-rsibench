@@ -167,6 +167,19 @@ class ExactFrameReturnTests(unittest.TestCase):
 
 
 class SelectionRetryGateTests(unittest.TestCase):
+    def test_compose_blank_line_means_no_running_service(self):
+        from unittest.mock import patch
+        with patch.object(controller.train_recorder, "_running",
+                          return_value={""}):
+            self.assertEqual(
+                controller._running_services_without_compose_blank(
+                    Path("/unused/selection")), set())
+        with patch.object(controller.train_recorder, "_running",
+                          return_value={"", "db"}):
+            self.assertEqual(
+                controller._running_services_without_compose_blank(
+                    Path("/unused/selection")), {"db"})
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
