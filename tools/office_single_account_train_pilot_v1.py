@@ -316,6 +316,106 @@ class OfficeTrainScorer:
                 'verifier_result_sha256': _sha(_canonical(scored))}
 
 
+def inspect_manual_evidence(spec: dict, spec_raw: bytes,
+                            evidence_path: Path, root: Path,
+                            actor: dict, reset: dict,
+                            paths: dict[str, Path], *,
+                            evidence_schema: str = EVIDENCE_SCHEMA,
+                            split: str = 'train',
+                            additional_fields: frozenset[str] = frozenset()
+                            ) -> tuple[dict, dict, dict]:
+    """Reuse exact folder, screenshot and download checks across splits."""
+    evidence, _ = _json(evidence_path, root)
+    _require(set(evidence) == ({'schema', 'spec_sha256', 'split',
+                              'manual_gui', 'phases'} | additional_fields) and
+             evidence['schema'] == evidence_schema and
+             evidence['spec_sha256'] == _sha(spec_raw) and
+             evidence['split'] == split and
+             type(evidence['phases']) is dict and
+             set(evidence['phases']) ==
+                 {'before', 'saved', 'reset', 'cleanup'},
+             'single_account_evidence_not_bound')
+    gui = evidence['manual_gui']
+    _require(type(gui) is dict and set(gui) == {
+        'operator_reviewed', 'original_office_gui',
+        'signed_in_dedicated_test_account', 'model_calls',
+        'application_api_edits', 'actor_edit_url_sha256',
+        'before_screenshot_ref', 'after_screenshot_ref'} and
+        gui['operator_reviewed'] is True and
+        gui['original_office_gui'] is True and
+        gui['signed_in_dedicated_test_account'] is True and
+        gui['model_calls'] == 0 and
+        gui['application_api_edits'] is False and
+        gui['actor_edit_url_sha256'] ==
+            actor['edit_url_sha256'],
+        'single_account_manual_original_gui_evidence_missing')
+    before_screen = _png(gui['before_screenshot_ref'], root)
+    after_screen = _png(gui['after_screenshot_ref'], root)
+    _require(before_screen != after_screen,
+             'single_account_gui_before_after_same_frame')
+    phase_files = {}
+    times = []
+    phase_times = {}
+    used_downloads = set()
+    evaluator_paths = {path.resolve() for path in paths.values()}
+    for phase in ('before', 'saved', 'reset', 'cleanup'):
+        entry = evidence['phases'][phase]
+        expected_keys = ({'inventory_ref'} if phase == 'cleanup'
+                         else {'inventory_ref', 'downloads'})
+        _require(type(entry) is dict and
+                 set(entry) == expected_keys,
+                 'single_account_phase_shape_invalid')
+        inventory_path, _ = _ref(entry['inventory_ref'], root,
+                                 maximum=2_000_000)
+        inventory, _ = _json(inventory_path, root)
+        expected_items = ([] if phase == 'cleanup' else
+                          [reset] if phase == 'reset' else [actor])
+        _require(set(inventory) == {
+            'schema', 'phase', 'account_principal_sha256',
+            'folder_label_sha256', 'items', 'screenshot_ref',
+            'operator_reviewed', 'observed_at_utc'} and
+            inventory['schema'] == INVENTORY_SCHEMA and
+            inventory['phase'] == phase and
+            inventory['account_principal_sha256'] ==
+                spec['account_principal_sha256'] and
+            inventory['folder_label_sha256'] ==
+                spec['folder_label_sha256'] and
+            inventory['items'] == expected_items and
+            inventory['operator_reviewed'] is True,
+            'single_account_folder_inventory_not_one_current_item')
+        _png(inventory['screenshot_ref'], root)
+        observed = _time(inventory['observed_at_utc'])
+        times.append(observed)
+        phase_times[phase] = observed
+        if phase == 'cleanup':
+            continue
+        refs = entry['downloads']
+        _require(type(refs) is list and len(refs) == 2,
+                 'single_account_two_downloads_required')
+        first_path, first = _ref(refs[0], root)
+        second_path, second = _ref(refs[1], root)
+        _require(first_path != second_path and
+                 first_path not in used_downloads and
+                 second_path not in used_downloads and
+                 first_path.resolve() not in evaluator_paths and
+                 second_path.resolve() not in evaluator_paths and
+                 'packages' not in first_path.parts and
+                 'packages' not in second_path.parts and
+                 first == second and
+                 first_path.suffix == second_path.suffix ==
+                    ('.pptx' if spec['cell_id'] ==
+                     'powerpoint-web' else '.xlsx'),
+                 'single_account_exact_double_download_changed')
+        used_downloads.update((first_path, second_path))
+        phase_files[phase] = first_path
+    _require(times == sorted(times) and
+             len(set(times)) == len(times),
+             'single_account_phase_order_invalid')
+    return evidence, phase_files, {'before_screenshot_sha256': before_screen,
+                                   'after_screenshot_sha256': after_screen,
+                                   'phase_times': phase_times}
+
+
 def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
           work_root: Path, scorer_factory=None) -> dict:
     """Inspect local private evidence only; no Microsoft/provider capability."""
@@ -371,89 +471,8 @@ def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
              actor['sourcedoc_sha256'] !=
                  reset['sourcedoc_sha256'],
              'single_account_reset_copy_not_distinct')
-    evidence, _ = _json(evidence_path, root)
-    _require(set(evidence) == {'schema', 'spec_sha256', 'split',
-                               'manual_gui', 'phases'} and
-             evidence['schema'] == EVIDENCE_SCHEMA and
-             evidence['spec_sha256'] == _sha(spec_raw) and
-             evidence['split'] == 'train' and
-             type(evidence['phases']) is dict and
-             set(evidence['phases']) ==
-                 {'before', 'saved', 'reset', 'cleanup'},
-             'single_account_evidence_not_bound')
-    gui = evidence['manual_gui']
-    _require(type(gui) is dict and set(gui) == {
-        'operator_reviewed', 'original_office_gui',
-        'signed_in_dedicated_test_account', 'model_calls',
-        'application_api_edits', 'actor_edit_url_sha256',
-        'before_screenshot_ref', 'after_screenshot_ref'} and
-        gui['operator_reviewed'] is True and
-        gui['original_office_gui'] is True and
-        gui['signed_in_dedicated_test_account'] is True and
-        gui['model_calls'] == 0 and
-        gui['application_api_edits'] is False and
-        gui['actor_edit_url_sha256'] ==
-            actor['edit_url_sha256'],
-        'single_account_manual_original_gui_evidence_missing')
-    before_screen = _png(gui['before_screenshot_ref'], root)
-    after_screen = _png(gui['after_screenshot_ref'], root)
-    _require(before_screen != after_screen,
-             'single_account_gui_before_after_same_frame')
-    phase_files = {}
-    times = []
-    used_downloads = set()
-    evaluator_paths = {path.resolve() for path in paths.values()}
-    for phase in ('before', 'saved', 'reset', 'cleanup'):
-        entry = evidence['phases'][phase]
-        expected_keys = ({'inventory_ref'} if phase == 'cleanup'
-                         else {'inventory_ref', 'downloads'})
-        _require(type(entry) is dict and
-                 set(entry) == expected_keys,
-                 'single_account_phase_shape_invalid')
-        inventory_path, _ = _ref(entry['inventory_ref'], root,
-                                 maximum=2_000_000)
-        inventory, _ = _json(inventory_path, root)
-        expected_items = ([] if phase == 'cleanup' else
-                          [reset] if phase == 'reset' else [actor])
-        _require(set(inventory) == {
-            'schema', 'phase', 'account_principal_sha256',
-            'folder_label_sha256', 'items', 'screenshot_ref',
-            'operator_reviewed', 'observed_at_utc'} and
-            inventory['schema'] == INVENTORY_SCHEMA and
-            inventory['phase'] == phase and
-            inventory['account_principal_sha256'] ==
-                spec['account_principal_sha256'] and
-            inventory['folder_label_sha256'] ==
-                spec['folder_label_sha256'] and
-            inventory['items'] == expected_items and
-            inventory['operator_reviewed'] is True,
-            'single_account_folder_inventory_not_one_current_item')
-        _png(inventory['screenshot_ref'], root)
-        times.append(_time(inventory['observed_at_utc']))
-        if phase == 'cleanup':
-            continue
-        refs = entry['downloads']
-        _require(type(refs) is list and len(refs) == 2,
-                 'single_account_two_downloads_required')
-        first_path, first = _ref(refs[0], root)
-        second_path, second = _ref(refs[1], root)
-        _require(first_path != second_path and
-                 first_path not in used_downloads and
-                 second_path not in used_downloads and
-                 first_path.resolve() not in evaluator_paths and
-                 second_path.resolve() not in evaluator_paths and
-                 'packages' not in first_path.parts and
-                 'packages' not in second_path.parts and
-                 first == second and
-                 first_path.suffix == second_path.suffix ==
-                    ('.pptx' if spec['cell_id'] ==
-                     'powerpoint-web' else '.xlsx'),
-                 'single_account_exact_double_download_changed')
-        used_downloads.update((first_path, second_path))
-        phase_files[phase] = first_path
-    _require(times == sorted(times) and
-             len(set(times)) == len(times),
-             'single_account_phase_order_invalid')
+    evidence, phase_files, _gui = inspect_manual_evidence(
+        spec, spec_raw, evidence_path, root, actor, reset, paths)
     fake_test_scorer = scorer_factory is not None
     scorer = (scorer_factory(spec, paths) if fake_test_scorer else
               OfficeTrainScorer(spec, paths))

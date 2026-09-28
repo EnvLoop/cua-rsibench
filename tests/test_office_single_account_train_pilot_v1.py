@@ -73,7 +73,7 @@ class SingleAccountTests(unittest.TestCase):
         prefix = 'EL-PPT' if ppt else 'EL-Excel'
         task_id = ('ppt-wdi-' if ppt else 'xl-train-') + 'a' * 16
         package = self.root / 'packages' / 'train' / task_id
-        package.mkdir(parents=True, mode=0o700)
+        package.mkdir(parents=True, mode=0o700, exist_ok=True)
         task_path = package / 'task.private.json'
         source = package / ('source.pptx' if ppt else 'actor.xlsx')
         before = pptx('baseline') if ppt else workbook()
