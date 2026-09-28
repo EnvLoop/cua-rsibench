@@ -1,0 +1,23 @@
+{
+  "schema": "cua-native-wdi-v066-calc-writer-train-demo-plan-public-v1",
+  "dated_utc": "2026-09-28T14:01:53Z",
+  "status": "source_and_fake_tests_ready_no_paid_demo_create",
+  "scope": "Two distinct pinned public train packages, Calc and Writer; no selection or final content",
+  "demo_runner_source_sha256": "52309f42cc795705d70bd96555af8e50326419979ffbdb1b2f1cd21aefc7ea30",
+  "independent_demo_auditor_source_sha256": "b0f0201c3deb4b08903be8171772f9fe23ea57d81bf1defe40da38ac4230104b",
+  "earlier_sparse_public_train_calc_receipt_sha256": "8737c277f0d0ad8c6eb676047b1f7855bdae0f9a9afa4f4c43212f795365a678",
+  "earlier_sparse_public_train_writer_receipt_sha256": "060e758e5e018eae30d4f5c7e58df823cced1c30ddab0376d2af5a1edc799568",
+  "earlier_sparse_receipts_reused_as_v066_sft": false,
+  "calc_normalized_gui_actions_planned": 12,
+  "writer_normalized_gui_actions_planned": 8,
+  "per_action_observation_and_predispatch_raw_frames_required": true,
+  "actor_saved_xlsx_and_docx_independent_verification_required": true,
+  "fresh_guest_scoped_profile_and_teardown_required": true,
+  "new_paid_public_train_guests_created": 0,
+  "diagnostic_lane_before_conservative_reserved_usd": "41.82777777777777777777777778",
+  "two_new_600_second_leases_planned_total_usd": "42.16111111111111111111111111",
+  "proposed_diagnostic_lane_cap_usd": "43",
+  "actual_provider_billed_usd": null,
+  "official_final_admissions": 0,
+  "official_model_results": 0
+}
