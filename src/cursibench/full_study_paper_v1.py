@@ -557,8 +557,18 @@ def _render_pdf(data: dict, path: Path, *, synthetic_fixture: bool = False) -> N
 
 def build_report(data: dict, out_dir: Path, *,
                  synthetic_fixture: bool = False) -> dict:
-    """Write a fresh review directory; only tests may request a watermark."""
+    """Write a fresh private review directory from audited or test-only data."""
+    if not synthetic_fixture and not isinstance(data, publication.VerifiedPublicationData):
+        raise ValueError('unwatermarked report requires verified publication data')
     out_dir = out_dir.resolve()
+    repo_root = Path(__file__).resolve().parents[2]
+    try:
+        within_repo = out_dir.relative_to(repo_root)
+    except ValueError:
+        pass
+    else:
+        if not within_repo.parts or within_repo.parts[0] not in {'work', 'tmp'}:
+            raise ValueError('report must be built in a private review directory')
     if out_dir.exists():
         raise FileExistsError(f'report output already exists: {out_dir}')
     out_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -572,17 +582,30 @@ def build_report(data: dict, out_dir: Path, *,
             ('family-effects.svg', effect_figure(data)),
             ('candidate-trajectories.svg', trajectory_figure(data)),
         ):
+            if synthetic_fixture:
+                drawing.add(Rect(1, 1, drawing.width - 2, drawing.height - 2,
+                                 fillColor=None, strokeColor=colors.HexColor('#b52020'),
+                                 strokeWidth=2))
+                _text(drawing, 6, drawing.height - 14,
+                      'SYNTHETIC FIXTURE - NOT RESULTS', size=9,
+                      color=colors.HexColor('#b52020'), bold=True)
             renderSVG.drawToFile(drawing, str(figures / name))
         family_path = stage / 'family-effects-pseudonymized.json'
-        family_path.write_bytes(evidence.json_bytes(_family_supplement(data)) + b'\n')
+        family = _family_supplement(data)
+        if synthetic_fixture:
+            family['synthetic_layout_fixture'] = True
+        family_path.write_bytes(evidence.json_bytes(family) + b'\n')
         search_path = stage / 'campaign-search-summary.json'
-        search_path.write_bytes(evidence.json_bytes({
+        search = {
             'schema': 'cua-full-study-public-campaign-search-summary-v1',
             'study_id': data['summary']['study_id'],
             'matrix_plan_sha256': data['summary']['matrix_plan_sha256'],
             'trajectory_index_sha256': data['trajectory']['index_sha256'],
             'campaigns': data['trajectory']['campaigns'],
-        }) + b'\n')
+        }
+        if synthetic_fixture:
+            search['synthetic_layout_fixture'] = True
+        search_path.write_bytes(evidence.json_bytes(search) + b'\n')
         pdf_path = stage / 'EnvLoop-Full-Computer-Use-Study.pdf'
         _render_pdf(data, pdf_path, synthetic_fixture=synthetic_fixture)
         files = sorted(path for path in stage.rglob('*') if path.is_file())

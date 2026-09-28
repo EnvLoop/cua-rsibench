@@ -155,3 +155,12 @@ private source-family names, account state, credentials, or gold. Independently
 render every PDF page, inspect figures and tables, scan all output bytes for
 private data, then download and hash-check the eventual public release before
 calling it published. The builder itself never uploads or publishes.
+
+The unwatermarked renderer accepts only the in-process object returned by the
+complete publication audit. A plain aggregate dictionary cannot be passed to
+`build_report` to bypass the audit. Within this repository, output is restricted
+to `work/` or `tmp/`; publishable paths under `docs/` are refused before any
+file is written. The test-only synthetic route watermarks every PDF page and
+every SVG and labels both JSON supplements and the output manifest as synthetic.
+These controls reduce accidental release of a test fixture. They do not replace
+the independent input audit, privacy review, or visual inspection of all pages.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -19,6 +20,14 @@ import test_full_study_publication_v1 as publication_fixture  # noqa: E402
 
 
 class PaperLayoutTests(unittest.TestCase):
+    def test_builder_rejects_tracked_publication_directory(self):
+        with tempfile.TemporaryDirectory(prefix='.paper-review-path-',
+                                         dir=ROOT / 'docs') as temp:
+            output = Path(temp) / 'report'
+            with self.assertRaisesRegex(ValueError, 'private review directory'):
+                paper.build_report({}, output, synthetic_fixture=True)
+            self.assertFalse(output.exists())
+
     def test_synthetic_layout_is_watermarked_and_not_overwritten(self):
         fixture = publication_fixture.PublicationGateTests
         fixture.setUpClass()
@@ -41,16 +50,28 @@ class PaperLayoutTests(unittest.TestCase):
             }
             with tempfile.TemporaryDirectory(prefix='cua-paper-layout-') as temp:
                 output = Path(temp) / 'synthetic-layout'
+                with self.assertRaisesRegex(ValueError, 'verified publication data'):
+                    paper.build_report(data, output)
+                self.assertFalse(output.exists())
                 manifest = paper.build_report(data, output,
                                               synthetic_fixture=True)
                 self.assertTrue(manifest['synthetic_layout_fixture'])
                 self.assertEqual(len(manifest['file_sha256']), 7)
+                for relative, expected_sha256 in manifest['file_sha256'].items():
+                    self.assertEqual(
+                        hashlib.sha256((output / relative).read_bytes()).hexdigest(),
+                        expected_sha256)
                 self.assertTrue((output / 'EnvLoop-Full-Computer-Use-Study.pdf').is_file())
                 self.assertEqual(len(list((output / 'figures').glob('*.svg'))), 4)
+                for figure in (output / 'figures').glob('*.svg'):
+                    self.assertIn('SYNTHETIC FIXTURE - NOT RESULTS',
+                                  figure.read_text())
                 search = json.loads((output / 'campaign-search-summary.json').read_text())
                 self.assertEqual(len(search['campaigns']), 24)
+                self.assertIs(search['synthetic_layout_fixture'], True)
                 supplement = json.loads((output / 'family-effects-pseudonymized.json').read_text())
                 self.assertEqual(len(supplement['comparisons']), 24)
+                self.assertIs(supplement['synthetic_layout_fixture'], True)
                 self.assertTrue(all('source_family' not in family
                                     for entry in supplement['comparisons']
                                     for family in entry['families']))
@@ -62,16 +83,40 @@ class PaperLayoutTests(unittest.TestCase):
                                  if line.startswith('Pages:')))
                 self.assertGreaterEqual(pages, 4)
                 page_prefix = Path(temp) / 'rendered'
-                subprocess.run(['pdftoppm', '-f', '1', '-l', '1',
-                                '-scale-to', '600', '-singlefile', '-png',
+                subprocess.run(['pdftoppm', '-f', '1', '-l', str(pages),
+                                '-scale-to', '600', '-png',
                                 str(pdf_path), str(page_prefix)],
                                check=True, capture_output=True)
-                with Image.open(page_prefix.with_suffix('.png')) as image:
-                    red_pixels = sum(1 for red, green, blue in
-                                     image.convert('RGB').get_flattened_data()
-                                     if red > 110 and red > green * 1.7 and
-                                     red > blue * 1.5)
-                self.assertGreater(red_pixels, 100)
+                rendered = sorted(Path(temp).glob('rendered-*.png'))
+                self.assertEqual(len(rendered), pages)
+                for number, page_path in enumerate(rendered, start=1):
+                    with self.subTest(page=number), Image.open(page_path) as image:
+                        pixels = image.convert('RGB').get_flattened_data()
+                        red_pixels = sum(1 for red, green, blue in pixels
+                                         if red > 110 and red > green * 1.7 and
+                                         red > blue * 1.5)
+                        self.assertGreater(red_pixels, 100)
+                        page_text = subprocess.run(
+                            ['pdftotext', '-f', str(number), '-l', str(number),
+                             str(pdf_path), '-'], check=True, capture_output=True,
+                            text=True).stdout
+                        self.assertIn('EnvLoop / Computer-use data research',
+                                      page_text)
+                        self.assertIn('Full-study technical report', page_text)
+                pdf_text = subprocess.run(
+                    ['pdftotext', str(pdf_path), '-'], check=True,
+                    capture_output=True, text=True).stdout
+                for caption in ('Figure 1.', 'Figure 2.', 'Figure 3.', 'Figure 4.',
+                                'Appendix A.', 'References'):
+                    self.assertIn(caption, pdf_text)
+                visible = pdf_text + ''.join(
+                    path.read_text() for path in output.rglob('*')
+                    if path.suffix in {'.svg', '.json'})
+                for cell in fixture.plan['cells']:
+                    for task_id in cell['analysis_family_by_task']:
+                        self.assertNotIn(task_id, visible)
+                    for family in set(cell['analysis_family_by_task'].values()):
+                        self.assertNotIn(family, visible)
                 with self.assertRaises(FileExistsError):
                     paper.build_report(data, output, synthetic_fixture=True)
         finally:

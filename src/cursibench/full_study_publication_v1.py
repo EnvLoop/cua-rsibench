@@ -32,6 +32,21 @@ TIMEOUT_TYPES = {
 PUBLISHED_STUDY_ID = 'full-computer-use-v1'
 USAGE_FIELDS = results.USAGE_FIELDS
 ROUND_FAILURE_TYPES = results.FAILURE_TYPES | {'validation', 'budget', 'other'}
+_VERIFIED_PUBLICATION_TOKEN = object()
+
+
+class VerifiedPublicationData(dict):
+    """In-process result of the complete source audit, not a public input format.
+
+    The renderer accepts this type for an unwatermarked report. This is an
+    accidental-misuse boundary, not a security boundary against Python code
+    that deliberately forges objects inside this process.
+    """
+
+    def __init__(self, value: dict, *, _token: object) -> None:
+        if _token is not _VERIFIED_PUBLICATION_TOKEN:
+            raise ValueError('publication data must come from the complete source audit')
+        super().__init__(value)
 
 
 def require(condition: bool, message: str) -> None:
@@ -545,7 +560,7 @@ def _trajectory_bundle(trajectory: dict, root: Path, index: dict,
 def load_publication_data(*, matrix_manifest: Path, execution_index: Path,
                           audited_summary: Path, telemetry_index: Path,
                           independent_review: Path,
-                          trajectory_index: Path) -> dict:
+                          trajectory_index: Path) -> VerifiedPublicationData:
     """Rebuild and verify every input before returning aggregate report data."""
     manifest, manifest_raw = read_json(matrix_manifest, 'matrix manifest')
     plan = matrix.build(manifest, matrix_manifest.parent,
@@ -582,7 +597,7 @@ def load_publication_data(*, matrix_manifest: Path, execution_index: Path,
     usage = _usage_aggregates(index, execution_index.parent, summary)
     family_counts = {cell['cell_id']: len(set(cell['analysis_family_by_task'].values()))
                      for cell in plan['cells']}
-    return {
+    return VerifiedPublicationData({
         'plan': plan, 'summary': summary, 'telemetry': measures,
         'review': reviewed, 'usage': usage, 'trajectory': search,
         'family_counts': family_counts,
@@ -595,4 +610,4 @@ def load_publication_data(*, matrix_manifest: Path, execution_index: Path,
             'trajectory_index_sha256': evidence.digest(trajectory_raw),
             'independent_review_sha256': evidence.digest(review_raw),
         },
-    }
+    }, _token=_VERIFIED_PUBLICATION_TOKEN)
