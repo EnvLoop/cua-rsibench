@@ -98,6 +98,13 @@ class ScopedTrainControlTests(unittest.TestCase):
                 "status": "reserved_before_public_train_gui_control_creates",
                 "train_control_source_sha256": train.digest(
                     Path(train.__file__).read_bytes()),
+                "train_control_audit_source_sha256": train.digest(
+                    Path(train.__file__).with_name(
+                        "v066_scoped_profile_train_control_audit.py").read_bytes()),
+                "profile_guard_source_sha256": train.digest(
+                    Path(train.scoped_guard.__file__).read_bytes()),
+                "action_adapter_sha256": train.digest(
+                    Path(train.qwen_v066_adapter.__file__).read_bytes()),
                 "scoped_reference_sha256": reference_sha,
                 "public_train_package_sha256": package["package_sha256"],
                 "guest_identity_public_sha256": train.digest(
