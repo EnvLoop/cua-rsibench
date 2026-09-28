@@ -22,6 +22,7 @@ from . import full_study_matrix_v1 as matrix
 from . import full_study_selection_environment_v1 as environment
 from . import full_study_shared_base_selection_v1 as shared
 from . import full_study_selection_paid_coverage_v1 as paid_coverage
+from . import full_study_qwen_runtime_gate_v1 as qwen_runtime_gate
 from . import scale_final_v06 as cell_final
 from .scale_vision_proxy import MODEL, TinkerVisionBackend, digest as vision_digest
 from .scale_final_v06 import is_hash
@@ -182,7 +183,8 @@ class SharedBaseSession:
 
     def _envelope(self, *, attempt_id: str, category: str,
                   worker_request: dict,
-                  worker_request_ref: dict) -> dict:
+                  worker_request_ref: dict,
+                  qwen_runtime: dict | None) -> dict:
         task_id = worker_request.get("task_id")
         by_id = {row["task_id"]: row["package_sha256"]
                  for row in self.started["selection_tasks"]}
@@ -226,6 +228,8 @@ class SharedBaseSession:
             "runtime_sha256": self.cell["matched_bindings"]["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
             "worker_request_ref": worker_request_ref,
+            **({"qwen_runtime": qwen_runtime} if qwen_runtime is not None
+               else {}),
         }
 
     def dispatch_paid(self, *, attempt_id: str, category: str,
@@ -255,6 +259,20 @@ class SharedBaseSession:
         _require(committed + _money(reserve_usd) <= _money(
             self.cell["base_selection_cost_upper_bound_usd"]),
             "shared_base_selection_separate_reserve_exhausted")
+        runtime = None
+        if category == "tinker":
+            try:
+                runtime = qwen_runtime_gate.pre_dispatch(
+                    repo_root=self.study.repo_root,
+                    study_plan_sha256=self.study.plan_sha256)
+            except qwen_runtime_gate.RuntimeGateError:
+                raise SharedBaseExecutionError(
+                    "shared_base_qwen_runtime_pre_dispatch_failed") from None
+            _require(type(runtime) is dict and set(runtime) == {
+                "runtime_spec_sha256", "toy_public_receipt_sha256",
+                "runtime_gate_source_sha256"} and
+                all(is_hash(value) for value in runtime.values()),
+                "shared_base_qwen_runtime_receipt_invalid")
         raw_ref = _write_new(
             self.directory / "paid" /
             (attempt_id + ".worker-request.private.json"),
@@ -262,7 +280,8 @@ class SharedBaseSession:
         raw_ref["path"] = "paid/" + raw_ref["path"]
         envelope = self._envelope(
             attempt_id=attempt_id, category=category,
-            worker_request=request, worker_request_ref=raw_ref)
+            worker_request=request, worker_request_ref=raw_ref,
+            qwen_runtime=runtime)
         envelope_ref = _write_new(
             self.directory / "paid" /
             (attempt_id + ".request.private.json"), _canonical(envelope))

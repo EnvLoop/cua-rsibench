@@ -189,6 +189,86 @@ class QwenRuntimeGateTests(unittest.TestCase):
                               study_plan_sha256="a" * 64,
                               private_toy_dir=self.private)
 
+    def test_pre_dispatch_rechecks_evidence_and_active_worker(self):
+        receipt = {
+            "status": "pre_dispatch_runtime_evidence_verified",
+            "study_plan_sha256": "a" * 64,
+            "runtime_spec_sha256": "b" * 64,
+            "toy_public_receipt_sha256": "c" * 64,
+            "provider_calls": 0,
+            "dispatch_authorized": False,
+            "benchmark_score": None,
+        }
+        with patch.object(gate, "validate", return_value=receipt) as check:
+            with patch.object(gate, "assert_active_worker") as worker:
+                binding = gate.pre_dispatch(
+                    repo_root=self.root, study_plan_sha256="a" * 64)
+        self.assertEqual(check.call_args.kwargs["private_toy_dir"],
+                         self.root / gate.PRIVATE_TOY_RELATIVE)
+        worker.assert_called_once_with(self.root)
+        self.assertEqual(binding["runtime_spec_sha256"], "b" * 64)
+        self.assertEqual(binding["toy_public_receipt_sha256"], "c" * 64)
+        self.assertEqual(binding["runtime_gate_source_sha256"],
+                         sha256(Path(gate.__file__).read_bytes()).hexdigest())
+
+    def test_pre_dispatch_rejects_forged_runtime_receipt(self):
+        forged = {
+            "status": "pre_dispatch_runtime_evidence_verified",
+            "study_plan_sha256": "a" * 64,
+            "runtime_spec_sha256": "b" * 64,
+            "toy_public_receipt_sha256": "c" * 64,
+            "provider_calls": 1,
+            "dispatch_authorized": True,
+            "benchmark_score": 1,
+        }
+        with patch.object(gate, "validate", return_value=forged):
+            with patch.object(gate, "assert_active_worker") as worker:
+                with self.assertRaisesRegex(gate.RuntimeGateError,
+                                            "pre_dispatch_receipt_invalid"):
+                    gate.pre_dispatch(repo_root=self.root,
+                                      study_plan_sha256="a" * 64)
+        worker.assert_not_called()
+
+    def test_active_worker_rejects_general_interpreter_before_imports(self):
+        with self.assertRaisesRegex(gate.RuntimeGateError,
+                                    "active_worker_not_dedicated_venv"):
+            gate.assert_active_worker(self.root)
+
+    def test_active_worker_accepts_only_root_packages_and_pythonpath(self):
+        source = (self.root / "src/cursibench" /
+                  "full_study_qwen_runtime_gate_v1.py")
+        source.parent.mkdir(parents=True)
+        source.write_bytes(b"synthetic root gate")
+        venv = self.work / "qwen38-training-runtime/.venv"
+        packages = {}
+        for name in gate.CRITICAL_PACKAGES:
+            origin = (venv / "lib/python3.14/site-packages" / name /
+                      "__init__.py")
+            origin.parent.mkdir(parents=True, exist_ok=True)
+            origin.write_bytes(b"synthetic package")
+            packages[name] = origin
+        def spec(name):
+            return SimpleNamespace(origin=str(packages[name]))
+        with patch.object(gate, "__file__", str(source)), \
+             patch.object(gate.sys, "executable", str(venv / "bin/python")), \
+             patch.object(gate.sys, "prefix", str(venv)), \
+             patch.object(gate.site, "ENABLE_USER_SITE", False), \
+             patch.object(gate, "find_spec", side_effect=spec), \
+             patch.dict(os.environ, {"PYTHONPATH": str(self.root / "src")}):
+            gate.assert_active_worker(self.root)
+            os.environ["PYTHONPATH"] = str(self.root / "src") + \
+                os.pathsep + "/tmp/foreign-overlay"
+            with self.assertRaisesRegex(gate.RuntimeGateError,
+                                        "pythonpath_overlay_forbidden"):
+                gate.assert_active_worker(self.root)
+            os.environ["PYTHONPATH"] = str(self.root / "src")
+            foreign = self.root / "foreign-package.py"
+            foreign.write_bytes(b"synthetic overlay")
+            packages["tinker"] = foreign
+            with self.assertRaisesRegex(gate.RuntimeGateError,
+                                        "active_package_origin_invalid"):
+                gate.assert_active_worker(self.root)
+
 
 if __name__ == "__main__":
     unittest.main()

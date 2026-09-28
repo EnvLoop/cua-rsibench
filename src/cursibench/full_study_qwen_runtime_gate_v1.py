@@ -11,7 +11,10 @@ import json
 import os
 from pathlib import Path
 import re
+import site
 import subprocess
+import sys
+from importlib.util import find_spec
 
 
 MODEL = "Qwen/Qwen3.8-27B"
@@ -22,6 +25,12 @@ HASH = re.compile(r"[0-9a-f]{64}\Z")
 PROVIDER_ENV_KEYS = (
     "TINKER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
     "E2B_API_KEY", "HF_TOKEN", "HUGGING_FACE_HUB_TOKEN",
+)
+PRIVATE_TOY_RELATIVE = Path(
+    "work/full-study/tinker-qwen38-vision-paid-transformers554-20260928")
+CRITICAL_PACKAGES = (
+    "tinker", "transformers", "tokenizers", "torch",
+    "tml_renderers", "tinker_cookbook",
 )
 
 
@@ -227,4 +236,73 @@ def validate(*, repo_root: Path, study_plan_sha256: str,
     }
 
 
-__all__ = ["validate", "RuntimeGateError"]
+def assert_active_worker(repo_root: Path) -> None:
+    """Reject an overlay or a caller outside the verified root-owned venv.
+
+    ``validate`` checks a fresh isolated subprocess. This second check binds
+    the process that will actually execute the provider callback.
+    """
+    root = Path(repo_root).absolute()
+    venv = root / "work/qwen38-training-runtime/.venv"
+    interpreter = venv / "bin/python"
+    _require(Path(sys.executable).absolute() == interpreter and
+             Path(sys.prefix).absolute() == venv and
+             site.ENABLE_USER_SITE is False,
+             "runtime_active_worker_not_dedicated_venv")
+    source = root / "src/cursibench/full_study_qwen_runtime_gate_v1.py"
+    _require(source.is_file() and not source.is_symlink() and
+             Path(__file__).resolve() == source.resolve(),
+             "runtime_gate_source_not_root_checkout")
+    paths = os.environ.get("PYTHONPATH", "")
+    allowed = {root, root / "src"}
+    _require(not paths or all(item and Path(item).is_absolute() and
+                              not Path(item).is_symlink() and
+                              Path(item).absolute() in allowed
+                              for item in paths.split(os.pathsep)),
+             "runtime_pythonpath_overlay_forbidden")
+    for name in CRITICAL_PACKAGES:
+        try:
+            spec = find_spec(name)
+            origin = Path(spec.origin).absolute() if spec and spec.origin else None
+        except (ImportError, ModuleNotFoundError, TypeError, ValueError):
+            origin = None
+        _require(origin is not None and origin.is_file() and
+                 not origin.is_symlink() and
+                 origin.resolve().is_relative_to(venv.resolve()),
+                 "runtime_active_package_origin_invalid")
+
+
+def pre_dispatch(*, repo_root: Path, study_plan_sha256: str) -> dict:
+    """Recheck evidence and process identity immediately before paid Tinker.
+
+    This does not grant study admission; the campaign freeze, task partition,
+    and dollar ledger remain the caller's responsibility.
+    """
+    root = Path(repo_root).absolute()
+    receipt = validate(
+        repo_root=root, study_plan_sha256=study_plan_sha256,
+        private_toy_dir=root / PRIVATE_TOY_RELATIVE)
+    _require(type(receipt) is dict and set(receipt) == {
+        "status", "study_plan_sha256", "runtime_spec_sha256",
+        "toy_public_receipt_sha256", "provider_calls",
+        "dispatch_authorized", "benchmark_score",
+    } and receipt["status"] == "pre_dispatch_runtime_evidence_verified" and
+             receipt["study_plan_sha256"] == study_plan_sha256 and
+             all(type(receipt[key]) is str and HASH.fullmatch(receipt[key])
+                 for key in ("runtime_spec_sha256",
+                             "toy_public_receipt_sha256")) and
+             type(receipt["provider_calls"]) is int and
+             receipt["provider_calls"] == 0 and
+             receipt["dispatch_authorized"] is False and
+             receipt["benchmark_score"] is None,
+             "runtime_pre_dispatch_receipt_invalid")
+    assert_active_worker(root)
+    return {
+        "runtime_spec_sha256": receipt["runtime_spec_sha256"],
+        "toy_public_receipt_sha256": receipt["toy_public_receipt_sha256"],
+        "runtime_gate_source_sha256": _sha(Path(__file__).read_bytes()),
+    }
+
+
+__all__ = ["validate", "assert_active_worker", "pre_dispatch",
+           "RuntimeGateError"]

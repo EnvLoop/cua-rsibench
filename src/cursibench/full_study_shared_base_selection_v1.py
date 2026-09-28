@@ -499,6 +499,12 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
              result_status == "completed"),
             "base_selection_paid_result_not_completed")
         if category == "tinker":
+            qwen_runtime = request.get("qwen_runtime")
+            _require(type(qwen_runtime) is dict and set(qwen_runtime) == {
+                "runtime_spec_sha256", "toy_public_receipt_sha256",
+                "runtime_gate_source_sha256"} and
+                all(_hash(value) for value in qwen_runtime.values()),
+                "base_selection_qwen_runtime_binding_missing")
             if cell_id == "gitlab" and task_id is not None:
                 _require(worker_result.get("reported_model") == MODEL,
                          "base_selection_gitlab_provider_model_changed")
@@ -522,6 +528,8 @@ def verify_receipt(study, budget, cell_id: str, source: Path,
             "runtime_sha256": bindings["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
             "worker_request_ref": request.get("worker_request_ref"),
+            **({"qwen_runtime": qwen_runtime} if category == "tinker"
+               else {}),
         }
         _require(
             (worker_request.get("task_id") in (None, task_id) and

@@ -23,6 +23,7 @@ class SharedBaseSessionTests(unittest.TestCase):
             "test_campaign_cannot_start_without_one_shared_base_selection")
         harness.setUp()
         self.addCleanup(harness.tearDown)
+        self.harness = harness
         self.study = harness.frozen()
         (Path(self.study.repo_root) / "work").mkdir(mode=0o700,
                                                      exist_ok=True)
@@ -54,6 +55,8 @@ class SharedBaseSessionTests(unittest.TestCase):
             envelope = (self.session.directory / "paid" /
                         (attempt_id + ".request.private.json"))
             self.assertTrue(envelope.exists())
+            self.assertEqual(json.loads(envelope.read_bytes())[
+                "qwen_runtime"]["runtime_spec_sha256"], "d" * 64)
             return {"status": "completed", "text": '{"type":"finish"}'}
         paid = self.session.dispatch_paid(
             attempt_id=attempt_id, category="tinker",
@@ -92,6 +95,26 @@ class SharedBaseSessionTests(unittest.TestCase):
                          {"settled"})
         self.assertEqual({row["category"] for row in owner.values()},
                          {"tinker", "e2b"})
+
+    def test_runtime_refusal_precedes_shared_base_file_reserve_and_provider(self):
+        self.harness.runtime_gate_mock.side_effect = (
+            execution.qwen_runtime_gate.RuntimeGateError("missing_runtime"))
+        attempt_id = self.session.attempt_id + "-sample-001"
+        called = []
+        with self.assertRaisesRegex(execution.SharedBaseExecutionError,
+                                    "qwen_runtime_pre_dispatch_failed"):
+            self.session.dispatch_paid(
+                attempt_id=attempt_id, category="tinker",
+                work=self.tinker_request(), request=self.tinker_request(),
+                reserve_usd="0.01", resource_reservation={},
+                provider=lambda _: called.append("provider"))
+        self.assertEqual(called, [])
+        self.assertEqual(self.session.budget.owner_attempts(
+            self.session.owner), {})
+        self.assertFalse((self.session.directory / "paid" /
+                          (attempt_id + ".request.private.json")).exists())
+        self.assertFalse((self.session.directory / "paid" /
+                          (attempt_id + ".worker-request.private.json")).exists())
 
     def test_uncertain_callback_keeps_reserve_and_cannot_replay(self):
         request = self.tinker_request()

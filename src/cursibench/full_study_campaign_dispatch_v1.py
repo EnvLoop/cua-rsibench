@@ -29,6 +29,7 @@ import urllib.request
 from . import full_study_budget_v1 as dollars
 from . import full_study_matrix_v1 as matrix
 from . import full_study_pre_campaign_v1 as pre_campaign
+from . import full_study_qwen_runtime_gate_v1 as qwen_runtime_gate
 from . import full_study_selection_environment_v1 as selection_environment
 from . import full_study_selection_paid_coverage_v1 as paid_coverage
 from . import full_study_shared_base_selection_v1 as shared_base
@@ -542,6 +543,17 @@ class CampaignSession:
         for row in intents:
             info = row['data']
             attempt_id = info['attempt_id']
+            if info['category'] == 'tinker':
+                runtime = info.get('qwen_runtime')
+                _require(type(runtime) is dict and set(runtime) == {
+                    'runtime_spec_sha256', 'toy_public_receipt_sha256',
+                    'runtime_gate_source_sha256'} and
+                    all(cell_final.is_hash(value) for value in
+                        runtime.values()),
+                    'paid_tinker_runtime_binding_missing_or_invalid')
+            else:
+                _require('qwen_runtime' not in info,
+                         'non_tinker_runtime_binding_invalid')
             record = state.get(attempt_id)
             _require(record is not None and
                      record['category'] == info['category'] and
@@ -1490,6 +1502,19 @@ class CampaignSession:
         _require(not any(row['data']['work_sha256'] == work_sha for row in
                          self._events('paid_intent')),
                  'same_work_already_recorded_no_automatic_replay')
+        runtime = None
+        if category == 'tinker':
+            try:
+                runtime = qwen_runtime_gate.pre_dispatch(
+                    repo_root=self.study.repo_root,
+                    study_plan_sha256=self.study.plan_sha256)
+            except qwen_runtime_gate.RuntimeGateError:
+                raise DispatchError('qwen_runtime_pre_dispatch_failed') from None
+            _require(type(runtime) is dict and set(runtime) == {
+                'runtime_spec_sha256', 'toy_public_receipt_sha256',
+                'runtime_gate_source_sha256'} and
+                all(cell_final.is_hash(value) for value in runtime.values()),
+                'qwen_runtime_pre_dispatch_receipt_invalid')
         request_sha = _sha(request_raw)
         request_path = self.directory / f'{attempt_id}.request.private.json'
         result_path = self.directory / f'{attempt_id}.result.private.json'
@@ -1503,6 +1528,7 @@ class CampaignSession:
             'work_sha256': work_sha, 'request_sha256': request_sha,
             'reserved_usd': reserve_usd,
             'resource_reservation': units,
+            **({'qwen_runtime': runtime} if runtime is not None else {}),
             'epoch_seconds': int(self.now()),
         })
         self.budget.mark_dispatched(attempt_id, request_sha)

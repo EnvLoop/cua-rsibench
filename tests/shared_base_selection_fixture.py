@@ -89,6 +89,11 @@ def build(study, budget, cell_id: str, *, winning_indices=(),
             "runtime_sha256": cell["matched_bindings"]["runtime"],
             "action_profile": "scale-action-profile-v0.6.6",
             "worker_request_ref": worker_request_ref,
+            **({"qwen_runtime": {
+                "runtime_spec_sha256": "d" * 64,
+                "toy_public_receipt_sha256": "e" * 64,
+                "runtime_gate_source_sha256": "f" * 64,
+            }} if category == "tinker" else {}),
         }
         request_ref = _json(root / "paid" /
                             f"{attempt_id}.request.json", request)

@@ -10,6 +10,7 @@ from types import SimpleNamespace
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
@@ -122,8 +123,25 @@ class FullStudyDispatchTests(unittest.TestCase):
             'hidden_final_model_attempts_before_freeze': 0,
         }
         self.clock = [1_800_000_000]
+        self.runtime_gate_calls = []
+        def fake_runtime_gate(*, repo_root, study_plan_sha256):
+            self.assertEqual(repo_root, self.root.resolve())
+            self.assertEqual(study_plan_sha256, sha(
+                (self.prepared / 'campaign-plan.json').read_bytes()))
+            self.runtime_gate_calls.append(study_plan_sha256)
+            return {
+                'runtime_spec_sha256': 'd' * 64,
+                'toy_public_receipt_sha256': 'e' * 64,
+                'runtime_gate_source_sha256': 'f' * 64,
+            }
+        self.runtime_gate_patch = patch.object(
+            dispatch.qwen_runtime_gate, 'pre_dispatch',
+            side_effect=fake_runtime_gate)
+        self.runtime_gate_mock = self.runtime_gate_patch.start()
+        self.addCleanup(self.runtime_gate_patch.stop)
 
     def tearDown(self):
+        self.runtime_gate_patch.stop()
         self.temp.cleanup()
 
     def frozen(self, witness=None):
@@ -525,6 +543,52 @@ class FullStudyDispatchTests(unittest.TestCase):
         self.assertEqual(session.snapshot()['token_telemetry']['tinker_scheduled_train_tokens'], 40)
         self.assertNotIn('checkpoint_path', result)
         self.assertEqual(len(session._events('tinker_checkpoint')), 1)
+        self.assertEqual(len(self.runtime_gate_calls), 1)
+        paid = [row for row in session._events('paid_intent')
+                if row['data']['category'] == 'tinker']
+        self.assertEqual(paid[0]['data']['qwen_runtime'], {
+            'runtime_spec_sha256': 'd' * 64,
+            'toy_public_receipt_sha256': 'e' * 64,
+            'runtime_gate_source_sha256': 'f' * 64,
+        })
+
+    def test_tinker_runtime_refusal_precedes_reservation_or_provider(self):
+        _, session = self.campaign()
+        rendered, dataset = self.proposed_train_batch(session)
+        before = set(session.budget.owner_attempts(session.owner))
+        self.runtime_gate_mock.side_effect = (
+            dispatch.qwen_runtime_gate.RuntimeGateError('missing_runtime'))
+        called = []
+        with self.assertRaisesRegex(dispatch.DispatchError,
+                                    'qwen_runtime_pre_dispatch_failed'):
+            session.dispatch_tinker_sft(
+                round_index=1, dataset_manifest_path=dataset,
+                rendered_batch=rendered,
+                provider=lambda *_: called.append('provider'))
+        self.assertEqual(called, [])
+        self.assertEqual(set(session.budget.owner_attempts(session.owner)), before)
+        self.assertFalse((session.directory /
+                          'tinker-001.request.private.json').exists())
+        self.assertFalse(any(row['data']['category'] == 'tinker'
+                             for row in session._events('paid_intent')))
+
+    def test_selection_tinker_sampler_uses_same_runtime_gate(self):
+        _, session = self.campaign()
+        self.runtime_gate_mock.side_effect = (
+            dispatch.qwen_runtime_gate.RuntimeGateError('wrong_interpreter'))
+        called = []
+        with self.assertRaisesRegex(dispatch.DispatchError,
+                                    'qwen_runtime_pre_dispatch_failed'):
+            session.dispatch_paid(
+                attempt_id='selection-runtime-rejected', category='tinker',
+                work={'kind': 'selection-sample'},
+                request={
+                    'schema': 'cua-full-study-selection-sampling-request-v1'},
+                reserve_usd='0.000001', resource_reservation={},
+                provider=lambda _: called.append('provider'))
+        self.assertEqual(called, [])
+        self.assertNotIn('selection-runtime-rejected',
+                         session.budget.owner_attempts(session.owner))
 
     def test_tinker_rejects_selection_or_final_source_before_provider(self):
         _, session = self.campaign()
