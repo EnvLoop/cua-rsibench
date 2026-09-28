@@ -144,6 +144,13 @@ def execute(*, output: Path, work_root: Path, guest_identity_public: Path,
             "reserved_before_public_train_gui_control_creates" or
             reserved.get("train_control_source_sha256") !=
             digest(Path(__file__).read_bytes()) or
+            reserved.get("train_control_audit_source_sha256") !=
+            digest(Path(__file__).with_name(
+                "v066_scoped_profile_train_control_audit.py").read_bytes()) or
+            reserved.get("profile_guard_source_sha256") !=
+            digest(Path(scoped_guard.__file__).read_bytes()) or
+            reserved.get("action_adapter_sha256") !=
+            digest(Path(qwen_v066_adapter.__file__).read_bytes()) or
             reserved.get("scoped_reference_sha256") != reference_sha or
             reserved.get("public_train_package_sha256") !=
             package["package_sha256"] or
