@@ -113,7 +113,9 @@ def _read_controls(task: dict, plan_sha256: str,
             before = json.loads((folder / 'private-before.json').read_bytes())
             pre_edit = json.loads((folder / 'private-pre-edit.json').read_bytes())
             guard = result.get('quote', {}).get('release_modal_guard')
-            require(result.get('task_id') == task['task_id'] and
+            require(result.get('schema') ==
+                    'envloop-magento-original-gui-control-v3' and
+                    result.get('task_id') == task['task_id'] and
                     result.get('mode') == ('wrong-variant' if mode == 'gui-wrong-variant'
                                            else 'positive' if mode == 'gui-positive'
                                            else 'neutral') and

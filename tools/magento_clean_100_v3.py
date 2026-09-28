@@ -298,12 +298,37 @@ def verify_finished_attempt(run_dir: Path, events: list[dict], index: int,
     for pair, mode, score in (('positive', 'gui-positive', 1.0),
                               ('negative', 'gui-wrong-variant', 0.0)):
         result, _ = read_json(base / pair / mode / 'result.json')
-        require(result.get('score', {}).get('score') == score and
+        require(result.get('schema') ==
+                'envloop-magento-original-gui-control-v3' and
+                result.get('score', {}).get('score') == score and
                 result['score'].get('independent_saved_state') is True and
                 result['score'].get('task_id') == case['task_id'] and
                 result.get('model_calls') ==
                 result.get('official_final_tasks_admitted') == 0,
                 'independent native saved-state score missing')
+    for pair, mode in (('positive', 'neutral'),
+                       ('positive', 'gui-positive'),
+                       ('negative', 'neutral'),
+                       ('negative', 'gui-wrong-variant')):
+        folder = base / pair / mode
+        result, _ = read_json(folder / 'result.json')
+        before, before_sha = read_json(folder / 'private-before.json')
+        pre_edit, pre_edit_sha = read_json(folder / 'private-pre-edit.json')
+        guard = result.get('quote', {}).get('release_modal_guard')
+        require(result.get('schema') ==
+                'envloop-magento-original-gui-control-v3' and
+                result.get('task_id') == case['task_id'] and
+                result.get('before_sha256') == before_sha and
+                result.get('pre_edit_sha256') == pre_edit_sha and
+                before == pre_edit and
+                type(guard) is dict and
+                guard.get('obstruction_clear_before_business_edit') is True and
+                type(guard.get('release_mask_observed')) is bool and
+                type(guard.get('release_notification_modals_closed')) is int and
+                guard['release_notification_modals_closed'] >= 0 and
+                result.get('model_calls') ==
+                result.get('official_final_tasks_admitted') == 0,
+                'v3 GUI release guard changed business state before candidate edit')
     reset, _ = read_json(base / 'negative/fresh-reset.private.json')
     require(reset.get('fresh_clone_reset_passed') is True and
             reset.get('material_monitored_sql_and_search_state') is True and

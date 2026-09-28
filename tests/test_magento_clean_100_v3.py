@@ -206,7 +206,8 @@ class MagentoClean100V3Tests(unittest.TestCase):
                     before = {'business': 'unchanged'}
                     save(folder / 'private-before.json', before)
                     save(folder / 'private-pre-edit.json', before)
-                    result = {'task_id': task['task_id'],
+                    result = {'schema': 'envloop-magento-original-gui-control-v3',
+                              'task_id': task['task_id'],
                               'mode': ('wrong-variant' if mode == 'gui-wrong-variant'
                                        else 'positive' if mode == 'gui-positive'
                                        else 'neutral'),

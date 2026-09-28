@@ -278,7 +278,7 @@ async def run(case: dict, source: Path, container: str,
              'untouched_variant_changed' in score['failure_codes']) or
             (mode == 'neutral' and neutral_preserved),
             'independent saved-state control did not discriminate')
-    result = {'schema': 'envloop-magento-original-gui-control-v1',
+    result = {'schema': 'envloop-magento-original-gui-control-v3',
               'status': ('neutral_fixture_normalization_development_only'
                          if mode == 'neutral' else
                          'single_control_passed_reset_still_required'),
