@@ -20,6 +20,25 @@ from tools import export_desktop_v066_calc_writer_train_sft_common_v1 as common
 
 
 class CalcWriterExporterTests(unittest.TestCase):
+    def test_public_offline_render_receipts_bind_exact_exporter_sources(self):
+        root = Path(__file__).resolve().parents[1]
+        helper_sha = common.digest(Path(common.__file__).read_bytes())
+        for kind, module, count in (("calc", calc, 12),
+                                     ("writer", writer, 8)):
+            path = (root / "docs/evidence" /
+                f"native-wdi-v066-{kind}-train-sft-render-2026-09-28.json")
+            public = json.loads(path.read_bytes())
+            self.assertEqual(public["status"],
+                             "evaluator_scripted_public_train_gui_rendered_offline")
+            self.assertEqual(public["real_gui_train_turns"], count)
+            self.assertEqual(public["exporter_source_sha256"],
+                             common.digest(Path(module.__file__).read_bytes()))
+            self.assertEqual(public["shared_helper_source_sha256"], helper_sha)
+            self.assertEqual(module.HELPER_SHA256, helper_sha)
+            self.assertEqual(public["provider_calls"], 0)
+            self.assertIsNone(public["benchmark_score"])
+            self.assertEqual(public["official_final_admissions"], 0)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
