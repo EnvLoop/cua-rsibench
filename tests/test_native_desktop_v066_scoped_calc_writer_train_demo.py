@@ -65,6 +65,37 @@ class FakeSandbox:
 
 
 class CalcWriterTrainDemoTests(unittest.TestCase):
+    def test_serial_pair_stops_after_first_invalid_guest(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            output = root / "new-demos"
+            reservation = root / "reservation.json"
+            reservation.write_text("{}")
+            kwargs = {"output_root": output, "work_root": root,
+                      "guest_public": root / "guest",
+                      "scoped_reference": root / "reference",
+                      "reservation_path": reservation}
+            with self.assertRaisesRegex(ValueError, "disabled"):
+                demo.run_both(**kwargs)
+            self.assertFalse(output.exists())
+
+            def fail_first(**arguments):
+                target = arguments["output_root"] / "calc"
+                target.mkdir()
+                (target / "receipt.json").write_text("{}")
+                return {"status": "train_gui_positive_failed",
+                        "is_running_after_kill": False}
+
+            with (patch.object(demo, "_validate_reservation",
+                               return_value="r" * 64),
+                  patch.object(demo, "run_one", side_effect=fail_first) as worker):
+                result = demo.run_both(
+                    **kwargs, enable_paid_train_demos=True)
+            self.assertEqual(result["status"], "stopped_for_reconciliation")
+            self.assertEqual(len(result["attempts"]), 1)
+            self.assertFalse((output / "writer").exists())
+            worker.assert_called_once()
+
     def test_public_plan_binds_exact_sources_and_official_zero(self):
         root = Path(__file__).resolve().parents[1]
         public = json.loads((root / "docs/evidence" /
