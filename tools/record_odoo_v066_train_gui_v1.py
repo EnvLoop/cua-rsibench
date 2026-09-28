@@ -454,6 +454,14 @@ class ActionJournal:
                 "visible_text_ref": visible,
                 "assistant_action_ref": action_ref,
                 "normalized_action": normalized,
+                "observed_url": getattr(self.adapter, "latest_url", None),
+                "observation_controls": [
+                    {"ref": control.ref, "role": control.role,
+                     "label": control.label, "visible": control.visible,
+                     "enabled": control.enabled}
+                    for control in observation.controls],
+                "observed_target_control": getattr(
+                    self.adapter, "observed_target_control", None),
                 "dispatch_state": "intent_durable_before_gui_action",
                 "pre_intent_stale_resamples": attempt,
             }

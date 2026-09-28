@@ -107,7 +107,7 @@ class ScalePlanTests(unittest.TestCase):
         self.freeze = self.root / "freeze.public.json"
         write(self.freeze, {
             "schema": protocol.SOURCE_FREEZE_SCHEMA,
-            "status": "frozen_after_pinned_border_dispatch_and_second_failure_audit",
+            "status": "frozen_after_visible_control_and_final_physical_frame_audit",
             "ratification_sha256": protocol.RATIFICATION_SHA,
             "source_sha256s": protocol.current_source_hashes(),
             "host_runtime": protocol.host_runtime(),
@@ -121,6 +121,10 @@ class ScalePlanTests(unittest.TestCase):
                 protocol.SELECTION_GATE_AUDIT_FREEZE_SHA256,
             "old_blank_compose_freeze_sha256":
                 protocol.BLANK_COMPOSE_FREEZE_SHA256,
+            "old_pinned_border_draft_sha256":
+                protocol.PINNED_BORDER_DRAFT_SHA256,
+            "old_observation_bound_draft_sha256":
+                protocol.OBSERVATION_BOUND_DRAFT_SHA256,
             "selection_second_failure_public_sha256": protocol.digest((
                 protocol.ROOT / "docs/evidence/odoo-v066-selection-second-post-intent-stale-2026-09-29.json").read_bytes()),
             "physical_dispatch_profile": protocol.PINNED_BORDER_PROFILE,
@@ -338,6 +342,13 @@ class HoldoutActionTests(unittest.TestCase):
             row = {"task_id": "TRAIN-ONLY-1", "package_sha256": "a" * 64,
                    "task_binding_sha256": "b" * 64}
             self.assertEqual(auditor._action_chain(out, trace, row), (1, 1, 0))
+            intent = protocol.private_json(
+                out / "actions/step-000-intent.private.json")
+            visible = json.loads((out /
+                intent["visible_text_ref"]["path"]).read_text())
+            self.assertEqual(intent["observation_controls"],
+                             visible["controls"])
+            self.assertIsNone(intent["observed_url"])
             self.assertEqual(journal.sft, [])
             self.assertFalse((out / "sft_candidate.private.json").exists())
 

@@ -14,7 +14,9 @@ from io import BytesIO
 import json
 import os
 from pathlib import Path
+import re
 import stat
+from urllib.parse import urlsplit
 
 from PIL import Image, ImageChops
 
@@ -82,7 +84,10 @@ def _lease(events_path: Path, pid: int, start: datetime,
 
 def _micro_alternate_independent(first: bytes, second: bytes) -> bool:
     with Image.open(BytesIO(first)) as source, Image.open(BytesIO(second)) as sampled:
-        a, b = source.convert("RGB"), sampled.convert("RGB")
+        require(source.format == sampled.format == "PNG" and
+                source.mode == sampled.mode == "RGB",
+                "scale_guard_frame_mode_changed")
+        a, b = source.copy(), sampled.copy()
     require(a.size == b.size == (1440, 1000),
             "scale_guard_frame_geometry_changed")
     box = ImageChops.difference(a, b).getbbox()
@@ -104,7 +109,8 @@ def _micro_alternate_independent(first: bytes, second: bytes) -> bool:
 
 
 def _exact_return_chain(attempt: Path, trace: dict,
-                        *, require_pinned_profile: bool = False) -> None:
+                        *, require_pinned_profile: bool = False,
+                        family: str | None = None) -> None:
     samples = trace.get("exact_return_guard_samples")
     require(type(samples) is list and samples,
             "scale_exact_return_guard_missing")
@@ -134,7 +140,8 @@ def _exact_return_chain(attempt: Path, trace: dict,
                       sample.get("observed_frame_id_sha256"))
         require(type(step) is int and step >= prior_step and
                 stage in ("parse", "dispatch") and
-                sample.get("sample") in range(6) and
+                sample.get("sample") in range(
+                    7 if require_pinned_profile else 6) and
                 source_key in observed and
                 sample.get("classification") in (
                     "exact_return", "one_recurring_micro_raster_alternate",
@@ -150,7 +157,7 @@ def _exact_return_chain(attempt: Path, trace: dict,
         observed_sha = source_key[0]
         group = grouped.setdefault((step, source_key, stage), [])
         require(sample["sample"] == len(group) and
-                len(group) < 6 and
+                len(group) < (7 if require_pinned_profile else 6) and
                 (not group or group[-1][1] not in (
                     "exact_return", "pinned_border_equivalence_accepted")),
                 "scale_exact_return_sample_bounded_sequence_invalid")
@@ -172,12 +179,32 @@ def _exact_return_chain(attempt: Path, trace: dict,
     require(all(len(alternatives) <= 1 for alternatives in
                 alternatives_by_observation.values()),
             "scale_exact_return_third_frame_present")
+    if require_pinned_profile:
+        require(all(sample.get("classification") !=
+                    "pinned_border_equivalence_accepted" or
+                    (sample.get("stage") == "dispatch" and
+                     sample.get("step") in successful_frames and
+                     sample.get("observed_frame_sha256") ==
+                     successful_frames[sample["step"]][0] and
+                     sample.get("observed_frame_id_sha256") ==
+                     successful_frames[sample["step"]][1])
+                    for sample in samples),
+                "scale_pinned_accepted_orphan_guard_sample")
     for action in trace["actions"]:
         step = action["step"]
         source_key = successful_frames[step]
+        successful_indices = [index for index, sample in enumerate(samples)
+                              if sample.get("step") == step and
+                              sample.get("observed_frame_sha256") ==
+                              source_key[0] and
+                              sample.get("observed_frame_id_sha256") ==
+                              source_key[1]]
         parse = grouped.get((step, source_key, "parse"), [])
         dispatch = grouped.get((step, source_key, "dispatch"), [])
-        require(parse and dispatch and
+        require(successful_indices and
+                successful_indices == list(range(
+                    successful_indices[0], successful_indices[-1] + 1)) and
+                parse and dispatch and
                 parse[-1][1] == "exact_return" and
                 dispatch[-1][1] in (
                     "exact_return", "pinned_border_equivalence_accepted") and
@@ -194,6 +221,29 @@ def _exact_return_chain(attempt: Path, trace: dict,
                          "exact_return", "pinned_border_equivalence_accepted")),
                 "scale_action_not_guarded_by_exact_return")
         if require_pinned_profile:
+            candidates = sorted((attempt / "actions").glob(
+                f"step-{step:03d}*-intent.private.json"))
+            intent = protocol.private_json(candidates[0])
+            visible_ref = intent.get("visible_text_ref")
+            require(type(visible_ref) is dict,
+                    "scale_model_visible_control_reference_missing")
+            _, visible_raw = pilot._ref(attempt, visible_ref)
+            try:
+                visible = json.loads(visible_raw)
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                raise ScaleAuditError(
+                    "scale_model_visible_controls_invalid_json") from None
+            controls = visible.get("controls")
+            contract = action.get("contract_receipt", {})
+            require(type(controls) is list and
+                    controls == intent.get("observation_controls") and
+                    visible.get("screenshot", {}).get("sha256") ==
+                    source_key[0] and
+                    len(controls) == contract.get("control_count") and
+                    contract.get("action_type") ==
+                    intent.get("normalized_action", {}).get("type") and
+                    contract.get("frame_id_sha256") == source_key[1],
+                    "scale_model_visible_controls_action_or_frame_unbound")
             physical = action.get("contract_receipt", {}).get(
                 "physical_dispatch_guard")
             require(type(physical) is dict and
@@ -201,6 +251,12 @@ def _exact_return_chain(attempt: Path, trace: dict,
                     protocol.PINNED_BORDER_PROFILE and
                     physical.get("observed_frame_sha256") == source_key[0] and
                     physical.get("observed_frame_id_sha256") == source_key[1] and
+                    physical.get("observed_url") ==
+                    intent.get("observed_url") and
+                    physical.get("physical_url") ==
+                    intent.get("observed_url") and
+                    physical.get("target_point") ==
+                    intent.get("normalized_action", {}).get("target") and
                     physical.get("physical_frame_ref") ==
                     next(sample["sampled_frame_ref"] for sample in
                          reversed(samples)
@@ -215,13 +271,12 @@ def _exact_return_chain(attempt: Path, trace: dict,
                         physical.get("pinned_pixel_coordinates") == [],
                         "scale_exact_physical_receipt_changed")
             else:
-                candidates = sorted((attempt / "actions").glob(
-                    f"step-{step:03d}*-intent.private.json"))
-                intent = protocol.private_json(candidates[0])
                 target = intent.get("normalized_action", {}).get("target")
                 control = physical.get("target_control")
+                observed_control = intent.get("observed_target_control")
                 bounds = control.get("bounds") if type(control) is dict else None
-                require(len(dispatch) == 6 and
+                require(len(dispatch) == 7 and
+                        family == "purchase" and
                         all(classification ==
                             "one_recurring_micro_raster_alternate"
                             for _, classification in dispatch[:-1]) and
@@ -235,8 +290,28 @@ def _exact_return_chain(attempt: Path, trace: dict,
                         set(target) == {"x", "y"} and
                         type(bounds) is list and len(bounds) == 4 and
                         control.get("visible") is True and
+                        control.get("enabled") is True and
                         type(control.get("ref")) is str and
                         type(control.get("role")) is str and
+                        type(control.get("label")) is str and
+                        type(observed_control) is dict and
+                        all(control.get(key) == observed_control.get(key)
+                            for key in ("ref", "role", "label", "visible",
+                                        "enabled", "bounds",
+                                        "purchase_rfq_view")) and
+                        control.get("purchase_rfq_view") is True and
+                        re.fullmatch(r"/odoo/purchase/[0-9]+",
+                                     urlsplit(intent["observed_url"]).path)
+                        is not None and
+                        type(controls) is list and
+                        len([row for row in controls
+                             if type(row) is dict and
+                             row.get("ref") == control["ref"] and
+                             row.get("role") == control["role"] and
+                             row.get("label") == control["label"] and
+                             row.get("visible") is True and
+                             row.get("enabled") is True]) == 1 and
+                        all(type(value) in (int, float) for value in bounds) and
                         bounds[0] <= target["x"] <= bounds[2] and
                         bounds[1] <= target["y"] <= bounds[3] and
                         all(not (bounds[0] - 8 <= x <= bounds[2] + 8 and
@@ -447,6 +522,16 @@ def _action_chain(attempt: Path, trace: dict, row: dict,
                 intent.get("dispatch_state") ==
                 "intent_durable_before_gui_action",
                 "scale_normalized_action_not_bound_to_intent")
+        if require_pinned_profile:
+            controls = intent.get("observation_controls")
+            require(type(controls) is list and
+                    len(controls) == contract.get("control_count") and
+                    len({row.get("ref") for row in controls
+                         if type(row) is dict}) == len(controls) and
+                    all(type(row) is dict and
+                        set(row) == {"ref", "role", "label", "visible", "enabled"}
+                        for row in controls),
+                    "scale_observed_control_table_missing_or_changed")
         if action["phase"] == "positive":
             require(negative == 0, "scale_action_phase_order_invalid")
             positive += 1
@@ -464,7 +549,8 @@ def _action_chain(attempt: Path, trace: dict, row: dict,
         pilot._ref(attempt, rejected["assistant_action_ref"])
     if require_exact_return_guard:
         _exact_return_chain(
-            attempt, trace, require_pinned_profile=require_pinned_profile)
+            attempt, trace, require_pinned_profile=require_pinned_profile,
+            family=row.get("family"))
     require(positive > 0 and negative > 0,
             "scale_positive_or_negative_gui_phase_missing")
     return positive, negative, len(rejections)

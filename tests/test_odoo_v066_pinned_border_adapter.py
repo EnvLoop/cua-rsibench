@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+from copy import deepcopy
 from hashlib import sha256
 from io import BytesIO
 import os
@@ -39,7 +40,9 @@ class FakePage:
         self.url = "http://localhost/odoo/purchase/1"
         self.control = control or {
             "ref": "c005", "role": "input", "label": "",
-            "visible": True, "bounds": [500, 470, 520, 490],
+            "visible": True, "enabled": True,
+            "purchase_rfq_view": True,
+            "bounds": [500, 470, 520, 490],
         }
         self.waits = []
 
@@ -51,7 +54,6 @@ class FakePage:
         self.waits.append(ms)
 
     def evaluate(self, code: str, target: dict):
-        assert target == {"x": 508, "y": 479}
         return self.control
 
 
@@ -69,6 +71,12 @@ def adapter(frames, control=None):
     actor._pending_dispatch_action = {
         "type": "double_click", "target": {"x": 508, "y": 479}}
     actor._physical_guard_receipt = None
+    actor.observed_target_control = {
+        "ref": "c005", "role": "input", "label": "",
+        "visible": True, "enabled": True,
+        "purchase_rfq_view": True,
+        "bounds": [500, 470, 520, 490],
+    }
     actor.frame_guard_sink = lambda index, raw: {
         "path": f"frames/guard-{index:04d}.png",
         "sha256": sha256(raw).hexdigest(),
@@ -87,7 +95,7 @@ def adapter(frames, control=None):
 class PinnedBorderTests(unittest.TestCase):
     def test_six_identical_pinned_alternates_allow_bound_target(self):
         alternate = png(blue=240)
-        actor, observation = adapter([alternate] * 6)
+        actor, observation = adapter([alternate] * 7)
         self.assertTrue(actor._frame_current(observation, stage="dispatch"))
         self.assertEqual(actor.frame_guard_samples[-1]["classification"],
                          CLASSIFICATION)
@@ -109,16 +117,24 @@ class PinnedBorderTests(unittest.TestCase):
                          "third_or_material_frame_rejected")
 
     def test_target_control_must_match_observed_ref_and_exclude_border(self):
-        actor, observation = adapter([png(blue=240)] * 6,
+        actor, observation = adapter([png(blue=240)] * 7,
                                      {"ref": "c999", "role": "input",
                                       "label": "", "visible": True,
+                                      "enabled": True,
+                                      "purchase_rfq_view": True,
                                       "bounds": [500, 470, 520, 490]})
         self.assertFalse(actor._frame_current(observation, stage="dispatch"))
         self.assertIsNone(actor._physical_guard_receipt)
         self.assertFalse(_target_outside_pinned_border(
             {"type": "double_click", "target": {"x": 508, "y": 479}},
             {"ref": "c005", "role": "input", "label": "",
-             "visible": True, "bounds": [20, 400, 520, 490]},
+             "visible": True, "enabled": True,
+             "purchase_rfq_view": True,
+             "bounds": [20, 400, 520, 490]},
+            {"ref": "c005", "role": "input", "label": "",
+             "visible": True, "enabled": True,
+             "purchase_rfq_view": True,
+             "bounds": [20, 400, 520, 490]},
             observation))
 
     def test_changed_url_or_task_binding_fails(self):
@@ -128,6 +144,37 @@ class PinnedBorderTests(unittest.TestCase):
         actor, observation = adapter([png(blue=240)] * 6)
         observation.task_binding_sha256 = "c" * 64
         self.assertFalse(actor._frame_current(observation, stage="dispatch"))
+
+    def test_wrong_view_and_non_pointer_actions_fail_closed(self):
+        actor, observation = adapter([png(blue=240)] * 7)
+        actor.page.url = actor.latest_url = "http://localhost/odoo/sales/1"
+        self.assertFalse(actor._frame_current(observation, stage="dispatch"))
+        for kind in ("key", "scroll", "drag", "finish"):
+            actor, observation = adapter([png(blue=240)] * 7)
+            actor._pending_dispatch_action = {
+                "type": kind, "target": {"x": 508, "y": 479}}
+            self.assertFalse(actor._frame_current(
+                observation, stage="dispatch"), kind)
+
+    def test_forged_label_role_disabled_or_changed_target_fails(self):
+        for field, value in (("label", "forged"), ("role", "button"),
+                             ("enabled", False), ("ref", "c999"),
+                             ("purchase_rfq_view", False)):
+            actor, observation = adapter([png(blue=240)] * 7)
+            actor.page.control = {**actor.page.control, field: value}
+            self.assertFalse(actor._frame_current(
+                observation, stage="dispatch"), field)
+        actor, observation = adapter([png(blue=240)] * 7)
+        actor._pending_dispatch_action["target"] = {"x": 600, "y": 479}
+        self.assertFalse(actor._frame_current(observation, stage="dispatch"))
+
+    def test_final_post_dom_screenshot_must_be_same_alternate(self):
+        actor, observation = adapter([png(blue=240)] * 6 +
+                                     [png(blue=240, third=True)])
+        self.assertFalse(actor._frame_current(observation, stage="dispatch"))
+        self.assertIsNone(actor._physical_guard_receipt)
+        self.assertEqual(actor.frame_guard_samples[-1]["classification"],
+                         "third_or_material_frame_rejected")
 
     def test_independent_audit_reopens_equivalent_dispatch_pngs_and_target(self):
         with tempfile.TemporaryDirectory() as scratch:
@@ -140,16 +187,38 @@ class PinnedBorderTests(unittest.TestCase):
             observed = frames / "observed.png"
             observed.write_bytes(first)
             observed.chmod(0o600)
+            visible = actions / "step-000-visible.txt"
+            visible_payload = {
+                "controls": [{"ref": "c005", "role": "input",
+                              "label": "", "visible": True,
+                              "enabled": True}],
+                "screenshot": {"sha256": sha256(first).hexdigest()},
+                "a11y_text": "", "dom_text": "",
+            }
+            visible.write_bytes(protocol.canonical(visible_payload))
+            visible.chmod(0o600)
             intent = actions / "step-000-intent.private.json"
             intent.write_bytes(protocol.canonical({
                 "frame_id": "frame-0",
+                "visible_text_ref": {
+                    "path": "actions/step-000-visible.txt",
+                    "sha256": sha256(visible.read_bytes()).hexdigest()},
+                "observed_url": "http://localhost/odoo/purchase/1",
+                "observation_controls": [{
+                    "ref": "c005", "role": "input", "label": "",
+                    "visible": True, "enabled": True}],
+                "observed_target_control": {
+                    "ref": "c005", "role": "input", "label": "",
+                    "visible": True, "enabled": True,
+                    "purchase_rfq_view": True,
+                    "bounds": [500, 470, 520, 490]},
                 "normalized_action": {
                     "type": "double_click",
                     "target": {"x": 508, "y": 479}},
             }))
             intent.chmod(0o600)
             samples = []
-            for index in range(7):
+            for index in range(8):
                 raw = first if index == 0 else alternate
                 path = frames / f"guard-{index:04d}.png"
                 path.write_bytes(raw)
@@ -165,7 +234,7 @@ class PinnedBorderTests(unittest.TestCase):
                         "sha256": sha256(raw).hexdigest()},
                     "classification": (
                         "exact_return" if index == 0 else
-                        CLASSIFICATION if index == 6 else
+                        CLASSIFICATION if index == 7 else
                         "one_recurring_micro_raster_alternate"),
                 })
             physical = {
@@ -173,10 +242,15 @@ class PinnedBorderTests(unittest.TestCase):
                 "classification": CLASSIFICATION,
                 "observed_frame_sha256": sha256(first).hexdigest(),
                 "observed_frame_id_sha256": sha256(b"frame-0").hexdigest(),
+                "observed_url": "http://localhost/odoo/purchase/1",
+                "physical_url": "http://localhost/odoo/purchase/1",
+                "target_point": {"x": 508, "y": 479},
                 "physical_frame_ref": samples[-1]["sampled_frame_ref"],
                 "target_control": {
                     "ref": "c005", "role": "input", "label": "",
-                    "visible": True, "bounds": [500, 470, 520, 490]},
+                    "visible": True, "enabled": True,
+                    "purchase_rfq_view": True,
+                    "bounds": [500, 470, 520, 490]},
                 "pinned_pixel_coordinates": [[41, 419], [132, 419]],
             }
             trace = {
@@ -184,19 +258,73 @@ class PinnedBorderTests(unittest.TestCase):
                     "step": 0,
                     "frame": {"path": "frames/observed.png",
                               "sha256": sha256(first).hexdigest()},
-                    "contract_receipt": {"physical_dispatch_guard": physical},
+                    "contract_receipt": {
+                        "physical_dispatch_guard": physical,
+                        "action_type": "double_click",
+                        "frame_id_sha256": sha256(b"frame-0").hexdigest(),
+                        "control_count": 1},
                 }],
                 "pre_intent_rejections": [],
                 "exact_return_guard_samples": samples,
             }
             independent._exact_return_chain(
-                attempt, trace, require_pinned_profile=True)
+                attempt, trace, require_pinned_profile=True,
+                family="purchase")
+            pristine = deepcopy(trace)
             physical["target_control"]["bounds"] = [20, 400, 520, 490]
             with self.assertRaisesRegex(
                     independent.ScaleAuditError,
                     "scale_pinned_physical_dispatch_target_or_pixels_invalid"):
                 independent._exact_return_chain(
-                    attempt, trace, require_pinned_profile=True)
+                    attempt, trace, require_pinned_profile=True,
+                    family="purchase")
+            for field, value in (("ref", "c999"), ("role", "button"),
+                                 ("label", "forged"), ("enabled", False),
+                                 ("purchase_rfq_view", False)):
+                forged = deepcopy(pristine)
+                forged["actions"][0]["contract_receipt"][
+                    "physical_dispatch_guard"]["target_control"][field] = value
+                with self.assertRaises(independent.ScaleAuditError,
+                                       msg=field):
+                    independent._exact_return_chain(
+                        attempt, forged, require_pinned_profile=True,
+                        family="purchase")
+            for field, value in (("target_point", {"x": 600, "y": 479}),
+                                 ("physical_url", "http://localhost/odoo/sales/1"),
+                                 ("classification", "exact_physical_frame")):
+                forged = deepcopy(pristine)
+                forged["actions"][0]["contract_receipt"][
+                    "physical_dispatch_guard"][field] = value
+                with self.assertRaises(independent.ScaleAuditError,
+                                       msg=field):
+                    independent._exact_return_chain(
+                        attempt, forged, require_pinned_profile=True,
+                        family="purchase")
+            with self.assertRaisesRegex(
+                    independent.ScaleAuditError,
+                    "scale_pinned_physical_dispatch_target_or_pixels_invalid"):
+                independent._exact_return_chain(
+                    attempt, pristine, require_pinned_profile=True,
+                    family="sales")
+            interleaved = deepcopy(pristine)
+            interleaved["exact_return_guard_samples"][2]["step"] = 1
+            with self.assertRaises(independent.ScaleAuditError):
+                independent._exact_return_chain(
+                    attempt, interleaved, require_pinned_profile=True,
+                    family="purchase")
+            forged_visible = deepcopy(visible_payload)
+            forged_visible["controls"][0]["label"] = "forged"
+            visible.write_bytes(protocol.canonical(forged_visible))
+            saved_intent = protocol.private_json(intent)
+            saved_intent["visible_text_ref"]["sha256"] = sha256(
+                visible.read_bytes()).hexdigest()
+            intent.write_bytes(protocol.canonical(saved_intent))
+            with self.assertRaisesRegex(
+                    independent.ScaleAuditError,
+                    "scale_model_visible_controls_action_or_frame_unbound"):
+                independent._exact_return_chain(
+                    attempt, pristine, require_pinned_profile=True,
+                    family="purchase")
 
 
 class PinnedRetryGateTests(unittest.TestCase):

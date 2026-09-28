@@ -22,6 +22,8 @@ OLD_LEASE_FREEZE_SHA256 = "f32a309bffddc411e8c317e23b322a7707bedc27e64f20b14c5be
 EXACT_RETURN_DRAFT_SHA256 = "4b4e8bf2f1f36fb4b04c7867be50cbc540f8a0fa30c3badad07b1293366fdaf0"
 SELECTION_GATE_AUDIT_FREEZE_SHA256 = "4c2729791c5adc4aaa817029afbd518e30514f8a66cbe64dcb31e0cd2e58d931"
 BLANK_COMPOSE_FREEZE_SHA256 = "cf1344cf5a8640cec013ec982000b20852a78f6a611e1e9c2b3e8a499ee087ee"
+PINNED_BORDER_DRAFT_SHA256 = "43e6cae93cfc4d8b7d231ccc9118dc316e56d0db3a453810b24acfef71e31f8b"
+OBSERVATION_BOUND_DRAFT_SHA256 = "a7f8c8f3f9570961cdfe2c070941f79a69c348367fce165712f922109fb1e01f"
 PINNED_BORDER_PROFILE = "pinned-noninteractive-border-dispatch-2026-09-29"
 EXACT_RETURN_AMENDMENT = "exact-frame-return-2026-09-28"
 PRIVATE_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-v1"
@@ -137,7 +139,7 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 "scale_historical_source_freeze_changed")
     else:
         require(value.get("status") ==
-                "frozen_after_pinned_border_dispatch_and_second_failure_audit" and
+                "frozen_after_visible_control_and_final_physical_frame_audit" and
                 value.get("frame_guard_amendment") == EXACT_RETURN_AMENDMENT and
                 value.get("physical_dispatch_profile") ==
                 PINNED_BORDER_PROFILE and
@@ -149,6 +151,10 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
                 SELECTION_GATE_AUDIT_FREEZE_SHA256 and
                 value.get("old_blank_compose_freeze_sha256") ==
                 BLANK_COMPOSE_FREEZE_SHA256 and
+                value.get("old_pinned_border_draft_sha256") ==
+                PINNED_BORDER_DRAFT_SHA256 and
+                value.get("old_observation_bound_draft_sha256") ==
+                OBSERVATION_BOUND_DRAFT_SHA256 and
                 value.get("selection_second_failure_public_sha256") ==
                 digest((ROOT / "docs/evidence" /
                     "odoo-v066-selection-second-post-intent-stale-2026-09-29.json"

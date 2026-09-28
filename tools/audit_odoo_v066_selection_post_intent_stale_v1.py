@@ -60,7 +60,10 @@ def _ref(attempt: Path, reference: dict) -> Path:
 
 def _two_pinned_pixels(observed_path: Path, current_path: Path) -> bool:
     with Image.open(observed_path) as source, Image.open(current_path) as now:
-        a, b = source.convert("RGB"), now.convert("RGB")
+        if (source.format != "PNG" or now.format != "PNG" or
+                source.mode != "RGB" or now.mode != "RGB"):
+            return False
+        a, b = source.copy(), now.copy()
     if a.size != b.size or a.size != (1440, 1000):
         return False
     changed = {}

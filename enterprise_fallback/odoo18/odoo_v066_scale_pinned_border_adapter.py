@@ -8,6 +8,9 @@ remain private; every dispatch receipt states which physical rule was used.
 
 from __future__ import annotations
 
+import re
+from urllib.parse import urlsplit
+
 from cursibench.scale_action_contract import ContractError, validate_action
 
 from .odoo_native_adapter import _digest
@@ -35,12 +38,18 @@ TARGET_ELEMENT_JS = """({x, y}) => {
       el.getAttribute('name') || '').trim().replace(/\\s+/g, ' ').slice(0, 220),
     visible: rect.width > 2 && rect.height > 2 &&
       style.display !== 'none' && style.visibility !== 'hidden',
+    enabled: !el.disabled,
+    purchase_rfq_view: /^\\/odoo\\/purchase\\/[0-9]+$/.test(location.pathname) &&
+      !!document.querySelector('.o_form_view') &&
+      !document.querySelector('iframe.o-FileViewer-view') &&
+      document.body.innerText.includes('Request for Quotation'),
     bounds: [rect.left, rect.top, rect.right, rect.bottom]
   };
 }"""
 
 
 def _target_outside_pinned_border(action: dict, current_control: dict | None,
+                                  observed_control: dict | None,
                                   observation) -> bool:
     if action.get("type") not in ("click", "double_click", "type"):
         return False
@@ -51,7 +60,17 @@ def _target_outside_pinned_border(action: dict, current_control: dict | None,
     if type(x) is not int or type(y) is not int or any(
             abs(x - px) <= 8 and abs(y - py) <= 8 for px, py in PIXELS):
         return False
-    if type(current_control) is not dict or not current_control.get("visible"):
+    if (type(current_control) is not dict or
+            type(observed_control) is not dict or
+            current_control.get("visible") is not True or
+            current_control.get("enabled") is not True or
+            observed_control.get("visible") is not True or
+            observed_control.get("enabled") is not True or
+            current_control.get("purchase_rfq_view") is not True or
+            observed_control.get("purchase_rfq_view") is not True or
+            any(current_control.get(key) != observed_control.get(key)
+                for key in ("ref", "role", "label", "bounds",
+                            "purchase_rfq_view"))):
         return False
     bounds = current_control.get("bounds")
     if (type(bounds) is not list or len(bounds) != 4 or
@@ -77,6 +96,17 @@ class OdooV066ScalePinnedBorderAdapter(OdooV066ScaleExactReturnAdapter):
         super().__init__(*args, **kwargs)
         self._pending_dispatch_action: dict | None = None
         self._physical_guard_receipt: dict | None = None
+        self.observed_target_control: dict | None = None
+
+    def parse_current_action(self, raw: str) -> dict:
+        action = super().parse_current_action(raw)
+        self.observed_target_control = None
+        if (action.get("type") in ("click", "double_click", "type") and
+                type(action.get("target")) is dict and
+                set(action["target"]) == {"x", "y"}):
+            self.observed_target_control = self.page.evaluate(
+                TARGET_ELEMENT_JS, action["target"])
+        return action
 
     def _frame_current(self, observation, *, stage: str) -> bool:
         start = len(self.frame_guard_samples)
@@ -93,6 +123,10 @@ class OdooV066ScalePinnedBorderAdapter(OdooV066ScaleExactReturnAdapter):
                 "physical_frame_ref": last["sampled_frame_ref"],
                 "observed_frame_id_sha256":
                     _digest(observation.frame_id.encode()),
+                "observed_url": self.latest_url,
+                "physical_url": self.page.url,
+                "target_point": self._pending_dispatch_action.get("target")
+                    if self._pending_dispatch_action else None,
                 "target_control": None,
                 "pinned_pixel_coordinates": [],
             }
@@ -101,6 +135,8 @@ class OdooV066ScalePinnedBorderAdapter(OdooV066ScaleExactReturnAdapter):
         action = self._pending_dispatch_action
         if (action is None or len(samples) != MAX_EXACT_RETURN_SAMPLES or
                 self.page.url != self.latest_url or
+                not re.fullmatch(
+                    r"/odoo/purchase/[0-9]+", urlsplit(self.page.url).path) or
                 observation.task_id != self.task_id or
                 observation.task_binding_sha256 != self.task_binding_sha256 or
                 any(sample.get("classification") !=
@@ -113,17 +149,42 @@ class OdooV066ScalePinnedBorderAdapter(OdooV066ScaleExactReturnAdapter):
         if type(target) is not dict or set(target) != {"x", "y"}:
             return False
         current = self.page.evaluate(TARGET_ELEMENT_JS, target)
-        if not _target_outside_pinned_border(action, current, observation):
+        if not _target_outside_pinned_border(
+                action, current, self.observed_target_control, observation):
             return False
-        last = samples[-1]
-        last["classification"] = CLASSIFICATION
+        if self.page.url != self.latest_url:
+            return False
+        final_png = self.page.screenshot(type="png")
+        final_sha = _digest(final_png)
+        final_ref = self.frame_guard_sink(
+            len(self.frame_guard_samples), final_png)
+        if (type(final_ref) is not dict or
+                final_ref.get("sha256") != final_sha):
+            raise ContractError("invalid_observation")
+        accepted = final_sha == samples[-1]["sampled_frame_ref"]["sha256"]
+        self.frame_guard_samples.append({
+            "step": self.step,
+            "stage": "dispatch",
+            "sample": MAX_EXACT_RETURN_SAMPLES,
+            "observed_frame_sha256": observation.screenshot["sha256"],
+            "observed_frame_id_sha256":
+                _digest(observation.frame_id.encode()),
+            "sampled_frame_ref": final_ref,
+            "classification": (CLASSIFICATION if accepted else
+                               "third_or_material_frame_rejected"),
+        })
+        if not accepted or self.page.url != self.latest_url:
+            return False
         self._physical_guard_receipt = {
             "profile": PROFILE,
             "classification": CLASSIFICATION,
             "observed_frame_sha256": observation.screenshot["sha256"],
-            "physical_frame_ref": last["sampled_frame_ref"],
+            "physical_frame_ref": final_ref,
             "observed_frame_id_sha256":
                 _digest(observation.frame_id.encode()),
+            "observed_url": self.latest_url,
+            "physical_url": self.page.url,
+            "target_point": target,
             "target_control": current,
             "pinned_pixel_coordinates": [list(point) for point in PIXELS],
         }

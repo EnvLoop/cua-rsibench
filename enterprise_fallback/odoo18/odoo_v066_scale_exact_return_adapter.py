@@ -32,7 +32,10 @@ ALLOWED_FLICKER_RGB_PAIRS = {
 def _micro_raster_alternate(observed: bytes, current: bytes) -> bool:
     try:
         with Image.open(BytesIO(observed)) as first, Image.open(BytesIO(current)) as second:
-            a, b = first.convert("RGB"), second.convert("RGB")
+            if (first.format != "PNG" or second.format != "PNG" or
+                    first.mode != "RGB" or second.mode != "RGB"):
+                return False
+            a, b = first.copy(), second.copy()
     except (OSError, ValueError):
         return False
     if a.size != b.size or a.size != (1440, 1000):
