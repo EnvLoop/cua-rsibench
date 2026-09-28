@@ -11,7 +11,8 @@ from __future__ import annotations
 import re
 from urllib.parse import urlsplit
 
-from cursibench.scale_action_contract import ContractError, validate_action
+from cursibench.scale_action_contract import ContractError
+from cursibench.scale_action_contract_v066 import validate_action
 
 from .odoo_native_adapter import _digest
 from .odoo_v066_scale_exact_return_adapter import (
