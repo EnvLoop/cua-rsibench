@@ -39,6 +39,22 @@ class CalcWriterExporterTests(unittest.TestCase):
             self.assertIsNone(public["benchmark_score"])
             self.assertEqual(public["official_final_admissions"], 0)
 
+    def test_two_source_aggregate_has_no_training_or_score_claim(self):
+        root = Path(__file__).resolve().parents[1]
+        summary = json.loads((root / "docs/evidence" /
+            "native-wdi-v066-calc-writer-sft-sources-2026-09-28.json"
+            ).read_bytes())
+        self.assertEqual(summary["shared_helper_source_sha256"],
+                         common.digest(Path(common.__file__).read_bytes()))
+        self.assertEqual(summary["calc_exporter_source_sha256"],
+                         common.digest(Path(calc.__file__).read_bytes()))
+        self.assertEqual(summary["writer_exporter_source_sha256"],
+                         common.digest(Path(writer.__file__).read_bytes()))
+        self.assertEqual(summary["total_real_gui_train_turns"], 20)
+        self.assertFalse(summary["source_manifest_or_tinker_training_call_performed"])
+        self.assertIsNone(summary["benchmark_score"])
+        self.assertEqual(summary["official_final_admissions"], 0)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
