@@ -1,0 +1,26 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "action_type_counts": {
+    "click": 3,
+    "double_click": 1,
+    "key": 8,
+    "type": 1,
+    "wait": 5
+  },
+  "benchmark_score": null,
+  "cell_id": "desktop-native",
+  "exporter_source_sha256": "f047ff5473aee65e4985b68e90f8eef81b6d4382d7980a0418d17ad6e6b89b19",
+  "model": "Qwen/Qwen3.8-27B",
+  "official_final_admissions": 0,
+  "private_render_sha256": "fb8a24d1973023d40dfd569e7d9d4338482206f9c7dbe5d39666025a7d89e240",
+  "prompt_tokens_total": 29627,
+  "provider_calls": 0,
+  "ratification_sha256": "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359",
+  "real_gui_train_turns": 18,
+  "saved_artifact_sha256": "eb746329cc71f4dfb776877fc76b3d3be00ecb3ef789b251044ecca71577bd86",
+  "schema": "envloop-desktop-v066-public-train-sft-render-public-v1",
+  "source_gui_receipt_sha256": "0a3da0c06a4b60d6de61c95eb629593ff5d305d9ffd659d2455312f892847aca",
+  "status": "evaluator_scripted_public_train_gui_rendered_offline",
+  "supervised_datum_tokens_max": 1673,
+  "supervised_datum_tokens_total": 29876
+}
