@@ -18,6 +18,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 RATIFICATION_SHA = "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359"
 SOURCE_FREEZE_SCHEMA = "envloop-odoo-v066-scale-gui-source-freeze-v1"
+OLD_LEASE_FREEZE_SHA256 = "f32a309bffddc411e8c317e23b322a7707bedc27e64f20b14c5be2fefbc8179c"
+EXACT_RETURN_AMENDMENT = "exact-frame-return-2026-09-28"
 PRIVATE_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-v1"
 PUBLIC_PLAN_SCHEMA = "envloop-odoo-v066-split-gui-control-plan-public-v1"
 CASE_SCHEMA = "envloop-odoo-v066-split-gui-case-control-v1"
@@ -31,10 +33,12 @@ SOURCE_FILES = (
     "tools/odoo_v066_scale_recipes_v1.py",
     "tools/odoo_v066_scale_controller_v1.py",
     "tools/odoo_v066_scale_audit_v1.py",
+    "tools/audit_odoo_v066_selection_flicker_v1.py",
     "tools/audit_odoo_v066_inline_lease_incident_v1.py",
     "tools/prepare_odoo_v066_lease_timing_adoption_v1.py",
     "tools/record_odoo_v066_train_gui_v1.py",
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
+    "enterprise_fallback/odoo18/odoo_v066_scale_exact_return_adapter.py",
     "enterprise_fallback/odoo18/odoo_native_adapter.py",
     "enterprise_fallback/odoo18/verify.py",
     "enterprise_fallback/odoo18/reset.py",
@@ -112,24 +116,34 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
     value = public_json(path)
     raw = path.read_bytes()
     require(value.get("schema") == SOURCE_FREEZE_SCHEMA and
-            value.get("status") == "frozen_after_pre_result_lease_audit_timing_amendment" and
             value.get("ratification_sha256") == RATIFICATION_SHA and
-            value.get("source_sha256s") == current_source_hashes() and
-            value.get("host_runtime") == host_runtime() and
-            value.get("old_source_freeze_sha256") == digest((
-                ROOT / "docs/evidence/odoo-v066-scale-control-source-freeze-2026-09-28.json"
-            ).read_bytes()) and
-            value.get("incident_public_sha256") == digest((
-                ROOT / "docs/evidence/odoo-v066-scale-first-train-inline-lease-incident-2026-09-28.json"
-            ).read_bytes()) and
-            value.get("train_raw_complete_before_new_freeze") == 1 and
-            value.get("train_case_reclassified_before_new_freeze") is False and
-            value.get("accepted_train_pilot_count") == 1 and
-            value.get("selection_gui_controls_before_freeze") == 0 and
-            value.get("final_gui_controls_before_freeze") == 0 and
             value.get("official_final_tasks_admitted") == 0 and
             value.get("model_attempts") == 0,
             "scale_source_freeze_changed_or_nonzero")
+    if value.get("status") == "frozen_after_pre_result_lease_audit_timing_amendment":
+        # Historical batches are read-only auditable under their immutable
+        # source freeze. This branch must never authorize a current dispatch.
+        require(digest(raw) == OLD_LEASE_FREEZE_SHA256 and
+                value.get("train_raw_complete_before_new_freeze") == 1 and
+                value.get("train_case_reclassified_before_new_freeze") is False and
+                value.get("selection_gui_controls_before_freeze") == 0 and
+                value.get("final_gui_controls_before_freeze") == 0,
+                "scale_historical_source_freeze_changed")
+    else:
+        require(value.get("status") ==
+                "frozen_after_selection_exact_frame_return_amendment" and
+                value.get("frame_guard_amendment") == EXACT_RETURN_AMENDMENT and
+                value.get("old_source_freeze_sha256") ==
+                OLD_LEASE_FREEZE_SHA256 and
+                value.get("selection_failure_public_sha256") == digest((
+                    ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json"
+                ).read_bytes()) and
+                value.get("source_sha256s") == current_source_hashes() and
+                value.get("host_runtime") == host_runtime() and
+                value.get("accepted_train_pilot_count") == 1 and
+                value.get("retained_selection_failed_controls_before_freeze") == 1 and
+                value.get("official_final_gui_controls_before_freeze") == 0,
+                "scale_exact_return_source_freeze_changed_or_nonzero")
     return value, digest(raw)
 
 
@@ -233,6 +247,7 @@ def build_split_plan(*, split: str, worker_dir: Path,
         "task_set_manifest_sha256": full["task_set_manifest_sha256"],
         "checkpoint": full["checkpoints"][split],
         "source_sha256s": source_freeze["source_sha256s"],
+        "frame_guard_amendment": source_freeze.get("frame_guard_amendment"),
         "task_count": count,
         "world_case_count": world_count,
         "accepted_train_pilot_excluded": split == "train",
@@ -272,6 +287,8 @@ def validate_split_plan(*, split: str, private_path: Path,
             private.get("ratification_sha256") == RATIFICATION_SHA and
             private.get("source_freeze_sha256") == freeze_sha and
             private.get("source_sha256s") == source_freeze["source_sha256s"] and
+            private.get("frame_guard_amendment") ==
+            source_freeze.get("frame_guard_amendment") and
             private.get("task_count") == count and
             private.get("world_case_count") == SPLITS[split][3] and
             private.get("accepted_train_pilot_excluded") is (split == "train") and

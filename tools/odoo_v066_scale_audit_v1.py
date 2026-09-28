@@ -10,10 +10,13 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
+from io import BytesIO
 import json
 import os
 from pathlib import Path
 import stat
+
+from PIL import Image, ImageChops
 
 from enterprise_fallback.odoo18 import v066_requalification_pilot as pilot
 from enterprise_fallback.odoo18.partition_factory import source_asset
@@ -77,7 +80,115 @@ def _lease(events_path: Path, pid: int, start: datetime,
     return False
 
 
-def _action_chain(attempt: Path, trace: dict, row: dict) -> tuple[int, int, int]:
+def _micro_alternate_independent(first: bytes, second: bytes) -> bool:
+    with Image.open(BytesIO(first)) as source, Image.open(BytesIO(second)) as sampled:
+        a, b = source.convert("RGB"), sampled.convert("RGB")
+    require(a.size == b.size == (1440, 1000),
+            "scale_guard_frame_geometry_changed")
+    box = ImageChops.difference(a, b).getbbox()
+    if box is None:
+        return False
+    changes = {}
+    for row in range(box[1], box[3]):
+        for col in range(box[0], box[2]):
+            old, new = a.getpixel((col, row)), b.getpixel((col, row))
+            if old == new:
+                continue
+            changes[(col, row)] = (old, new)
+            if len(changes) > 2:
+                return False
+    return set(changes) == {(41, 419), (132, 419)} and all(
+        pair in {((235, 237, 239), (235, 237, 240)),
+                 ((235, 237, 240), (235, 237, 239))}
+        for pair in changes.values())
+
+
+def _exact_return_chain(attempt: Path, trace: dict) -> None:
+    samples = trace.get("exact_return_guard_samples")
+    require(type(samples) is list and samples,
+            "scale_exact_return_guard_missing")
+    observed = {}
+    successful_frames = {}
+    for action in trace["actions"]:
+        _, raw = pilot._ref(attempt, action["frame"], image=True)
+        candidates = sorted((attempt / "actions").glob(
+            f"step-{action['step']:03d}*-intent.private.json"))
+        require(len(candidates) == 1,
+                "scale_exact_return_action_intent_missing")
+        intent = protocol.private_json(candidates[0])
+        frame_id_sha = protocol.digest(intent["frame_id"].encode())
+        key = (action["frame"]["sha256"], frame_id_sha)
+        observed[key] = raw
+        successful_frames[action["step"]] = key
+    for reference in trace["pre_intent_rejections"]:
+        rejection = pilot._artifact_json(attempt, reference)
+        frame = rejection["observed_frame_ref"]
+        _, raw = pilot._ref(attempt, frame, image=True)
+        observed[(frame["sha256"], rejection["frame_id_sha256"])] = raw
+    prior_step = -1
+    grouped = {}
+    for index, sample in enumerate(samples):
+        step, stage = sample.get("step"), sample.get("stage")
+        source_key = (sample.get("observed_frame_sha256"),
+                      sample.get("observed_frame_id_sha256"))
+        require(type(step) is int and step >= prior_step and
+                stage in ("parse", "dispatch") and
+                sample.get("sample") in range(6) and
+                source_key in observed and
+                sample.get("classification") in (
+                    "exact_return", "one_recurring_micro_raster_alternate"),
+                "scale_exact_return_sample_order_or_class_invalid")
+        prior_step = step
+        ref = sample.get("sampled_frame_ref")
+        require(type(ref) is dict and
+                ref.get("path") == f"frames/guard-{index:04d}.png",
+                "scale_exact_return_sample_path_changed")
+        _, raw = pilot._ref(attempt, ref, image=True)
+        sampled_sha = protocol.digest(raw)
+        observed_sha = source_key[0]
+        group = grouped.setdefault((step, source_key, stage), [])
+        require(sample["sample"] == len(group) and
+                len(group) < 6 and
+                (not group or group[-1][1] != "exact_return"),
+                "scale_exact_return_sample_bounded_sequence_invalid")
+        group.append((sampled_sha, sample["classification"]))
+        if sample["classification"] == "exact_return":
+            require(sampled_sha == observed_sha,
+                    "scale_exact_return_digest_not_exact")
+        else:
+            require(sampled_sha != observed_sha and
+                    _micro_alternate_independent(observed[source_key], raw),
+                    "scale_exact_return_alternate_not_micro")
+    alternatives_by_observation = {}
+    for (step, source_key, _stage), group in grouped.items():
+        alternatives_by_observation.setdefault((step, source_key), set()).update(
+            digest for digest, classification in group
+            if classification == "one_recurring_micro_raster_alternate")
+    require(all(len(alternatives) <= 1 for alternatives in
+                alternatives_by_observation.values()),
+            "scale_exact_return_third_frame_present")
+    for action in trace["actions"]:
+        step = action["step"]
+        source_key = successful_frames[step]
+        parse = grouped.get((step, source_key, "parse"), [])
+        dispatch = grouped.get((step, source_key, "dispatch"), [])
+        require(parse and dispatch and
+                parse[-1][1] == dispatch[-1][1] == "exact_return" and
+                next(index for index, sample in enumerate(samples)
+                     if sample.get("step") == step and
+                     sample.get("observed_frame_id_sha256") == source_key[1] and
+                     sample.get("stage") == "parse" and
+                     sample.get("classification") == "exact_return") <
+                next(index for index, sample in enumerate(samples)
+                     if sample.get("step") == step and
+                     sample.get("observed_frame_id_sha256") == source_key[1] and
+                     sample.get("stage") == "dispatch" and
+                     sample.get("classification") == "exact_return"),
+                "scale_action_not_guarded_by_exact_return")
+
+
+def _action_chain(attempt: Path, trace: dict, row: dict,
+                  *, require_exact_return_guard: bool = False) -> tuple[int, int, int]:
     actions = trace.get("actions")
     rejections = trace.get("pre_intent_rejections")
     require(trace.get("schema") == controller.TRACE_SCHEMA and
@@ -147,6 +258,8 @@ def _action_chain(attempt: Path, trace: dict, row: dict) -> tuple[int, int, int]
                 "scale_pre_intent_rejection_invalid")
         pilot._ref(attempt, rejected["observed_frame_ref"], image=True)
         pilot._ref(attempt, rejected["assistant_action_ref"])
+    if require_exact_return_guard:
+        _exact_return_chain(attempt, trace)
     require(positive > 0 and negative > 0,
             "scale_positive_or_negative_gui_phase_missing")
     return positive, negative, len(rejections)
@@ -199,7 +312,9 @@ def audit_case(*, plan: dict, row: dict, attempt: Path,
             artifacts[name] = pilot._artifact_json(attempt, ref)
     trace = artifacts["gui_trace"]
     positive_actions, negative_actions, rejected = _action_chain(
-        attempt, trace, row)
+        attempt, trace, row,
+        require_exact_return_guard=(plan.get("frame_guard_amendment") ==
+                                    "exact-frame-return-2026-09-28"))
     require(refs["source_frame"]["sha256"] in {
         action["frame"]["sha256"] for action in trace["actions"]},
         "scale_source_not_in_native_gui_trace")

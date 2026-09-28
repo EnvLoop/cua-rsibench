@@ -107,21 +107,19 @@ class ScalePlanTests(unittest.TestCase):
         self.freeze = self.root / "freeze.public.json"
         write(self.freeze, {
             "schema": protocol.SOURCE_FREEZE_SCHEMA,
-            "status": "frozen_after_pre_result_lease_audit_timing_amendment",
+            "status": "frozen_after_selection_exact_frame_return_amendment",
             "ratification_sha256": protocol.RATIFICATION_SHA,
             "source_sha256s": protocol.current_source_hashes(),
             "host_runtime": protocol.host_runtime(),
             "train_pilot_public_sha256": protocol.digest(
                 self.train_pilot.read_bytes()),
             "accepted_train_pilot_count": 1,
-            "old_source_freeze_sha256": protocol.digest((
-                protocol.ROOT / "docs/evidence/odoo-v066-scale-control-source-freeze-2026-09-28.json").read_bytes()),
-            "incident_public_sha256": protocol.digest((
-                protocol.ROOT / "docs/evidence/odoo-v066-scale-first-train-inline-lease-incident-2026-09-28.json").read_bytes()),
-            "train_raw_complete_before_new_freeze": 1,
-            "train_case_reclassified_before_new_freeze": False,
-            "selection_gui_controls_before_freeze": 0,
-            "final_gui_controls_before_freeze": 0,
+            "old_source_freeze_sha256": protocol.OLD_LEASE_FREEZE_SHA256,
+            "frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT,
+            "selection_failure_public_sha256": protocol.digest((
+                protocol.ROOT / "docs/evidence/odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json").read_bytes()),
+            "retained_selection_failed_controls_before_freeze": 1,
+            "official_final_gui_controls_before_freeze": 0,
             "official_final_tasks_admitted": 0,
             "model_attempts": 0}, private=False)
 
@@ -293,6 +291,23 @@ class LeaseTimingTests(unittest.TestCase):
 
 
 class HoldoutActionTests(unittest.TestCase):
+    def test_train_exact_return_cannot_replay_without_source_transition(self):
+        from unittest.mock import patch
+        with patch.object(controller, "_preflight", return_value=(
+                {"frame_guard_amendment": protocol.EXACT_RETURN_AMENDMENT},
+                Path("/unused/private"))), patch.object(
+                    controller, "_modules", side_effect=AssertionError(
+                        "modules must not load")):
+            with self.assertRaisesRegex(
+                    controller.ScaleControlError,
+                    "scale_train_requires_separate_source_transition"):
+                controller.run(
+                    split="train", worker_dir=Path("/unused/train"),
+                    private_plan_path=Path("/unused/plan"),
+                    public_plan_path=Path("/unused/public"),
+                    source_freeze_path=Path("/unused/freeze"),
+                    run_dir=Path("/unused/run"), resume=False, max_cases=1)
+
     def test_current_frame_actions_never_create_sft_candidate(self):
         with tempfile.TemporaryDirectory() as scratch:
             out = Path(scratch) / "attempt"

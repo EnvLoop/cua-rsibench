@@ -21,10 +21,16 @@ class OdooV066TrainAdapter(OdooNativeAdapter):
         observation, _historical_payload = self.observe(memory=memory)
         return observation, render_for_model(observation)
 
+    def _frame_current(self, observation, *, stage: str) -> bool:
+        """Keep the train profile's original single exact screenshot check."""
+        return (self.page.url == self.latest_url and
+                _digest(self.page.screenshot(type="png")) ==
+                observation.screenshot["sha256"])
+
     def parse_current_action(self, raw: str) -> dict:
         observation = self.latest
-        if observation is None or self.page.url != self.latest_url or _digest(
-                self.page.screenshot(type="png")) != observation.screenshot["sha256"]:
+        if observation is None or not self._frame_current(
+                observation, stage="parse"):
             raise ContractError("stale_frame")
         return normalize_model_action(raw, observation,
                                       current_frame_id=observation.frame_id)
@@ -34,9 +40,7 @@ class OdooV066TrainAdapter(OdooNativeAdapter):
         observation = self.latest
         if observation is None:
             raise ContractError("stale_frame")
-        if (self.page.url != self.latest_url or
-                _digest(self.page.screenshot(type="png"))
-                != observation.screenshot["sha256"]):
+        if not self._frame_current(observation, stage="dispatch"):
             self.latest = None
             raise ContractError("stale_frame")
         action = validate_action(raw_action, observation,

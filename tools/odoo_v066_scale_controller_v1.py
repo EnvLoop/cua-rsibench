@@ -30,6 +30,7 @@ CASE_STATUS = "raw_gui_positive_negative_reset_complete_source_review_pending"
 INTENT_SCHEMA = "envloop-odoo-v066-scale-case-intent-v1"
 JOURNAL_SCHEMA = "envloop-odoo-v066-scale-control-journal-event-v1"
 TRACE_SCHEMA = "envloop-odoo-v066-gui-control-trace-v1"
+SELECTION_RETRY_GATE_SCHEMA = "envloop-odoo-v066-selection-exact-frame-return-retry-gate-v1"
 STAGES = ("pre_restore", "source_observed", "positive_reload",
           "positive_sql", "negative_reload", "negative_sql", "post_restore")
 
@@ -277,8 +278,9 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
                    case: dict, wrong: dict, family: str,
                    modules) -> dict:
     from playwright.sync_api import sync_playwright
-    from enterprise_fallback.odoo18.odoo_v066_train_adapter import (
-        OdooV066TrainAdapter, VIEWPORT)
+    from enterprise_fallback.odoo18.odoo_v066_train_adapter import VIEWPORT
+    from enterprise_fallback.odoo18.odoo_v066_scale_exact_return_adapter import (
+        OdooV066ScaleExactReturnAdapter)
     factory, gui_controls, reset, verify, _lease = modules
     private = factory.PRIVATE
     attempt = run_dir / f"attempt-{ordinal:03d}"
@@ -332,11 +334,17 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
                                        credentials["login"])
             page.goto(f"http://127.0.0.1:{config['ODOO_PORT']}" +
                       recipes.ROUTES[family])
-            adapter = OdooV066TrainAdapter(
+            adapter = OdooV066ScaleExactReturnAdapter(
                 page, task_id=case["id"],
                 task_binding_sha256=row["package_sha256"],
                 instruction=case["prompt"])
             journal = HoldoutJournal(adapter, page, attempt)
+            def save_guard_sample(index: int, png: bytes) -> dict:
+                reference = _save(
+                    attempt / "frames" / f"guard-{index:04d}.png", png)
+                reference["path"] = "frames/" + reference["path"]
+                return reference
+            adapter.frame_guard_sink = save_guard_sample
             failure_stage = "source_gui"
             source_frame, source_label = recipes.show_source(
                 page, journal, family, case, int(config["ODOO_PORT"]))
@@ -446,6 +454,8 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
                 "task_binding_sha256": row["task_binding_sha256"],
                 "actions": journal.trace,
                 "pre_intent_rejections": journal.pre_intent_rejections,
+                "exact_return_guard_samples":
+                    journal.adapter.frame_guard_samples,
                 "sft_examples_written": 0,
             })
         if not reset_exact or not services_restored:
@@ -534,6 +544,211 @@ def verify_reclassified_current_baseline(run_dir: Path,
         worker_private / "baseline-filestore-manifest.json")
     require(sql == frozen_sql and files == frozen_files,
             "scale_reclassified_current_baseline_artifacts_changed")
+
+
+def _selection_retry_gate(*, gate_path: Path, worker: Path, plan: dict,
+                          private_plan_path: Path, source_freeze_path: Path,
+                          old_run_dir: Path, incident_public_path: Path,
+                          require_unchanged_lease_log: bool) -> dict:
+    root = worker / "private" / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260928-v1").resolve() and
+            not old_run_dir.is_symlink(),
+            "scale_selection_original_failed_run_not_selected")
+    require(gate_path.parent.resolve() == root.resolve() and
+            gate_path.name == "selection-exact-return-retry-gate.private.json",
+            "scale_selection_retry_gate_path_invalid")
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_journal = old_run_dir / "journal.private.jsonl"
+    rows, tail, count = read_journal(old_journal)
+    require(gate.get("schema") == SELECTION_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "old_failure_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("selection_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_run_dir / "attempt-000/failure.private.json").read_bytes()) and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_run_dir / "attempt-000/gui_trace.json").read_bytes()) ==
+            incident.get("gui_trace_sha256") and
+            gate.get("old_step_three_intent_or_dispatch") is False and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0 and
+            gate.get("model_attempts") == 0 and
+            not (old_run_dir / "attempt-000/actions/step-003-intent.private.json").exists() and
+            not (old_run_dir / "attempt-000/actions/step-003-result.private.json").exists(),
+            "scale_selection_retry_old_failure_or_authority_changed")
+    sql_path = root / "selection-retry-current-sql.private.json"
+    files_path = root / "selection-retry-current-filestore.private.json"
+    sql = protocol.private_json(sql_path)
+    files = protocol.private_json(files_path)
+    frozen_sql = protocol.private_json(worker / "private/baseline_snapshot.json")
+    frozen_files = protocol.private_json(
+        worker / "private/baseline-filestore-manifest.json")
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            sql == frozen_sql and files == frozen_files and
+            plan["tasks"][0]["task_id"] == rows[0]["task_id"] and
+            plan["tasks"][0]["package_sha256"] == rows[0]["package_sha256"],
+            "scale_selection_retry_live_baseline_or_same_case_not_exact")
+    if require_unchanged_lease_log:
+        events = worker / "private/worker-lease-events.jsonl"
+        require(protocol.digest(events.read_bytes()) ==
+                gate.get("worker_lease_events_sha256"),
+                "scale_selection_retry_gate_stale_worker_activity")
+    return gate
+
+
+def prepare_selection_retry_gate(*, worker_dir: Path,
+                                 new_private_plan_path: Path,
+                                 new_public_plan_path: Path,
+                                 new_source_freeze_path: Path,
+                                 old_run_dir: Path,
+                                 old_private_plan_path: Path,
+                                 old_public_plan_path: Path,
+                                 old_source_freeze_path: Path,
+                                 incident_public_path: Path,
+                                 new_run_dir: Path) -> dict:
+    """One explicit no-GUI live SQL/full-filestore check before a dated retry."""
+    worker = Path(worker_dir).resolve()
+    require(worker.name == "selection" and
+            os.environ.get("ENVLOOP_ODOO_WORKER_DIR") == str(worker),
+            "scale_selection_original_worker_not_selected")
+    plan, private = _preflight(
+        split="selection", worker_dir=worker,
+        private_plan_path=new_private_plan_path,
+        public_plan_path=new_public_plan_path,
+        source_freeze_path=new_source_freeze_path,
+        run_dir=new_run_dir, resume=False)
+    require(plan.get("frame_guard_amendment") ==
+            protocol.EXACT_RETURN_AMENDMENT,
+            "scale_selection_retry_new_source_not_bound")
+    from tools import audit_odoo_v066_selection_flicker_v1 as incident_audit
+    incident = incident_audit.audit(
+        repo=protocol.ROOT, worker=worker,
+        run_dir=old_run_dir,
+        private_plan=old_private_plan_path,
+        public_plan=old_public_plan_path,
+        source_freeze=old_source_freeze_path,
+        verify_services=True)
+    published = protocol.public_json(incident_public_path)
+    require(incident == published and
+            incident.get("old_failure_journal_retained") is True and
+            incident.get("source_evidence_captured") is False and
+            incident.get("positive_or_negative_saved_state_captured") is False,
+            "scale_selection_old_failure_not_independently_unchanged")
+    root = private / "v066_scale_controls"
+    gate_path = root / "selection-exact-return-retry-gate.private.json"
+    sql_path = root / "selection-retry-current-sql.private.json"
+    files_path = root / "selection-retry-current-filestore.private.json"
+    require(not any(path.exists() for path in (gate_path, sql_path, files_path)),
+            "scale_selection_retry_gate_refuses_overwrite")
+    factory, _gui, reset, verify, lease = _modules(worker)
+    failure = None
+    sql = files = None
+    restored = False
+    with _run_lock(root):
+        with lease.exclusive_worker_operation("v066_selection_retry_baseline"):
+            running_before = train_recorder._running(worker)
+            require(running_before == set(),
+                    "scale_selection_retry_services_not_cold")
+            try:
+                train_recorder._compose(worker, "up", "-d", "db")
+                sql = verify.snapshot()
+                config = factory.local_config()
+                files = reset.filestore_manifest(
+                    config["ODOO_PROJECT"] + "_filestore")
+            except BaseException as error:
+                failure = error
+            finally:
+                try:
+                    train_recorder._compose(worker, "stop", "db")
+                    restored = (train_recorder._running(worker) == set())
+                except BaseException as error:
+                    if failure is None:
+                        failure = error
+        if failure is not None:
+            raise ScaleControlError(
+                "scale_selection_retry_live_baseline_query_failed") from failure
+        frozen_sql = protocol.private_json(private / "baseline_snapshot.json")
+        frozen_files = protocol.private_json(
+            private / "baseline-filestore-manifest.json")
+        require(sql == frozen_sql and files == frozen_files and restored,
+                "scale_selection_retry_current_baseline_not_exact")
+        sql_ref = _save(sql_path, sql)
+        files_ref = _save(files_path, files)
+        old_journal = old_run_dir / "journal.private.jsonl"
+        _rows, old_tail, _length = read_journal(old_journal)
+        old_attempt = old_run_dir / "attempt-000"
+        require(incident_audit.audit_rejections(
+            old_attempt,
+            protocol.private_json(old_attempt / "gui_trace.json")) ==
+            (3, 2) and
+            protocol.digest(old_journal.read_bytes()) ==
+            published["journal_sha256"] and
+            protocol.digest((old_attempt / "failure.private.json").read_bytes())
+            == published["private_failure_sha256"] and
+            protocol.digest((old_attempt / "gui_trace.json").read_bytes()) ==
+            published["gui_trace_sha256"],
+            "scale_selection_old_failure_changed_during_baseline_check")
+        lease_events = private / "worker-lease-events.jsonl"
+        protocol._private(lease_events)
+        gate = {
+            "schema": SELECTION_RETRY_GATE_SCHEMA,
+            "status": "old_failure_retained_current_baseline_exact_no_gui_replay",
+            "new_private_plan_sha256":
+                protocol.digest(new_private_plan_path.read_bytes()),
+            "new_source_freeze_sha256":
+                protocol.digest(new_source_freeze_path.read_bytes()),
+            "selection_failure_public_sha256":
+                protocol.digest(incident_public_path.read_bytes()),
+            "old_journal_sha256": protocol.digest(old_journal.read_bytes()),
+            "old_journal_tail_sha256": old_tail,
+            "old_failure_sha256": protocol.digest((
+                old_run_dir / "attempt-000/failure.private.json").read_bytes()),
+            "old_gui_trace_sha256": protocol.digest((
+                old_run_dir / "attempt-000/gui_trace.json").read_bytes()),
+            "old_step_three_intent_or_dispatch": False,
+            "current_sql_sha256": sql_ref["sha256"],
+            "current_filestore_sha256": files_ref["sha256"],
+            "worker_lease_events_sha256":
+                protocol.digest(lease_events.read_bytes()),
+            "service_state_restored": True,
+            "official_final_tasks_admitted": 0,
+            "model_attempts": 0,
+        }
+        _save(gate_path, gate)
+        _selection_retry_gate(
+            gate_path=gate_path, worker=worker, plan=plan,
+            private_plan_path=new_private_plan_path,
+            source_freeze_path=new_source_freeze_path,
+            old_run_dir=old_run_dir,
+            incident_public_path=incident_public_path,
+            require_unchanged_lease_log=True)
+        return {
+            "schema": SELECTION_RETRY_GATE_SCHEMA,
+            "status": "same_id_retry_preflight_ready_no_gui_dispatched",
+            "gate_sha256": protocol.digest(gate_path.read_bytes()),
+            "old_journal_tail_sha256": old_tail,
+            "current_sql_sha256": sql_ref["sha256"],
+            "current_full_filestore_sha256": files_ref["sha256"],
+            "official_final_tasks_admitted": 0,
+            "model_attempts": 0,
+        }
 
 
 def _old_plan_adoption(*, adoption_path: Path | None,
@@ -751,9 +966,21 @@ def _execute_case_then_audit_after_release(*, lease, run_dir: Path,
                                            ordinal: int, row: dict,
                                            case: dict, wrong: dict,
                                            family: str, modules,
-                                           plan: dict, worker_private: Path) -> None:
+                                           plan: dict, worker_private: Path,
+                                           selection_retry_lease_sha: str | None = None) -> None:
     attempt_name = f"attempt-{ordinal:03d}"
     with lease.exclusive_worker_operation(LEASE_OPERATION):
+        if selection_retry_lease_sha is not None:
+            events = worker_private / "worker-lease-events.jsonl"
+            protocol._private(events)
+            lines = events.read_bytes().splitlines(keepends=True)
+            require(lines and
+                    protocol.digest(b"".join(lines[:-1])) ==
+                    selection_retry_lease_sha and
+                    json.loads(lines[-1]).get("operation") == LEASE_OPERATION and
+                    json.loads(lines[-1]).get("event") == "acquired" and
+                    json.loads(lines[-1]).get("pid") == os.getpid(),
+                    "scale_selection_retry_gate_stale_before_first_gui")
         _event(run_dir / "journal.private.jsonl", {
             "event": "case_started", "ordinal": ordinal,
             "task_id": row["task_id"],
@@ -777,7 +1004,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
         adoption_path: Path | None = None,
         old_private_plan_path: Path | None = None,
         old_source_freeze_path: Path | None = None,
-        incident_public_path: Path | None = None) -> dict:
+        incident_public_path: Path | None = None,
+        old_run_dir: Path | None = None,
+        selection_retry_gate_path: Path | None = None) -> dict:
     require(type(max_cases) is int and 1 <= max_cases <= 100,
             "scale_max_cases_invalid")
     plan, private = _preflight(
@@ -786,9 +1015,26 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
         public_plan_path=public_plan_path,
         source_freeze_path=source_freeze_path,
         run_dir=run_dir, resume=resume)
+    require(plan.get("frame_guard_amendment") ==
+            protocol.EXACT_RETURN_AMENDMENT,
+            "scale_current_dispatch_requires_exact_return_freeze")
+    require(split != "train",
+            "scale_train_requires_separate_source_transition")
     worker = Path(worker_dir).resolve()
     factory, gui_controls, reset, verify, lease = _modules(worker)
     root = private / "v066_scale_controls"
+    selection_gate = None
+    if split == "selection":
+        require(old_run_dir is not None and incident_public_path is not None and
+                selection_retry_gate_path is not None,
+                "scale_selection_retry_requires_old_attempt_and_live_gate")
+        selection_gate = _selection_retry_gate(
+            gate_path=selection_retry_gate_path, worker=worker, plan=plan,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            old_run_dir=old_run_dir,
+            incident_public_path=incident_public_path,
+            require_unchanged_lease_log=not resume)
     with _run_lock(root):
         adopted_old = None
         if not resume:
@@ -801,6 +1047,9 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                 "source_freeze_sha256": protocol.digest(
                     source_freeze_path.read_bytes()),
                 "expected_case_count": plan["task_count"],
+                "selection_retry_gate_sha256": (
+                    protocol.digest(selection_retry_gate_path.read_bytes())
+                    if selection_gate is not None else None),
                 "official_final_tasks_admitted": 0,
                 "model_attempts": 0,
             })
@@ -808,7 +1057,10 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
             intent = protocol.private_json(run_dir / "batch-intent.private.json")
             require(intent.get("schema") == protocol.BATCH_SCHEMA and
                     intent.get("split") == split and
-                    intent.get("expected_case_count") == plan["task_count"],
+                    intent.get("expected_case_count") == plan["task_count"] and
+                    (selection_gate is None or
+                     intent.get("selection_retry_gate_sha256") ==
+                     protocol.digest(selection_retry_gate_path.read_bytes())),
                     "scale_batch_intent_changed")
             current_binding = (
                 intent.get("private_plan_sha256") ==
@@ -868,14 +1120,22 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
                     lease=lease, run_dir=run_dir, ordinal=index,
                     row=row, case=case, wrong=wrong, family=family,
                     modules=(factory, gui_controls, reset, verify, lease),
-                    plan=plan, worker_private=private)
+                    plan=plan, worker_private=private,
+                    selection_retry_lease_sha=(
+                        selection_gate["worker_lease_events_sha256"]
+                        if selection_gate is not None and index == 0 and
+                        not resume else None))
             except BaseException:
-                _event(run_dir / "journal.private.jsonl", {
-                    "event": "case_failed", "ordinal": index,
-                    "task_id": row["task_id"],
-                    "package_sha256": row["package_sha256"],
-                    "attempt_dir": attempt_name,
-                })
+                rows, _tail, _count = read_journal(
+                    run_dir / "journal.private.jsonl")
+                if rows and rows[-1].get("event") == "case_started" and \
+                        rows[-1].get("ordinal") == index:
+                    _event(run_dir / "journal.private.jsonl", {
+                        "event": "case_failed", "ordinal": index,
+                        "task_id": row["task_id"],
+                        "package_sha256": row["package_sha256"],
+                        "attempt_dir": attempt_name,
+                    })
                 raise
             _event(run_dir / "journal.private.jsonl", {
                 "event": "case_completed", "ordinal": index,
@@ -914,6 +1174,8 @@ if __name__ == "__main__":
     runner.add_argument("--old-private-plan", type=Path)
     runner.add_argument("--old-source-freeze", type=Path)
     runner.add_argument("--incident-public", type=Path)
+    runner.add_argument("--old-run-dir", type=Path)
+    runner.add_argument("--selection-retry-gate", type=Path)
     runner.add_argument("--execute", action="store_true")
     reconcile = sub.add_parser("reconcile")
     reconcile.add_argument("--worker-dir", type=Path, required=True)
@@ -926,6 +1188,18 @@ if __name__ == "__main__":
     reconcile.add_argument("--incident-public", type=Path, required=True)
     reconcile.add_argument("--adoption-private", type=Path, required=True)
     reconcile.add_argument("--execute-baseline-check", action="store_true")
+    selection_retry = sub.add_parser("prepare-selection-retry")
+    selection_retry.add_argument("--worker-dir", type=Path, required=True)
+    selection_retry.add_argument("--new-private-plan", type=Path, required=True)
+    selection_retry.add_argument("--new-public-plan", type=Path, required=True)
+    selection_retry.add_argument("--new-source-freeze", type=Path, required=True)
+    selection_retry.add_argument("--old-run-dir", type=Path, required=True)
+    selection_retry.add_argument("--old-private-plan", type=Path, required=True)
+    selection_retry.add_argument("--old-public-plan", type=Path, required=True)
+    selection_retry.add_argument("--old-source-freeze", type=Path, required=True)
+    selection_retry.add_argument("--incident-public", type=Path, required=True)
+    selection_retry.add_argument("--new-run-dir", type=Path, required=True)
+    selection_retry.add_argument("--execute-baseline-check", action="store_true")
     args = parser.parse_args()
     authorized = (args.execute if args.command == "run"
                   else args.execute_baseline_check)
@@ -947,8 +1221,10 @@ if __name__ == "__main__":
                 adoption_path=args.adoption_private,
                 old_private_plan_path=args.old_private_plan,
                 old_source_freeze_path=args.old_source_freeze,
-                incident_public_path=args.incident_public)
-        else:
+                incident_public_path=args.incident_public,
+                old_run_dir=args.old_run_dir,
+                selection_retry_gate_path=args.selection_retry_gate)
+        elif args.command == "reconcile":
             result = reconcile_completed_failed_case(
                 worker_dir=args.worker_dir, run_dir=args.run_dir,
                 old_private_plan_path=args.old_private_plan,
@@ -958,6 +1234,18 @@ if __name__ == "__main__":
                 new_source_freeze_path=args.new_source_freeze,
                 incident_public_path=args.incident_public,
                 adoption_path=args.adoption_private)
+        else:
+            result = prepare_selection_retry_gate(
+                worker_dir=args.worker_dir,
+                new_private_plan_path=args.new_private_plan,
+                new_public_plan_path=args.new_public_plan,
+                new_source_freeze_path=args.new_source_freeze,
+                old_run_dir=args.old_run_dir,
+                old_private_plan_path=args.old_private_plan,
+                old_public_plan_path=args.old_public_plan,
+                old_source_freeze_path=args.old_source_freeze,
+                incident_public_path=args.incident_public,
+                new_run_dir=args.new_run_dir)
     except Exception as error:
         # Never put private task instructions/IDs or raw Playwright text on stdout.
         print(json.dumps({"schema": protocol.BATCH_SCHEMA,
