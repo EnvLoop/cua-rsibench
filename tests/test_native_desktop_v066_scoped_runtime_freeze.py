@@ -51,19 +51,36 @@ class ScopedRuntimeFreezeTests(unittest.TestCase):
                 "same_application_cross_guest_pairs_passed": 3,
                 "private_independent_audit_sha256": digest(private_audit.read_bytes()),
                 "official_final_admissions": 0}))
+            trio_private = root / "train-trio.private.json"
+            trio_private.write_text(json.dumps({
+                "schema": "cua-native-wdi-v066-scoped-profile-train-trio-audit-private-v1",
+                "status": "public_train_gui_positive_near_reset_passed",
+                "provider_active_zero_after": True,
+                "official_final_admissions": 0}))
+            trio_private.chmod(0o600)
+            trio_public = root / "train-trio-public.json"
+            trio_public.write_text(json.dumps({
+                "schema": "cua-native-wdi-v066-scoped-profile-train-trio-public-v1",
+                "status": "public_train_gui_positive_near_reset_passed",
+                "private_independent_whole_trio_audit_sha256":
+                    digest(trio_private.read_bytes()),
+                "distinct_e2b_guests": 3,
+                "official_final_admissions": 0}))
             private_freeze = root / "runtime.private.json"
             public_freeze = root / "runtime-public.json"
             with (patch.object(freeze, "validate_ratification",
                                return_value=({}, "a" * 64)),
                   patch.object(freeze, "validate_reference",
-                               return_value=({}, "b" * 64))):
+                               return_value=({}, "b" * 64)),
+                  patch.object(freeze, "TRAIN_TRIO_PUBLIC", trio_public)):
                 aggregate = freeze.write(
                     private_path=private_freeze,
                     public_path=public_freeze,
                     action_ratification=action,
                     public_calibration=public,
                     private_calibration_audit=private_audit,
-                    scoped_reference=reference)
+                    scoped_reference=reference,
+                    train_gui_trio_private_audit=trio_private)
                 _value, sha = freeze.validate(
                     path=private_freeze,
                     action_ratification=action,
