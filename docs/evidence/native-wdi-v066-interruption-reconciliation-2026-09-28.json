@@ -1,0 +1,24 @@
+{
+  "actual_provider_billed_usd": null,
+  "all_unresolved_leases_plus_grace_expired": true,
+  "attempted_sandboxes": 22,
+  "automatic_replay_authorized": false,
+  "checked_date": "2026-09-27",
+  "cleanup_unverified_count": 0,
+  "conservative_full_lease_reserved_usd": "3.666666666666666666666666667",
+  "known_unresolved_active_count": 0,
+  "lane_cap_usd": "60",
+  "missing_receipt_count": 0,
+  "no_acknowledged_sandbox_id_count": 0,
+  "official_full_study_admissions": 0,
+  "private_reconciliation_sha256": "65501a699473245032a29d062eb238638ce1fb7aabf66d1656266ba003a0efed",
+  "provider_active_error_type": null,
+  "provider_active_total": 0,
+  "ready_for_manual_repair_review": true,
+  "schema": "cua-native-wdi-v066-final-control-reconciliation-public-v1",
+  "status_counts": {
+    "cold_reset_observed": 7,
+    "control_failed_or_infrastructure_invalid": 1,
+    "control_passed": 14
+  }
+}
