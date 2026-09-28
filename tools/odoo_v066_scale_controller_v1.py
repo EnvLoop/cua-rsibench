@@ -9,7 +9,9 @@ A partial or failed task blocks resume; no automatic replay exists.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -91,6 +93,7 @@ def next_case_index(run_dir: Path, plan: dict) -> int:
     rows, _last, _count = read_journal(run_dir / "journal.private.jsonl")
     completed = 0
     pending = None
+    failed = None
     for event in rows:
         kind = event.get("event")
         ordinal = event.get("ordinal")
@@ -101,7 +104,8 @@ def next_case_index(run_dir: Path, plan: dict) -> int:
                 event.get("package_sha256") == task["package_sha256"],
                 "scale_journal_task_identity_changed")
         if kind == "case_started":
-            require(pending is None and ordinal == completed and
+            require(pending is None and failed is None and
+                    ordinal == completed and
                     event.get("attempt_dir") == f"attempt-{ordinal:03d}",
                     "scale_journal_started_out_of_order")
             pending = event
@@ -117,12 +121,65 @@ def next_case_index(run_dir: Path, plan: dict) -> int:
             completed += 1
             pending = None
         elif kind == "case_failed":
-            require(pending is not None and ordinal == completed,
+            require(pending is not None and failed is None and
+                    ordinal == completed and
+                    event.get("attempt_dir") == pending["attempt_dir"],
                     "scale_failed_case_without_start")
-            raise ScaleControlError("scale_failed_case_requires_manual_reconciliation")
+            failed = event
+            pending = None
+        elif kind == "case_reclassified_after_lease_release":
+            require(failed is not None and pending is None and
+                    ordinal == completed and
+                    event.get("attempt_dir") == failed["attempt_dir"],
+                    "scale_reclassification_without_retained_failure")
+            authority_path = run_dir / "reclassification.private.json"
+            authority = protocol.private_json(authority_path)
+            receipt_path = (run_dir / failed["attempt_dir"] /
+                            "attempt.private.json")
+            protocol._private(receipt_path)
+            require(authority.get("schema") ==
+                    "envloop-odoo-v066-manual-lease-reclassification-v1" and
+                    authority.get("status") ==
+                    "approved_after_current_live_baseline_and_post_lease_audit" and
+                    authority.get("ordinal") == ordinal and
+                    authority.get("task_id") == task["task_id"] and
+                    authority.get("package_sha256") == task["package_sha256"] and
+                    authority.get("new_private_plan_sha256") ==
+                    protocol.digest(protocol.canonical(plan)) and
+                    authority.get("old_attempt_sha256") ==
+                    protocol.digest(receipt_path.read_bytes()) and
+                    event.get("authority_sha256") ==
+                    protocol.digest(authority_path.read_bytes()) and
+                    event.get("attempt_receipt_sha256") ==
+                    authority["old_attempt_sha256"],
+                    "scale_reclassification_authority_or_saved_attempt_invalid")
+            baseline_path = run_dir / "current-baseline-check.private.json"
+            baseline = protocol.private_json(baseline_path)
+            sql_path = run_dir / "current-baseline-sql.private.json"
+            filestore_path = run_dir / "current-baseline-filestore.private.json"
+            protocol._private(sql_path)
+            protocol._private(filestore_path)
+            require(authority.get("current_baseline_check_sha256") ==
+                    protocol.digest(baseline_path.read_bytes()) and
+                    baseline.get("schema") ==
+                    "envloop-odoo-v066-current-baseline-check-v1" and
+                    baseline.get("status") ==
+                    "current_sql_and_full_filestore_equal_frozen_baseline" and
+                    baseline.get("sql_snapshot_sha256") ==
+                    protocol.digest(sql_path.read_bytes()) and
+                    baseline.get("filestore_manifest_sha256") ==
+                    protocol.digest(filestore_path.read_bytes()) and
+                    baseline.get("original_service_state_restored") is True and
+                    baseline.get("current_baseline_checked_after_old_lease_release")
+                    is True and
+                    baseline.get("official_final_tasks_admitted") == 0,
+                    "scale_reclassification_current_baseline_missing")
+            completed += 1
+            failed = None
         else:
             raise ScaleControlError("scale_journal_event_unknown")
     require(pending is None, "scale_partial_case_requires_manual_reconciliation")
+    require(failed is None, "scale_failed_case_requires_manual_reconciliation")
     return completed
 
 
@@ -450,9 +507,277 @@ def _case_evidence(*, run_dir: Path, ordinal: int, row: dict,
     raise ScaleControlError("scale_case_failed_no_automatic_replay") from failure
 
 
+@contextmanager
+def _run_lock(root: Path):
+    root.mkdir(mode=0o700, exist_ok=True)
+    protocol._private(root, directory=True)
+    lock_path = root / "scale-run-coordinator.lock"
+    descriptor = os.open(lock_path, os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ScaleControlError("scale_run_coordinator_busy") from None
+        yield
+    finally:
+        fcntl.flock(descriptor, fcntl.LOCK_UN)
+        os.close(descriptor)
+
+
+def verify_reclassified_current_baseline(run_dir: Path,
+                                         worker_private: Path) -> None:
+    sql = protocol.private_json(run_dir / "current-baseline-sql.private.json")
+    files = protocol.private_json(
+        run_dir / "current-baseline-filestore.private.json")
+    frozen_sql = protocol.private_json(worker_private / "baseline_snapshot.json")
+    frozen_files = protocol.private_json(
+        worker_private / "baseline-filestore-manifest.json")
+    require(sql == frozen_sql and files == frozen_files,
+            "scale_reclassified_current_baseline_artifacts_changed")
+
+
+def _old_plan_adoption(*, adoption_path: Path | None,
+                       old_private_plan_path: Path | None,
+                       old_source_freeze_path: Path | None,
+                       incident_public_path: Path | None,
+                       current_plan: dict,
+                       current_source_freeze_path: Path) -> tuple[dict, dict]:
+    require(all(path is not None for path in (
+        adoption_path, old_private_plan_path, old_source_freeze_path,
+        incident_public_path)),
+        "scale_old_batch_requires_source_adoption")
+    adoption = protocol.private_json(adoption_path)
+    old = protocol.private_json(old_private_plan_path)
+    old_freeze = protocol.public_json(old_source_freeze_path)
+    new_freeze = protocol.public_json(current_source_freeze_path)
+    incident = protocol.public_json(incident_public_path)
+    require(adoption.get("schema") ==
+            "envloop-odoo-v066-lease-audit-source-adoption-v1" and
+            adoption.get("status") == "prepared_for_manual_live_baseline_reconciliation" and
+            adoption.get("old_private_plan_sha256") ==
+            protocol.digest(old_private_plan_path.read_bytes()) and
+            adoption.get("new_private_plan_sha256") ==
+            protocol.digest(protocol.canonical(current_plan)) and
+            adoption.get("old_source_freeze_sha256") ==
+            protocol.digest(old_source_freeze_path.read_bytes()) and
+            adoption.get("new_source_freeze_sha256") ==
+            protocol.digest(current_source_freeze_path.read_bytes()) and
+            adoption.get("incident_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            incident.get("schema") ==
+            "envloop-odoo-v066-inline-lease-audit-order-incident-v1" and
+            incident.get("status") ==
+            "complete_actor_control_audited_after_lease_release_reclassification_pending" and
+            incident.get("old_attempt_sha256") ==
+            adoption.get("old_attempt_sha256") and
+            old.get("tasks") == current_plan.get("tasks") and
+            old.get("checkpoint") == current_plan.get("checkpoint") and
+            old.get("split") == current_plan.get("split") and
+            old.get("ratification_sha256") == current_plan.get("ratification_sha256") and
+            old_freeze.get("ratification_sha256") ==
+            new_freeze.get("ratification_sha256") ==
+            protocol.RATIFICATION_SHA and
+            adoption.get("official_final_tasks_admitted") == 0,
+            "scale_old_new_source_adoption_invalid")
+    changed = {"tools/odoo_v066_scale_protocol_v1.py",
+               "tools/odoo_v066_scale_controller_v1.py",
+               "tools/odoo_v066_scale_audit_v1.py",
+               "tools/audit_odoo_v066_inline_lease_incident_v1.py"}
+    common = set(old_freeze.get("source_sha256s", {})) - changed
+    require(common and all(old_freeze["source_sha256s"][name] ==
+                           new_freeze["source_sha256s"].get(name)
+                           for name in common),
+            "scale_actor_action_verifier_or_runtime_source_changed")
+    return adoption, old
+
+
+def reconcile_completed_failed_case(*, worker_dir: Path, run_dir: Path,
+                                    old_private_plan_path: Path,
+                                    old_source_freeze_path: Path,
+                                    new_private_plan_path: Path,
+                                    new_public_plan_path: Path,
+                                    new_source_freeze_path: Path,
+                                    incident_public_path: Path,
+                                    adoption_path: Path) -> dict:
+    """Explicit live baseline check; append reclassification, never replay GUI."""
+    worker = Path(worker_dir).resolve()
+    require(worker.name == "train" and
+            os.environ.get("ENVLOOP_ODOO_WORKER_DIR") == str(worker),
+            "scale_reconcile_original_train_worker_not_selected")
+    new_plan, private = _preflight(
+        split="train", worker_dir=worker,
+        private_plan_path=new_private_plan_path,
+        public_plan_path=new_public_plan_path,
+        source_freeze_path=new_source_freeze_path,
+        run_dir=run_dir, resume=True)
+    adoption, old_plan = _old_plan_adoption(
+        adoption_path=adoption_path,
+        old_private_plan_path=old_private_plan_path,
+        old_source_freeze_path=old_source_freeze_path,
+        incident_public_path=incident_public_path,
+        current_plan=new_plan,
+        current_source_freeze_path=new_source_freeze_path)
+    factory, _gui, reset, verify, lease = _modules(worker)
+    root = private / "v066_scale_controls"
+    with _run_lock(root):
+        journal_path = run_dir / "journal.private.jsonl"
+        rows, previous_tail, length = read_journal(journal_path)
+        require(length == 2 and
+                [row.get("event") for row in rows] ==
+                ["case_started", "case_failed"] and
+                [row.get("ordinal") for row in rows] == [0, 0] and
+                previous_tail == adoption["old_journal_tail_sha256"] and
+                protocol.digest(journal_path.read_bytes()) ==
+                adoption["old_journal_sha256"] and
+                rows[0].get("task_id") == rows[1].get("task_id") ==
+                new_plan["tasks"][0]["task_id"] and
+                rows[0].get("attempt_dir") == rows[1].get("attempt_dir") ==
+                "attempt-000",
+                "scale_reconcile_old_failure_chain_changed")
+        attempt = run_dir / "attempt-000"
+        receipt_path = attempt / "attempt.private.json"
+        protocol._private(receipt_path)
+        require(protocol.digest(receipt_path.read_bytes()) ==
+                adoption["old_attempt_sha256"] and
+                not (attempt / "failure.private.json").exists(),
+                "scale_reconcile_saved_actor_attempt_changed")
+        from tools import odoo_v066_scale_audit_v1 as independent
+        independent.audit_case(
+            plan=old_plan, row=old_plan["tasks"][0],
+            attempt=attempt, worker_private=private)
+        require(not (run_dir / "current-baseline-check.private.json").exists()
+                and not (run_dir / "reclassification.private.json").exists(),
+                "scale_reconciliation_evidence_already_exists")
+        running_before: set[str] = set()
+        service_ready = False
+        failure = None
+        snapshot = files = None
+        services_restored = False
+        with lease.exclusive_worker_operation("v066_scale_reconcile"):
+            try:
+                running_before = train_recorder._running(worker)
+                if "db" not in running_before:
+                    train_recorder._compose(worker, "up", "-d", "db")
+                service_ready = True
+                snapshot = verify.snapshot()
+                config = factory.local_config()
+                files = reset.filestore_manifest(
+                    config["ODOO_PROJECT"] + "_filestore")
+            except BaseException as error:
+                failure = error
+            finally:
+                if service_ready:
+                    try:
+                        if "db" not in running_before:
+                            train_recorder._compose(worker, "stop", "db")
+                        services_restored = (
+                            train_recorder._running(worker) == running_before)
+                    except BaseException as error:
+                        services_restored = False
+                        if failure is None:
+                            failure = error
+        if failure is not None:
+            raise ScaleControlError(
+                "scale_reconcile_current_baseline_query_failed") from failure
+        baseline = protocol.private_json(private / "baseline_snapshot.json")
+        frozen = protocol.private_json(
+            private / "baseline-filestore-manifest.json")
+        require(snapshot is not None and files is not None and
+                snapshot == baseline and files == frozen and
+                services_restored is True,
+                "scale_current_sql_or_full_filestore_baseline_not_exact")
+        sql_ref = _save(run_dir / "current-baseline-sql.private.json", snapshot)
+        files_ref = _save(run_dir / "current-baseline-filestore.private.json", files)
+        baseline_check = {
+            "schema": "envloop-odoo-v066-current-baseline-check-v1",
+            "status": "current_sql_and_full_filestore_equal_frozen_baseline",
+            "sql_snapshot_sha256": sql_ref["sha256"],
+            "filestore_manifest_sha256": files_ref["sha256"],
+            "frozen_sql_baseline_sha256": protocol.digest(
+                (private / "baseline_snapshot.json").read_bytes()),
+            "frozen_filestore_manifest_sha256": protocol.digest(
+                (private / "baseline-filestore-manifest.json").read_bytes()),
+            "original_service_state_restored": services_restored,
+            "current_baseline_checked_after_old_lease_release": True,
+            "official_final_tasks_admitted": 0,
+        }
+        baseline_ref = _save(
+            run_dir / "current-baseline-check.private.json", baseline_check)
+        # Audit again outside every Odoo worker lease before adopting the case.
+        independent.audit_case(
+            plan=old_plan, row=old_plan["tasks"][0],
+            attempt=attempt, worker_private=private)
+        authority = {
+            "schema": "envloop-odoo-v066-manual-lease-reclassification-v1",
+            "status": "approved_after_current_live_baseline_and_post_lease_audit",
+            "ordinal": 0,
+            "task_id": old_plan["tasks"][0]["task_id"],
+            "package_sha256": old_plan["tasks"][0]["package_sha256"],
+            "old_attempt_sha256": adoption["old_attempt_sha256"],
+            "old_private_plan_sha256": adoption["old_private_plan_sha256"],
+            "new_private_plan_sha256": adoption["new_private_plan_sha256"],
+            "old_source_freeze_sha256": adoption["old_source_freeze_sha256"],
+            "new_source_freeze_sha256": adoption["new_source_freeze_sha256"],
+            "incident_public_sha256": adoption["incident_public_sha256"],
+            "current_baseline_check_sha256": baseline_ref["sha256"],
+            "replay_of_original_gui_attempt": False,
+            "original_case_failed_event_retained": True,
+            "official_final_tasks_admitted": 0,
+        }
+        authority_ref = _save(
+            run_dir / "reclassification.private.json", authority)
+        new_tail = _event(journal_path, {
+            "event": "case_reclassified_after_lease_release",
+            "ordinal": 0,
+            "task_id": authority["task_id"],
+            "package_sha256": authority["package_sha256"],
+            "attempt_dir": "attempt-000",
+            "authority_sha256": authority_ref["sha256"],
+            "attempt_receipt_sha256": authority["old_attempt_sha256"],
+        })
+        require(next_case_index(run_dir, new_plan) == 1,
+                "scale_reclassified_chain_not_resumable")
+        return {"schema": "envloop-odoo-v066-lease-reclassification-result-v1",
+                "status": "old_complete_case_reclassified_without_gui_replay",
+                "journal_tail_sha256": new_tail,
+                "old_attempt_sha256": authority["old_attempt_sha256"],
+                "current_baseline_check_sha256": baseline_ref["sha256"],
+                "completed_raw_case_count": 1,
+                "official_final_tasks_admitted": 0,
+                "model_attempts": 0}
+
+
+def _execute_case_then_audit_after_release(*, lease, run_dir: Path,
+                                           ordinal: int, row: dict,
+                                           case: dict, wrong: dict,
+                                           family: str, modules,
+                                           plan: dict, worker_private: Path) -> None:
+    attempt_name = f"attempt-{ordinal:03d}"
+    with lease.exclusive_worker_operation(LEASE_OPERATION):
+        _event(run_dir / "journal.private.jsonl", {
+            "event": "case_started", "ordinal": ordinal,
+            "task_id": row["task_id"],
+            "package_sha256": row["package_sha256"],
+            "attempt_dir": attempt_name,
+        })
+        _case_evidence(
+            run_dir=run_dir, ordinal=ordinal, row=row, case=case,
+            wrong=wrong, family=family, modules=modules)
+    # The release event must exist before the auditor checks the lease interval.
+    from tools import odoo_v066_scale_audit_v1 as independent
+    independent.audit_case(
+        plan=plan, row=plan["tasks"][ordinal],
+        attempt=run_dir / attempt_name,
+        worker_private=worker_private)
+
+
 def run(*, split: str, worker_dir: Path, private_plan_path: Path,
         public_plan_path: Path, source_freeze_path: Path,
-        run_dir: Path, resume: bool, max_cases: int) -> dict:
+        run_dir: Path, resume: bool, max_cases: int,
+        adoption_path: Path | None = None,
+        old_private_plan_path: Path | None = None,
+        old_source_freeze_path: Path | None = None,
+        incident_public_path: Path | None = None) -> dict:
     require(type(max_cases) is int and 1 <= max_cases <= 100,
             "scale_max_cases_invalid")
     plan, private = _preflight(
@@ -464,9 +789,8 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
     worker = Path(worker_dir).resolve()
     factory, gui_controls, reset, verify, lease = _modules(worker)
     root = private / "v066_scale_controls"
-    root.mkdir(mode=0o700, exist_ok=True)
-    protocol._private(root, directory=True)
-    with lease.exclusive_worker_operation(LEASE_OPERATION):
+    with _run_lock(root):
+        adopted_old = None
         if not resume:
             run_dir.mkdir(mode=0o700)
             _save(run_dir / "batch-intent.private.json", {
@@ -484,17 +808,44 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
             intent = protocol.private_json(run_dir / "batch-intent.private.json")
             require(intent.get("schema") == protocol.BATCH_SCHEMA and
                     intent.get("split") == split and
-                    intent.get("private_plan_sha256") ==
-                    protocol.digest(private_plan_path.read_bytes()) and
-                    intent.get("source_freeze_sha256") ==
-                    protocol.digest(source_freeze_path.read_bytes()),
+                    intent.get("expected_case_count") == plan["task_count"],
                     "scale_batch_intent_changed")
+            current_binding = (
+                intent.get("private_plan_sha256") ==
+                protocol.digest(private_plan_path.read_bytes()) and
+                intent.get("source_freeze_sha256") ==
+                protocol.digest(source_freeze_path.read_bytes()))
+            if not current_binding:
+                adoption, adopted_old = _old_plan_adoption(
+                    adoption_path=adoption_path,
+                    old_private_plan_path=old_private_plan_path,
+                    old_source_freeze_path=old_source_freeze_path,
+                    incident_public_path=incident_public_path,
+                    current_plan=plan,
+                    current_source_freeze_path=source_freeze_path)
+                require(intent.get("private_plan_sha256") ==
+                        adoption["old_private_plan_sha256"] and
+                        intent.get("source_freeze_sha256") ==
+                        adoption["old_source_freeze_sha256"],
+                        "scale_batch_intent_old_source_not_adopted")
         index = next_case_index(run_dir, plan)
         if resume and index:
             from tools import odoo_v066_scale_audit_v1 as independent
+            journal_rows, _, _ = read_journal(
+                run_dir / "journal.private.jsonl")
+            reclassified = {event["ordinal"] for event in journal_rows
+                            if event.get("event") ==
+                            "case_reclassified_after_lease_release"}
+            if reclassified:
+                verify_reclassified_current_baseline(run_dir, private)
             for ordinal in range(index):
+                audited_plan = (adopted_old if ordinal in reclassified
+                                else plan)
+                require(audited_plan is not None,
+                        "scale_reclassified_case_old_plan_missing")
                 independent.audit_case(
-                    plan=plan, row=plan["tasks"][ordinal],
+                    plan=audited_plan,
+                    row=audited_plan["tasks"][ordinal],
                     attempt=run_dir / f"attempt-{ordinal:03d}",
                     worker_private=private)
         limit = min(plan["task_count"], index + max_cases)
@@ -509,25 +860,15 @@ def run(*, split: str, worker_dir: Path, private_plan_path: Path,
             attempt_name = f"attempt-{index:03d}"
             require(not (run_dir / attempt_name).exists(),
                     "scale_next_attempt_dir_exists_reconcile_first")
-            _event(run_dir / "journal.private.jsonl", {
-                "event": "case_started", "ordinal": index,
-                "task_id": row["task_id"],
-                "package_sha256": row["package_sha256"],
-                "attempt_dir": attempt_name,
-            })
             family, case = by_id[row["task_id"]]
             wrong = next(candidate for candidate in world["cases"][family]
                          if candidate["id"] != case["id"])
             try:
-                receipt = _case_evidence(
-                    run_dir=run_dir, ordinal=index, row=row, case=case,
-                    wrong=wrong, family=family, modules=(
-                        factory, gui_controls, reset, verify, lease))
-                from tools import odoo_v066_scale_audit_v1 as independent
-                independent.audit_case(
-                    plan=plan, row=plan["tasks"][index],
-                    attempt=run_dir / attempt_name,
-                    worker_private=private)
+                _execute_case_then_audit_after_release(
+                    lease=lease, run_dir=run_dir, ordinal=index,
+                    row=row, case=case, wrong=wrong, family=family,
+                    modules=(factory, gui_controls, reset, verify, lease),
+                    plan=plan, worker_private=private)
             except BaseException:
                 _event(run_dir / "journal.private.jsonl", {
                     "event": "case_failed", "ordinal": index,
@@ -569,22 +910,54 @@ if __name__ == "__main__":
     runner.add_argument("--run-dir", type=Path, required=True)
     runner.add_argument("--resume", action="store_true")
     runner.add_argument("--max-cases", type=int, default=1)
+    runner.add_argument("--adoption-private", type=Path)
+    runner.add_argument("--old-private-plan", type=Path)
+    runner.add_argument("--old-source-freeze", type=Path)
+    runner.add_argument("--incident-public", type=Path)
     runner.add_argument("--execute", action="store_true")
+    reconcile = sub.add_parser("reconcile")
+    reconcile.add_argument("--worker-dir", type=Path, required=True)
+    reconcile.add_argument("--run-dir", type=Path, required=True)
+    reconcile.add_argument("--old-private-plan", type=Path, required=True)
+    reconcile.add_argument("--old-source-freeze", type=Path, required=True)
+    reconcile.add_argument("--new-private-plan", type=Path, required=True)
+    reconcile.add_argument("--new-public-plan", type=Path, required=True)
+    reconcile.add_argument("--new-source-freeze", type=Path, required=True)
+    reconcile.add_argument("--incident-public", type=Path, required=True)
+    reconcile.add_argument("--adoption-private", type=Path, required=True)
+    reconcile.add_argument("--execute-baseline-check", action="store_true")
     args = parser.parse_args()
-    if not args.execute:
+    authorized = (args.execute if args.command == "run"
+                  else args.execute_baseline_check)
+    if not authorized:
         print(json.dumps({"schema": protocol.BATCH_SCHEMA,
                           "status": "refused_without_explicit_execute",
                           "official_final_tasks_admitted": 0,
                           "model_attempts": 0}, sort_keys=True))
         raise SystemExit(2)
     try:
-        result = run(
-            split=args.split, worker_dir=args.worker_dir,
-            private_plan_path=args.private_plan,
-            public_plan_path=args.public_plan,
-            source_freeze_path=args.source_freeze,
-            run_dir=args.run_dir, resume=args.resume,
-            max_cases=args.max_cases)
+        if args.command == "run":
+            result = run(
+                split=args.split, worker_dir=args.worker_dir,
+                private_plan_path=args.private_plan,
+                public_plan_path=args.public_plan,
+                source_freeze_path=args.source_freeze,
+                run_dir=args.run_dir, resume=args.resume,
+                max_cases=args.max_cases,
+                adoption_path=args.adoption_private,
+                old_private_plan_path=args.old_private_plan,
+                old_source_freeze_path=args.old_source_freeze,
+                incident_public_path=args.incident_public)
+        else:
+            result = reconcile_completed_failed_case(
+                worker_dir=args.worker_dir, run_dir=args.run_dir,
+                old_private_plan_path=args.old_private_plan,
+                old_source_freeze_path=args.old_source_freeze,
+                new_private_plan_path=args.new_private_plan,
+                new_public_plan_path=args.new_public_plan,
+                new_source_freeze_path=args.new_source_freeze,
+                incident_public_path=args.incident_public,
+                adoption_path=args.adoption_private)
     except Exception as error:
         # Never put private task instructions/IDs or raw Playwright text on stdout.
         print(json.dumps({"schema": protocol.BATCH_SCHEMA,

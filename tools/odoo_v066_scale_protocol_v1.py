@@ -31,6 +31,8 @@ SOURCE_FILES = (
     "tools/odoo_v066_scale_recipes_v1.py",
     "tools/odoo_v066_scale_controller_v1.py",
     "tools/odoo_v066_scale_audit_v1.py",
+    "tools/audit_odoo_v066_inline_lease_incident_v1.py",
+    "tools/prepare_odoo_v066_lease_timing_adoption_v1.py",
     "tools/record_odoo_v066_train_gui_v1.py",
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
     "enterprise_fallback/odoo18/odoo_native_adapter.py",
@@ -110,11 +112,18 @@ def validate_source_freeze(path: Path) -> tuple[dict, str]:
     value = public_json(path)
     raw = path.read_bytes()
     require(value.get("schema") == SOURCE_FREEZE_SCHEMA and
-            value.get("status") == "frozen_before_first_remaining_train_selection_final_gui_control" and
+            value.get("status") == "frozen_after_pre_result_lease_audit_timing_amendment" and
             value.get("ratification_sha256") == RATIFICATION_SHA and
             value.get("source_sha256s") == current_source_hashes() and
             value.get("host_runtime") == host_runtime() and
-            value.get("train_remaining_gui_controls_before_freeze") == 0 and
+            value.get("old_source_freeze_sha256") == digest((
+                ROOT / "docs/evidence/odoo-v066-scale-control-source-freeze-2026-09-28.json"
+            ).read_bytes()) and
+            value.get("incident_public_sha256") == digest((
+                ROOT / "docs/evidence/odoo-v066-scale-first-train-inline-lease-incident-2026-09-28.json"
+            ).read_bytes()) and
+            value.get("train_raw_complete_before_new_freeze") == 1 and
+            value.get("train_case_reclassified_before_new_freeze") is False and
             value.get("accepted_train_pilot_count") == 1 and
             value.get("selection_gui_controls_before_freeze") == 0 and
             value.get("final_gui_controls_before_freeze") == 0 and

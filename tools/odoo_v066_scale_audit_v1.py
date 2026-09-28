@@ -303,7 +303,10 @@ def audit_case(*, plan: dict, row: dict, attempt: Path,
 
 def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
                 public_plan_path: Path, source_freeze_path: Path,
-                run_dir: Path) -> tuple[dict, dict]:
+                run_dir: Path, adoption_path: Path | None = None,
+                old_private_plan_path: Path | None = None,
+                old_source_freeze_path: Path | None = None,
+                incident_public_path: Path | None = None) -> tuple[dict, dict]:
     plan = protocol.validate_split_plan(
         split=split, private_path=private_plan_path,
         public_path=public_plan_path,
@@ -315,17 +318,41 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
     intent = protocol.private_json(run_dir / "batch-intent.private.json")
     require(intent.get("schema") == protocol.BATCH_SCHEMA and
             intent.get("split") == split and
-            intent.get("private_plan_sha256") ==
-            protocol.digest(private_plan_path.read_bytes()) and
-            intent.get("source_freeze_sha256") ==
-            protocol.digest(source_freeze_path.read_bytes()) and
             intent.get("expected_case_count") == plan["task_count"],
             "scale_batch_intent_unbound")
+    old_plan = None
+    current_binding = (intent.get("private_plan_sha256") ==
+                       protocol.digest(private_plan_path.read_bytes()) and
+                       intent.get("source_freeze_sha256") ==
+                       protocol.digest(source_freeze_path.read_bytes()))
+    if not current_binding:
+        adoption, old_plan = controller._old_plan_adoption(
+            adoption_path=adoption_path,
+            old_private_plan_path=old_private_plan_path,
+            old_source_freeze_path=old_source_freeze_path,
+            incident_public_path=incident_public_path,
+            current_plan=plan,
+            current_source_freeze_path=source_freeze_path)
+        require(intent.get("private_plan_sha256") ==
+                adoption["old_private_plan_sha256"] and
+                intent.get("source_freeze_sha256") ==
+                adoption["old_source_freeze_sha256"],
+                "scale_batch_intent_old_source_not_adopted")
     completed = controller.next_case_index(run_dir, plan)
+    journal_rows, _, _ = controller.read_journal(
+        run_dir / "journal.private.jsonl")
+    reclassified = {event["ordinal"] for event in journal_rows
+                    if event.get("event") ==
+                    "case_reclassified_after_lease_release"}
+    if reclassified:
+        controller.verify_reclassified_current_baseline(run_dir, private)
     rows = []
     for ordinal in range(completed):
+        selected = old_plan if ordinal in reclassified else plan
+        require(selected is not None,
+                "scale_reclassified_case_old_plan_missing")
         rows.append(audit_case(
-            plan=plan, row=plan["tasks"][ordinal],
+            plan=selected, row=selected["tasks"][ordinal],
             attempt=run_dir / f"attempt-{ordinal:03d}",
             worker_private=private))
     counts = Counter(row["family"] for row in rows)
@@ -347,6 +374,7 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
         "verified_family_counts": dict(counts),
         "per_id": rows,
         "source_visual_reviews_pending": completed,
+        "reclassified_without_gui_replay_count": len(reclassified),
         "official_final_tasks_admitted": 0,
         "model_attempts": 0,
     }
@@ -360,6 +388,7 @@ def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
         "expected_case_count": plan["task_count"],
         "verified_family_counts": dict(counts),
         "source_visual_reviews_pending": completed,
+        "reclassified_without_gui_replay_count": len(reclassified),
         "official_final_tasks_admitted": 0,
         "model_attempts": 0,
     }
@@ -376,6 +405,10 @@ if __name__ == "__main__":
     parser.add_argument("--public-plan", type=Path, required=True)
     parser.add_argument("--source-freeze", type=Path, required=True)
     parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--adoption-private", type=Path)
+    parser.add_argument("--old-private-plan", type=Path)
+    parser.add_argument("--old-source-freeze", type=Path)
+    parser.add_argument("--incident-public", type=Path)
     parser.add_argument("--private-out", type=Path, required=True)
     parser.add_argument("--public-out", type=Path, required=True)
     args = parser.parse_args()
@@ -385,7 +418,11 @@ if __name__ == "__main__":
             private_plan_path=args.private_plan,
             public_plan_path=args.public_plan,
             source_freeze_path=args.source_freeze,
-            run_dir=args.run_dir)
+            run_dir=args.run_dir,
+            adoption_path=args.adoption_private,
+            old_private_plan_path=args.old_private_plan,
+            old_source_freeze_path=args.old_source_freeze,
+            incident_public_path=args.incident_public)
         protocol.write_new(args.private_out, private=True, value=private)
         protocol.write_new(args.public_out, private=False, value=public)
     except Exception as error:

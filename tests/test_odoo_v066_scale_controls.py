@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -106,14 +107,19 @@ class ScalePlanTests(unittest.TestCase):
         self.freeze = self.root / "freeze.public.json"
         write(self.freeze, {
             "schema": protocol.SOURCE_FREEZE_SCHEMA,
-            "status": "frozen_before_first_remaining_train_selection_final_gui_control",
+            "status": "frozen_after_pre_result_lease_audit_timing_amendment",
             "ratification_sha256": protocol.RATIFICATION_SHA,
             "source_sha256s": protocol.current_source_hashes(),
             "host_runtime": protocol.host_runtime(),
             "train_pilot_public_sha256": protocol.digest(
                 self.train_pilot.read_bytes()),
             "accepted_train_pilot_count": 1,
-            "train_remaining_gui_controls_before_freeze": 0,
+            "old_source_freeze_sha256": protocol.digest((
+                protocol.ROOT / "docs/evidence/odoo-v066-scale-control-source-freeze-2026-09-28.json").read_bytes()),
+            "incident_public_sha256": protocol.digest((
+                protocol.ROOT / "docs/evidence/odoo-v066-scale-first-train-inline-lease-incident-2026-09-28.json").read_bytes()),
+            "train_raw_complete_before_new_freeze": 1,
+            "train_case_reclassified_before_new_freeze": False,
             "selection_gui_controls_before_freeze": 0,
             "final_gui_controls_before_freeze": 0,
             "official_final_tasks_admitted": 0,
@@ -204,6 +210,86 @@ class JournalTests(unittest.TestCase):
         with self.assertRaisesRegex(controller.ScaleControlError,
                                     "scale_journal_hash_chain_changed"):
             controller.read_journal(self.journal)
+
+
+class LeaseTimingTests(unittest.TestCase):
+    def test_independent_case_audit_runs_only_after_release(self):
+        events = []
+
+        class FakeLease:
+            @contextmanager
+            def exclusive_worker_operation(self, operation):
+                events.append("acquired")
+                try:
+                    yield
+                finally:
+                    events.append("released")
+
+        row = {"task_id": "case-0", "package_sha256": "a" * 64}
+        plan = {"tasks": [row]}
+        with patch.object(controller, "_event", side_effect=lambda *_: events.append("started")), \
+             patch.object(controller, "_case_evidence", side_effect=lambda **_: events.append("gui")), \
+             patch.object(auditor, "audit_case", side_effect=lambda **_: events.append("independent_audit")):
+            controller._execute_case_then_audit_after_release(
+                lease=FakeLease(), run_dir=Path("/unused"), ordinal=0,
+                row=row, case={}, wrong={}, family="purchase",
+                modules=(), plan=plan, worker_private=Path("/unused"))
+        self.assertEqual(events,
+                         ["acquired", "started", "gui", "released", "independent_audit"])
+
+    def test_reclassification_retains_failed_row_and_requires_live_baseline(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            run_dir = Path(scratch) / "run"
+            run_dir.mkdir(mode=0o700)
+            plan = {"task_count": 1, "tasks": [{
+                "task_id": "case-0", "package_sha256": "a" * 64}]}
+            attempt = run_dir / "attempt-000"
+            attempt.mkdir(mode=0o700)
+            receipt = attempt / "attempt.private.json"
+            write(receipt, {"schema": "raw-control"})
+            args = {"ordinal": 0, "task_id": "case-0",
+                    "package_sha256": "a" * 64,
+                    "attempt_dir": "attempt-000"}
+            controller._event(run_dir / "journal.private.jsonl",
+                              {"event": "case_started", **args})
+            controller._event(run_dir / "journal.private.jsonl",
+                              {"event": "case_failed", **args})
+            with self.assertRaisesRegex(controller.ScaleControlError,
+                                        "scale_failed_case_requires_manual_reconciliation"):
+                controller.next_case_index(run_dir, plan)
+            baseline_path = run_dir / "current-baseline-check.private.json"
+            sql_path = run_dir / "current-baseline-sql.private.json"
+            files_path = run_dir / "current-baseline-filestore.private.json"
+            write(sql_path, {"saved_sql": []})
+            write(files_path, {"saved_filestore": []})
+            baseline = {"schema": "envloop-odoo-v066-current-baseline-check-v1",
+                        "status": "current_sql_and_full_filestore_equal_frozen_baseline",
+                        "sql_snapshot_sha256": protocol.digest(sql_path.read_bytes()),
+                        "filestore_manifest_sha256": protocol.digest(files_path.read_bytes()),
+                        "original_service_state_restored": True,
+                        "current_baseline_checked_after_old_lease_release": True,
+                        "official_final_tasks_admitted": 0}
+            write(baseline_path, baseline)
+            authority_path = run_dir / "reclassification.private.json"
+            authority = {"schema": "envloop-odoo-v066-manual-lease-reclassification-v1",
+                         "status": "approved_after_current_live_baseline_and_post_lease_audit",
+                         "ordinal": 0, "task_id": "case-0",
+                         "package_sha256": "a" * 64,
+                         "new_private_plan_sha256": protocol.digest(protocol.canonical(plan)),
+                         "old_attempt_sha256": protocol.digest(receipt.read_bytes()),
+                         "current_baseline_check_sha256": protocol.digest(
+                             baseline_path.read_bytes())}
+            write(authority_path, authority)
+            controller._event(run_dir / "journal.private.jsonl", {
+                "event": "case_reclassified_after_lease_release", **args,
+                "authority_sha256": protocol.digest(authority_path.read_bytes()),
+                "attempt_receipt_sha256": authority["old_attempt_sha256"]})
+            self.assertEqual(controller.next_case_index(run_dir, plan), 1)
+            baseline["status"] = "not_equal"
+            write(baseline_path, baseline)
+            with self.assertRaisesRegex(controller.ScaleControlError,
+                                        "scale_reclassification_current_baseline_missing"):
+                controller.next_case_index(run_dir, plan)
 
 
 class HoldoutActionTests(unittest.TestCase):
@@ -395,6 +481,25 @@ class IndependentSavedStateTests(unittest.TestCase):
             self.assertEqual(len(journal.pre_intent_rejections), 2)
 
 
+class ReclassifiedBaselineTests(unittest.TestCase):
+    def test_saved_current_baseline_must_equal_frozen_bytes_on_resume(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            run_dir = root / "run"
+            private = root / "worker-private"
+            run_dir.mkdir(mode=0o700)
+            private.mkdir(mode=0o700)
+            write(run_dir / "current-baseline-sql.private.json", {"rows": [1]})
+            write(run_dir / "current-baseline-filestore.private.json", {"file": "a"})
+            write(private / "baseline_snapshot.json", {"rows": [1]})
+            write(private / "baseline-filestore-manifest.json", {"file": "a"})
+            controller.verify_reclassified_current_baseline(run_dir, private)
+            write(run_dir / "current-baseline-filestore.private.json", {"file": "b"})
+            with self.assertRaisesRegex(controller.ScaleControlError,
+                                        "scale_reclassified_current_baseline_artifacts_changed"):
+                controller.verify_reclassified_current_baseline(run_dir, private)
+
+
 class LiveDispatchGuardTests(unittest.TestCase):
     def test_cli_refuses_without_execute_before_docker_or_private_lookup(self):
         command = [sys.executable,
@@ -403,6 +508,26 @@ class LiveDispatchGuardTests(unittest.TestCase):
                    "run", "--split", "selection", "--worker-dir", "/missing",
                    "--private-plan", "/missing/plan", "--public-plan", "/missing/public",
                    "--source-freeze", "/missing/freeze", "--run-dir", "/missing/run"]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(completed.returncode, 2)
+        self.assertEqual(json.loads(completed.stdout)["status"],
+                         "refused_without_explicit_execute")
+        self.assertNotIn("/missing", completed.stdout)
+
+
+    def test_reconcile_cli_refuses_without_explicit_live_baseline_check(self):
+        command = [sys.executable,
+                   str(Path(__file__).resolve().parents[1] /
+                       "tools/odoo_v066_scale_controller_v1.py"),
+                   "reconcile", "--worker-dir", "/missing/train",
+                   "--run-dir", "/missing/run",
+                   "--old-private-plan", "/missing/old",
+                   "--old-source-freeze", "/missing/old-freeze",
+                   "--new-private-plan", "/missing/new",
+                   "--new-public-plan", "/missing/new-public",
+                   "--new-source-freeze", "/missing/new-freeze",
+                   "--incident-public", "/missing/incident",
+                   "--adoption-private", "/missing/adoption"]
         completed = subprocess.run(command, capture_output=True, text=True)
         self.assertEqual(completed.returncode, 2)
         self.assertEqual(json.loads(completed.stdout)["status"],
