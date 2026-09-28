@@ -5,7 +5,8 @@ from __future__ import annotations
 import io
 import json
 from pathlib import Path
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -111,6 +112,8 @@ class ScopedTrainControlTests(unittest.TestCase):
             Image.new("RGB", (1280, 800), "white").save(image, format="PNG")
             for attempt in ("positive", "near-miss", "cold-reset"):
                 fake = FakeSandbox(baseline, guest, image.getvalue())
+                fake_sdk = ModuleType("e2b_desktop")
+                fake_sdk.Sandbox = SimpleNamespace(create=lambda **_kwargs: fake)
                 output = work / "gui-diagnostics" / "scoped-train" / attempt
 
                 def reserve(root, path, raw):
@@ -134,7 +137,8 @@ class ScopedTrainControlTests(unittest.TestCase):
                             if attempt == "near-miss" else
                             {"passed": True, "errors": []})
 
-                with (patch.dict(train.os.environ, {"E2B_API_KEY": "fake"}),
+                with (patch.dict(sys.modules, {"e2b_desktop": fake_sdk}),
+                      patch.dict(train.os.environ, {"E2B_API_KEY": "fake"}),
                       patch.object(train, "validate_reference",
                                    return_value=({"applications": {"impress": "x" * 64}},
                                                  reference_sha)),
@@ -144,9 +148,11 @@ class ScopedTrainControlTests(unittest.TestCase):
                                        "combined_reserved_usd": "41.50"}),
                       patch.object(train, "active_hashes",
                                    return_value=(set(), 0)),
+                      patch.object(train.importlib.metadata, "version",
+                                   return_value="2.2.0"),
                       patch.object(train, "storage_audit",
                                    return_value={"dispatch_storage_ready": True}),
-                      patch("e2b_desktop.Sandbox.create", return_value=fake),
+                      patch.object(fake_sdk.Sandbox, "create", return_value=fake),
                       patch.object(train, "wait_for_document_ready",
                                    return_value={}),
                       patch.object(train.scoped_guard, "attest",
