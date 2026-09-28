@@ -171,6 +171,35 @@ class CrossRootFixture(unittest.TestCase):
                 "old_ratification": self.old_ratification,
                 "old_reservation": self.old_reservation}
 
+    def synthetic_public_amendment(self, retained):
+        value = json.loads(gate.AMENDMENT.read_bytes())
+        value.update({
+            "candidate_inventory_sha256":
+                retained["candidate_inventory_sha256"],
+            "old_six_cell_ratification_sha256":
+                retained["original_ratification_sha256"],
+            "old_desktop_lane_reservation_sha256":
+                retained["original_reservation_sha256"],
+            "retained_old_run_journal_sha256":
+                retained["original_run_journal_sha256"],
+            "retained_old_attempt_tree_sha256":
+                retained["original_attempt_tree_sha256"],
+            "retained_old_attempt_tree_files":
+                retained["original_attempt_tree_files"],
+            "retained_old_storage_ledger_sha256":
+                retained["original_storage"]["ledger_sha256"],
+            "retained_old_raw_evidence_rows_verified":
+                retained["original_storage"]["verified_raw_evidence_rows"],
+            "retained_old_raw_evidence_bytes_verified":
+                retained["original_storage"]["reserved_evidence_bytes"],
+        })
+        path = self.root / "public-amendment.json"
+        path.write_text(json.dumps(value))
+        patcher = patch.object(gate, "AMENDMENT", path)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        return path
+
     def test_old22_and_new300_charge_one_existing_60_dollar_lane(self):
         retained = gate.audit_retained_original(**self.original_kwargs())
         self.assertEqual(retained["original_intents"], 22)
@@ -250,6 +279,7 @@ class CrossRootFixture(unittest.TestCase):
 
     def test_bridge_requires_old_tree_new_hash_and_unused_root(self):
         retained = gate.audit_retained_original(**self.original_kwargs())
+        amendment_path = self.synthetic_public_amendment(retained)
         new_ratification = self.root / "new-ratification.json"
         new_reservation = self.root / "new-reservation.json"
         prior = (datetime.now(timezone.utc) -
@@ -288,6 +318,12 @@ class CrossRootFixture(unittest.TestCase):
             bridge["original_attempt_tree_sha256"] = "0" * 64
             private_json(bridge_path, bridge)
             with self.assertRaisesRegex(ValueError, "reservation bridge invalid"):
+                gate.preflight_fresh_full100(**kwargs)
+            amendment = json.loads(amendment_path.read_text())
+            amendment["retained_old_attempt_tree_sha256"] = "0" * 64
+            amendment_path.write_text(json.dumps(amendment))
+            with self.assertRaisesRegex(
+                    ValueError, "does not bind old evidence"):
                 gate.preflight_fresh_full100(**kwargs)
 
 

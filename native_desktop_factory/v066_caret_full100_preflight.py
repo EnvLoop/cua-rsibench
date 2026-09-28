@@ -34,6 +34,8 @@ NEW_TASKS = 100
 NEW_INTENTS = NEW_TASKS * 3
 OLD_LEASE_CLEANUP_GRACE_SECONDS = 90
 BRIDGE_SCHEMA = "cua-native-wdi-v066-caret-full100-cross-root-bridge-v1"
+AMENDMENT = (Path(__file__).resolve().parents[1] / "docs/evidence" /
+             "native-wdi-v066-caret-pre-result-amendment-2026-09-28.json")
 
 
 def _private(path: Path, *, directory: bool) -> bool:
@@ -292,10 +294,73 @@ def combined_budget(*, original_root: Path, fresh_root: Path,
             "actual_provider_billed_usd": None}
 
 
+def validate_public_amendment(retained: dict) -> str:
+    if not AMENDMENT.is_file() or AMENDMENT.is_symlink():
+        raise ValueError("Published caret amendment absent")
+    raw = AMENDMENT.read_bytes()
+    value = json.loads(raw)
+    bindings = {
+        "schema": "cua-native-wdi-v066-caret-pre-result-amendment-v1",
+        "status": "proposed_before_new_paid_controls_and_all_official_model_outcomes",
+        "old_adapter_sha256": OLD_ADAPTER_SHA256,
+        "proposed_new_adapter_sha256":
+            digest(Path(qwen_v066_adapter.__file__).read_bytes()),
+        "candidate_inventory_sha256":
+            retained["candidate_inventory_sha256"],
+        "old_six_cell_ratification_sha256":
+            retained["original_ratification_sha256"],
+        "old_desktop_lane_reservation_sha256":
+            retained["original_reservation_sha256"],
+        "retained_old_run_journal_sha256":
+            retained["original_run_journal_sha256"],
+        "retained_old_attempt_tree_sha256":
+            retained["original_attempt_tree_sha256"],
+        "retained_old_attempt_tree_files":
+            retained["original_attempt_tree_files"],
+        "retained_old_storage_ledger_sha256":
+            retained["original_storage"]["ledger_sha256"],
+        "retained_old_raw_evidence_rows_verified":
+            retained["original_storage"]["verified_raw_evidence_rows"],
+        "retained_old_raw_evidence_bytes_verified":
+            retained["original_storage"]["reserved_evidence_bytes"],
+        "old_full_lease_intents": OLD_INTENTS,
+        "old_complete_gui_trios_under_prior_adapter": OLD_COMPLETE_TRIOS,
+        "old_failed_partial_gui_trios": 1,
+        "new_full100_fresh_gui_trios_planned": NEW_TASKS,
+        "new_full100_fresh_sandbox_intents_planned": NEW_INTENTS,
+        "old_plus_new_conservative_full_lease_intents":
+            OLD_INTENTS + NEW_INTENTS,
+        "old_plus_new_conservative_reserved_usd":
+            str(Decimal((OLD_INTENTS + NEW_INTENTS) * LEASE_SECONDS) /
+                Decimal(3600)),
+        "existing_lane_cap_usd": str(LANE_CAP_USD),
+        "new_six_cell_ratification_recorded": False,
+        "new_cross_root_bridge_recorded": False,
+        "new_e2b_sandboxes_created": 0,
+        "new_model_attempts": 0,
+        "official_final_admissions": 0,
+        "official_model_results": 0,
+    }
+    if (type(value) is not dict or
+            any(value.get(key) != expected for key, expected in
+                bindings.items())):
+        raise ValueError("Published caret amendment does not bind old evidence")
+    try:
+        amended_at = datetime.fromisoformat(value["dated_utc"])
+    except (KeyError, TypeError, ValueError):
+        raise ValueError("Published caret amendment date invalid") from None
+    if (amended_at.tzinfo is None or
+            amended_at.astimezone(timezone.utc) > datetime.now(timezone.utc)):
+        raise ValueError("Published caret amendment date invalid")
+    return digest(raw)
+
+
 def expected_bridge(*, retained: dict, new_ratification: Path,
                     new_reservation: Path) -> dict:
+    amendment_sha = validate_public_amendment(retained)
     return {"schema": BRIDGE_SCHEMA,
             "status": "reserved_before_amended_final_create",
+            "amendment_public_sha256": amendment_sha,
             "candidate_inventory_sha256":
                 retained["candidate_inventory_sha256"],
             "original_attempt_tree_sha256":
@@ -341,6 +406,7 @@ def preflight_fresh_full100(*, candidate_root: Path,
         old_reservation=old_reservation)
     if not retained["original_all_leases_plus_grace_mature"]:
         raise ValueError("Old leases plus cleanup grace are not mature")
+    validate_public_amendment(retained)
     validate_lane(ratification=new_ratification,
                   reservation=new_reservation,
                   candidate_root=candidate_root,
