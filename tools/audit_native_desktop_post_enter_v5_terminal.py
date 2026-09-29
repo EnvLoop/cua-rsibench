@@ -12,14 +12,18 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import stat
+import subprocess
 
 from native_desktop_factory.post_enter_train_probe_v1 import SAMPLE_DELAYS_MS
 from native_desktop_factory.qwen_v064_adapter import application_frame_digest
 from native_desktop_factory.reconcile_interrupted_sweep import active_hashes
-from native_desktop_factory.v066_post_enter_train_calibration_v1 import (
-    PERMIT_SCHEMA, validate_source,
-)
 from native_desktop_factory.v066_storage_budget import audit as storage_audit
+
+
+FROZEN_SOURCE_COMMIT = "98c6f05"
+FROZEN_PERMIT_SCHEMA = (
+    "cua-native-wdi-v066-post-enter-train-calibration-permit-private-v1"
+)
 
 
 def digest(raw: bytes) -> str:
@@ -53,8 +57,54 @@ def saved_ref(root: Path, ref: dict) -> bytes:
     return raw
 
 
+def historical_source(freeze_path: Path) -> dict:
+    """Verify the consumed source against its pinned Git tree, not HEAD.
+
+    Later TRAIN-only repairs may change the live modules. The first attempt's
+    28 source hashes still have to replay from the pre-repair commit.
+    """
+    value = json.loads(private(freeze_path))
+    public_path = Path(value.get("public_path", ""))
+    public = json.loads(public_path.read_bytes())
+    require(
+        value.get("schema") ==
+            "cua-native-wdi-v066-post-enter-train-calibration-freeze-private-v1" and
+        value.get("status") == "source_frozen_no_dispatch" and
+        value.get("dispatch_authorized") is False and
+        value.get("same_intent_replay_authorized") is False and
+        value.get("official_final_admissions") == 0 and
+        value.get("three_full_lease_intents") == 3 and
+        value.get("sample_delays_ms") == [0, 250, 250, 250, 250] and
+        type(value.get("source_sha256s")) is dict and
+        len(value["source_sha256s"]) == 28 and
+        public.get("schema") ==
+            "cua-native-wdi-v066-post-enter-train-calibration-freeze-public-v1" and
+        public.get("private_freeze_sha256") == digest(private(freeze_path)) and
+        public.get("source_sha256s") == value["source_sha256s"] and
+        public.get("dispatch_authorized") is False and
+        digest(private(Path(value["reservation_path"]))) ==
+            value["reservation_sha256"] and
+        digest(Path(value["guest_public"]).read_bytes()) ==
+            value["guest_public_sha256"] and
+        digest(private(Path(value["scoped_reference"]))) ==
+            value["scoped_reference_sha256"],
+        "consumed_v5_freeze_or_public_binding_changed")
+    repo = Path(__file__).resolve().parents[1]
+    for name, expected in value["source_sha256s"].items():
+        relative = Path(name)
+        require(not relative.is_absolute() and
+                ".." not in relative.parts and
+                relative.suffix == ".py", "historical_source_path_unsafe")
+        result = subprocess.run(
+            ["git", "show", f"{FROZEN_SOURCE_COMMIT}:{name}"],
+            cwd=repo, capture_output=True, check=True)
+        require(digest(result.stdout) == expected,
+                "historical_source_git_tree_changed")
+    return value
+
+
 def audit(freeze_path: Path, permit_path: Path) -> dict:
-    value = validate_source(freeze_path)
+    value = historical_source(freeze_path)
     # The pre-run permit's budget snapshot is intentionally historical. The
     # live ledger has a new guest after execution, so checked_permit() is a
     # dispatch gate and cannot be reused as a post-run forensic assertion.
@@ -64,7 +114,7 @@ def audit(freeze_path: Path, permit_path: Path) -> dict:
     review_raw = private(review_path)
     review = json.loads(review_raw)
     require(
-        permit.get("schema") == PERMIT_SCHEMA and
+        permit.get("schema") == FROZEN_PERMIT_SCHEMA and
         permit.get("status") == "reviewed_exact_three_train_guests" and
         permit.get("freeze_sha256") == digest(private(freeze_path)) and
         permit.get("source_sha256s") == value["source_sha256s"] and

@@ -10,7 +10,9 @@ import unittest
 
 from PIL import Image, ImageDraw
 
-from native_desktop_factory.post_enter_train_probe_v1 import PostEnterProbeProxy
+from native_desktop_factory.post_enter_train_probe_v1 import (
+    MAX_PROBE_WALL_MS, PostEnterProbeProxy,
+)
 from native_desktop_factory import v066_post_enter_train_calibration_audit_v1 as audit
 
 
@@ -46,7 +48,7 @@ class Guest:
 
 
 class ProbeTests(unittest.TestCase):
-    def make_probe(self, guest, directory):
+    def make_probe(self, guest, directory, *, capture_latency_ms=0):
         root = Path(directory)
         output = root / "calc"
         output.mkdir()
@@ -58,6 +60,12 @@ class ProbeTests(unittest.TestCase):
         def sleeper(seconds):
             waits.append(seconds)
             current_ns[0] += int(seconds * 1_000_000_000)
+        if capture_latency_ms:
+            original_screenshot = guest.screenshot
+            def slow_screenshot():
+                current_ns[0] += capture_latency_ms * 1_000_000
+                return original_screenshot()
+            guest.screenshot = slow_screenshot
         proxy = PostEnterProbeProxy(
             guest, storage_root=root, output=output,
             document_filename="train.xlsx", clock=clock, sleep=sleeper)
@@ -80,6 +88,32 @@ class ProbeTests(unittest.TestCase):
             self.assertTrue(all((output / Path(x["frame"]["private_path"]).name).is_file()
                                 for x in rows))
             self.assertEqual(guest.actions, ["enter"])
+
+    def test_remote_capture_latency_fits_new_bound_but_overshoot_stops(self):
+        a, b = png("red"), png("blue")
+        self.assertEqual(MAX_PROBE_WALL_MS, 30_000)
+        with TemporaryDirectory() as directory:
+            guest = Guest([a, b, b, b, b] * 2)
+            proxy, output, _waits = self.make_probe(
+                guest, directory, capture_latency_ms=2_000)
+            proxy.press("enter")
+            proxy.press("enter")
+            rows = [json.loads(line) for line in
+                    (output / "post-enter-samples.ndjson").read_text().splitlines()]
+            self.assertGreater(rows[4]["elapsed_since_enter_ns"], 10_000_000_000)
+            self.assertLess(rows[4]["elapsed_since_enter_ns"],
+                            MAX_PROBE_WALL_MS * 1_000_000)
+            self.assertEqual(audit._post_enter_samples(
+                output_root=Path(directory))["raw_frames"], 10)
+        with TemporaryDirectory() as directory:
+            guest = Guest([a, b, b, b, b])
+            proxy, output, _waits = self.make_probe(
+                guest, directory, capture_latency_ms=6_500)
+            with self.assertRaisesRegex(ValueError, "boundary changed"):
+                proxy.press("enter")
+            self.assertEqual(guest.actions, ["enter"])
+            self.assertEqual(len((output / "post-enter-samples.ndjson").read_text(
+                ).splitlines()), 5)
 
     def test_modal_or_oscillation_stops_without_next_action(self):
         a, b = png("red"), png("blue")

@@ -19,7 +19,9 @@ from .v066_storage_budget import reserve_and_write
 
 
 SAMPLE_DELAYS_MS = (0, 250, 250, 250, 250)
-MAX_PROBE_WALL_MS = 10_000
+# Five remote screenshots each took about two seconds in the first real
+# public-TRAIN attempt. Keep a bounded probe while allowing capture latency.
+MAX_PROBE_WALL_MS = 30_000
 
 
 def digest(raw: bytes) -> str:

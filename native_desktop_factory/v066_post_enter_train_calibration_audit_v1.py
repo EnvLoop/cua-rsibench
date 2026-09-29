@@ -15,7 +15,7 @@ from pathlib import Path
 from . import v066_scoped_calc_writer_train_demo as demo
 from . import v066_scoped_calc_writer_train_demo_audit_v2 as demo_audit
 from .budget_ledger import audit as budget_audit
-from .post_enter_train_probe_v1 import SAMPLE_DELAYS_MS
+from .post_enter_train_probe_v1 import MAX_PROBE_WALL_MS, SAMPLE_DELAYS_MS
 from .qwen_v064_adapter import application_frame_digest
 from .reconcile_interrupted_sweep import active_hashes
 from .v066_scoped_profile_reference import validate_reference
@@ -170,7 +170,8 @@ def _post_enter_samples(*, output_root: Path) -> dict:
                     type(row.get("monotonic_after_ns")) is not int or
                     row["monotonic_after_ns"] < row["monotonic_before_ns"] or
                     row.get("elapsed_since_enter_ns", -1) < 0 or
-                    row["elapsed_since_enter_ns"] > 10_000_000_000):
+                    row["elapsed_since_enter_ns"] >
+                        MAX_PROBE_WALL_MS * 1_000_000):
                 raise ValueError("Post-Enter timestamp/frame/window evidence changed")
             application.append(row["application_frame_sha256"])
             window.append(row["window_id_after_sha256"])
