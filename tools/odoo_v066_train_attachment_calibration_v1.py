@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import time
 
 from tools import odoo_v066_scale_protocol_v1 as protocol
@@ -19,7 +20,7 @@ from tools import record_odoo_v066_train_gui_v1 as recorder
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "envloop-odoo-train-attachment-calibration-v1"
-FREEZE_SCHEMA = "envloop-odoo-train-attachment-calibration-freeze-v2"
+FREEZE_SCHEMA = "envloop-odoo-train-attachment-calibration-freeze-v3"
 RECEIPT_SCHEMA = "envloop-odoo-train-attachment-calibration-attempt-v1"
 RUN_NAME = "attachment-route-train-pilot-20260929-01"
 SOURCE_FILES = (
@@ -27,11 +28,19 @@ SOURCE_FILES = (
     "tools/audit_odoo_v066_train_attachment_calibration_v1.py",
     "tools/record_odoo_v066_train_gui_v1.py",
     "tools/odoo_v066_scale_controller_v1.py",
+    "tools/odoo_v066_scale_protocol_v1.py",
+    "tools/odoo_v066_scale_recipes_v1.py",
     "enterprise_fallback/odoo18/odoo_v066_train_attachment_route_adapter_v1.py",
     "enterprise_fallback/odoo18/odoo_v066_scale_exact_return_adapter.py",
+    "enterprise_fallback/odoo18/odoo_v066_scale_pinned_border_adapter.py",
+    "enterprise_fallback/odoo18/odoo_v066_scale_parse_border_adapter_v5.py",
+    "enterprise_fallback/odoo18/odoo_v066_two_frame_dispatch_adapter_v6.py",
     "enterprise_fallback/odoo18/odoo_v066_train_adapter.py",
     "enterprise_fallback/odoo18/odoo_native_adapter.py",
     "enterprise_fallback/odoo18/partition_factory.py",
+    "enterprise_fallback/odoo18/hidden_factory.py",
+    "enterprise_fallback/odoo18/factory.py",
+    "enterprise_fallback/odoo18/compose.yaml",
     "enterprise_fallback/odoo18/gui_controls.py",
     "enterprise_fallback/odoo18/reset.py",
     "enterprise_fallback/odoo18/verify.py",
@@ -39,9 +48,14 @@ SOURCE_FILES = (
     "src/cursibench/scale_action_contract.py",
     "src/cursibench/scale_action_contract_v066.py",
     "src/cursibench/scale_action_output_v066.py",
+    "src/cursibench/scale_action_output_v065.py",
     "src/cursibench/scale_vision_proxy.py",
 )
 PUBLIC_STATUS = "source_frozen_train_only_no_native_attempt"
+READINESS_TIMEOUT_S = 60
+READINESS_PROBE_TIMEOUT_S = 5
+READINESS_MAX_PROBES = 30
+READINESS_POLL_S = 1
 
 
 class CalibrationError(RuntimeError):
@@ -72,6 +86,9 @@ def _worker(worker_dir: Path):
     require(worker.name == "train" and
             os.environ.get("ENVLOOP_ODOO_WORKER_DIR") == str(worker),
             "calibration_train_worker_not_selected")
+    require((worker / "compose.yaml").is_file() and
+            not (worker / "compose.yaml").is_symlink(),
+            "calibration_original_worker_compose_missing")
     private = protocol._worker_split(worker, "train")
     return worker, private
 
@@ -145,6 +162,76 @@ def _checkpoint(private: Path) -> dict:
             "baseline_snapshot_sha256": protocol.digest(baseline.read_bytes())}
 
 
+def _wait_db_ready(worker: Path, *, clock=None, sleeper=None, probe=None) -> dict:
+    """Bounded native PostgreSQL health and verifier read-only SELECT 1."""
+    clock = clock or time.monotonic
+    sleeper = sleeper or time.sleep
+
+    def default_probe(*args: str, timeout_s: float):
+        return subprocess.run(
+            ["docker", "compose", "--env-file", ".env", *args],
+            cwd=worker, capture_output=True, text=True, check=False,
+            timeout=timeout_s)
+
+    probe = probe or default_probe
+    started = clock()
+    deadline = started + READINESS_TIMEOUT_S
+    observations = []
+    for attempt in range(1, READINESS_MAX_PROBES + 1):
+        remaining = deadline - clock()
+        if remaining <= 0:
+            break
+        row = {"attempt": attempt, "services": [],
+               "pg_isready_exit_code": None, "psql_exit_code": None}
+        try:
+            ps = probe("ps", "--status", "running", "--services",
+                       timeout_s=min(READINESS_PROBE_TIMEOUT_S, remaining))
+            row["compose_ps_exit_code"] = ps.returncode
+            if ps.returncode == 0:
+                services = {item.strip() for item in ps.stdout.splitlines()
+                            if item.strip()}
+                require(services <= {"db"},
+                        "train_calibration_unexpected_web_during_db_readiness")
+                row["services"] = sorted(services)
+                if services == {"db"}:
+                    remaining = deadline - clock()
+                    if remaining > 0:
+                        health = probe(
+                            "exec", "-T", "db", "pg_isready", "-U", "odoo",
+                            "-d", "postgres",
+                            timeout_s=min(READINESS_PROBE_TIMEOUT_S, remaining))
+                        row["pg_isready_exit_code"] = health.returncode
+                        if health.returncode == 0:
+                            remaining = deadline - clock()
+                            if remaining > 0:
+                                sql = probe(
+                                    "exec", "-T", "db", "psql", "-U",
+                                    "bench_verify", "-d", "bench", "-At",
+                                    "-v", "ON_ERROR_STOP=1", "-c", "SELECT 1",
+                                    timeout_s=min(READINESS_PROBE_TIMEOUT_S,
+                                                  remaining))
+                                row["psql_exit_code"] = sql.returncode
+                                if sql.returncode == 0:
+                                    require(sql.stdout == "1\n",
+                                            "train_calibration_ready_sql_unexpected")
+                                    observations.append(row)
+                                    return {
+                                        "status": "postgres_health_and_select_1_ready",
+                                        "query": "SELECT 1", "probe_count": attempt,
+                                        "elapsed_milliseconds":
+                                            round((clock() - started) * 1000),
+                                        "observations": observations,
+                                    }
+        except subprocess.TimeoutExpired:
+            row["probe_timeout"] = True
+        observations.append(row)
+        remaining = deadline - clock()
+        if remaining <= 0:
+            break
+        sleeper(min(READINESS_POLL_S, remaining))
+    raise CalibrationError("train_calibration_db_readiness_timeout")
+
+
 def prepare(*, worker_dir: Path, accepted_audit_path: Path,
             private_freeze_path: Path, public_freeze_path: Path) -> dict:
     worker, private = _worker(worker_dir)
@@ -173,6 +260,9 @@ def prepare(*, worker_dir: Path, accepted_audit_path: Path,
         "checkpoint": checkpoint,
         "partition_cases_sha256":
             protocol.digest((private / "partition_cases.json").read_bytes()),
+        "worker_env_sha256": protocol.digest((worker / ".env").read_bytes()),
+        "worker_compose_sha256":
+            protocol.digest((worker / "compose.yaml").read_bytes()),
         "source_hashes_sha256":
             protocol.digest((private / "source_hashes.json").read_bytes()),
         "source_files_sha256": source_hashes,
@@ -229,6 +319,10 @@ def _verify_freeze(worker_dir: Path, accepted_audit_path: Path,
             freeze.get("checkpoint") == _checkpoint(private) and
             freeze.get("partition_cases_sha256") == protocol.digest(
                 (private / "partition_cases.json").read_bytes()) and
+            freeze.get("worker_env_sha256") ==
+            protocol.digest((worker / ".env").read_bytes()) and
+            freeze.get("worker_compose_sha256") ==
+            protocol.digest((worker / "compose.yaml").read_bytes()) and
             freeze.get("source_hashes_sha256") == protocol.digest(
                 (private / "source_hashes.json").read_bytes()) and
             freeze.get("source_files_sha256") == _source_hashes() and
@@ -302,9 +396,13 @@ def run(*, worker_dir: Path, accepted_audit_path: Path,
         try:
             running_before = recorder._running(worker)
             service_state_observed = True
-            if not {"db", "web"} <= running_before:
-                recorder._compose(worker, "up", "-d", "db", "web")
+            require(running_before == set(),
+                    "train_calibration_worker_services_not_cold")
+            recorder._compose(worker, "up", "-d", "db")
             services_ready = True
+            refs["db_readiness"] = recorder._artifact(
+                out, "db_readiness.json", _wait_db_ready(worker))
+            recorder._compose(worker, "up", "-d", "web")
             stage = "pre_restore"
             refs["pre_restore"] = recorder._artifact(
                 out, "pre_restore.json", reset.restore())
@@ -435,6 +533,7 @@ def run(*, worker_dir: Path, accepted_audit_path: Path,
                         post["business_snapshot_equal"] and
                         post["physical_filestore_equal_before_web_restart"] and
                         _private_json(out / "restored_sql.json") == baseline and
+                        _private_json(out / "restored_filestore.json") == files and
                         verify.protected_source_file_differences(
                             baseline, files,
                             _private_json(out / "restored_filestore.json")) == [])
@@ -468,11 +567,14 @@ def run(*, worker_dir: Path, accepted_audit_path: Path,
                 failure = CalibrationError("train_calibration_reset_or_budget_failed")
                 failure_stage = "post_restore"
             if failure is None:
-                if _source_hashes() != freeze["source_files_sha256"]:
+                try:
+                    _verify_freeze(worker, accepted_audit_path,
+                                   private_freeze_path, public_freeze_path)
+                except Exception:
                     failure = CalibrationError("train_calibration_source_changed")
                     failure_stage = "final_source_recheck"
             if failure is None:
-                required = {"pre_restore", "baseline_sql", "source_frame",
+                required = {"db_readiness", "pre_restore", "baseline_sql", "source_frame",
                             "positive_reload_frame", "positive_sql",
                             "positive_filestore", "positive_store_paths",
                             "negative_reload_frame", "negative_sql",

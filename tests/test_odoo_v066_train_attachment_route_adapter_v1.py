@@ -10,11 +10,21 @@ from unittest.mock import patch
 
 from PIL import Image
 
+from tools.audit_odoo_v066_train_attachment_calibration_v1 import (
+    CalibrationAuditError, _require_full_post_web_manifest,
+)
+from tools.odoo_v066_train_attachment_calibration_v1 import _wait_db_ready
 from enterprise_fallback.odoo18.odoo_v066_scale_exact_return_adapter import (
     OdooV066ScaleExactReturnAdapter,
 )
+from enterprise_fallback.odoo18.odoo_v066_scale_parse_border_adapter_v5 import (
+    OdooV066ScaleParseBorderAdapterV5,
+)
 from enterprise_fallback.odoo18.odoo_v066_train_attachment_route_adapter_v1 import (
     OdooV066TrainAttachmentRouteAdapterV1,
+)
+from enterprise_fallback.odoo18.odoo_v066_two_frame_dispatch_adapter_v6 import (
+    OdooV066TwoFrameDispatchAdapterV6,
 )
 
 
@@ -72,7 +82,8 @@ class AttachmentGuardTests(unittest.TestCase):
 
     def run_guard(self, *, exact: bool, first: bytes,
                   second: bytes | None, identities: list[dict | None] | None = None,
-                  action: dict | None = None, route: str | None = None):
+                  action: dict | None = None, route: str | None = None,
+                  base_frames: list[bytes] | None = None):
         page = Page([first] + ([] if second is None else [second]),
                     identities or [self.identity] * 3)
         if route is not None:
@@ -86,6 +97,7 @@ class AttachmentGuardTests(unittest.TestCase):
         adapter.observed_attachment = self.identity
         adapter.observed_attachment_frame_id = self.observation.frame_id
         adapter._pending_action = action or self.action
+        adapter._pending_link = True
         saved: list[bytes] = []
 
         def sink(index: int, raw: bytes) -> dict:
@@ -97,7 +109,8 @@ class AttachmentGuardTests(unittest.TestCase):
         adapter.frame_guard_sink = sink
 
         def base(current, observation, *, stage):
-            samples = [self.observed] if exact else [self.alternate] * 6
+            samples = (base_frames if base_frames is not None else
+                       ([self.observed] if exact else [self.alternate] * 6))
             for index, raw in enumerate(samples):
                 ref = current.frame_guard_sink(
                     len(current.frame_guard_samples), raw)
@@ -108,10 +121,10 @@ class AttachmentGuardTests(unittest.TestCase):
                     "observed_frame_id_sha256":
                         sha256(observation.frame_id.encode()).hexdigest(),
                     "sampled_frame_ref": ref,
-                    "classification": ("exact_return" if exact else
+                    "classification": ("exact_return" if raw == self.observed else
                                        "one_recurring_micro_raster_alternate"),
                 })
-            return exact
+            return samples[-1] == self.observed
 
         with patch.object(OdooV066ScaleExactReturnAdapter,
                           "_frame_current", new=base):
@@ -157,6 +170,14 @@ class AttachmentGuardTests(unittest.TestCase):
         self.assertIsNone(adapter._physical_guard)
         self.assertEqual(len(saved), 8)
 
+    def test_recurring_alternate_then_exact_return_is_bounded(self):
+        passed, adapter, saved = self.run_guard(
+            exact=True, first=self.observed, second=self.observed,
+            base_frames=[self.alternate, self.alternate, self.observed])
+        self.assertTrue(passed)
+        self.assertEqual(len(saved), 5)
+        self.assertEqual(adapter._physical_guard["base_sample_count"], 3)
+
     def test_task_frame_and_route_bindings_fail_closed(self):
         for action, route in (
             ({**self.action, "frame_id": "old-frame"}, None),
@@ -188,6 +209,59 @@ class AttachmentGuardTests(unittest.TestCase):
                 page, task_id="ELPO-TRN-0001", task_binding_sha256="a" * 64,
                 instruction="train-only",
                 expected_attachment_label="ELPO-SEL-0001-source.pdf")
+
+    def test_non_link_parse_and_dispatch_keep_v5_v6_path(self):
+        page = Page([], [])
+        adapter = OdooV066TrainAttachmentRouteAdapterV1(
+            page, task_id=self.observation.task_id,
+            task_binding_sha256=self.observation.task_binding_sha256,
+            instruction="train-only", expected_attachment_label=self.label)
+        adapter.latest = self.observation
+        adapter.latest_url = page.url
+        other = {**self.action, "target": {"x": 1307, "y": 868}}
+        with patch(
+                "enterprise_fallback.odoo18."
+                "odoo_v066_train_attachment_route_adapter_v1."
+                "normalize_model_action", return_value=other), patch.object(
+                    OdooV066ScaleParseBorderAdapterV5,
+                    "parse_current_action", return_value=other) as parsed:
+            self.assertEqual(adapter.parse_current_action("synthetic"), other)
+            parsed.assert_called_once_with("synthetic")
+        with patch.object(OdooV066TwoFrameDispatchAdapterV6,
+                          "dispatch", return_value={"delegated": True}) as sent:
+            self.assertEqual(adapter.dispatch(other), {"delegated": True})
+            sent.assert_called_once_with(other)
+
+    def test_db_readiness_retries_before_any_sql_snapshot(self):
+        calls = []
+        results = iter([
+            SimpleNamespace(returncode=0, stdout="db\n"),
+            SimpleNamespace(returncode=1, stdout=""),
+            SimpleNamespace(returncode=0, stdout="db\n"),
+            SimpleNamespace(returncode=0, stdout=""),
+            SimpleNamespace(returncode=0, stdout="1\n"),
+        ])
+
+        def probe(*args, timeout_s):
+            calls.append(args)
+            return next(results)
+
+        ready = _wait_db_ready(
+            "/unused/train", clock=lambda: 0.0,
+            sleeper=lambda _duration: None, probe=probe)
+        self.assertEqual(ready["probe_count"], 2)
+        self.assertEqual(ready["status"],
+                         "postgres_health_and_select_1_ready")
+        self.assertEqual(calls[-1][-2:], ("-c", "SELECT 1"))
+
+    def test_extra_physical_filestore_file_is_rejected(self):
+        frozen = {"filestore/bench/aa/source": "a" * 64}
+        _require_full_post_web_manifest(frozen, dict(frozen))
+        with self.assertRaisesRegex(
+                CalibrationAuditError,
+                "audit_full_post_web_filestore_manifest_changed"):
+            _require_full_post_web_manifest(
+                frozen, {**frozen, "filestore/bench/runtime-cache": "b" * 64})
 
 
 if __name__ == "__main__":

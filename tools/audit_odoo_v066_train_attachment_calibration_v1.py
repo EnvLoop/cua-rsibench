@@ -141,6 +141,12 @@ def _score(task_id: str, gold: dict, baseline: dict, observed: dict,
             "difference_codes": differences}
 
 
+def _require_full_post_web_manifest(frozen: dict, observed: dict) -> None:
+    require(type(frozen) is dict and type(observed) is dict and
+            observed == frozen,
+            "audit_full_post_web_filestore_manifest_changed")
+
+
 def _guard(out: Path, action: dict, intent: dict, result: dict,
            label: str, samples: list[dict]) -> tuple[set[str], int]:
     receipt = action["contract_receipt"]
@@ -196,7 +202,7 @@ def _guard(out: Path, action: dict, intent: dict, result: dict,
                   _micro_raster_alternate(frame, first))),
                 "audit_attachment_guard_physical_frames_invalid")
         require(type(item.get("base_sample_count")) is int and
-                item["base_sample_count"] in (1, 6),
+                1 <= item["base_sample_count"] <= 6,
                 "audit_attachment_guard_base_count_invalid")
         base_samples = [sample for sample in samples
                         if sample.get("step") == action["step"] and
@@ -216,17 +222,19 @@ def _guard(out: Path, action: dict, intent: dict, result: dict,
                 "audit_attachment_guard_sample_sequence_invalid")
         base_raw = [_ref(out, sample["sampled_frame_ref"], image=True)[1]
                     for sample in base_samples]
-        if len(base_raw) == 1:
-            require(base_raw[0] == frame and
-                    base_samples[0].get("classification") == "exact_return",
-                    "audit_attachment_exact_base_sample_invalid")
-        else:
-            require(len(set(base_raw)) == 1 and
+        exact_return = base_samples[-1].get("classification") == "exact_return"
+        prior = base_samples[:-1] if exact_return else base_samples
+        require(not exact_return or base_raw[-1] == frame,
+                "audit_attachment_exact_return_sample_invalid")
+        if prior:
+            require(len({protocol.digest(raw) for raw in base_raw[:len(prior)]}) == 1 and
                     _micro_raster_alternate(frame, base_raw[0]) and
                     all(sample.get("classification") ==
                         "one_recurring_micro_raster_alternate"
-                        for sample in base_samples),
+                        for sample in prior),
                     "audit_attachment_alternate_base_samples_invalid")
+        require(exact_return or len(base_samples) == 6,
+                "audit_attachment_base_no_exact_or_six_alternates")
         require(all(sample.get("observed_frame_sha256") ==
                     action["frame"]["sha256"] and
                     sample.get("observed_frame_id_sha256") ==
@@ -287,7 +295,7 @@ def audit(*, worker_dir: Path, accepted_audit_path: Path,
     _lease(private / "worker-lease-events.jsonl",
            receipt["worker_pid"], start, finish)
     refs = receipt.get("refs")
-    names = {"pre_restore", "baseline_sql", "source_frame",
+    names = {"db_readiness", "pre_restore", "baseline_sql", "source_frame",
              "positive_reload_frame", "positive_sql",
              "positive_filestore", "positive_store_paths",
              "negative_reload_frame", "negative_sql",
@@ -302,6 +310,19 @@ def audit(*, worker_dir: Path, accepted_audit_path: Path,
             _ref(out, ref, image=True)
         else:
             artifacts[name] = _artifact(out, ref)
+    readiness = artifacts["db_readiness"]
+    observations = readiness.get("observations")
+    require(readiness.get("status") ==
+            "postgres_health_and_select_1_ready" and
+            readiness.get("query") == "SELECT 1" and
+            type(readiness.get("probe_count")) is int and
+            1 <= readiness["probe_count"] <= calibration.READINESS_MAX_PROBES and
+            type(observations) is list and
+            len(observations) == readiness["probe_count"] and
+            observations[-1].get("services") == ["db"] and
+            observations[-1].get("pg_isready_exit_code") == 0 and
+            observations[-1].get("psql_exit_code") == 0,
+            "audit_bounded_db_readiness_missing")
     baseline = _json(private / "baseline_snapshot.json")
     frozen = _json(private / "baseline-filestore-manifest.json")
     checkpoint = freeze["checkpoint"]
@@ -324,6 +345,7 @@ def audit(*, worker_dir: Path, accepted_audit_path: Path,
     require(verify.protected_source_file_differences(
         baseline, frozen, artifacts["restored_filestore"]) == [],
         "audit_post_restart_source_changed")
+    _require_full_post_web_manifest(frozen, artifacts["restored_filestore"])
     from enterprise_fallback.odoo18.partition_factory import source_asset
     world = _json(private / "partition_cases.json")
     source = source_asset(case, world)
@@ -454,7 +476,9 @@ def audit(*, worker_dir: Path, accepted_audit_path: Path,
         "independent_positive_reward": positive["reward"],
         "independent_wrong_object_reward": negative["reward"],
         "source_attachment_physically_read_back": True,
+        "bounded_db_readiness_verified": True,
         "full_pre_web_filestore_reset_exact": True,
+        "full_post_web_filestore_manifest_exact": True,
         "protected_source_bytes_after_web_restart_equal": True,
         "native_attachment_link_dispatches_checked": link_count,
         "physical_guard_pngs_checked": len(sample_paths),

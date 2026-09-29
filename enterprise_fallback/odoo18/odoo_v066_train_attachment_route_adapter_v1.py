@@ -18,6 +18,10 @@ from .odoo_v066_scale_exact_return_adapter import (
     MAX_EXACT_RETURN_SAMPLES, OdooV066ScaleExactReturnAdapter,
     _micro_raster_alternate,
 )
+from .odoo_v066_train_adapter import OdooV066TrainAdapter
+from .odoo_v066_two_frame_dispatch_adapter_v6 import (
+    OdooV066TwoFrameDispatchAdapterV6,
+)
 
 
 PROFILE = "train-only-visible-attachment-route-2026-09-29-v1"
@@ -75,8 +79,8 @@ def _identity(raw: object) -> dict | None:
             ("label", "tag", "role", "title", "bounds")}
 
 
-class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
-    """Allow a bounded raster alternate only for the observed PDF link."""
+class OdooV066TrainAttachmentRouteAdapterV1(OdooV066TwoFrameDispatchAdapterV6):
+    """Preserve v6 RFQ guards, adding a train-only visible-PDF-link guard."""
 
     def __init__(self, *args, expected_attachment_label: str, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,6 +92,7 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
         self.observed_target_control: dict | None = None
         self.observed_attachment_frame_id: str | None = None
         self._pending_action: dict | None = None
+        self._pending_link = False
         self._parsed_action: dict | None = None
         self._parse_guard: dict | None = None
         self._physical_guard: dict | None = None
@@ -106,7 +111,7 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
             ATTACHMENT_LOOKUP_JS,
             {"label": self.expected_attachment_label, "target": target}))
 
-    def _is_link_action(self, observation, action: dict | None) -> bool:
+    def _claims_observed_link(self, observation, action: dict | None) -> bool:
         if (type(action) is not dict or action.get("type") != "click" or
                 action.get("task_id") != self.task_id or
                 action.get("task_binding_sha256") !=
@@ -122,9 +127,15 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
                 any(type(target[key]) is not int for key in ("x", "y"))):
             return False
         observed = _identity(self.observed_attachment)
-        return (observed is not None and
-                observed["label"] == self.expected_attachment_label and
-                self._lookup(target) == observed)
+        if observed is None or observed["label"] != self.expected_attachment_label:
+            return False
+        left, top, right, bottom = observed["bounds"]
+        return left <= target["x"] <= right and top <= target["y"] <= bottom
+
+    def _is_link_action(self, observation, action: dict | None) -> bool:
+        return (self._claims_observed_link(observation, action) and
+                self._lookup(action["target"]) ==
+                _identity(self.observed_attachment))
 
     def _record_final(self, observation, stage: str, index: int,
                       raw: bytes, classification: str) -> dict:
@@ -142,12 +153,15 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
         return ref
 
     def _frame_current(self, observation, *, stage: str) -> bool:
+        if not self._pending_link:
+            return super()._frame_current(observation, stage=stage)
         start = len(self.frame_guard_samples)
-        exact = super()._frame_current(observation, stage=stage)
+        exact = OdooV066ScaleExactReturnAdapter._frame_current(
+            self, observation, stage=stage)
         samples = self.frame_guard_samples[start:]
         action = self._pending_action
         if not self._is_link_action(observation, action):
-            return exact
+            return False
         # No widening for an unrelated route or target. A failing base guard
         # may be recovered only from six copies of the one frozen alternate.
         alternate_sha = None
@@ -160,8 +174,20 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
                          for item in samples}) != 1):
                 return False
             alternate_sha = samples[-1]["sampled_frame_ref"]["sha256"]
-        elif len(samples) != 1 or samples[0].get("classification") != "exact_return":
-            return False
+        else:
+            # The bounded base sampler may see its already proven alternate
+            # before the exact observed PNG returns. No third state is allowed.
+            earlier = samples[:-1]
+            if (not 1 <= len(samples) <= MAX_EXACT_RETURN_SAMPLES or
+                    samples[-1].get("classification") != "exact_return" or
+                    any(item.get("classification") !=
+                        "one_recurring_micro_raster_alternate"
+                        for item in earlier) or
+                    len({item["sampled_frame_ref"]["sha256"]
+                         for item in earlier}) > 1):
+                return False
+            if earlier:
+                alternate_sha = earlier[0]["sampled_frame_ref"]["sha256"]
         target = action["target"]
         observed = _identity(self.observed_attachment)
         if observed is None or self._lookup(target) != observed:
@@ -218,8 +244,12 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
             raise ContractError("stale_frame")
         action = normalize_model_action(
             raw, observation, current_frame_id=observation.frame_id)
+        if not self._claims_observed_link(observation, action):
+            self._parsed_action = None
+            return super().parse_current_action(raw)
         self._parse_guard = None
         self._pending_action = action
+        self._pending_link = True
         try:
             if not self._frame_current(observation, stage="parse"):
                 raise ContractError("stale_frame")
@@ -227,19 +257,26 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
             return action
         finally:
             self._pending_action = None
+            self._pending_link = False
 
     def dispatch(self, raw_action: str | dict) -> dict:
         observation = self.latest
-        if observation is None or self._parsed_action is None:
+        if observation is None:
             raise ContractError("stale_frame")
+        if self._parsed_action is None:
+            return super().dispatch(raw_action)
         action = validate_action(
             raw_action, observation, current_frame_id=observation.frame_id)
         if action != self._parsed_action:
             raise ContractError("stale_frame")
         self._physical_guard = None
         self._pending_action = action
+        self._pending_link = True
         try:
-            applied = super().dispatch(action)
+            # Bypass v5/v6's non-link dispatch wrapper only for this already
+            # parsed train PDF link. The base dispatcher still validates the
+            # exact screenshot/action contract and performs the mouse click.
+            applied = OdooV066TrainAdapter.dispatch(self, action)
             if self._parse_guard is not None:
                 if self._physical_guard is None:
                     raise ContractError("stale_frame")
@@ -250,6 +287,7 @@ class OdooV066TrainAttachmentRouteAdapterV1(OdooV066ScaleExactReturnAdapter):
             return applied
         finally:
             self._pending_action = None
+            self._pending_link = False
             self._parsed_action = None
             self._parse_guard = None
 
