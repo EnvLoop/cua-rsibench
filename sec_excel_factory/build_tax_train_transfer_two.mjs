@@ -277,6 +277,14 @@ async function build(c, variant) {
   const dest = path.join(out, `${variant}.xlsx`);
   await blob.save(dest);
   await fs.chmod(dest, 0o600);
+  // The spreadsheet runtime may emit a sibling inspection trace. It can
+  // contain workbook content and must remain evaluator-private as well.
+  const inspectionTrace = `${dest}.inspect.ndjson`;
+  try {
+    await fs.chmod(inspectionTrace, 0o600);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
   if (variant === 'positive') {
     for (const name of SHEETS) {
       const png = await w.render({sheetName: name, autoCrop: 'all', scale: 1.5, format: 'png'});

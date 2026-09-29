@@ -8,7 +8,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from sec_excel_factory.audit_tax_train_transfer_two import _require_frozen_case_exact
+from sec_excel_factory.audit_tax_train_transfer_two import (
+    _require_frozen_case_exact, _require_private_modes,
+)
 from sec_excel_factory.verify_tax_train_transfer_two import (
     TARGETS, _case_scope, _close, _counterfactuals, expected_values,
 )
@@ -47,6 +49,19 @@ def _case() -> dict:
 
 
 class TaxTrainTransferSyntheticTests(unittest.TestCase):
+    def test_private_inspection_trace_must_not_be_world_readable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "private-release"
+            root.mkdir(mode=0o700)
+            trace = root / "seed.xlsx.inspect.ndjson"
+            trace.write_text('{"kind":"notice"}\n')
+            trace.chmod(0o644)
+            with self.assertRaisesRegex(ValueError,
+                                        "private_train_artifact_mode_changed"):
+                _require_private_modes(root)
+            trace.chmod(0o600)
+            _require_private_modes(root)
+
     def test_signed_bridge_and_separate_interest_scope(self) -> None:
         case = _case()
         _case_scope(case)

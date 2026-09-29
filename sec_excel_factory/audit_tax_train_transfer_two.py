@@ -47,6 +47,17 @@ def _require_frozen_case_exact(case: dict, reconstructed: dict) -> None:
         raise ValueError("private_case_fields_differ_from_frozen_semantic_review")
 
 
+def _require_private_modes(root: Path) -> None:
+    if not root.is_dir() or (root.stat().st_mode & 0o777) != 0o700:
+        raise ValueError("private_train_root_mode_not_0700")
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise ValueError("private_train_symlink_forbidden")
+        required = 0o700 if path.is_dir() else 0o600
+        if (path.stat().st_mode & 0o777) != required:
+            raise ValueError("private_train_artifact_mode_changed")
+
+
 def mutate(source: Path, destination: Path, sheet: str, address: str,
            *, formula: str | None = None, value: str | None = None,
            style_change: bool = False, remove_cache: bool = False,
@@ -220,6 +231,7 @@ def audit_one(index: int, root: Path, controls: Path) -> dict:
 
 def audit(root: Path, output: Path, *, source_plan: Path,
           semantic_review: Path, raw_root: Path, card_root: Path) -> dict:
+    _require_private_modes(root)
     manifest_path = root / "cases-manifest.private.json"
     manifest = json.loads(manifest_path.read_bytes())
     if (manifest.get("schema") != "envloop.sec_tax_train_case_manifest.private.v1" or
