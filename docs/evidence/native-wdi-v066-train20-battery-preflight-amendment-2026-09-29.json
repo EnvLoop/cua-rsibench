@@ -1,0 +1,22 @@
+{
+  "assignment_unchanged": true,
+  "battery_authorized_requires_explicit_cli_flag": true,
+  "e2b_train_guest_creates": 0,
+  "holdout_candidate_count": 5,
+  "host_power_source_percent_timestamp_and_probe_hash_in_intent": true,
+  "new_plan_public_sha256": "324b4b8489783d55404ee2ce78bb3f204cdfcb75e3c1e330dbab0c6e4680fc1c",
+  "no_concurrent_train_guest_while_final_batch_active": true,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_plan_public_sha256": "79dbbe64eb8ddc711b96e1db619d423ac59da467213889c33d00b9a23a7af427",
+  "provider_active_zero_gate_retained": true,
+  "schema": "cua-native-wdi-v066-train20-battery-preflight-amendment-public-v1",
+  "sft_candidate_count": 15,
+  "source_sha256s": {
+    "native_desktop_factory/v066_train20_audit.py": "b00867c55cc75043a6996ae56cdfa05fe0e5e25ce898bdf614d64a2dc9442fc7",
+    "native_desktop_factory/v066_train20_plan.py": "014f41ae56ed44dd8c3ffae04bb8fc32c4b519884e735d29a784c58381452db5",
+    "native_desktop_factory/v066_train20_worker.py": "3f85541cb0f754b71fbd1c8b3dbbdbfbf40be6fef035a2b751adad39193f141f"
+  },
+  "status": "offline_pre_result_train_only_battery_authorized_source",
+  "tinker_calls": 0
+}

@@ -83,12 +83,17 @@ def audit_one(*, candidate_root: Path, evidence_root: Path,
             intent.get("runner_sha256") != digest(Path(worker.__file__).read_bytes()) or
             intent.get("lease_seconds") != 600 or
             intent.get("automatic_replay_authorized") is not False or
+            type(intent.get("battery_authorized")) is not bool or
+            type(intent.get("host_power_before_intent")) is not dict or
             receipt.get("schema") != worker.RECEIPT_SCHEMA or
             receipt.get("purpose") != "evaluator_scripted_sft_source_no_model" or
             receipt.get("split") != "train" or
             receipt.get("task_id") != task_id or
             receipt.get("plan_sha256") != plan_sha or
             receipt.get("intent_sha256") != digest(intent_raw) or
+            receipt.get("battery_authorized") != intent["battery_authorized"] or
+            receipt.get("host_power_before_intent") !=
+            intent["host_power_before_intent"] or
             receipt.get("package_sha256") != row["package_sha256"] or
             receipt.get("input_sha256") != row["input_sha256"] or
             receipt.get("action_script_sha256") != row["action_script_sha256"] or
@@ -111,6 +116,19 @@ def audit_one(*, candidate_root: Path, evidence_root: Path,
         raise ValueError("Train GUI intent, source, status, or cleanup changed")
     if require_real_provider and receipt.get("provider_kind") != "e2b_desktop":
         raise ValueError("Fake provider data cannot enter real SFT source")
+    power = intent["host_power_before_intent"]
+    if (power.get("source") not in
+            ("AC Power", "Battery Power", "test_unverified") or
+            (power.get("source") == "Battery Power" and
+             intent["battery_authorized"] is not True) or
+            (require_real_provider and
+             (power.get("source") == "test_unverified" or
+              type(power.get("battery_percent")) is not int or
+              not 0 <= power["battery_percent"] <= 100 or
+              type(power.get("probe_sha256")) is not str or
+              len(power["probe_sha256"]) != 64 or
+              type(power.get("captured_utc")) is not str))):
+        raise ValueError("Train-only battery authorization or telemetry is invalid")
     if receipt.get("provider_kind") not in ("e2b_desktop", "fake_test_only"):
         raise ValueError("Unknown Desktop provider kind")
     directory, baseline, oracle = admit._package(

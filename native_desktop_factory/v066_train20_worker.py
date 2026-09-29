@@ -14,6 +14,7 @@ import importlib.metadata
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import time
 
@@ -56,6 +57,24 @@ def ac_power_ready() -> bool:
     return result.returncode == 0 and "Now drawing from 'AC Power'" in result.stdout
 
 
+def host_power_snapshot() -> dict:
+    """Retain a bounded host power observation before a paid train intent."""
+    result = subprocess.run(["pmset", "-g", "batt"], capture_output=True,
+                            text=True, check=False, timeout=10)
+    raw = result.stdout.encode()
+    source = ("AC Power" if "Now drawing from 'AC Power'" in result.stdout
+              else "Battery Power" if "Now drawing from 'Battery Power'"
+              in result.stdout else None)
+    matches = re.findall(r"\b([0-9]{1,3})%", result.stdout)
+    if (result.returncode != 0 or source is None or
+            len(matches) != 1 or not 0 <= int(matches[0]) <= 100 or
+            len(raw) > 4096):
+        raise ValueError("Host power telemetry is unavailable")
+    return {"source": source, "battery_percent": int(matches[0]),
+            "probe_sha256": digest(raw),
+            "captured_utc": datetime.now(timezone.utc).isoformat()}
+
+
 def _persist_receipt(path: Path, value: dict) -> None:
     raw = (json.dumps(value, indent=2, sort_keys=True) + "\n").encode()
     temp = path.with_name("receipt-next.json")
@@ -92,11 +111,20 @@ def _preflight(*, root: Path, task_id: str, plan: dict,
 
 
 def create_intent(*, root: Path, row: dict, plan: dict, plan_sha: str,
-                  require_ac: bool = True, require_provider: bool = True) -> Path:
+                  require_ac: bool = True, require_provider: bool = True,
+                  battery_authorized: bool = False) -> Path:
     """Write one exclusive, source-bound intent only after all pre-create gates."""
     task_id = row["task_id"]
     _preflight(root=root, task_id=task_id, plan=plan,
                require_ac=require_ac, require_provider=require_provider)
+    if type(battery_authorized) is not bool or (battery_authorized and require_ac):
+        raise ValueError("Battery authorization and AC policy conflict")
+    power = (host_power_snapshot() if require_provider else
+             {"source": "test_unverified", "battery_percent": None,
+              "probe_sha256": None, "captured_utc": None})
+    if (require_provider and power["source"] == "Battery Power" and
+            not battery_authorized):
+        raise ValueError("Battery execution lacks explicit authorization")
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     root.chmod(0o700)
     out = root / task_id
@@ -115,6 +143,8 @@ def create_intent(*, root: Path, row: dict, plan: dict, plan_sha: str,
             Decimal(plan["planning_usd_per_hour_upper"]) *
             Decimal(LEASE_SECONDS) / Decimal(3600)),
         "automatic_replay_authorized": False,
+        "battery_authorized": battery_authorized,
+        "host_power_before_intent": power,
         "actual_provider_billed_usd": None,
         "official_final_admissions": 0, "official_model_results": 0,
     }
@@ -139,6 +169,15 @@ def execute_one(*, candidate_root: Path, evidence_root: Path,
             intent.get("lease_seconds") != LEASE_SECONDS or
             intent.get("automatic_replay_authorized") is not False):
         raise ValueError("One-use source-bound train intent changed or consumed")
+    power = intent.get("host_power_before_intent")
+    if (type(intent.get("battery_authorized")) is not bool or
+            type(power) is not dict or
+            power.get("source") not in
+            ("AC Power", "Battery Power", "test_unverified") or
+            (sandbox_factory is None and power.get("source") == "test_unverified") or
+            (power.get("source") == "Battery Power" and
+             intent["battery_authorized"] is not True)):
+        raise ValueError("Train intent lacks authorized power telemetry")
     inventory_row = next((item for item in plan["train_rows"]
                           if item["task_id"] == task_id), None)
     if row != inventory_row or task_id not in plan["sft_task_ids"]:
@@ -173,6 +212,8 @@ def execute_one(*, candidate_root: Path, evidence_root: Path,
         "input_sha256": row["input_sha256"],
         "action_script_sha256": row["action_script_sha256"],
         "intent_sha256": digest(intent_raw), "plan_sha256": plan_sha,
+        "battery_authorized": intent["battery_authorized"],
+        "host_power_before_intent": power,
         "runner_sha256": digest(Path(__file__).read_bytes()),
         "adapter_sha256": digest(Path(qwen_v066_adapter.__file__).read_bytes()),
         "profile_guard_sha256": digest(Path(profile_guard.__file__).read_bytes()),
@@ -336,7 +377,8 @@ def execute_one(*, candidate_root: Path, evidence_root: Path,
 def collect(*, repo_root: Path, candidate_root: Path, evidence_root: Path,
             plan_path: Path, guest_public: Path, scoped_reference: Path,
             ratification: Path, max_new: int,
-            enable_paid_train20: bool = False) -> dict:
+            enable_paid_train20: bool = False,
+            battery_authorized: bool = False) -> dict:
     if enable_paid_train20 is not True or not 1 <= max_new <= 15:
         raise ValueError("Explicit paid train20 enablement and 1–15 cap required")
     plan, plan_sha = validate_plan(
@@ -369,7 +411,8 @@ def collect(*, repo_root: Path, candidate_root: Path, evidence_root: Path,
             result["status"] = "bounded_pause_after_accepted_ids"
             break
         create_intent(root=evidence_root, row=row, plan=plan,
-                      plan_sha=plan_sha)
+                      plan_sha=plan_sha, require_ac=not battery_authorized,
+                      battery_authorized=battery_authorized)
         receipt = execute_one(
             candidate_root=candidate_root, evidence_root=evidence_root,
             row=row, plan=plan, plan_sha=plan_sha,
@@ -409,6 +452,7 @@ def main() -> None:
     parser.add_argument("--ratification", type=Path, required=True)
     parser.add_argument("--max-new", type=int, default=1)
     parser.add_argument("--enable-paid-train20", action="store_true")
+    parser.add_argument("--battery-authorized", action="store_true")
     args = parser.parse_args()
     result = collect(
         repo_root=args.repo_root, candidate_root=args.candidate_root,
@@ -416,7 +460,8 @@ def main() -> None:
         guest_public=args.guest_public,
         scoped_reference=args.scoped_reference,
         ratification=args.ratification, max_new=args.max_new,
-        enable_paid_train20=args.enable_paid_train20)
+        enable_paid_train20=args.enable_paid_train20,
+        battery_authorized=args.battery_authorized)
     print(json.dumps(result, sort_keys=True))
     if result["status"].startswith("stopped_after"):
         raise SystemExit(2)

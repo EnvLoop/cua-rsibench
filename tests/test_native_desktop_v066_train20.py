@@ -85,6 +85,48 @@ class TestTrain20(unittest.TestCase):
                                      plan_sha="d" * 64,
                                      require_ac=False, require_provider=False)
 
+    def test_battery_authorized_intent_keeps_power_telemetry(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "evidence"
+            row = {"task_id": "train-a", "package_sha256": "a" * 64,
+                   "input_sha256": "b" * 64,
+                   "action_script_sha256": "c" * 64}
+            frozen = {"sft_task_ids": ["train-a"],
+                      "holdout_task_ids": [],
+                      "planning_usd_per_hour_upper": "1.00"}
+            observed = {"source": "Battery Power", "battery_percent": 71,
+                        "probe_sha256": "e" * 64,
+                        "captured_utc": "2026-09-29T00:00:00+00:00"}
+            with patch.dict(worker.os.environ, {"E2B_API_KEY": "test"}), \
+                 patch.object(worker, "active_hashes", return_value=(set(), 0)), \
+                 patch.object(worker, "host_power_snapshot",
+                              return_value=observed):
+                with self.assertRaisesRegex(ValueError, "authorization"):
+                    worker.create_intent(
+                        root=root, row=row, plan=frozen,
+                        plan_sha="d" * 64, require_ac=False,
+                        require_provider=True)
+                self.assertEqual(len(list(root.glob("*/intent.json"))), 0)
+                out = worker.create_intent(
+                    root=root, row=row, plan=frozen,
+                    plan_sha="d" * 64, require_ac=False,
+                    require_provider=True, battery_authorized=True)
+            intent = json.loads((out / "intent.json").read_bytes())
+            self.assertTrue(intent["battery_authorized"])
+            self.assertEqual(intent["host_power_before_intent"], observed)
+
+    def test_host_power_parser_rejects_unknown_and_keeps_percent(self):
+        output = "Now drawing from 'Battery Power'\n -InternalBattery-0 71%; discharging"
+        with patch.object(worker.subprocess, "run", return_value=
+                          SimpleNamespace(returncode=0, stdout=output)):
+            observed = worker.host_power_snapshot()
+        self.assertEqual(observed["source"], "Battery Power")
+        self.assertEqual(observed["battery_percent"], 71)
+        with patch.object(worker.subprocess, "run", return_value=
+                          SimpleNamespace(returncode=0, stdout="unknown")):
+            with self.assertRaisesRegex(ValueError, "telemetry"):
+                worker.host_power_snapshot()
+
     def _fake_evidence(self, root: Path):
         task_id = "wdi-native-mex-calc-growth"
         candidate = root / "candidates"
@@ -116,7 +158,11 @@ class TestTrain20(unittest.TestCase):
                   "input_sha256": row["input_sha256"],
                   "action_script_sha256": row["action_script_sha256"],
                   "runner_sha256": plan.digest(Path(worker.__file__).read_bytes()),
-                  "lease_seconds": 600, "automatic_replay_authorized": False}
+                  "lease_seconds": 600, "automatic_replay_authorized": False,
+                  "battery_authorized": False,
+                  "host_power_before_intent": {
+                      "source": "test_unverified", "battery_percent": None,
+                      "probe_sha256": None, "captured_utc": None}}
         intent_raw = plan.encode(intent)
         _write(out / "intent.json", intent_raw)
         image = io.BytesIO()
@@ -158,6 +204,8 @@ class TestTrain20(unittest.TestCase):
                    "purpose": "evaluator_scripted_sft_source_no_model",
                    "split": "train", "task_id": task_id,
                    "plan_sha256": frozen_sha, "intent_sha256": plan.digest(intent_raw),
+                   "battery_authorized": False,
+                   "host_power_before_intent": intent["host_power_before_intent"],
                    "package_sha256": row["package_sha256"],
                    "input_sha256": row["input_sha256"],
                    "action_script_sha256": row["action_script_sha256"],
