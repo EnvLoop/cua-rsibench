@@ -1,0 +1,20 @@
+{
+  "corrected_review_sha256": "b8eb2d73511ff19f7b68aa2fae67e309e21d51d2ee4e317ad974f48d500fdf72",
+  "dimension_counts_corrected": 40,
+  "dimension_member_lists_verified_from_original_xbrl": 60,
+  "direct_field_dimension_counts_corrected": 32,
+  "excel_web_gui_controls": 0,
+  "field_value_and_presence_mappings_rechecked": 64,
+  "independent_source_parser_sha256": "5b5d391c1a818d21f248a4525b51d7d84e79805b2f0b6e255fa36e72f9975cfc",
+  "model_calls": 0,
+  "nested_reconciliation_dimension_counts_corrected": 8,
+  "official_final_admissions": 0,
+  "old_review_sha256": "657fb74cb1cef2e0130d570b319dcf7d1a054257fd8c8aa48a78506adf531d77",
+  "other_review_data_changes": 0,
+  "private_correction_audit_sha256": "20b1dd6d518a02904245ec1db3faba1aa81955dae45d08e948690fad41b58e36",
+  "remaining_source_mismatches": 0,
+  "same_accession_bank_companyfacts_checks": 20,
+  "schema": "envloop.sec_excel_train_next_four_scope_correction.public.v1",
+  "source_plan_sha256": "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa",
+  "status": "corrected_scope_metadata_independently_verified"
+}
