@@ -17,8 +17,10 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import signal
 import stat
 import sys
+import time
 
 from . import prospective_final_controls_v066 as lane
 from . import v066_supervised_final_batch_v1 as old_batch
@@ -28,27 +30,27 @@ from . import v066_supervised_final_one_v1 as one
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = one.PRIVATE_ROOT
 ORIGINAL = one.RUN_DIR
-BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-v2-20260929"
+BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-v3-20260929"
 SUPERVISION = BRANCH / "supervision"
 PRIVATE_FREEZE = BRANCH / "source-freeze.private.json"
 PUBLIC_FREEZE = (
-    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v2-source-freeze-2026-09-29.json"
+    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v3-source-freeze-2026-09-29.json"
 )
 PRIVATE_OUTCOME = BRANCH / "requalification-audit.private.json"
 PUBLIC_OUTCOME = (
-    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v2-outcome-2026-09-29.json"
+    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v3-outcome-2026-09-29.json"
 )
-SUPERSEDED_BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-20260929"
-SUPERSEDED_PRIVATE_FREEZE_SHA256 = "f3d07836a3f6bcc79b40a0471bab8573a8ef7df2f0e930d495e847a09ad08604"
-SUPERSEDED_PUBLIC_FREEZE_SHA256 = "d172621b23fb48adaa4f649de1e56b80615affc7b06bb5a57f42e3710df0dff5"
-SUPERSEDED_SOURCE_BUNDLE_SHA256 = "85a4641ccea21502436ffc83144e30217cd870a6539cbb1f1da369f4fc25f1ee"
-SUPERSEDED_PUBLIC_FREEZE = ROOT / "docs/evidence/gitlab-v066-infra-requalification-source-freeze-2026-09-29.json"
+SUPERSEDED_BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-v2-20260929"
+SUPERSEDED_PRIVATE_FREEZE_SHA256 = "029015f45aed1fe3bc55fcbc374a0e50ee31e63d112068dd538c898ae8d32508"
+SUPERSEDED_PUBLIC_FREEZE_SHA256 = "00e26bf45cbd7683c7b2ebae348ee09912a2110bbe2c8fc42b8d7b8a425a4db2"
+SUPERSEDED_SOURCE_BUNDLE_SHA256 = "661a7c5cd01b07f8af16f8f44e8c723ea430ef49ca0ac1363fdb163238418aac"
+SUPERSEDED_PUBLIC_FREEZE = ROOT / "docs/evidence/gitlab-v066-infra-requalification-v2-source-freeze-2026-09-29.json"
 NINE_PRIVATE = ORIGINAL / "current-v066-nine-id-terminal-private-audit-20260929.json"
 NINE_PUBLIC = ROOT / "docs/evidence/gitlab-v066-current-nine-id-terminal-controls-2026-09-29.json"
 RETRY_INDEX = 9
 PREFIX_EVENTS = 18
-FREEZE_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-private-v2"
-PUBLIC_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-public-v2"
+FREEZE_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-private-v3"
+PUBLIC_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-public-v3"
 INTENT_SCHEMA = "envloop-gitlab-v066-infra-requalification-intent-private-v1"
 RESULT_SCHEMA = "envloop-gitlab-v066-infra-requalification-result-private-v1"
 AUDIT_SCHEMA = "envloop-gitlab-v066-infra-requalification-audit-private-v1"
@@ -58,6 +60,7 @@ SOURCE_FILES = (
     "tests/test_gitlab_v066_infra_requalification.py",
     "docs/FULL_STUDY_GITLAB_V066_INFRA_REQUALIFICATION_2026-09-29.md",
     "docs/FULL_STUDY_GITLAB_V066_INFRA_REQUALIFICATION_V2_2026-09-29.md",
+    "docs/FULL_STUDY_GITLAB_V066_INFRA_REQUALIFICATION_V3_2026-09-29.md",
 )
 
 
@@ -208,19 +211,19 @@ def _original_context(ratification_private: Path) -> dict:
     }
 
 
-def _superseded_v1_freeze(context: dict) -> dict:
-    """Bind the unpublished-at-dispatch v1 branch without rewriting it."""
+def _superseded_v2_freeze(context: dict) -> dict:
+    """Bind the undispatched v2 branch without rewriting it."""
     old_private_path = SUPERSEDED_BRANCH / "source-freeze.private.json"
     old_public_path = SUPERSEDED_PUBLIC_FREEZE
     require(one.sha(old_private_path.read_bytes()) ==
             SUPERSEDED_PRIVATE_FREEZE_SHA256 and
             one.sha(old_public_path.read_bytes()) ==
             SUPERSEDED_PUBLIC_FREEZE_SHA256,
-            "superseded_v1_freeze_bytes_changed")
+            "superseded_v2_freeze_bytes_changed")
     old_private, _ = _read_private(old_private_path)
     old_public = json.loads(old_public_path.read_bytes())
     require(old_private.get("schema") ==
-            "envloop-gitlab-v066-infra-requalification-source-private-v1" and
+            "envloop-gitlab-v066-infra-requalification-source-private-v2" and
             old_private.get("source_bundle_sha256") ==
             SUPERSEDED_SOURCE_BUNDLE_SHA256 and
             old_private.get("original_100_id_plan_sha256") ==
@@ -246,17 +249,17 @@ def _superseded_v1_freeze(context: dict) -> dict:
             not (SUPERSEDED_BRANCH / "attempts" /
                  f"{RETRY_INDEX:03d}").exists() and
             not list((SUPERSEDED_BRANCH / "supervision").iterdir()),
-            "superseded_v1_branch_was_dispatched_or_changed")
+            "superseded_v2_branch_was_dispatched_or_changed")
     for index in range(RETRY_INDEX):
         key = f"{index:03d}"
         require(old_private.get("branch_nine_attempt_manifests", {}).get(key) ==
                 _tree_manifest(ORIGINAL / "attempts" / key) ==
                 _tree_manifest(SUPERSEDED_BRANCH / "attempts" / key),
-                "superseded_v1_attempt_prefix_changed")
+                "superseded_v2_attempt_prefix_changed")
     return {
-        "superseded_v1_private_freeze_sha256":
+        "superseded_v2_private_freeze_sha256":
             SUPERSEDED_PRIVATE_FREEZE_SHA256,
-        "superseded_v1_public_freeze_sha256":
+        "superseded_v2_public_freeze_sha256":
             SUPERSEDED_PUBLIC_FREEZE_SHA256,
     }
 
@@ -290,10 +293,10 @@ def _public_freeze(private: dict, private_sha: str) -> dict:
         "schema": PUBLIC_SCHEMA,
         "status": "source_frozen_no_requalification_dispatched",
         "private_freeze_sha256": private_sha,
-        "superseded_v1_public_freeze_sha256":
-            private["superseded_v1_public_freeze_sha256"],
-        "superseded_v1_private_freeze_sha256":
-            private["superseded_v1_private_freeze_sha256"],
+        "superseded_v2_public_freeze_sha256":
+            private["superseded_v2_public_freeze_sha256"],
+        "superseded_v2_private_freeze_sha256":
+            private["superseded_v2_private_freeze_sha256"],
         "source_bundle_sha256": private["source_bundle_sha256"],
         "original_100_id_plan_sha256": private["original_100_id_plan_sha256"],
         "original_full_failed_journal_sha256":
@@ -320,7 +323,7 @@ def freeze(ratification_private: Path) -> dict:
             not PUBLIC_FREEZE.exists(),
             "fresh_requalification_branch_and_public_freeze_required")
     context = _original_context(ratification_private)
-    superseded = _superseded_v1_freeze(context)
+    superseded = _superseded_v2_freeze(context)
     source_sha256s = _source_hashes()
     BRANCH.mkdir(mode=0o700)
     (BRANCH / "attempts").mkdir(mode=0o700)
@@ -386,14 +389,14 @@ def freeze(ratification_private: Path) -> dict:
 
 def validate_freeze(ratification_private: Path) -> tuple[dict, dict, dict, dict]:
     context = _original_context(ratification_private)
-    superseded = _superseded_v1_freeze(context)
+    superseded = _superseded_v2_freeze(context)
     private, private_sha = _read_private(PRIVATE_FREEZE)
     require(private.get("schema") == FREEZE_SCHEMA and
             private.get("status") == "source_frozen_no_requalification_dispatched" and
-            private.get("superseded_v1_public_freeze_sha256") ==
-            superseded["superseded_v1_public_freeze_sha256"] and
-            private.get("superseded_v1_private_freeze_sha256") ==
-            superseded["superseded_v1_private_freeze_sha256"] and
+            private.get("superseded_v2_public_freeze_sha256") ==
+            superseded["superseded_v2_public_freeze_sha256"] and
+            private.get("superseded_v2_private_freeze_sha256") ==
+            superseded["superseded_v2_private_freeze_sha256"] and
             private.get("original_100_id_plan_sha256") == context["old_sha"] and
             private.get("original_full_failed_journal_sha256") ==
             context["journal_full_sha256"] and
@@ -511,6 +514,71 @@ def _terminalize_branch(context: dict, *, elapsed: float,
     return after["failed"] is True and after["pending"] is None
 
 
+GROUP_TERM_GRACE_SECONDS = 5.0
+GROUP_KILL_GRACE_SECONDS = 5.0
+GROUP_POLL_SECONDS = 0.1
+
+
+def _group_exists(pgid: int) -> bool:
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    return True
+
+
+def _wait_group_gone(pgid: int, seconds: float) -> bool:
+    deadline = time.monotonic() + seconds
+    while _group_exists(pgid):
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(min(GROUP_POLL_SECONDS, max(0.0, deadline - time.monotonic())))
+    return True
+
+
+def _confirm_child_process_group(child: dict) -> dict:
+    """Never infer group termination from the direct child's wait alone."""
+    checked = dict(child)
+    direct_terminated = checked.get("child_terminated") is True
+    pgid = checked.get("child_pid")
+    checked.update({
+        "direct_child_terminated": direct_terminated,
+        "process_group_terminated": False,
+        "group_survivor_observed_after_child_wait": False,
+        "post_watchdog_sigterm_used": False,
+        "post_watchdog_sigkill_used": False,
+        "termination_unconfirmed": True,
+        "child_terminated": False,
+    })
+    # The inherited watchdog starts the child in a new session, so its PID is
+    # its PGID. An absent or self-group PID cannot safely be signalled.
+    if type(pgid) is not int or pgid <= 1 or pgid == os.getpgrp():
+        return checked
+    try:
+        survivor = _group_exists(pgid)
+        checked["group_survivor_observed_after_child_wait"] = survivor
+        if survivor:
+            try:
+                os.killpg(pgid, signal.SIGTERM)
+                checked["post_watchdog_sigterm_used"] = True
+            except ProcessLookupError:
+                pass
+            if not _wait_group_gone(pgid, GROUP_TERM_GRACE_SECONDS):
+                try:
+                    os.killpg(pgid, signal.SIGKILL)
+                    checked["post_watchdog_sigkill_used"] = True
+                except ProcessLookupError:
+                    pass
+                if not _wait_group_gone(pgid, GROUP_KILL_GRACE_SECONDS):
+                    return checked
+        checked["process_group_terminated"] = True
+        checked["child_terminated"] = direct_terminated
+        checked["termination_unconfirmed"] = not direct_terminated
+    except OSError as exc:
+        checked["process_group_check_error_type"] = type(exc).__name__
+    return checked
+
+
 def _child_run(ratification_private: Path, reviewed_digest: str) -> dict:
     _reviewed_public_digest(reviewed_digest)
     _private, context, branch_audit, _visible = validate_freeze(
@@ -580,12 +648,12 @@ def run_requalification(ratification_private: Path,
         env = dict(os.environ)
         env["PYTHONPATH"] = str(ROOT / "src") + os.pathsep + str(ROOT)
         try:
-            child = one.supervise_child(
+            child = _confirm_child_process_group(one.supervise_child(
                 argv, cwd=ROOT, env=env,
                 stdout_path=SUPERVISION / f"{RETRY_INDEX:03d}-child.stdout.private.log",
                 stderr_path=SUPERVISION / f"{RETRY_INDEX:03d}-child.stderr.private.log",
                 timeout_seconds=one.CHILD_TIMEOUT_SECONDS,
-                grace_seconds=one.TERM_GRACE_SECONDS)
+                grace_seconds=one.TERM_GRACE_SECONDS))
         except Exception as exc:
             child = {
                 "timed_out": False, "sigkill_used": False,
@@ -605,6 +673,8 @@ def run_requalification(ratification_private: Path,
                     context["old"])
                 passed = (not child["timed_out"] and
                           child["exit_code"] == 0 and
+                          child["process_group_terminated"] is True and
+                          child["group_survivor_observed_after_child_wait"] is False and
                           current["next_index"] == RETRY_INDEX + 1 and
                           current["pending"] is None and
                           not current["failed"])
@@ -640,6 +710,8 @@ def run_requalification(ratification_private: Path,
                             context, elapsed=child["elapsed_seconds"],
                             error_type=("SupervisedProcessTimeout"
                                         if child["timed_out"]
+                                        else "SurvivingProcessGroupAfterChildExit"
+                                        if child.get("group_survivor_observed_after_child_wait")
                                         else "SupervisedChildNonpassingExit")),
                     }
                 except Exception as exc:
@@ -761,6 +833,8 @@ def audit_requalification(ratification_private: Path,
             "requalification_result_changed")
     if passed:
         require(result["child"].get("child_terminated") is True and
+                result["child"].get("process_group_terminated") is True and
+                result["child"].get("group_survivor_observed_after_child_wait") is False and
                 result["child"].get("timed_out") is False and
                 result["child"].get("exit_code") == 0 and
                 result.get("post_attempt_baseline_exact") is True and
@@ -777,8 +851,10 @@ def audit_requalification(ratification_private: Path,
         lane.assert_live_world(context["old"])
     elif result.get("status") == "requalification_terminal_no_replay_exactly_reset":
         require(result["child"].get("child_terminated") is True and
+                result["child"].get("process_group_terminated") is True and
                 (result["child"].get("timed_out") is True or
-                 result["child"].get("exit_code") != 0) and
+                 result["child"].get("exit_code") != 0 or
+                 result["child"].get("group_survivor_observed_after_child_wait") is True) and
                 result.get("post_attempt_baseline_exact") is True and
                 result.get("journal_reconciliation", {}).get("terminal_failure") is True and
                 branch_audit["completed_task_count"] == RETRY_INDEX and

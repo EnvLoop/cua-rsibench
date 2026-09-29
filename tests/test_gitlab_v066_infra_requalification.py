@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from contextlib import nullcontext
 import json
+import os
 from pathlib import Path
+import signal
+import sys
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
@@ -106,6 +109,12 @@ class RecoveryBranchTests(unittest.TestCase):
             patch.object(recovery, "_lock", side_effect=nullcontext),
             patch.object(recovery.lane, "assert_live_world",
                          return_value={"business_sha256": "d" * 64}),
+            patch.object(recovery, "_confirm_child_process_group",
+                         side_effect=lambda value: {
+                             **value,
+                             "process_group_terminated": True,
+                             "group_survivor_observed_after_child_wait": False,
+                         }),
             child_patch,
         ]
 
@@ -125,8 +134,8 @@ class RecoveryBranchTests(unittest.TestCase):
     def test_public_freeze_has_no_private_task_identity(self):
         private = {
             "source_bundle_sha256": "a" * 64,
-            "superseded_v1_public_freeze_sha256": "3" * 64,
-            "superseded_v1_private_freeze_sha256": "4" * 64,
+            "superseded_v2_public_freeze_sha256": "3" * 64,
+            "superseded_v2_private_freeze_sha256": "4" * 64,
             "original_100_id_plan_sha256": "b" * 64,
             "original_full_failed_journal_sha256": "c" * 64,
             "original_failed_terminal_entry_sha256": "d" * 64,
@@ -256,6 +265,42 @@ class RecoveryBranchTests(unittest.TestCase):
             recovery.run_requalification(
                 self.private / "ratification.json", self.review_sha)
 
+    def test_sigterm_ignoring_grandchild_cannot_fake_group_termination(self):
+        code = (
+            'import subprocess,sys,time; '
+            'p=subprocess.Popen([sys.executable,"-c",'
+            '"import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);'
+            'time.sleep(30)"]); print(p.pid,flush=True); time.sleep(30)'
+        )
+        stdout = self.private / "watchdog.stdout.private.log"
+        stderr = self.private / "watchdog.stderr.private.log"
+        raw = None
+        try:
+            raw = recovery.one.supervise_child(
+                [sys.executable, "-c", code], cwd=self.private,
+                env=dict(os.environ), stdout_path=stdout, stderr_path=stderr,
+                timeout_seconds=1.0, grace_seconds=0.2)
+            self.assertTrue(raw["timed_out"])
+            self.assertTrue(raw["child_terminated"])
+            with patch.object(recovery, "GROUP_TERM_GRACE_SECONDS", 0.2), \
+                 patch.object(recovery, "GROUP_KILL_GRACE_SECONDS", 0.5):
+                checked = recovery._confirm_child_process_group(raw)
+            self.assertTrue(checked["group_survivor_observed_after_child_wait"])
+            self.assertTrue(checked["post_watchdog_sigterm_used"])
+            self.assertTrue(checked["post_watchdog_sigkill_used"])
+            self.assertTrue(checked["process_group_terminated"] or
+                            checked["termination_unconfirmed"])
+            if checked["process_group_terminated"]:
+                self.assertFalse(recovery._group_exists(raw["child_pid"]))
+            else:
+                self.assertFalse(checked["child_terminated"])
+        finally:
+            if raw is not None and raw.get("child_pid"):
+                try:
+                    os.killpg(raw["child_pid"], signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+
     def test_undispatched_audit_cannot_publish_result(self):
         with patch.object(recovery, "validate_freeze",
                           return_value=({}, self.context, self.prefix_audit, {})):
@@ -313,7 +358,8 @@ class RecoveryBranchTests(unittest.TestCase):
             "continuation_dispatch_authorized": False,
             "model_calls": 0, "official_final_admitted": 0,
             "child": {"child_terminated": True, "timed_out": False,
-                      "exit_code": 0},
+                      "exit_code": 0, "process_group_terminated": True,
+                      "group_survivor_observed_after_child_wait": False},
             "post_attempt_baseline_exact": True,
             "raw_audit": {
                 "completed_task_count": 10,
