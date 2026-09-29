@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import copy
+from hashlib import sha256
+from pathlib import Path
+import tempfile
 import unittest
 
+from sec_excel_factory.audit_tax_train_transfer_two import _require_frozen_case_exact
 from sec_excel_factory.verify_tax_train_transfer_two import (
     TARGETS, _case_scope, _close, _counterfactuals, expected_values,
 )
-from tools.sec_tax_train_prepare_v1 import _fact
+from tools.sec_tax_train_prepare_v1 import CARD_SIGNATURE, GRAPH, _fact, _make_case
 
 
 def _item(value, presence="reported") -> dict:
@@ -99,6 +104,65 @@ class TaxTrainTransferSyntheticTests(unittest.TestCase):
                                     "unreported_category_misrepresented_as_filed_fact"):
             _fact({"status": "not_separately_reported", "signed_value_musd": 0,
                    "source_field": None}, "translation", mandatory=False)
+
+    def test_balanced_fact_tamper_cannot_match_frozen_review(self) -> None:
+        fixture = _case()
+        plan = {"issuer_cik": 999999, "accession": "0000999999-25-000001",
+                "form": "10-K", "primary_document": "synthetic-10k.html",
+                "final_graph_reservation": GRAPH,
+                "skill_signature_sha256": CARD_SIGNATURE}
+        card = {"minimum_target_edits": 9, "independent_skill_review": True,
+                "causal_skill_atoms": ["synthetic causal step"],
+                "dependency_edges": []}
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "source-00"
+            root.mkdir()
+            raw = {}
+            for name in ("10k.html", "companyfacts.json"):
+                data = f"synthetic fixture {name}".encode()
+                (root / name).write_bytes(data)
+                raw[name] = sha256(data).hexdigest()
+            periods = []
+            for i, period in enumerate(fixture["periods"]):
+                projection = {}
+                for key, fact in period["fields"].items():
+                    projected = "net_interest_expense" if key == "interest_flow" else key
+                    source = None if fact["presence"] == "not_separately_reported" else {
+                        "companyfacts_same_accession_match": True,
+                        "document": "10k.html", "ixbrl_tag": "synthetic:Fact",
+                        "ixbrl_context_ref": f"synthetic-context-{i}-{key}",
+                        "context_period": {"instant": period["period_end"]},
+                        "filed_musd": abs(fact["value"]),
+                    }
+                    projection[projected] = {
+                        "status": fact["presence"],
+                        "signed_value_musd": fact["value"],
+                        "source_field": source}
+                projection["combined_interest_penalties_expense_benefit"] = {
+                    "status": "not_separately_reported",
+                    "signed_value_musd": None, "source_field": None}
+                periods.append({"period_end": period["period_end"],
+                                "period_start": "synthetic-period-start",
+                                "bridge_arithmetic_delta_musd": 0,
+                                "template_fields": projection})
+            reviewed = {"source_index": 0, "identity": plan,
+                        "semantic_source_review": "pass",
+                        "official_final_case_admitted": False,
+                        "excel_web_admitted": False,
+                        "raw_sha256": raw,
+                        "bridge_location": {"document": "10k.html"},
+                        "periods": periods}
+            exact = _make_case(0, reviewed, plan, Path(temp),
+                               "synthetic-review-sha", card)
+            _require_frozen_case_exact(exact, exact)
+            changed = copy.deepcopy(exact)
+            current = changed["periods"][1]["fields"]
+            current["current_year_additions"]["value"] += 1
+            current["prior_year_reductions"]["value"] -= 1
+            _case_scope(changed)  # The signed arithmetic still balances.
+            with self.assertRaisesRegex(ValueError,
+                                        "private_case_fields_differ_from_frozen_semantic_review"):
+                _require_frozen_case_exact(changed, exact)
 
 
 if __name__ == "__main__":

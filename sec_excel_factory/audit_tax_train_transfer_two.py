@@ -18,7 +18,10 @@ from zipfile import ZipFile
 
 from sec_excel_factory.verify_tax_train_transfer_two import TARGETS, verify
 from sec_excel_factory.verify_train_transfer_four import _sheet_paths
-from tools.sec_tax_train_prepare_v1 import REVIEW_SHA256, SOURCE_PLAN_SHA256
+from tools.sec_tax_train_prepare_v1 import (
+    CARD_SIGNATURE, GRAPH, REVIEW_SHA256, REVIEWED_CARD_SHA256,
+    SOURCE_PLAN_SHA256, _make_case,
+)
 from verify_ooxml import Evaluator, load_xlsx
 
 
@@ -36,6 +39,12 @@ def _private(path: Path, value: dict) -> None:
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "wb") as out:
         out.write(raw)
+
+
+def _require_frozen_case_exact(case: dict, reconstructed: dict) -> None:
+    """Require every normalized reviewed fact, absence and locator to match."""
+    if case != reconstructed:
+        raise ValueError("private_case_fields_differ_from_frozen_semantic_review")
 
 
 def mutate(source: Path, destination: Path, sheet: str, address: str,
@@ -210,7 +219,7 @@ def audit_one(index: int, root: Path, controls: Path) -> dict:
 
 
 def audit(root: Path, output: Path, *, source_plan: Path,
-          semantic_review: Path, raw_root: Path) -> dict:
+          semantic_review: Path, raw_root: Path, card_root: Path) -> dict:
     manifest_path = root / "cases-manifest.private.json"
     manifest = json.loads(manifest_path.read_bytes())
     if (manifest.get("schema") != "envloop.sec_tax_train_case_manifest.private.v1" or
@@ -227,6 +236,18 @@ def audit(root: Path, output: Path, *, source_plan: Path,
     plan, review = json.loads(plan_raw), json.loads(review_raw)
     if review.get("source_plan_sha256") != SOURCE_PLAN_SHA256:
         raise ValueError("source_review_plan_binding_changed")
+    card_path = card_root / "skill-cards-reviewed.private.json"
+    if (_sha(card_path) != REVIEWED_CARD_SHA256 or
+            manifest.get("signed_card_sha256") != REVIEWED_CARD_SHA256):
+        raise ValueError("reviewed_skill_card_freeze_changed")
+    cards = json.loads(card_path.read_bytes())
+    matches = [row for row in cards["cards"]
+               if row.get("skill_signature_sha256") == CARD_SIGNATURE and
+               row.get("final_graph_reservation") == GRAPH and
+               row.get("independent_skill_review") is True]
+    if len(matches) != 1:
+        raise ValueError("signed_reviewed_tax_skill_card_missing")
+    card = matches[0]
     for i in range(2):
         case_path = root / "cases" / f"case-{i:02d}.private.json"
         if _sha(case_path) != manifest["case_sha256"][i]:
@@ -242,6 +263,9 @@ def audit(root: Path, output: Path, *, source_plan: Path,
         for filename, digest in reviewed["raw_sha256"].items():
             if _sha(raw_root / f"source-{i:02d}" / filename) != digest:
                 raise ValueError("frozen_original_sec_raw_bytes_changed")
+        expected_case = _make_case(i, reviewed, selected, raw_root,
+                                   REVIEW_SHA256, card)
+        _require_frozen_case_exact(case, expected_case)
     controls = root / "offline-controls"
     if controls.exists():
         raise ValueError("offline_control_directory_must_be_fresh")
@@ -250,11 +274,13 @@ def audit(root: Path, output: Path, *, source_plan: Path,
     private = {"schema": "envloop.sec_tax_train_offline_audit.private.v1",
                "status": "two_train_only_tax_saved_ooxml_controls_passed",
                "source_manifest_sha256": _sha(manifest_path),
+               "frozen_source_case_reconstructions_exact": 2,
                "cases": rows, "model_calls": 0,
                "original_excel_web_gui_uses": 0, "official_final_admissions": 0}
     _private(output, private)
     return {"status": private["status"], "cases": 2,
             "positive_saved_ooxml_pass": 2, "seed_rejected": 2,
+            "frozen_source_case_reconstructions_exact": 2,
             "one_target_short_rejected": sum(r["one_target_short_rejected"] for r in rows),
             "individual_hardcodes_rejected": sum(r["individual_hardcodes_rejected"] for r in rows),
             "semantic_negatives_rejected": sum(r["semantic_negatives_rejected"] for r in rows),
@@ -273,11 +299,13 @@ def main() -> None:
     ap.add_argument("--source-plan", type=Path, required=True)
     ap.add_argument("--semantic-review", type=Path, required=True)
     ap.add_argument("--raw-root", type=Path, required=True)
+    ap.add_argument("--card-private-root", type=Path, required=True)
     args = ap.parse_args()
     print(json.dumps(audit(args.private_root, args.private_out,
                            source_plan=args.source_plan,
                            semantic_review=args.semantic_review,
-                           raw_root=args.raw_root), sort_keys=True))
+                           raw_root=args.raw_root,
+                           card_root=args.card_private_root), sort_keys=True))
 
 
 if __name__ == "__main__":

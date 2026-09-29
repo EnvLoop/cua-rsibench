@@ -23,6 +23,7 @@ CARD_SIGNATURE = "ff413ae00b002631deefbccab6a6392405c63e6f31a968efbb5ef67aaa5506
 GRAPH = "uncertain_tax_position_activity_and_interest_scope"
 SOURCE_PLAN_SHA256 = "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa"
 REVIEW_SHA256 = "0a016835fbd0eafec32361beaff0ef8486eb55efa1fa12c617eef91bcc6f455e"
+REVIEWED_CARD_SHA256 = "31603abdb060b93481dce5be4578c6099ea491ea9300b3922b88ffb902788e1f"
 BRIDGE_KEYS = ("opening", "current_year_additions", "prior_year_additions",
                "prior_year_reductions", "settlements", "lapse", "translation",
                "other", "closing")
@@ -201,7 +202,7 @@ def prepare(*, source_plan: Path, semantic_review: Path, expected_review_sha256:
     registry_raw, registry = _read(card_root / "private-split-reservations.json")
     _require(plan.get("schema") == "envloop.sec_excel_train_22_raw_source_plan.private.v1"
              and len(plan.get("records", [])) >= 2 and
-             plan.get("cards_sha256") == _sha(card_raw) and
+             plan.get("cards_sha256") == _sha(card_raw) == REVIEWED_CARD_SHA256 and
              plan.get("registry_sha256") == _sha(registry_raw) == EXCEL_SPLIT_SHA,
              "frozen_train_source_plan_or_split_changed")
     _require(registry.get("schema") == "private-excel-20-20-100-reservations-v1"
