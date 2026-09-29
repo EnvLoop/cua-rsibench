@@ -1,0 +1,9 @@
+# Odoo v0.6.6 parse-border source review correction
+
+The pre-review v5 source freeze (`ab508878479acc27ce747648deac7d61ce2994de96c87862f4f876936d177961`, retained in Git history) was superseded before any v5 baseline gate or GUI attempt. No v5 private plan, baseline-gate output, or `current-candidate-parse-v5-*` run directory existed when this correction was made. Official final admissions and model attempts remain zero.
+
+Independent synthetic mutations exposed an audit gap: the first auditor accepted a saved third/material `dispatch` frame after a purported successful physical dispatch, and it accepted a `parse_final` sample placed before its six parse samples. The case auditor intentionally skipped the older exact-return chain because it could not represent the new parse exception, but the v5 auditor had not yet replaced its complete indexed-sample coverage.
+
+The corrected read-only auditor now reopens every `frames/guard-XXXX.png` in global index order and binds each sample to a successful action or a durable pre-intent rejection. It checks frame identity and PNG content, per-stage sample numbering and chronology, parse/dispatch receipt references, the one recurring two-pixel alternate, and rejection attempt order. Offline tests include both original mutations, a parse-final indexed-sink collision, a valid stale rejection, and an unbound rejected frame. The evaluator adapter, prior failed attempt, original GUI recipe, and physical dispatch guard are unchanged.
+
+The corrected [source freeze](odoo-v066-parse-border-v5-source-freeze-2026-09-29.json) has SHA-256 `5cbf2d114c0ef0d8aaca45ad146e75af1072aa1c5e0e481bd25e88619f70eca7`. This source review alone does not authorize a GUI control, researcher campaign, or official final task admission. A fresh no-GUI SQL/full-filestore gate, independent gate audit, one-case GUI control, saved-state audit, and source visual review remain required.

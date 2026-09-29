@@ -19,6 +19,9 @@ ROOT = protocol.ROOT
 FREEZE = (ROOT / "docs/evidence" /
           "odoo-v066-parse-border-v5-source-freeze-2026-09-29.json")
 SCHEMA = "envloop-odoo-v066-parse-border-source-freeze-v5"
+PRE_REVIEW_FREEZE_SHA256 = (
+    "ab508878479acc27ce747648deac7d61ce2994de96c87862f4f876936d177961"
+)
 SOURCE_FILES = (
     "enterprise_fallback/odoo18/odoo_v066_scale_parse_border_adapter_v5.py",
     "tools/audit_odoo_v066_current_candidate_first_failure_20260929.py",
@@ -69,6 +72,10 @@ def build() -> dict:
         "schema": SCHEMA,
         "status": "source_frozen_before_v5_baseline_gate_or_gui_control",
         "as_of_date": "2026-09-29",
+        "supersedes_pre_review_source_freeze_sha256":
+            PRE_REVIEW_FREEZE_SHA256,
+        "review_correction":
+            "all_indexed_guard_samples_and_pre_intent_rejections_audited",
         "prior_db_readiness_source_freeze_sha256": digest(previous.FREEZE),
         "prior_terminal_failure_public_receipt_sha256":
             digest(failure.PUBLIC_PATH),
