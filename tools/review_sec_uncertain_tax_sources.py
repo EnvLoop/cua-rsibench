@@ -97,7 +97,7 @@ def _companyfacts_match(facts: dict, accession: str, ix: object, period: dict) -
     entries = facts.get("facts", {}).get("us-gaap", {}).get(tag, {}).get("units", {}).get("USD", [])
     expected = _ix_value_musd(ix) * 1_000_000
     for entry in entries:
-        if entry.get("accn") != accession or entry.get("val") != expected:
+        if entry.get("form") != "10-K" or entry.get("accn") != accession or entry.get("val") != expected:
             continue
         if "instant" in period and entry.get("end") == period["instant"] and not entry.get("start"):
             return True
