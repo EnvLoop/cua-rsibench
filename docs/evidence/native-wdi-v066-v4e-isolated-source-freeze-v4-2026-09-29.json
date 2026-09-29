@@ -6,7 +6,7 @@
   "historical_partial_logical_ids": 4,
   "official_final_admissions": 0,
   "official_final_model_attempts": 0,
-  "private_freeze_sha256": "531469d766eba9b2e8e6580fb608dcf53cf45d1dc0e3ca67456d7258d0d10d19",
+  "private_freeze_sha256": "57860f8ee672bcfca1c1be3df037bb9d10f1ddadc6f7db2dcb18ad24b0fe99bc",
   "projected_five_root_full_lease_intents": 323,
   "projected_five_root_reserved_usd_upper": "53.83333333333333333333333333",
   "retained_four_root_full_lease_intents": 56,
@@ -16,7 +16,7 @@
   "source_sha256s": {
     "native_desktop_factory/qwen_v066_adapter_v4_strict.py": "8565ef15784b1de9d20f79b08d0d17ac4e108f3e2c7e5a0e0dbe42e4e142b29b",
     "native_desktop_factory/v066_day_rollover_controller_v4e.py": "95f1730a919f81c419b14cad0aca472ceb9a43282a91141d69553058855a877c",
-    "native_desktop_factory/v066_day_rollover_durable_child_v4e.py": "7040da89393f11823bf9b7c6349ea787c33f3b047588cc23eae05d0ef3159888",
+    "native_desktop_factory/v066_day_rollover_durable_child_v4e.py": "f54ea55a893f9c01560f68479e351f54865b4282f90f823fe0f7a9b61376e081",
     "native_desktop_factory/v066_day_rollover_durable_output_v4d.py": "2c3a3497c6ae75d59033dc4c80c552d1df66c0d21c46e95894d206f93c193f9a",
     "native_desktop_factory/v066_day_rollover_five_root_v4e.py": "ff213f4b4221232cfa31b01028c401d5d3824877e90b9011d89efb7ea93546f1",
     "native_desktop_factory/v066_day_rollover_independent_audit_v4e.py": "d649fb6669632426df9e9ff53894a325ac2b953e1712d99ef6c5f9828e480e67"

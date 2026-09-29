@@ -175,7 +175,11 @@ def _precreate_gate() -> None:
     _v4d_lineage(Path(frozen["v4d_freeze_path"]))
     task_id, attempt = _flag("--task-id"), _flag("--attempt")
     root = Path(_flag("--attempts-root"))
+    expected_run_dir = (root.parent / "v066-v4e-root-owned-runs" /
+                        f"batch-{run['batch_number']:04d}")
     if (root.resolve() != Path(frozen["new_attempts_root"]).resolve() or
+            run_dir.resolve() != expected_run_dir.resolve() or
+            run_dir.is_symlink() or run_dir.stat().st_mode & 0o077 or
             task_id not in run["selected_private_task_ids"] or
             attempt not in ("positive", "near-miss", "cold-reset")):
         raise ValueError("v4e child is outside its root-owned bounded run")
