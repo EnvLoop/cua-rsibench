@@ -1,0 +1,33 @@
+{
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "current_four_root_full_lease_intents": 56,
+  "current_four_root_reserved_usd_upper": "9.333333333333333333333333333",
+  "dispatch_authorized": false,
+  "fresh_clone_retry_candidate_eligible": true,
+  "historical_complete_trios": 8,
+  "historical_partial_ids": 3,
+  "never_intended_ids": 88,
+  "new_precreate_partial_ids": 1,
+  "official_final_admissions": 0,
+  "official_final_model_attempts": 0,
+  "old_v4c_freeze_sha256": "ad98023e1a749ecbf9feead8151ddce3e989a949b1618b49548f8cfd427b19a7",
+  "private_forensic_audit_sha256": "8f9f8cd13099db72cf1f8103052b8ebe2e5eeaad9824ebba23bac1787b206ac3",
+  "private_freeze_sha256": "d1e2d7639bc20772a4922777d4cf0f2ec0f3f9f624d0b360a16270fa360885d3",
+  "projected_five_root_full_lease_intents": 323,
+  "projected_five_root_reserved_usd_upper": "53.83333333333333333333333333",
+  "projected_new_root_full_lease_intents": 267,
+  "provider_running_sandboxes_at_freeze": 0,
+  "public_terminal_audit_sha256": "0af66af0bf376492f1ca10f86e415434d0c7061421392fe045680606bf0834ff",
+  "replayed_stderr_sha256": "889fde231a681d4b230c5b5d0ac152e9231a0df0847ddadcad8a2713056c1346",
+  "same_intent_replay_authorized": false,
+  "schema": "cua-native-wdi-v066-v4d-continuation-freeze-public-v1",
+  "sorted_final_roster_sha256": "240bf7547d8aa36c0f4488cc48b1235dec20902655397c673c05878f072c9e23",
+  "source_sha256s": {
+    "native_desktop_factory/qwen_v066_adapter_v4_strict.py": "8565ef15784b1de9d20f79b08d0d17ac4e108f3e2c7e5a0e0dbe42e4e142b29b",
+    "native_desktop_factory/v066_day_rollover_durable_child_v4d.py": "94a6a128d52c816e6b4eac319feaa91db0ebfd949aedacdf17ddb47dd8c41dbf",
+    "native_desktop_factory/v066_day_rollover_durable_output_v4d.py": "2c3a3497c6ae75d59033dc4c80c552d1df66c0d21c46e95894d206f93c193f9a",
+    "native_desktop_factory/v066_day_rollover_precreate_freeze_v4d.py": "aff511c0a979f77d847497d8aca03d8894883f50f949c7199d8e1a1afb33648b"
+  },
+  "status": "frozen_without_dispatch_authority",
+  "terminal_batch_sha256": "5eb08a1702003b21d651d4451f03279477b91a8bee7792f83cd195e6dbef60ab"
+}
