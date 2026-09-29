@@ -1,0 +1,18 @@
+{
+  "fresh_observation_and_exact_predispatch_required": true,
+  "frozen_train_runner_sha256": "52309f42cc795705d70bd96555af8e50326419979ffbdb1b2f1cd21aefc7ea30",
+  "hidden_final_frames_used_for_candidate_design": false,
+  "material_transitions_checked": 2,
+  "material_transitions_settled_after_one_frozen_runner_retry": 2,
+  "official_final_admissions": 0,
+  "private_train_receipt_sha256": "7be30e3930c31d9fb4ec4ebe2fffd1e8fce15bbf9f38ef06a05b720b6309ae1a",
+  "provider_creates": 0,
+  "requested_no_action_wait_ms": 1000,
+  "runtime_dispatch_authorized": false,
+  "schema": "cua-native-wdi-v066-post-enter-train-offline-candidate-v1",
+  "selection_gui_transitions_measured": 0,
+  "source_scope": "public_train_calc_only",
+  "stale_action_reuse_authorized": false,
+  "status": "two_public_train_transitions_support_candidate_only",
+  "wall_time_to_stability_measured": false
+}
