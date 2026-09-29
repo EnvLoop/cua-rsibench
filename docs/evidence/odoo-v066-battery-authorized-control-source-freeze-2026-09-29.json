@@ -1,0 +1,40 @@
+{
+  "ac_power_required": false,
+  "as_of_date": "2026-09-29",
+  "battery_percent_threshold": null,
+  "campaign_dispatch_authorized": false,
+  "fresh_run_nonce_and_no_automatic_replay_required": true,
+  "host_power_samples_required": [
+    "gate_entry",
+    "gate_exit",
+    "runner_pre_intent",
+    "runner_pre_dispatch",
+    "runner_end"
+  ],
+  "independent_current_sql_full_filestore_gate_required": true,
+  "model_attempts": 0,
+  "new_source_sha256s": {
+    "tools/audit_odoo_v066_battery_authorized_batch_v2.py": "882a8473d5b8e2b152feb3a6801cb06132363e7f898351a91ec97cc7fc26698d",
+    "tools/audit_odoo_v066_current_candidate_no_gui_gate_v2.py": "8578efdd3e725efb44c9f784f6f1045393e1b606cd93910c9096e325fa6671b4",
+    "tools/odoo_v066_battery_authorized_power_v2.py": "97f3f0ddcce70f44e974c04e4e6b429eb74bd18a73db041ebcdaab54d5aedcb4",
+    "tools/odoo_v066_battery_authorized_source_v2.py": "c22a749e90b229c610c1dfec3108c3f111b51f83d9bbd904c3a60edc0ade9e2e",
+    "tools/odoo_v066_current_candidate_no_gui_gate_v2.py": "250a4802c014ac2a9300010f6465a18459626e1ccf5ccd8e96ceb3b7b41a712d",
+    "tools/odoo_v066_current_candidate_one_selection_v2.py": "48dfc154671a711752536a597c3df583ce348e2a08c607ccf41cf6f43e7642a9"
+  },
+  "official_final_tasks_admitted": 0,
+  "previous_ac_only_source_freeze_sha256": "17469d4a90f26f9e1c241ac899123a184bd3fbd177a9f745f1d7f69c763f2c1a",
+  "schema": "envloop-odoo-v066-battery-authorized-control-source-freeze-v2",
+  "selection_control_only": true,
+  "status": "source_bound_battery_authorized_evaluator_only_pending_live_gate",
+  "unchanged_current_candidate_private_sha256": "bd7225ea7b348d8a72a7e5dc951bdeacef159560b034e13c40a7680799e018a9",
+  "unchanged_retained_failure_public_sha256s": {
+    "first": "91985f9a3e9b964224b26e465b10512b5160ede92984a93e27b88b270e817891",
+    "second": "8ecb166f681edec4defda3002deb989c4004d83f87accf726c6b7891232a43bb",
+    "third": "3d37a88158cb9f4ab70694305dc0e6b5c0717cbab4da67b32bc743a0b56e9550"
+  },
+  "unchanged_split_public_plan_sha256s": {
+    "official_hidden": "3499ff02079a9fae045cb829c7f2ca2d1f14823cbac92101fc8eb5fca1276265",
+    "selection": "ab9cae61f6827a5067b5cc7c1d00068ad9997301a613694331b2b46267243582"
+  },
+  "user_authorization": "run_with_available_battery_do_not_wait_for_ac"
+}
