@@ -1,0 +1,23 @@
+{
+  "eligible_failed_logical_id_count": 1,
+  "historical_35_source_freeze_sha256": "55cf0e8312aab333d64b291df07ea0b74d5928c0a3c858fea72fc38aa79ce394",
+  "historical_35_sources_reopened": 35,
+  "maximum_fresh_full_trio_retries_per_failed_id": 1,
+  "new_e2b_creates": 0,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_positive_and_partial_near_miss_retained": true,
+  "private_freeze_sha256": "5d3f0ad7ce4ee33e9270f98934d3aa4aa98f44f92c808cba3d1d2aa5cb39f67a",
+  "public_audit_sha256": "c086aafb20d580339b65564a77ae479eff6024f27cdf720da56e397afae054a6",
+  "requires_new_six_cell_ratification_before_campaign": true,
+  "requires_new_v4_controller_and_independent_saved_state_audit": true,
+  "same_id_retry_dispatch_authorized": false,
+  "schema": "cua-native-wdi-v066-caret-liveness-source-freeze-public-v4",
+  "status": "frozen_pre_result_no_dispatch_authority",
+  "v4_source_sha256s": {
+    "native_desktop_factory/qwen_v066_adapter_v4.py": "939820c651cc448aac4d04ac70a37458d917c3ac191565f9fc8cae3fbc69cf46",
+    "native_desktop_factory/v066_caret_liveness_audit_v4.py": "59590b42e85dd0e1dd1ac75dadec162f8fd4d491311032159ebaa9a36ba15ee2",
+    "native_desktop_factory/v066_caret_liveness_freeze_v4.py": "86e86281b5ccb9a55286d25a78847c50ba2b81791bd148c1e45f1fca0f45b4a8",
+    "tests/test_native_desktop_v066_caret_liveness_v4.py": "eb9f5ef86323eed6990a555ba351056725b00f014e92d588030556612fb4ec08"
+  }
+}

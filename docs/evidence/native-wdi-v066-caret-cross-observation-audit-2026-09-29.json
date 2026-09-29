@@ -1,0 +1,31 @@
+{
+  "additional_window_chrome_pixels_outside_application": 151,
+  "all_raw_failure_pairs_reopened": 16,
+  "application_difference_pixels": 18,
+  "application_difference_shape_px": [
+    1,
+    18
+  ],
+  "applied_actions_before_failure": 15,
+  "at_most_one_fresh_full_trio_retry_eligible": true,
+  "new_e2b_creates": 0,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_adapter_sha256": "628f3f5383f265ecb781386d0a7ac5ab335d56238f9dec5c375f73c7baefb480",
+  "old_batch_run_receipt_sha256": "d3bb43c2b2b73d7e7c038742f639bc9ce88e2c48677c0f9db286ff8294093395",
+  "old_failed_receipt_sha256": "adf65dcafad13e2c895fe8f3fc0752d9ec13ecc9b3b13d6284010972d2ca101c",
+  "old_partial_cold_resets": 0,
+  "old_partial_near_miss_failures": 1,
+  "old_partial_positive_attempts": 1,
+  "private_audit_sha256": "c90787fcfd2841005cc8176d7d1727ddff7b02a855b3ed1ad2d1bf13322e4d81",
+  "retry_dispatch_authorized": false,
+  "schema": "cua-native-wdi-v066-caret-liveness-public-audit-v4",
+  "status": "counterfactual_frame_guard_only_no_control_admission",
+  "terminal_observation_alternate_pairs": 5,
+  "train_only_caret_shape_pairs": 9,
+  "train_only_drift_pairs_reopened": 28,
+  "train_only_material_or_other_pairs_rejected": 19,
+  "train_repeated_two_state_steps_with_applied_action": 2,
+  "v4_adapter_sha256": "939820c651cc448aac4d04ac70a37458d917c3ac191565f9fc8cae3fbc69cf46",
+  "v4_audit_source_sha256": "59590b42e85dd0e1dd1ac75dadec162f8fd4d491311032159ebaa9a36ba15ee2"
+}
