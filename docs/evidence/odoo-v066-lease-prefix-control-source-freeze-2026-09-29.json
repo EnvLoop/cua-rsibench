@@ -1,0 +1,41 @@
+{
+  "ac_power_required": false,
+  "appended_lease_rule": "canonical_strictly_paired_monotone_acquire_release_rows",
+  "as_of_date": "2026-09-29",
+  "campaign_dispatch_authorized": false,
+  "fresh_run_nonce_and_no_automatic_replay_required": true,
+  "historical_lease_rule": "exact_published_newline_prefix_ending_in_original_release",
+  "host_power_samples_required": [
+    "gate_entry",
+    "gate_exit",
+    "runner_pre_intent",
+    "runner_pre_dispatch",
+    "runner_end"
+  ],
+  "independent_current_sql_full_filestore_gate_required": true,
+  "model_attempts": 0,
+  "new_source_sha256s": {
+    "tools/audit_odoo_v066_battery_authorized_batch_v3.py": "d293e4f7456f5af0a8ddf7676f8a047200ef67a0655012e3c56a284ab88668fd",
+    "tools/audit_odoo_v066_current_candidate_no_gui_gate_v3.py": "6b381ec6baf42520be7d807701b1133eb82f12986b704d0cd196782c8720df3b",
+    "tools/odoo_v066_current_candidate_no_gui_gate_v3.py": "6d55fe58bdb90ceb81f5afdeea6078bf7e17a6f65adf132063d398dbb2d46079",
+    "tools/odoo_v066_current_candidate_one_selection_v3.py": "249893259f82c6f95ce134412c16b83ea99a3d91eb353b98a2af8fa4c2b004e8",
+    "tools/odoo_v066_lease_prefix_source_v3.py": "b804a620ae545fbeb8aef5abded4a4c14dd515c2dba674d9592ff159ac167767",
+    "tools/odoo_v066_retained_lease_prefix_v3.py": "3609facc03f56c57e0b34f09ac616b7c45c261a12814ef42f75212794e23c6fd"
+  },
+  "official_final_tasks_admitted": 0,
+  "old_auditors_and_attempts_unchanged": true,
+  "prior_battery_source_freeze_sha256": "8157d01d403a618b16391b6986e7c64cd6d725d80b42553cd93a996861c3a16d",
+  "schema": "envloop-odoo-v066-lease-prefix-control-source-freeze-v3",
+  "selection_control_only": true,
+  "status": "source_bound_historical_lease_prefix_amendment_pending_live_gate",
+  "unchanged_current_candidate_private_sha256": "bd7225ea7b348d8a72a7e5dc951bdeacef159560b034e13c40a7680799e018a9",
+  "unchanged_retained_failure_public_sha256s": {
+    "first": "91985f9a3e9b964224b26e465b10512b5160ede92984a93e27b88b270e817891",
+    "second": "8ecb166f681edec4defda3002deb989c4004d83f87accf726c6b7891232a43bb",
+    "third": "3d37a88158cb9f4ab70694305dc0e6b5c0717cbab4da67b32bc743a0b56e9550"
+  },
+  "unchanged_split_public_plan_sha256s": {
+    "official_hidden": "3499ff02079a9fae045cb829c7f2ca2d1f14823cbac92101fc8eb5fca1276265",
+    "selection": "ab9cae61f6827a5067b5cc7c1d00068ad9997301a613694331b2b46267243582"
+  }
+}
