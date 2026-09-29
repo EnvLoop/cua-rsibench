@@ -1,0 +1,17 @@
+{
+  "etag_supplied_for_new_sources": 0,
+  "frozen_private_priority_sha256": "1bd5df014f4cf2e58f4a73be4c2707155effb135027302ea75f407bcb5a0e530",
+  "historical_80_calibration_overlap": "unknown_private_manifest_unavailable",
+  "independent_auditor_source_sha256": "a117cdda2af0de3ef3e43c4c24db23172a964598d71e79abf93de68b536b9281",
+  "model_calls": 0,
+  "numeric_observations_reopened": 180,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "pilot_source_packages_exactly_retained": 2,
+  "rejected_candidate_zips_replayed": 2,
+  "schema": "envloop-ppt-transfer-expansion-source-independent-audit-20260929-v1",
+  "six_official_zip_and_snapshot_pairs_reopened": 6,
+  "source_selection_private_sha256": "8a59627cbd928e1cfa468b06b4462b6815e0b8b85726064f087ebe7f9e388205",
+  "split_source_overlap_count": 0,
+  "status": "six_new_official_sources_reopened_with_frozen_priority"
+}

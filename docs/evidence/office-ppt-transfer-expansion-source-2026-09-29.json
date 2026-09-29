@@ -1,0 +1,27 @@
+{
+  "candidate_rejections_before_six_complete": 2,
+  "etag_supplied_for_new_sources": 0,
+  "frozen_private_priority_sha256": "1bd5df014f4cf2e58f4a73be4c2707155effb135027302ea75f407bcb5a0e530",
+  "historical_80_calibration_overlap": "unknown_private_manifest_unavailable",
+  "model_calls": 0,
+  "new_official_wdi_source_families_checked": 6,
+  "numeric_observations_reopened": 180,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "offline_controls_passed": 0,
+  "pilot_source_families_retained": 2,
+  "rights_tier": "wdi_cc_by_4_0_facts_plus_authored_simulation",
+  "schema": "envloop-ppt-transfer-expansion-source-public-20260929-v1",
+  "selected_source_package_commitment_sha256": "a2b875554fdc4279d7418910d89dba882efa4c0c1dcb1bead5c5ef70c66b84ae",
+  "source_overlap_counts": {
+    "active_v13": 0,
+    "future_reserve": 0,
+    "historical_final": 0,
+    "original_35": 0,
+    "pilot_train": 0,
+    "rebased_calibration": 0
+  },
+  "source_selection_private_sha256": "8a59627cbd928e1cfa468b06b4462b6815e0b8b85726064f087ebe7f9e388205",
+  "status": "eight_train_only_source_families_checked_no_artifacts_yet",
+  "train_only_specs_built": 0
+}
