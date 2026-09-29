@@ -1,0 +1,45 @@
+{
+  "ac_power_required": false,
+  "appended_lease_rule": "canonical_strictly_paired_monotone_acquire_release_rows",
+  "as_of_date": "2026-09-29",
+  "campaign_dispatch_authorized": false,
+  "db_readiness_max_probes": 30,
+  "db_readiness_probe_timeout_seconds": 5,
+  "db_readiness_rule": "bounded_pg_isready_then_verifier_select_1_before_full_baseline",
+  "db_readiness_timeout_seconds": 60,
+  "fresh_run_nonce_and_no_automatic_replay_required": true,
+  "historical_lease_rule": "exact_published_newline_prefix_ending_in_original_release",
+  "host_power_samples_required": [
+    "gate_entry",
+    "gate_exit",
+    "runner_pre_intent",
+    "runner_pre_dispatch",
+    "runner_end"
+  ],
+  "independent_current_sql_full_filestore_gate_required": true,
+  "model_attempts": 0,
+  "new_source_sha256s": {
+    "tools/audit_odoo_v066_battery_authorized_batch_v4.py": "76c964d507a85aa70a9811d51fad7b59caf389d37d48ba82b9436999406867de",
+    "tools/audit_odoo_v066_current_candidate_no_gui_gate_v4.py": "023510be2bc94085f1e9dd646ceb59b39b35b03b78e96ea2d2c7ee7708a3f5dc",
+    "tools/odoo_v066_current_candidate_no_gui_gate_v4.py": "0e083685cfccad39f4d10e2c99172e2f77f1d8fd6e22e4d85bf9df9b5ea37396",
+    "tools/odoo_v066_current_candidate_one_selection_v4.py": "e58dea0abb801a26b260d8158473d34dbafef69db1393402afb289aa01b39e67",
+    "tools/odoo_v066_db_readiness_source_v4.py": "760209bb84d6fd29fe0f9d93f6c8ebbb813509af9b71d4c1f604a4bc83542357"
+  },
+  "official_final_tasks_admitted": 0,
+  "old_auditors_and_attempts_unchanged": true,
+  "prior_lease_prefix_source_freeze_sha256": "6ebe631fc35570df7ef47d1f0b703236f2987dd07416e78560ff6a34cb75949e",
+  "prior_v3_gate_sql_filestore_outputs_must_be_absent": true,
+  "schema": "envloop-odoo-v066-db-readiness-control-source-freeze-v4",
+  "selection_control_only": true,
+  "status": "source_bound_db_readiness_amendment_pending_live_gate",
+  "unchanged_current_candidate_private_sha256": "bd7225ea7b348d8a72a7e5dc951bdeacef159560b034e13c40a7680799e018a9",
+  "unchanged_retained_failure_public_sha256s": {
+    "first": "91985f9a3e9b964224b26e465b10512b5160ede92984a93e27b88b270e817891",
+    "second": "8ecb166f681edec4defda3002deb989c4004d83f87accf726c6b7891232a43bb",
+    "third": "3d37a88158cb9f4ab70694305dc0e6b5c0717cbab4da67b32bc743a0b56e9550"
+  },
+  "unchanged_split_public_plan_sha256s": {
+    "official_hidden": "3499ff02079a9fae045cb829c7f2ca2d1f14823cbac92101fc8eb5fca1276265",
+    "selection": "ab9cae61f6827a5067b5cc7c1d00068ad9997301a613694331b2b46267243582"
+  }
+}
