@@ -141,6 +141,18 @@ def validate(*, bridge_path: Path, candidate_root: Path,
         raise ValueError("Private scoped three-root bridge absent")
     raw = bridge_path.read_bytes()
     value = json.loads(raw)
+    if value.get("schema") == "cua-native-wdi-v066-day-rollover-four-root-bridge-v1":
+        from .v066_day_rollover_bridge import validate as validate_day_bridge
+        return validate_day_bridge(
+            bridge_path=bridge_path, candidate_root=candidate_root,
+            original_root=original_root, failed_root=failed_root,
+            fresh_root=fresh_root, action_ratification=action_ratification,
+            public_calibration=public_calibration,
+            private_calibration_audit=private_calibration_audit,
+            scoped_reference=scoped_reference, runtime_freeze=runtime_freeze,
+            new_lane_reservation=new_lane_reservation,
+            profile_private=profile_private, guest_public=guest_public,
+            fair_public=fair_public)
     _runtime, runtime_sha = validate_runtime(
         path=runtime_freeze,
         action_ratification=action_ratification,

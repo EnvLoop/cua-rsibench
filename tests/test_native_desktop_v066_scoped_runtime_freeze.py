@@ -9,21 +9,23 @@ import unittest
 from unittest.mock import patch
 
 from native_desktop_factory import v066_scoped_profile_runtime_freeze as freeze
+from native_desktop_factory import v066_day_rollover_runtime_freeze as day_freeze
 from native_desktop_factory.v066_final_freeze import digest
 
 
 class ScopedRuntimeFreezeTests(unittest.TestCase):
     def test_dated_public_runtime_and_bridge_bind_current_sources(self):
         public_path = (freeze.ROOT / "docs/evidence" /
-            "native-wdi-v066-scoped-profile-runtime-ratification-2026-09-28.json")
+            "native-wdi-v066-day-rollover-runtime-freeze-2026-09-29.json")
         bridge_path = (freeze.ROOT / "docs/evidence" /
-            "native-wdi-v066-scoped-profile-three-root-bridge-2026-09-28.json")
+            "native-wdi-v066-day-rollover-four-root-bridge-2026-09-29.json")
         public = json.loads(public_path.read_bytes())
         bridge = json.loads(bridge_path.read_bytes())
-        self.assertEqual(public["source_sha256s"], freeze.source_hashes())
-        self.assertEqual(bridge["public_scoped_runtime_ratification_sha256"],
-                         digest(public_path.read_bytes()))
-        self.assertEqual(bridge["combined_conservative_full_lease_intents"], 324)
+        self.assertEqual(public["source_sha256s"], day_freeze.source_hashes())
+        self.assertEqual(bridge["combined_full_lease_intents_planned"], 326)
+        self.assertEqual(bridge["historical_intent_counts"], [22, 2, 2])
+        self.assertEqual(public["current_public_tip_day"],
+                         public["prior_public_tip_day"] + 1)
         self.assertEqual(bridge["official_final_admissions"], 0)
 
     def test_source_hashes_cover_new_runner_guard_bridge_audit_and_old_bytes(self):

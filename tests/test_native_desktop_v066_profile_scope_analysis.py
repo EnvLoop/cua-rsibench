@@ -10,7 +10,7 @@ from native_desktop_factory.profile_canonical import digest
 
 def registry(*, document="one.xlsx", recovery="recovery_item_1",
              timestamp="123", setting="7", recovery_state="1",
-             include_recovery=True):
+             include_recovery=True, tip_day="20724"):
     recovery_item = (
         '<item oor:path="/org.openoffice.Office.Recovery/RecoveryList">'
         f'<node oor:name="{recovery}">'
@@ -27,6 +27,8 @@ def registry(*, document="one.xlsx", recovery="recovery_item_1",
             + timestamp + '''</value></prop><prop oor:name="LastTimeGetInvolvedShown"><value>'''
             + timestamp + '''</value></prop><prop oor:name="ooSetupLastVersion"><value>'''
             + setting + '''</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Misc"><prop oor:name="LastTipOfTheDayShown"><value>'''
+            + tip_day + '''</value></prop><prop oor:name="SomeOtherSetting"><value>keep</value></prop></item>
 </items>''').encode()
 
 
@@ -38,6 +40,20 @@ def rows(raw: bytes, *, settings_sha="a" * 64):
 
 
 class ProfileScopeAnalysisTests(unittest.TestCase):
+    def test_only_valid_tip_calendar_day_rollover_is_scoped(self):
+        yesterday = registry(tip_day="20724")
+        today = registry(tip_day="20725")
+        self.assertEqual(scope.scoped_profile(rows(yesterday), yesterday),
+                         scope.scoped_profile(rows(today), today))
+        changed_setting = today.replace(b"SomeOtherSetting\"><value>keep",
+                                        b"SomeOtherSetting\"><value>changed")
+        self.assertNotEqual(scope.scoped_profile(rows(yesterday), yesterday),
+                            scope.scoped_profile(rows(changed_setting),
+                                                 changed_setting))
+        malformed = registry(tip_day="tomorrow")
+        with self.assertRaisesRegex(ValueError, "tip day"):
+            scope.scoped_profile(rows(malformed), malformed)
+
     def test_document_history_recovery_and_two_timestamps_are_scoped(self):
         first = registry()
         second = registry(document="two.xlsx", recovery="recovery_item_999",

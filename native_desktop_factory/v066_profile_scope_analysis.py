@@ -26,6 +26,10 @@ PICKLIST_ITEMS = ("/org.openoffice.Office.Histories/Histories/"
 PICKLIST_ORDER = ("/org.openoffice.Office.Histories/Histories/"
                   "org.openoffice.Office.Histories:HistoryInfo['PickList']/OrderList")
 RECOVERY_LIST = "/org.openoffice.Office.Recovery/RecoveryList"
+TIP_MISC_PATH = "/org.openoffice.Office.Common/Misc"
+TIP_DAY_PROPERTY = "LastTipOfTheDayShown"
+TIP_DAY_MIN = 18_000
+TIP_DAY_MAX = 30_000
 DOCUMENT_CONTENT_PROPS = {
     PICKLIST_ITEMS: frozenset({"Title", "Thumbnail"}),
     PICKLIST_ORDER: frozenset({"HistoryItemRef"}),
@@ -43,11 +47,45 @@ def _structural_node(node: ET.Element) -> object:
             node.text.strip() if node.text else "", children]
 
 
+def tip_calendar_day(raw: bytes) -> int:
+    """Read the single exact LibreOffice tip day before scoped normalization."""
+    root = ET.fromstring(canonical_registry(raw))
+    values = []
+    for item in root.iter():
+        if item.attrib.get(OOR_PATH) != TIP_MISC_PATH:
+            continue
+        for prop in item:
+            if prop.attrib.get(OOR_NAME) != TIP_DAY_PROPERTY:
+                continue
+            if (not prop.tag.endswith("prop") or len(prop) != 1 or
+                    not prop[0].tag.endswith("value") or
+                    not re.fullmatch(r"[0-9]{5}", prop[0].text or "")):
+                raise ValueError("LibreOffice tip day has an unexpected shape")
+            values.append(int(prop[0].text))
+    if (len(values) != 1 or
+            not TIP_DAY_MIN <= values[0] <= TIP_DAY_MAX):
+        raise ValueError("Exactly one valid LibreOffice tip day is required")
+    return values[0]
+
+
 def scoped_registry(raw: bytes) -> object:
     root = ET.fromstring(canonical_registry(raw))
     counts = {path: 0 for path in DOCUMENT_CONTENT_PROPS}
+    tip_days = 0
     for item in root.iter():
         path = item.attrib.get(OOR_PATH)
+        if path == TIP_MISC_PATH:
+            for prop in item:
+                if prop.attrib.get(OOR_NAME) != TIP_DAY_PROPERTY:
+                    continue
+                tip_days += 1
+                if (tip_days != 1 or not prop.tag.endswith("prop") or
+                        len(prop) != 1 or not prop[0].tag.endswith("value") or
+                        not re.fullmatch(r"[0-9]{5}", prop[0].text or "") or
+                        not TIP_DAY_MIN <= int(prop[0].text) <= TIP_DAY_MAX):
+                    raise ValueError("LibreOffice tip day has an unexpected shape")
+                # This UI-only integer is a calendar day since 1970-01-01.
+                prop[0].text = "<calendar-day>"
         if path in counts:
             counts[path] += 1
             for node in item:

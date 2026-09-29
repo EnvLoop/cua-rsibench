@@ -1,0 +1,14 @@
+{
+  "calendar_day_increment": 1,
+  "changed_registry_property": "LastTipOfTheDayShown",
+  "current_day_public_train_neutral_guests_passed": 1,
+  "failed_final_pre_action_guests_retained": 2,
+  "nonregistry_files_identical": true,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_six_same_application_pairs_passed": 3,
+  "other_canonical_public_train_registry_fields_identical": true,
+  "private_independent_audit_sha256": "1713626343fab966626e3e7a3f009541c490c114d25dd3c897be824f4feb935b",
+  "schema": "cua-native-wdi-v066-day-rollover-raw-audit-public-v1",
+  "status": "pre_result_environment_date_amendment_not_final_admission"
+}

@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -62,6 +63,9 @@ class FakeSandbox:
         return self.registry
 
     def run(self, _command):
+        if _command.startswith("date -u"):
+            return SimpleNamespace(exit_code=0,
+                                   stdout="2026-09-29\n2026-09-29\n")
         return FakeRun([{
             "path": "registrymodifications.xcu",
             "sha256": digest(self.registry), "bytes": len(self.registry)},
@@ -186,3 +190,29 @@ class ScopedGuardTests(unittest.TestCase):
         self.assertEqual(len(snapshots), 1)
         self.assertEqual(len(list(out.glob("profile-*"))), 3)
         self.assertEqual(persisted, [1, 1])
+
+    def test_tip_day_is_bound_to_guest_calendar_and_prior_train_day(self):
+        dated = REGISTRY.replace(
+            b'</items>',
+            b'<item oor:path="/org.openoffice.Office.Common/Misc">'
+            b'<prop oor:name="LastTipOfTheDayShown">'
+            b'<value>20725</value></prop></item></items>')
+        value = json.loads(self.reference.read_bytes())
+        value["applications"]["calc"] = scope.scoped_profile(
+            json.loads(FakeSandbox(dated).run("probe").stdout), dated)
+        value["prior_public_tip_day"] = 20724
+        value["current_public_tip_day"] = 20725
+        self.reference.write_text(json.dumps(value))
+        good, error, receipt, _saved, out = self.check(
+            FakeSandbox(dated), "dated-good")
+        self.assertIsNone(error)
+        self.assertIsNotNone(good)
+        self.assertTrue(receipt["task_profile_tip_day_matches_guest_clock"])
+        self.assertEqual(len(receipt["guest_calendar_probes"]), 2)
+        self.assertEqual(len(list(out.glob("guest-calendar-*.txt"))), 2)
+        shifted = dated.replace(b'<value>20725</value>',
+                                b'<value>20726</value>')
+        _result, error, receipt, _saved, _out = self.check(
+            FakeSandbox(shifted), "dated-bad")
+        self.assertIsInstance(error, guard.ScopedProfileDrift)
+        self.assertFalse(receipt["task_profile_tip_day_matches_guest_clock"])

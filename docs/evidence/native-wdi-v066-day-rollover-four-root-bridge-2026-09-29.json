@@ -1,0 +1,19 @@
+{
+  "actual_provider_billed_usd": null,
+  "automatic_replay_authorized": false,
+  "combined_conservative_reserved_usd": "54.33333333333333333333333333",
+  "combined_full_lease_intents_planned": 326,
+  "fresh_intents_planned": 300,
+  "historical_intent_counts": [
+    22,
+    2,
+    2
+  ],
+  "lane_cap_usd": "60",
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "private_bridge_sha256": "6f9f1c522596fe0cc76cee9585b24f61b3fc8394f27705989f6fc1617af0a842",
+  "provider_active_before": 0,
+  "schema": "cua-native-wdi-v066-day-rollover-four-root-bridge-public-v1",
+  "status": "reserved_before_fresh_date_amended_evaluator_controls"
+}

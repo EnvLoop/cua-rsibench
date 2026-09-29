@@ -8,6 +8,7 @@ official model result or a six-cell qualified manifest by itself.
 from __future__ import annotations
 
 from collections import Counter
+from datetime import date
 import json
 from pathlib import Path
 
@@ -58,6 +59,7 @@ def _profile_receipt(*, candidate_root: Path, attempts_root: Path,
                 len(receipt.get("task_profile_scoped_snapshots", [])) != 2):
             raise ValueError("Fresh scoped-control source or profile guard invalid")
         scoped_values = []
+        tip_days = []
         for index, snapshot in enumerate(receipt["task_profile_scoped_snapshots"]):
             label = ("first", "second")[index]
             if snapshot.get("label") != label:
@@ -72,8 +74,32 @@ def _profile_receipt(*, candidate_root: Path, attempts_root: Path,
             if scoped != snapshot.get("scoped_profile_sha256"):
                 raise ValueError("Scoped raw profile recalculation disagrees")
             scoped_values.append(scoped)
+            if reference.get("current_public_tip_day") is not None:
+                tip_days.append(scope.tip_calendar_day(registry))
         if scoped_values != [expected, expected]:
             raise ValueError("Scoped raw profile is not the public-train reference")
+        day_floor = reference.get("current_public_tip_day")
+        if day_floor is not None:
+            if (reference.get("prior_public_tip_day") != day_floor - 1 or
+                    tip_days != [receipt.get("task_profile_tip_calendar_day")] * 2 or
+                    receipt.get("task_profile_tip_day_reference_floor") != day_floor or
+                    receipt.get("task_profile_tip_day_matches_guest_clock") is not True or
+                    len(receipt.get("guest_calendar_probes", [])) != 2):
+                raise ValueError("Guest calendar bound to prior public train day is absent")
+            guest_days = set()
+            for label, probe in zip(("before", "after"),
+                                    receipt["guest_calendar_probes"]):
+                raw = _bound_file(attempts_root, probe["raw"])
+                values = raw.decode().splitlines()
+                if len(values) != 2 or probe.get("label") != label:
+                    raise ValueError("Raw guest UTC/local date probe changed")
+                parsed = [(date.fromisoformat(item) - date(1970, 1, 1)).days
+                          for item in values]
+                if parsed != [probe.get("utc_day"), probe.get("local_day")]:
+                    raise ValueError("Guest calendar receipt differs from raw date")
+                guest_days.update(parsed)
+            if tip_days[0] < day_floor or tip_days[0] not in guest_days:
+                raise ValueError("LibreOffice tip day differs from guest UTC/local day")
         sandbox_ids.append(receipt["sandbox_id_sha256"])
     if len(set(sandbox_ids)) != len(ATTEMPTS):
         raise ValueError("Scoped positive, near-miss, and reset reused a guest")
