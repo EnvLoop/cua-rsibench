@@ -124,9 +124,13 @@ def audit_action(attempt: Path, trace: dict, row: dict,
     parse_samples = [s for s in samples if s.get("step") == index and
                      s.get("stage") == "parse" and
                      s.get("observed_frame_id_sha256") == frame_id_sha]
+    final_samples = [s for s in samples if s.get("step") == index and
+                     s.get("stage") == "parse_final" and
+                     s.get("observed_frame_id_sha256") == frame_id_sha]
     classification = parse.get("classification")
     if classification == PARSE_EXACT:
         need(parse.get("sample_count") == 1 and
+             final_samples == [] and
              len(parse_samples) == 1 and
              parse_samples[0].get("classification") == "exact_return" and
              parse_samples[0].get("observed_frame_sha256") == frame_sha and
@@ -152,6 +156,12 @@ def audit_action(attempt: Path, trace: dict, row: dict,
                            parse.get("target_control_after"), controls) and
              len(parse_samples) == 6 and
              [s.get("sample") for s in parse_samples] == list(range(6)) and
+             len(final_samples) == 1 and
+             final_samples[0].get("sample") == 6 and
+             final_samples[0].get("classification") == PARSE_ALT and
+             final_samples[0].get("observed_frame_sha256") == frame_sha and
+             final_samples[0].get("sampled_frame_ref") ==
+             parse.get("physical_frame_ref") and
              all(s.get("classification") ==
                  "one_recurring_micro_raster_alternate" and
                  s.get("observed_frame_sha256") == frame_sha

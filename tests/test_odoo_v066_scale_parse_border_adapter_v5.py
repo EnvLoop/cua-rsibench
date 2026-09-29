@@ -135,8 +135,14 @@ class ParseBorderTests(unittest.TestCase):
             instruction="synthetic")
         adapter.latest = self.observation
         adapter.latest_url = self.url
-        adapter.frame_guard_sink = lambda _index, raw: {
-            "path": "frames/physical.png", "sha256": sha256(raw).hexdigest()}
+        sink_indices = []
+
+        def sink(index, raw):
+            sink_indices.append(index)
+            return {"path": f"frames/guard-{index:04d}.png",
+                    "sha256": sha256(raw).hexdigest()}
+
+        adapter.frame_guard_sink = sink
 
         def stale(original, _raw):
             original.frame_guard_samples.extend(self.samples)
@@ -150,6 +156,10 @@ class ParseBorderTests(unittest.TestCase):
         self.assertEqual(adapter._parse_guard_receipt["classification"],
                          module.CLASSIFICATION)
         self.assertEqual(adapter.observed_target_control, self.control)
+        self.assertEqual(sink_indices, [6])
+        self.assertEqual(len(adapter.frame_guard_samples), 7)
+        self.assertEqual(adapter.frame_guard_samples[-1]["stage"],
+                         "parse_final")
         with patch.object(OdooV066ScalePinnedBorderAdapter, "dispatch",
                           return_value={"public_contract_receipt": {},
                                         "action": self.action}):
@@ -194,6 +204,9 @@ class ParseBorderTests(unittest.TestCase):
             with self.assertRaises(ContractError):
                 adapter.parse_current_action("{}")
         self.assertIsNone(adapter._parse_guard_receipt)
+        self.assertEqual(len(adapter.frame_guard_samples), 7)
+        self.assertEqual(adapter.frame_guard_samples[-1]["classification"],
+                         "parse_final_rejected")
 
 
 if __name__ == "__main__":

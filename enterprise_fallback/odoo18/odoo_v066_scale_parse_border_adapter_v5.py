@@ -127,17 +127,31 @@ class OdooV066ScaleParseBorderAdapterV5(OdooV066ScalePinnedBorderAdapter):
         final_ref = self.frame_guard_sink(
             len(self.frame_guard_samples), final_png)
         if (type(final_ref) is not dict or
-                final_ref.get("sha256") != _digest(final_png) or
-                not _valid_alternate(
-                    observation=observation, samples=samples,
-                    page_url=physical_url, latest_url=self.latest_url,
-                    task_id=self.task_id,
-                    task_binding_sha256=self.task_binding_sha256,
-                    action=action, control_before=before,
-                    control_after=after, final_png=final_png) or
-                self.page.url != physical_url or
-                _digest(self.page.screenshot(type="png")) !=
-                final_ref["sha256"]):
+                final_ref.get("sha256") != _digest(final_png)):
+            raise ContractError("invalid_observation")
+        accepted = (
+            _valid_alternate(
+                observation=observation, samples=samples,
+                page_url=physical_url, latest_url=self.latest_url,
+                task_id=self.task_id,
+                task_binding_sha256=self.task_binding_sha256,
+                action=action, control_before=before,
+                control_after=after, final_png=final_png) and
+            self.page.url == physical_url and
+            _digest(self.page.screenshot(type="png")) ==
+            final_ref["sha256"])
+        self.frame_guard_samples.append({
+            "step": self.step,
+            "stage": "parse_final",
+            "sample": MAX_EXACT_RETURN_SAMPLES,
+            "observed_frame_sha256": observation.screenshot["sha256"],
+            "observed_frame_id_sha256":
+                _digest(observation.frame_id.encode()),
+            "sampled_frame_ref": final_ref,
+            "classification": (CLASSIFICATION if accepted else
+                               "parse_final_rejected"),
+        })
+        if not accepted:
             raise ContractError("stale_frame")
         self.observed_target_control = after
         self._parse_guard_receipt = {

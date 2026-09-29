@@ -112,7 +112,13 @@ class ParseAuditTests(unittest.TestCase):
                  "observed_frame_sha256": frame["sha256"],
                  "observed_frame_id_sha256": digest(b"synthetic-frame"),
                  "sampled_frame_ref": reference}
-                for index, reference in enumerate(guard)],
+                for index, reference in enumerate(guard)] + [
+                    {"step": 0, "stage": "parse_final", "sample": 6,
+                     "classification": audit.PARSE_ALT,
+                     "observed_frame_sha256": frame["sha256"],
+                     "observed_frame_id_sha256":
+                         digest(b"synthetic-frame"),
+                     "sampled_frame_ref": final}],
         }
         self.write_intent_result()
 
