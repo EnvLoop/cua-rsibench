@@ -1,0 +1,16 @@
+{
+  "candidate_families_in_priority": 34,
+  "existing_train_pilot_source_families": 2,
+  "frozen_private_priority_sha256": "1bd5df014f4cf2e58f4a73be4c2707155effb135027302ea75f407bcb5a0e530",
+  "full_train_only_source_target": 8,
+  "historical_80_calibration_overlap": "unknown_private_manifest_unavailable",
+  "model_calls": 0,
+  "new_source_packages_checked": 0,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "offline_controls_passed": 0,
+  "pilot_manifest_sha256": "34a584f51ee2254d726c3a37e106e18efeaf3a41b515a72766b57407876a6499",
+  "required_new_official_wdi_source_families": 6,
+  "schema": "envloop-ppt-transfer-expansion-priority-public-20260929-v1",
+  "status": "candidate_priority_frozen_before_new_source_downloads"
+}
