@@ -57,11 +57,14 @@ PYTHONPATH=.:src python -m native_desktop_factory.v066_day_rollover_continuation
 
 PYTHONPATH=.:src python -m native_desktop_factory.v066_day_rollover_continuation_v3 run \
   --freeze work/native-desktop/v066-day-rollover-final-20260929/bounded-continuation-freeze-v3-20260929.private.json \
-  --run-dir work/native-desktop/v066-day-rollover-final-20260929/v066-durable-continuation-runs/batch-0001 \
+  --run-dir "$PWD/work/native-desktop/v066-day-rollover-final-20260929/v066-durable-continuation-runs/batch-0001" \
   --max-new-ids 1 --execute
 ```
 
 The v3 source freeze and paid run are separate events. Source preparation
 queries provider active state but creates no sandbox. The `plan` command is
 offline and creates no sandbox. The `run --execute` command is the sole paid
-entry point.
+entry point. The run directory must be absolute: the frozen controller compares
+it to the absolute parent of the private attempts root. The first root-owned
+invocation with the earlier relative path stopped at this path check before
+creating a batch directory or any E2B intent; no provider work was replayed.
