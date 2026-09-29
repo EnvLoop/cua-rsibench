@@ -1,5 +1,9 @@
 # Desktop evaluator interruption and bounded continuation — 2026-09-29
 
+**Dispatch amendment:** The [v3 durable continuation](native-wdi-v066-durable-continuation-v3-2026-09-29.md)
+supersedes this v2 launch procedure for any new paid E2B create. The v2
+source and freeze remain retained as pre-result historical evidence.
+
 The published date-amended 100-task E2B controller stopped without a terminal
 journal marker. The [field-limited interruption receipt](native-wdi-v066-orphan-interruption-2026-09-29.json)
 binds the private evidence. Its last durable journal remains `started` after seven
