@@ -8,6 +8,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
+import sys
 
 from native_desktop_factory import v066_day_rollover_controller_v4e as controller
 from native_desktop_factory import v066_day_rollover_durable_child_v4e as child
@@ -223,7 +224,7 @@ class DurableAttemptAuditTests(unittest.TestCase):
                 "power": {"source": "Battery Power"},
             }
             budget_raw = _write(attempt_dir / "budget.json", budget_value)
-            _write(attempt_dir / "intent.json", {
+            intent_raw = _write(attempt_dir / "intent.json", {
                 "schema": "cua-native-wdi-v066-final-control-intent-v1",
                 "status": "recorded_before_provider_create",
                 "task_id": row["task_id"], "attempt": "positive",
@@ -233,6 +234,14 @@ class DurableAttemptAuditTests(unittest.TestCase):
                 "durable_child_wrapper_sha256": "c" * 64,
                 "v4e_freeze_sha256": "e" * 64,
                 "same_intent_replay_authorized": False,
+            })
+            _write(attempt_dir / "child-started.json", {
+                "schema": "cua-native-wdi-v066-v4e-child-started-private-v1",
+                "status": "consumed_before_original_evaluator",
+                "task_id": row["task_id"], "attempt": "positive",
+                "intent_sha256": sha256(intent_raw).hexdigest(),
+                "freeze_sha256": "e" * 64,
+                "permit_sha256": None,
             })
             _write(attempt_dir / "child-output.json", {
                 "schema": "cua-native-wdi-v066-v4d-private-child-output-v1",
@@ -257,12 +266,50 @@ class DurableAttemptAuditTests(unittest.TestCase):
                     root=root, row=row, attempt="positive", frozen=frozen,
                     freeze_sha="e" * 64, seen_budget_totals=set())
             stderr_path.write_bytes(b"safe-stderr\n")
+            budget_value["five_root_budget"]["combined_full_lease_intents"] = 57
+            corrected_budget_raw = _write(attempt_dir / "budget.json", budget_value)
+            intent_value = json.loads(intent_raw)
+            intent_value["precreate_budget_sha256"] = sha256(corrected_budget_raw).hexdigest()
+            corrected_intent_raw = _write(attempt_dir / "intent.json", intent_value)
+            marker_value = json.loads((attempt_dir / "child-started.json").read_bytes())
+            marker_value["intent_sha256"] = sha256(corrected_intent_raw).hexdigest()
+            marker_value["status"] = "tampered"
+            _write(attempt_dir / "child-started.json", marker_value)
+            with self.assertRaisesRegex(ValueError, "durable attempt"):
+                auditor._checked_attempt(
+                    root=root, row=row, attempt="positive", frozen=frozen,
+                    freeze_sha="e" * 64, seen_budget_totals=set())
+            marker_value["status"] = "consumed_before_original_evaluator"
+            _write(attempt_dir / "child-started.json", marker_value)
             budget_value["five_root_budget"]["combined_full_lease_intents"] = 56
             _write(attempt_dir / "budget.json", budget_value)
             with self.assertRaisesRegex(ValueError, "durable attempt"):
                 auditor._checked_attempt(
                     root=root, row=row, attempt="positive", frozen=frozen,
                     freeze_sha="e" * 64, seen_budget_totals=set())
+
+
+class OneShotChildTests(unittest.TestCase):
+    def test_direct_child_replay_without_receipt_is_refused(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            attempt_dir = root / "attempts" / "private-12" / "positive"
+            _write(attempt_dir / "intent.json", {"schema": "test-intent"})
+            freeze = root / "freeze.json"
+            permit = root / "permit.json"
+            _write(freeze, {"schema": "test-freeze"})
+            _write(permit, {"schema": "test-permit"})
+            argv = ["child", "--attempts-root", str(root / "attempts"),
+                    "--task-id", "private-12", "--attempt", "positive"]
+            environ = {"ENVLOOP_DESKTOP_V4E_FREEZE": str(freeze),
+                       "ENVLOOP_DESKTOP_V4E_PERMIT": str(permit)}
+            with patch.object(sys, "argv", argv), patch.dict("os.environ", environ), \
+                    patch.object(child, "_precreate_gate"), \
+                    patch.object(child.original, "main") as original_main:
+                child.main()
+                with self.assertRaises(FileExistsError):
+                    child.main()
+                original_main.assert_called_once()
 
 
 if __name__ == "__main__":

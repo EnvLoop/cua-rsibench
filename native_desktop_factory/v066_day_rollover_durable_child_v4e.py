@@ -12,6 +12,7 @@ from . import qwen_v066_adapter_v4_strict as strict
 from . import v066_day_rollover_precreate_freeze_v4d as old_proof
 from . import v066_scoped_profile_final_attempt as original
 from .v066_day_rollover_durable_child_v3 import durable_write_text
+from .v066_day_rollover_continuation_v3 import _write_new
 from .v066_day_rollover_durable_child_v4d import (
     _sha, _verify_batch_order, _verify_precreate_receipts,
 )
@@ -250,6 +251,19 @@ def main() -> None:
     _precreate_gate()
     attempt_dir = (Path(_flag("--attempts-root")) /
                    _flag("--task-id") / _flag("--attempt"))
+    # Consume this exact intent before entering the original evaluator. The
+    # parent's durable stdout files protect its own path, while this exclusive
+    # fsynced marker also refuses a direct child replay after an uncertain
+    # process failure with no receipt.
+    _write_new(attempt_dir / "child-started.json", {
+        "schema": "cua-native-wdi-v066-v4e-child-started-private-v1",
+        "status": "consumed_before_original_evaluator",
+        "task_id": _flag("--task-id"),
+        "attempt": _flag("--attempt"),
+        "intent_sha256": _sha(_private(attempt_dir / "intent.json")),
+        "freeze_sha256": _sha(_private(Path(os.environ["ENVLOOP_DESKTOP_V4E_FREEZE"]))),
+        "permit_sha256": _sha(_private(Path(os.environ["ENVLOOP_DESKTOP_V4E_PERMIT"]))),
+    })
     with patch.dict(os.environ, {
             "ENVLOOP_DESKTOP_V4_ATTEMPTS_ROOT": _flag("--attempts-root"),
             "ENVLOOP_DESKTOP_V4_ATTEMPT_DIR": str(attempt_dir)}), \

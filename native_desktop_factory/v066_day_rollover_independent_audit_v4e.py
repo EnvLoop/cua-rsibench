@@ -48,12 +48,14 @@ def _checked_attempt(*, root: Path, row: dict, attempt: str,
     directory = root / task_id / attempt
     budget_raw = _private(directory / "budget.json")
     intent_raw = _private(directory / "intent.json")
+    child_started_raw = _private(directory / "child-started.json")
     output_raw = _private(directory / "child-output.json")
     stdout_raw = _private(directory / "child.stdout")
     stderr_raw = _private(directory / "child.stderr")
     receipt_raw = _private(directory / "receipt.json")
     budget = json.loads(budget_raw)
     intent = json.loads(intent_raw)
+    child_started = json.loads(child_started_raw)
     output = json.loads(output_raw)
     receipt = json.loads(receipt_raw)
     five = budget.get("five_root_budget", {})
@@ -91,6 +93,16 @@ def _checked_attempt(*, root: Path, row: dict, attempt: str,
                 frozen["source_sha256s"][CHILD_SOURCE] or
             intent.get("v4e_freeze_sha256") != freeze_sha or
             intent.get("same_intent_replay_authorized") is not False or
+            child_started.get("schema") !=
+                "cua-native-wdi-v066-v4e-child-started-private-v1" or
+            child_started.get("status") !=
+                "consumed_before_original_evaluator" or
+            child_started.get("task_id") != task_id or
+            child_started.get("attempt") != attempt or
+            child_started.get("intent_sha256") != digest(intent_raw) or
+            child_started.get("freeze_sha256") != freeze_sha or
+            child_started.get("permit_sha256") !=
+                intent.get("v4e_permit_sha256") or
             output.get("schema") !=
                 "cua-native-wdi-v066-v4d-private-child-output-v1" or
             output.get("status") !=
