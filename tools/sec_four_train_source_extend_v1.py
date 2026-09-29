@@ -29,6 +29,8 @@ def _plain(node) -> str:
 
 def _number(node) -> float:
     text = "".join(node.itertext()).strip().replace(",", "")
+    if text in {"—", "–", "-"}:
+        return 0.0
     value = float("".join(c for c in text if c.isdigit() or c == "."))
     return -value if node.get("sign") == "-" else value
 
@@ -37,7 +39,9 @@ def extend(pilot_path: Path, raw_dir: Path, review_path: Path) -> dict:
     pilot_raw = pilot_path.read_bytes()
     pilot = json.loads(pilot_raw)
     record = pilot["records"][3]
-    if not record["template_family"].endswith("interest_coverage_distinct_v1"):
+    if not all({"cash_from_operations", "operating_income", "interest_expense_abs",
+                "debt_principal_components", "debt_principal_total"} <= set(period)
+               for period in record["periods"]):
         raise ValueError("wrong_train_source_profile")
     review_raw = review_path.read_bytes()
     review = json.loads(review_raw)
@@ -96,16 +100,15 @@ def extend(pilot_path: Path, raw_dir: Path, review_path: Path) -> dict:
                     raise ValueError("source_debt_face_value_or_context_ambiguous")
                 values.append(matched[0])
             else:
-                if matched or "—" not in row_text:
+                if len(matched) != 1 or "—" not in row_text:
                     raise ValueError("source_zero_dash_not_supported")
                 if ((j == 0 and period_index == 0 and
                      not row_text.endswith("— $ 500.0")) or
                     (j == 3 and period_index == 1 and
                      not row_text.endswith("500.0 —"))):
                     raise ValueError("source_zero_dash_wrong_period")
-                values.append({"ix_id": None, "context_ref": None,
-                               "unit": "USD millions", "signed_value": 0.0,
-                               "derivation": "dated original note table dash"})
+                values.append({**matched[0],
+                               "presentation": "tagged dated original note table dash"})
         rows.append({"label": label, "row_sha256": row_sha, "period_values": values})
     for i, period in enumerate(record["periods"]):
         if sum(row["period_values"][i]["signed_value"] for row in rows) != period["debt_principal_total"]:
@@ -122,7 +125,7 @@ def extend(pilot_path: Path, raw_dir: Path, review_path: Path) -> dict:
                          "accession": record["accession"]},
             "period_end": [period["period_end"] for period in record["periods"]],
             "rows": rows,
-            "source_context_audit": "one original inline-XBRL face fact per nonzero instrument-year; dated note dash for zeros"}
+            "source_context_audit": "one original inline-XBRL face fact per instrument-year, including tagged dated dashes for zeros"}
 
 
 def main() -> None:
