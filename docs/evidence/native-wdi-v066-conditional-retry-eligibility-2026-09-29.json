@@ -1,0 +1,22 @@
+{
+  "additional_full_lease_intents_proposed": 6,
+  "automatic_replay_authorized": false,
+  "continuation_freeze_sha256": "5775cfc14daf411575682f10e1431f66e70486a5f65f437b50a4d54cf5041675",
+  "eligibility_source_sha256": "2bb05577b3d1c41768ed51cbf02738290c2fdad1aad5d242242b8fef51d5eb52",
+  "first_attempts_retained_and_charged": 2,
+  "model_or_researcher_result_observed": false,
+  "new_paid_guest_creates": 0,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "one_fresh_full_trio_per_id_proposed": true,
+  "partial_near_miss_saved_artifact_absent": true,
+  "private_eligibility_sha256": "97c183135e2aaf41c72b3333bc395f39d55e77e8e623a894b88a713f2d58abcf",
+  "projected_all_root_full_lease_intents_if_separately_authorized": 329,
+  "projected_reserved_usd_if_separately_authorized": "54.83333333333333333333333333",
+  "quarantined_logical_task_count": 2,
+  "requires_new_sidecar_bridge_and_source_freeze": true,
+  "same_id_retry_dispatch_authorized": false,
+  "schema": "cua-native-wdi-v066-fresh-clone-retry-eligibility-public-v1",
+  "scripted_positive_saved_verdict_observed_evaluator_private": true,
+  "status": "conditional_pre_result_evaluator_only_not_dispatch_authority"
+}
