@@ -310,6 +310,42 @@ class DurableContinuationTests(unittest.TestCase):
             self.assertEqual(journal["status"], "stopped_for_reconciliation")
             self.assertEqual(len(journal["task_outcomes"]), 1)
 
+    def test_stale_independent_audit_cannot_mark_a_trio_complete(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            paths = self._paths(root)
+            for name in ("bridge_path", "public_day_audit", "private_day_audit",
+                         "reference_path", "runtime_freeze", "failed_private_stop",
+                         "failed_public_interruption"):
+                paths[name] = root / name
+            paths["attempts_root"] = root / "v066-final-gui"
+            rows = [{"task_id": f"offline-{index}"} for index in range(100)]
+            run_dir = root / "v066-durable-continuation-runs" / "batch-0001"
+            freeze = root / "freeze.json"
+            freeze.write_text("frozen")
+            source = {"source_sha256s": {
+                "native_desktop_factory/v066_day_rollover_durable_child_v3.py":
+                    "a" * 64}}
+            unchanged = {"independently_accepted_complete_trios": 7}
+            with (patch.object(control, "validate_live", side_effect=[
+                    (source, unchanged, paths, rows),
+                    (source, unchanged, paths, rows)]),
+                  patch.object(control, "combined_budget", return_value={}),
+                  patch.object(control, "_sdk_and_credential",
+                               return_value=control.SDK_VERSIONS),
+                  patch.object(control, "_power_snapshot", return_value={
+                      "source": "AC Power"}),
+                  patch.object(control, "active_hashes", return_value=(set(), 0)),
+                  patch.object(control, "_task", return_value={
+                      "status": "provisional_trio_complete"})):
+                result = control.run_batch(
+                    freeze=freeze, run_dir=run_dir,
+                    max_new_ids=1, execute=True)
+            self.assertEqual(result["status"],
+                             "stopped_after_independent_audit_failure")
+            journal = json.loads((run_dir / "run-receipt.json").read_bytes())
+            self.assertEqual(journal["audit_error_type"], "ValueError")
+
     def test_root_interruption_leaves_explicit_terminal_no_replay_journal(self):
         with tempfile.TemporaryDirectory() as scratch:
             root = Path(scratch)

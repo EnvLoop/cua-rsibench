@@ -491,6 +491,10 @@ def run_batch(*, freeze: Path, run_dir: Path,
             try:
                 _freeze, current, _paths, _rows = validate_live(
                     freeze=freeze, active_run_dir=run_dir)
+                expected_count = (journal["existing_complete_trios_before"] +
+                                  len(journal["task_outcomes"]))
+                if current["independently_accepted_complete_trios"] != expected_count:
+                    raise ValueError("Independent audit did not accept the just-run ID")
                 journal["independently_accepted_complete_trios_after"] = current[
                     "independently_accepted_complete_trios"]
                 base._persist(journal_path, journal)
