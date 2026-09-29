@@ -12,6 +12,8 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import re
+import subprocess
 
 from ppt_wdi_factory import plan as ppt, verify
 from ppt_wdi_factory.build import DEFAULT_SKILL
@@ -161,6 +163,51 @@ def audit(*, private_root: Path, source_root: Path,
                 all(digest(private_bytes(path)) == saved_sha
                     for path, saved_sha in before.items()),
                 "transfer_saved_artifact_or_near_miss_control_failed")
+    visual = root / "visual-qa"
+    sample = json.loads(private_bytes(visual / "representatives.private.json"))
+    reviewed_raw = private_bytes(visual / "visual-review.private.json")
+    reviewed = json.loads(reviewed_raw)
+    require(sample.get("schema") ==
+            "envloop-ppt-transfer-expansion80-visual-sample-private-v1" and
+            len(sample.get("rows", [])) == 10 and
+            [item["workflow_index"] for item in sample["rows"]] == list(range(10)) and
+            [item["workflow"] for item in sample["rows"]] == list(ppt.WORKFLOWS) and
+            reviewed.get("schema") ==
+            "envloop-ppt-transfer-expansion80-visual-review-private-20260929-v1" and
+            reviewed.get("sample_rule") == "one_new_source_case_per_workflow" and
+            reviewed.get("reviewed_contact_sheets") == 2 and
+            reviewed.get("reviewed_full_resolution_pages") == 3 and
+            reviewed.get("layout_findings") == [] and
+            reviewed.get("powerpoint_web_rendering_checked") is False and
+            reviewed.get("office_web_gui_admitted") == 0,
+            "representative_visual_review_record_missing_or_overclaimed")
+    bound_decks = {(result["workflow"], result["spec_sha256"],
+                    result["deck_sha256"]) for result in results}
+    expected_pdfs = []
+    for index, item in enumerate(sample["rows"]):
+        require((item["workflow"], item["spec_sha256"], item["deck_sha256"])
+                in bound_decks and
+                digest(private_bytes(visual / "decks" /
+                    f"workflow-{index:02d}.pptx")) == item["deck_sha256"],
+                "visual_representative_not_bound_to_frozen_deck")
+        pdf = visual / "pdf" / f"workflow-{index:02d}.pdf"
+        information = subprocess.check_output(["pdfinfo", str(pdf)], text=True)
+        match = re.search(r"^Pages:\s+(\d+)$", information, re.M)
+        require(match is not None and int(match.group(1)) == 7,
+                "visual_representative_pdf_not_seven_pages")
+        expected_pdfs.append({"filename": pdf.name,
+                              "sha256": digest(private_bytes(pdf)),
+                              "pages": 7})
+    require(reviewed.get("representative_pdfs") == expected_pdfs and
+            len(list((visual / "pdf").glob("workflow-*.pdf"))) == 10 and
+            reviewed.get("contact_sheet_sha256") == [
+                digest(private_bytes(visual / f"contact-{index}.png"))
+                for index in (1, 2)] and
+            reviewed.get("full_resolution_page_sha256") == [
+                digest(private_bytes(visual / name)) for name in (
+                    "workflow-08-detail-4.png", "workflow-08-detail-5.png",
+                    "workflow-09-detail-7.png")],
+            "visual_pdf_or_review_image_changed")
     return {
         "schema": SCHEMA,
         "status": "80_train_only_direct_file_controls_reopened_not_gui_admitted",
@@ -173,7 +220,11 @@ def audit(*, private_root: Path, source_root: Path,
         "source_families_reopened": 8,
         "saved_artifact_and_near_miss_controls_passed": 80,
         "package_layout_and_native_chart_controls_passed": 80,
-        "visual_pdf_review_completed": False,
+        "representative_pdfs_reviewed": 10,
+        "representative_pdf_pages": 70,
+        "visual_review_private_sha256": digest(reviewed_raw),
+        "visual_pdf_review_completed": True,
+        "powerpoint_web_rendering_checked": False,
         "office_web_gui_admitted": 0,
         "model_calls": 0,
         "official_final_admitted": 0,
