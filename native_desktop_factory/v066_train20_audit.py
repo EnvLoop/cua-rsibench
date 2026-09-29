@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from dataclasses import replace
+from datetime import date
 import json
 from pathlib import Path
 
@@ -158,6 +159,7 @@ def audit_one(*, candidate_root: Path, evidence_root: Path,
             receipt.get("task_profile_scoped_sha256") != expected_profile or
             type(snapshots) is not list or len(snapshots) != 2):
         raise ValueError("Scoped task profile evidence is incomplete")
+    tip_days = []
     for label, snapshot in zip(("first", "second"), snapshots):
         if (snapshot.get("label") != label or
                 snapshot.get("profile_probe_script_sha256") !=
@@ -170,6 +172,30 @@ def audit_one(*, candidate_root: Path, evidence_root: Path,
         if (observed != expected_profile or
                 observed != snapshot.get("scoped_profile_sha256")):
             raise ValueError("Raw scoped LibreOffice profile changed")
+        if reference.get("current_public_tip_day") is not None:
+            tip_days.append(scope.tip_calendar_day(registry))
+    day_floor = reference.get("current_public_tip_day")
+    if day_floor is not None:
+        if (reference.get("prior_public_tip_day") != day_floor - 1 or
+                tip_days != [receipt.get("task_profile_tip_calendar_day")] * 2 or
+                receipt.get("task_profile_tip_day_reference_floor") != day_floor or
+                receipt.get("task_profile_tip_day_matches_guest_clock") is not True or
+                len(receipt.get("guest_calendar_probes", [])) != 2):
+            raise ValueError("Train scoped tip day lacks public baseline binding")
+        guest_days = set()
+        for label, probe in zip(("before", "after"),
+                                receipt["guest_calendar_probes"]):
+            raw = _bound_file(evidence_root, probe["raw"])
+            values = raw.decode().splitlines()
+            if len(values) != 2 or probe.get("label") != label:
+                raise ValueError("Raw train guest calendar probe changed")
+            parsed = [(date.fromisoformat(item) - date(1970, 1, 1)).days
+                      for item in values]
+            if parsed != [probe.get("utc_day"), probe.get("local_day")]:
+                raise ValueError("Train guest calendar receipt differs from raw")
+            guest_days.update(parsed)
+        if tip_days[0] < day_floor or tip_days[0] not in guest_days:
+            raise ValueError("Train profile tip day differs from guest date")
 
     instruction = (directory / "actor_task.txt").read_text()
     previous = None
