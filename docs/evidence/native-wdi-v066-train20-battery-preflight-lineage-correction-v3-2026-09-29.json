@@ -1,0 +1,23 @@
+{
+  "full100_frozen_source_count": 35,
+  "full100_public_freeze_path": "docs/evidence/native-wdi-v066-day-rollover-runtime-freeze-2026-09-29.json",
+  "full100_public_freeze_sha256": "4f3d035335adc9d3bd50d1fcf072b7c1f4521eb52d4007b7aadb496982ed147b",
+  "holdout_candidate_count": 5,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "paid_train_guest_creates": 0,
+  "public_v1_actual_sha256": "f48c303e091003a825122777a692ceef89f1a688d9509a34f5da884a580161f8",
+  "public_v1_path": "docs/evidence/native-wdi-v066-train20-battery-preflight-amendment-2026-09-29.json",
+  "published_v2_path": "docs/evidence/native-wdi-v066-train20-battery-preflight-amendment-v2-2026-09-29.json",
+  "published_v2_sha256": "f7e74496cac85d55f369bf06bd90bd1548888c56db9bbb3cb409cc4494f4a84f",
+  "schema": "cua-native-wdi-v066-train20-battery-public-lineage-correction-v3",
+  "sft_candidate_count": 15,
+  "status": "additive_public_hash_correction_before_any_train_call",
+  "supersedes_published_v2_sha256": "f7e74496cac85d55f369bf06bd90bd1548888c56db9bbb3cb409cc4494f4a84f",
+  "task_assignment_unchanged": true,
+  "tinker_calls": 0,
+  "v2_plan_path": "docs/evidence/native-wdi-v066-train20-battery-authorized-plan-v2-2026-09-29.json",
+  "v2_plan_sha256": "3c1234d955a884abb2d685a121b8d3d44704d928bbfd19ebdbb7ea86d59f65af",
+  "v2_stale_prior_v1_sha256_preserved": "1e5865a91cd9f1b0b1a3c1847c6c309cee0cfae9f60defe4ae82d890aa893ee3",
+  "validator_source_sha256": "428d4a81ae74b383529dd9123d0c1533282fbc84b3bf6359cc27b14b63a25dfd"
+}
