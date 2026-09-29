@@ -57,17 +57,27 @@ def _source_visible(case: dict, pdf: bytes) -> dict:
     if len(reader.pages) != 1:
         raise ValueError("Source PDF must be one page")
     text = reader.pages[0].extract_text()
-    line = case["lines"][case["target_line_index"]]
-    expected = line["expected"]
-    required = (
-        case["source_title"], f"Authorized RFQ: {case['id']}",
-        f"Supplier account: {case['vendor']}",
-        f"Record status: {case['authority_token'].upper()}",
-        f"Line SKU: {line['sku']}",
-        f"{case['quantity_label']}: {expected['qty']}",
-        f"{case['price_label']} (USD): {expected['price']:.2f}",
-        *(item["sku"] for item in case["lines"]),
-    )
+    common = (case["source_title"], f"Authorized RFQ: {case['id']}",
+              f"Supplier account: {case['vendor']}",
+              f"Record status: {case['authority_token'].upper()}")
+    if case.get("difficulty_profile") == "three_line_source_comparison_v2":
+        rows = []
+        for position, line in enumerate(case["lines"], 1):
+            expected = line["expected"]
+            rows.extend((f"Line {position} SKU: {line['sku']}",
+                         f"Authorized quantity: {expected['qty']}",
+                         f"Authorized unit rate (USD): {expected['price']:.2f}",
+                         f"Promised date: {expected['date']}"))
+        required = (*common, *rows)
+        if "Line SKU:" in text:
+            raise ValueError("V2 source singled out the faulty line")
+    else:
+        line = case["lines"][case["target_line_index"]]
+        expected = line["expected"]
+        required = (*common, f"Line SKU: {line['sku']}",
+                    f"{case['quantity_label']}: {expected['qty']}",
+                    f"{case['price_label']} (USD): {expected['price']:.2f}",
+                    *(item["sku"] for item in case["lines"]))
     if any(item not in text for item in required):
         raise ValueError("Source PDF does not visibly support private oracle")
     if "SUPPLIER CONFIRMATION" in text:
@@ -147,7 +157,8 @@ def audit(*, manifest_path: Path, correlation_path: Path,
     private = load(private_freeze_path)
     input_paths = {"task_manifest": manifest_path, "retirement_audit": correlation_path,
                    "train_world": train_world_path, "selection_world": selection_world_path}
-    if {name: digest(path.read_bytes()) for name, path in input_paths.items()} != public["input_sha256"]:
+    if any(digest(path.read_bytes()) != public["input_sha256"].get(name)
+           for name, path in input_paths.items()):
         raise ValueError("Frozen input drift")
     if digest(generator_path.read_bytes()) != public["generator_sha256"]:
         raise ValueError("Frozen generator drift")

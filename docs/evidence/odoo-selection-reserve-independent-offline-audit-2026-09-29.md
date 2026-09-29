@@ -1,5 +1,10 @@
 # Prospective Odoo selection reserve: offline source audit
 
+**Superseded before any native run:** a subsequent structural review found that
+the one-line v1 source reduced reading difficulty. See the
+[v1 retirement record](../FULL_STUDY_ODOO_SELECTION_RESERVE_V1_STRUCTURAL_RETIREMENT_2026-09-29.md).
+The five v1 identities are development-only and cannot fill the selection slots.
+
 **Status: five new private selection-only source packages, zero admissions.** The
 [pre-materialization freeze](odoo-selection-reserve-pre-materialization-freeze-2026-09-29.json)
 was committed before the private seed was used. It binds five ordered slots to
