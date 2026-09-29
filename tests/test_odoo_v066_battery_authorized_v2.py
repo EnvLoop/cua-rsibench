@@ -201,6 +201,26 @@ class RunnerTests(unittest.TestCase):
                                     str(self.worker.resolve())}),
         )
 
+    def test_pre_dispatch_failure_retains_terminal_power_and_no_replay(self):
+        with ExitStack() as stack:
+            for context in self.contexts():
+                stack.enter_context(context)
+            with patch.object(runner.power, "capture", side_effect=[
+                sample(0), power.PowerSampleError("pmset_unavailable"),
+                sample(2)]):
+                with self.assertRaisesRegex(runner.CurrentControlError,
+                                            "preserve_original_no_automatic_replay"):
+                    runner.run_one(
+                        worker_dir=self.worker, historical_root=self.root,
+                        private_plan=self.plan_path, public_plan=self.public,
+                        old_private_plan=self.old_private,
+                        old_public_plan=self.old_public, execute=True)
+        run = self.private / "v066_scale_controls" / self.plan["fresh_run_directory_name"]
+        failure = protocol.private_json(run / "pre-dispatch-failure.private.json")
+        self.assertEqual(failure["status"], "terminal_before_case_started_no_replay")
+        self.assertEqual(failure["host_power_end"]["battery_percent"], 6)
+        self.assertFalse((run / "attempt-000").exists())
+
     def test_battery_one_case_has_three_ordered_power_samples(self):
         def execute(**kwargs):
             attempt = kwargs["run_dir"] / "attempt-000"

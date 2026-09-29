@@ -19,7 +19,7 @@
     "tools/odoo_v066_battery_authorized_power_v2.py": "97f3f0ddcce70f44e974c04e4e6b429eb74bd18a73db041ebcdaab54d5aedcb4",
     "tools/odoo_v066_battery_authorized_source_v2.py": "c22a749e90b229c610c1dfec3108c3f111b51f83d9bbd904c3a60edc0ade9e2e",
     "tools/odoo_v066_current_candidate_no_gui_gate_v2.py": "250a4802c014ac2a9300010f6465a18459626e1ccf5ccd8e96ceb3b7b41a712d",
-    "tools/odoo_v066_current_candidate_one_selection_v2.py": "48dfc154671a711752536a597c3df583ce348e2a08c607ccf41cf6f43e7642a9"
+    "tools/odoo_v066_current_candidate_one_selection_v2.py": "1430537190f023a4a7249c12fea42d8c7b8778099ff9ca67737ef414b9d67730"
   },
   "official_final_tasks_admitted": 0,
   "previous_ac_only_source_freeze_sha256": "17469d4a90f26f9e1c241ac899123a184bd3fbd177a9f745f1d7f69c763f2c1a",

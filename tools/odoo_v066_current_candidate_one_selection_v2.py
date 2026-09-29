@@ -158,6 +158,17 @@ def run_one(*, worker_dir: Path, historical_root: Path,
             except BaseException as power_error:
                 power_end = {"status": "host_power_end_unavailable",
                              "error_type": type(power_error).__name__}
+            if not started:
+                protocol.write_new(run_dir / "pre-dispatch-failure.private.json", {
+                    "schema": BATCH_SCHEMA,
+                    "status": "terminal_before_case_started_no_replay",
+                    "batch_intent_sha256": batch_sha,
+                    "run_nonce_sha256": row["run_nonce_sha256"],
+                    "error_type": type(error).__name__,
+                    "host_power_end": power_end,
+                    "official_final_tasks_admitted": 0,
+                    "model_attempts": 0,
+                }, private=True)
             if started:
                 failure = attempt / "failure.private.json"
                 if not failure.exists():
