@@ -181,9 +181,13 @@ def audit(*, plan_path: Path, registry_path: Path, cards_path: Path,
                  re.search(r"\bFORM\s+10-K\b", _text(raw["10k"]), re.I) is not None,
                  "original_index_or_filing_form_not_reproduced")
         if row.get("supporting_document"):
-            _require(row["supporting_document"] in index and
+            support_rows = re.findall(r"<tr\b[^>]*>(.*?)</tr>", index,
+                                      flags=re.I | re.S)
+            _require(sum(row["supporting_document"] in table_row and
+                         re.search(r"EX-13|EXHIBIT\s+13", table_row, re.I)
+                         is not None for table_row in support_rows) == 1 and
                      len(raw["support"]) >= 1000,
-                     "incorporated_support_document_not_in_index")
+                     "incorporated_exhibit_13_not_in_original_index")
         facts = json.loads(raw["companyfacts"])
         count_for_accession = sum(
             fact.get("accn") == accession and fact.get("form") == "10-K"

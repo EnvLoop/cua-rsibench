@@ -177,9 +177,13 @@ def _source_identity(row: dict, raw: dict[str, bytes]) -> dict:
             re.search(r"<td[^>]*>\s*10-K\s*</td>", index, re.I) is not None,
             "original_10k_index_identity_mismatch")
     if row.get("supporting_document"):
-        require(row["supporting_document"] in index and
+        support_rows = re.findall(r"<tr\b[^>]*>(.*?)</tr>", index,
+                                  flags=re.I | re.S)
+        require(sum(row["supporting_document"] in table_row and
+                    re.search(r"EX-13|EXHIBIT\s+13", table_row, re.I) is not None
+                    for table_row in support_rows) == 1 and
                 len(raw["support"]) >= 1000,
-                "supporting_document_not_in_original_filing_index")
+                "supporting_exhibit_13_not_in_original_filing_index")
     filing = _visible_text(raw["10k"])
     require(re.search(r"\bFORM\s+10-K\b", filing, re.I) is not None,
             "original_filing_form_mismatch")

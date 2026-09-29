@@ -103,10 +103,11 @@ class SECTrainRawCaptureTests(unittest.TestCase):
         row["supporting_document"] = "annual-exhibit-13.htm"
         raw = self._raw(row)
         raw["support"] = b"<html>source facts</html>" * 60
-        with self.assertRaisesRegex(ValueError, "supporting_document_not_in"):
+        with self.assertRaisesRegex(ValueError, "supporting_exhibit_13_not_in"):
             lane._source_identity(row, raw)
         raw["index"] = raw["index"].replace(
-            b"<td>10-K</td>", b"<td>10-K</td> annual-exhibit-13.htm")
+            b"<td>10-K</td>",
+            b"<td>10-K</td><tr><td>EX-13</td><td>annual-exhibit-13.htm</td></tr>")
         self.assertTrue(lane._source_identity(row, raw)["index_form_match"])
 
     def _raw(self, row: dict) -> dict[str, bytes]:
