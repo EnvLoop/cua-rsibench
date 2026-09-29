@@ -1,0 +1,15 @@
+# Odoo train attachment-route calibration, additive v7
+
+**Superseded before live execution. Do not dispatch this v7 freeze.** An
+independent review found that the later wrong-object control uses a different
+train price editor and that this version does not bind the exact RFQ/product
+cell or native `<dialog open>` state. A new source freeze is required; v7 has
+no native attempt.
+
+The v6 train-only attempt opened and closed the original Odoo PDF viewer, returned to the RFQ, and selected the intended unit-price cell. Its [independent terminal audit](evidence/odoo-v066-train-attachment-route-v6-terminal-2026-09-29.md) shows three rejected pre-intent `double_click` observations. They alternated between exactly two 1440 × 1000 PNGs, differing only at four recorded RGB pixels on the RFQ panel's lower-left decorative corner. The proposed price target was hundreds of pixels away. V6 remains terminal and is not replayed.
+
+V7 adds one train-only inline-price-editor route to the existing viewer and RFQ guards. The runner passes the changed train line's frozen SKU and original two-decimal price to the adapter. A `double_click` qualifies for this route only when a unique visible `td[name="price_unit"] input` is focused in the SKU-matching row, its value matches the frozen original price, the target hits that input, and no viewer or visible dialog is present. Task, frame ID, purchase URL and observed editor geometry must remain unchanged. At parse and dispatch, the physical PNG must be either the observed PNG or the exact four-pixel/color-pair alternate. The base sample and two immediately following final screenshots must be identical; a third raster, moved target, wrong row, changed value, modal or unstable final frame fails closed. All other actions still use the unchanged v6/v3/v2 routes.
+
+The new run directory is `attachment-route-train-pilot-20260929-05`. Its fresh private 128-bit nonce and 28 source files are bound by the [public v7 source freeze](evidence/odoo-v066-attachment-train-source-freeze-v7-2026-09-29.json). The v7 success auditor independently compares the physical PNG bytes, target identity and saved parse/dispatch receipts. Fifty-five targeted unit and synthetic-browser tests passed, including wrong target, third state, modal, wrong SKU/value, lost focus, changed editor between parse and dispatch, and unstable first or second final frame. Offline freeze verification found only train cases and an absent new run directory.
+
+The v6 capture did not retain the editor's full live HTML. Synthetic DOM tests cover the expected Odoo `tr` and `td[name="price_unit"] input` structure, and the prior recorder successfully located that editor before the rejected action; a live v7 route remains unproven until one new train-only attempt. No v7 Docker, model, selection or final action has been executed. Success would still require independent PDF/GUI, positive and wrong-object saved-state, full filestore, cold-reset and lease/service audit. This pilot does not qualify an official final task.
