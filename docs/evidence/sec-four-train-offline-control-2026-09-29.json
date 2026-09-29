@@ -1,0 +1,64 @@
+{
+  "schema": "envloop.sec_four_train_offline_control_public.v1",
+  "created_utc": "2026-09-29T04:15:53Z",
+  "status": "four_source_bound_train_only_offline_controls_passed",
+  "source": {
+    "original_sec_10k_bundles": 4,
+    "distinct_issuers": 4,
+    "distinct_accessions": 4,
+    "issuer_overlap_with_original_140": 0,
+    "accession_overlap_with_original_140": 0,
+    "source_fact_entries_reviewed_in_cases": 68,
+    "raw_file_sha256_bindings": 12,
+    "independently_reviewed_debt_face_entries": 8,
+    "original_filing_and_companyfacts_semantic_reviews": 4,
+    "source_data_unit": "USD millions",
+    "scenario_data_status": "separately authored synthetic assumptions"
+  },
+  "artifact": {
+    "train_only_case_count": 4,
+    "screened_source_graph_profiles": 2,
+    "cases_per_profile": 2,
+    "editable_xlsx_count": 8,
+    "seed_xlsx_count": 4,
+    "positive_reference_xlsx_count": 4,
+    "target_formula_repairs_per_case": 12,
+    "all_original_filing_ids_and_workbooks_evaluator_private": true,
+    "private_directories_mode": "0700",
+    "private_files_mode": "0600"
+  },
+  "independent_saved_ooxml_controls": {
+    "positive_pass": 4,
+    "unrepaired_seed_rejected": 4,
+    "one_target_short_rejected": 48,
+    "individually_hardcoded_target_rejected": 48,
+    "wrong_period_sign_restricted_cash_or_debt_basis_rejected": 12,
+    "collateral_original_fact_edit_rejected": 4,
+    "target_style_edit_rejected": 4,
+    "stale_nontarget_display_cache_rejected": 4,
+    "total_negative_variants_rejected": 120,
+    "source_and_scenario_counterfactual_replays": 34,
+    "all_12_targets_have_dynamic_dependency_witness_in_each_case": true,
+    "copied_seed_byte_exact_reset": 4,
+    "independent_read_only_replay_completed": true,
+    "visual_spot_review_passed": true
+  },
+  "private_evidence_sha256": {
+    "case_manifest": "4ffafb235fb916a789f3afc7f79354d8ac6d871a2cb29433768af2e042d411c6",
+    "offline_audit": "eeca0174a8472f396f1f5d5f710e07be9615c073bfa767b656bc10ea78325de3",
+    "debt_face_extension": "4e47dca9d010f0e5d331178a459fa4f0e80fb4a0b2f63982f8896fe4fb25eebd",
+    "independent_debt_face_review": "b2d646baee487a7010e6eba859f4bd7f6ab5da791a66e95fa07c8f6ff9ef81cb",
+    "independent_review_signature": "d90dd5f5edcba687797ee3da006c80a964baf35bb001adcb8cc3096eefa3752b",
+    "review_public_key": "58cd27f21fbd16325c36f0bd2890eeba22dd59256c5a77b92d932075511c1fa8"
+  },
+  "admission_boundary": {
+    "original_excel_web_gui_saves": 0,
+    "original_excel_web_downloads": 0,
+    "real_cloud_resets": 0,
+    "model_calls": 0,
+    "training_analogues_admitted_to_researcher_runs": 0,
+    "official_final_tasks_admitted": 0,
+    "note": "The byte-exact reset is a copied local seed. The positive workbooks were authored offline, not through Excel for the web."
+  },
+  "review_identity_boundary": "The detached Ed25519 signature and pinned key hash bind a locally generated reviewer key; they do not certify an external human reviewer."
+}
