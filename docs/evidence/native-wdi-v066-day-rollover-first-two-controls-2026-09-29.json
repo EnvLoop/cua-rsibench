@@ -1,0 +1,17 @@
+{
+  "auditor_source_sha256": "98734b69308d0ca1e4128917ae9a16b4e50c941b335bc5de82080cdde25dd698",
+  "bridge_sha256": "6f9f1c522596fe0cc76cee9585b24f61b3fc8394f27705989f6fc1617af0a842",
+  "candidate_final_count": 100,
+  "distinct_fresh_sandboxes": 6,
+  "fresh_cold_resets_verified": 2,
+  "guest_calendar_bound_attempts": 6,
+  "independently_reopened_completed_trios": 2,
+  "near_miss_saved_artifacts_rejected": 2,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "positive_saved_artifacts_verified": 2,
+  "private_independent_audit_sha256": "2d99d9448ba809d267f22f206d7565ad78e9c81783ddf1b7a7f3f095d51b534b",
+  "runtime_freeze_sha256": "55cf0e8312aab333d64b291df07ea0b74d5928c0a3c858fea72fc38aa79ce394",
+  "schema": "cua-native-wdi-v066-day-rollover-prefix-audit-public-v1",
+  "status": "provisional_controls_only_not_six_cell_admission"
+}
