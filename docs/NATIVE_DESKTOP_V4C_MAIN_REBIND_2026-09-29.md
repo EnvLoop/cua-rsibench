@@ -35,7 +35,11 @@ for the failed near-miss receipt. This is a read-only source and evidence
 check, not a fresh result.
 
 Run from the main repository root with `PYTHONPATH=src:.` and a Python
-environment containing the repository dependencies. After the byte checks,
+environment containing the repository dependencies. `prepare` performs a
+read-only E2B active-sandbox check, so the pinned Desktop SDK and a securely
+injected `E2B_API_KEY` must be present; never print the credential. An initial
+invocation without that key stopped before writing either freeze or creating a
+guest. After the byte checks,
 write exactly one new main-checkout freeze:
 
 ```sh
