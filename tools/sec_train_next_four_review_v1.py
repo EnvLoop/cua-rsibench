@@ -106,8 +106,20 @@ def _period(tree, context_ref: str) -> dict:
             _need(len(elements) == 1 and elements[0].text,
                   "ixbrl_period_field_not_unique")
             result[key] = elements[0].text
-    result["dimension_member_count"] = len(
-        context.xpath('.//*[contains(name(),"explicitMember")]'))
+    # SEC inline-XBRL responses are parsed as HTML, which lowercases
+    # ``xbrldi:explicitMember`` to ``xbrldi:explicitmember``. Match the local
+    # tag case-insensitively instead of relying on an XML-cased XPath name.
+    members = []
+    for node in context.iter():
+        if (isinstance(node.tag, str) and
+                node.tag.rsplit("}", 1)[-1].rsplit(":", 1)[-1].lower()
+                == "explicitmember"):
+            axis = node.get("dimension")
+            member = " ".join(" ".join(node.itertext()).split())
+            _need(bool(axis and member), "ixbrl_dimension_member_incomplete")
+            members.append({"axis": axis, "member": member})
+    result["dimension_member_count"] = len(members)
+    result["dimension_members"] = members
     return result
 
 
