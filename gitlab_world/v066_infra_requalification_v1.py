@@ -28,22 +28,27 @@ from . import v066_supervised_final_one_v1 as one
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = one.PRIVATE_ROOT
 ORIGINAL = one.RUN_DIR
-BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-20260929"
+BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-v2-20260929"
 SUPERVISION = BRANCH / "supervision"
 PRIVATE_FREEZE = BRANCH / "source-freeze.private.json"
 PUBLIC_FREEZE = (
-    ROOT / "docs/evidence/gitlab-v066-infra-requalification-source-freeze-2026-09-29.json"
+    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v2-source-freeze-2026-09-29.json"
 )
 PRIVATE_OUTCOME = BRANCH / "requalification-audit.private.json"
 PUBLIC_OUTCOME = (
-    ROOT / "docs/evidence/gitlab-v066-infra-requalification-outcome-2026-09-29.json"
+    ROOT / "docs/evidence/gitlab-v066-infra-requalification-v2-outcome-2026-09-29.json"
 )
+SUPERSEDED_BRANCH = PRIVATE_ROOT / "v066-infra-requalification-branch-20260929"
+SUPERSEDED_PRIVATE_FREEZE_SHA256 = "f3d07836a3f6bcc79b40a0471bab8573a8ef7df2f0e930d495e847a09ad08604"
+SUPERSEDED_PUBLIC_FREEZE_SHA256 = "d172621b23fb48adaa4f649de1e56b80615affc7b06bb5a57f42e3710df0dff5"
+SUPERSEDED_SOURCE_BUNDLE_SHA256 = "85a4641ccea21502436ffc83144e30217cd870a6539cbb1f1da369f4fc25f1ee"
+SUPERSEDED_PUBLIC_FREEZE = ROOT / "docs/evidence/gitlab-v066-infra-requalification-source-freeze-2026-09-29.json"
 NINE_PRIVATE = ORIGINAL / "current-v066-nine-id-terminal-private-audit-20260929.json"
 NINE_PUBLIC = ROOT / "docs/evidence/gitlab-v066-current-nine-id-terminal-controls-2026-09-29.json"
 RETRY_INDEX = 9
 PREFIX_EVENTS = 18
-FREEZE_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-private-v1"
-PUBLIC_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-public-v1"
+FREEZE_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-private-v2"
+PUBLIC_SCHEMA = "envloop-gitlab-v066-infra-requalification-source-public-v2"
 INTENT_SCHEMA = "envloop-gitlab-v066-infra-requalification-intent-private-v1"
 RESULT_SCHEMA = "envloop-gitlab-v066-infra-requalification-result-private-v1"
 AUDIT_SCHEMA = "envloop-gitlab-v066-infra-requalification-audit-private-v1"
@@ -52,6 +57,7 @@ SOURCE_FILES = (
     "gitlab_world/v066_infra_requalification_v1.py",
     "tests/test_gitlab_v066_infra_requalification.py",
     "docs/FULL_STUDY_GITLAB_V066_INFRA_REQUALIFICATION_2026-09-29.md",
+    "docs/FULL_STUDY_GITLAB_V066_INFRA_REQUALIFICATION_V2_2026-09-29.md",
 )
 
 
@@ -202,6 +208,59 @@ def _original_context(ratification_private: Path) -> dict:
     }
 
 
+def _superseded_v1_freeze(context: dict) -> dict:
+    """Bind the unpublished-at-dispatch v1 branch without rewriting it."""
+    old_private_path = SUPERSEDED_BRANCH / "source-freeze.private.json"
+    old_public_path = SUPERSEDED_PUBLIC_FREEZE
+    require(one.sha(old_private_path.read_bytes()) ==
+            SUPERSEDED_PRIVATE_FREEZE_SHA256 and
+            one.sha(old_public_path.read_bytes()) ==
+            SUPERSEDED_PUBLIC_FREEZE_SHA256,
+            "superseded_v1_freeze_bytes_changed")
+    old_private, _ = _read_private(old_private_path)
+    old_public = json.loads(old_public_path.read_bytes())
+    require(old_private.get("schema") ==
+            "envloop-gitlab-v066-infra-requalification-source-private-v1" and
+            old_private.get("source_bundle_sha256") ==
+            SUPERSEDED_SOURCE_BUNDLE_SHA256 and
+            old_private.get("original_100_id_plan_sha256") ==
+            context["old_sha"] and
+            old_private.get("original_full_failed_journal_sha256") ==
+            context["journal_full_sha256"] and
+            old_private.get("branch_nine_prefix_journal_sha256") ==
+            context["journal_prefix_sha256"] and
+            old_private.get("status") ==
+            "source_frozen_no_requalification_dispatched" and
+            old_public.get("private_freeze_sha256") ==
+            SUPERSEDED_PRIVATE_FREEZE_SHA256 and
+            old_public.get("status") ==
+            "source_frozen_no_requalification_dispatched" and
+            old_public.get("continuation_dispatch_authorized") is False and
+            SUPERSEDED_BRANCH.is_dir() and
+            not SUPERSEDED_BRANCH.is_symlink() and
+            SUPERSEDED_BRANCH.stat().st_mode & 0o077 == 0 and
+            (SUPERSEDED_BRANCH / "plan.private.json").read_bytes() ==
+            context["plan_raw"] and
+            (SUPERSEDED_BRANCH / "journal.private.jsonl").read_bytes() ==
+            context["journal_prefix"] and
+            not (SUPERSEDED_BRANCH / "attempts" /
+                 f"{RETRY_INDEX:03d}").exists() and
+            not list((SUPERSEDED_BRANCH / "supervision").iterdir()),
+            "superseded_v1_branch_was_dispatched_or_changed")
+    for index in range(RETRY_INDEX):
+        key = f"{index:03d}"
+        require(old_private.get("branch_nine_attempt_manifests", {}).get(key) ==
+                _tree_manifest(ORIGINAL / "attempts" / key) ==
+                _tree_manifest(SUPERSEDED_BRANCH / "attempts" / key),
+                "superseded_v1_attempt_prefix_changed")
+    return {
+        "superseded_v1_private_freeze_sha256":
+            SUPERSEDED_PRIVATE_FREEZE_SHA256,
+        "superseded_v1_public_freeze_sha256":
+            SUPERSEDED_PUBLIC_FREEZE_SHA256,
+    }
+
+
 def _branch_audit(context: dict) -> tuple[dict, dict]:
     require(BRANCH.is_dir() and not BRANCH.is_symlink() and
             BRANCH.stat().st_mode & 0o077 == 0 and
@@ -231,6 +290,10 @@ def _public_freeze(private: dict, private_sha: str) -> dict:
         "schema": PUBLIC_SCHEMA,
         "status": "source_frozen_no_requalification_dispatched",
         "private_freeze_sha256": private_sha,
+        "superseded_v1_public_freeze_sha256":
+            private["superseded_v1_public_freeze_sha256"],
+        "superseded_v1_private_freeze_sha256":
+            private["superseded_v1_private_freeze_sha256"],
         "source_bundle_sha256": private["source_bundle_sha256"],
         "original_100_id_plan_sha256": private["original_100_id_plan_sha256"],
         "original_full_failed_journal_sha256":
@@ -257,7 +320,7 @@ def freeze(ratification_private: Path) -> dict:
             not PUBLIC_FREEZE.exists(),
             "fresh_requalification_branch_and_public_freeze_required")
     context = _original_context(ratification_private)
-    lane.assert_live_world(context["old"])
+    superseded = _superseded_v1_freeze(context)
     source_sha256s = _source_hashes()
     BRANCH.mkdir(mode=0o700)
     (BRANCH / "attempts").mkdir(mode=0o700)
@@ -280,6 +343,7 @@ def freeze(ratification_private: Path) -> dict:
         "schema": FREEZE_SCHEMA,
         "status": "source_frozen_no_requalification_dispatched",
         "frozen_utc": datetime.now(timezone.utc).isoformat(),
+        **superseded,
         "original_100_id_plan_sha256": context["old_sha"],
         "original_full_failed_journal_sha256":
             context["journal_full_sha256"],
@@ -322,9 +386,14 @@ def freeze(ratification_private: Path) -> dict:
 
 def validate_freeze(ratification_private: Path) -> tuple[dict, dict, dict, dict]:
     context = _original_context(ratification_private)
+    superseded = _superseded_v1_freeze(context)
     private, private_sha = _read_private(PRIVATE_FREEZE)
     require(private.get("schema") == FREEZE_SCHEMA and
             private.get("status") == "source_frozen_no_requalification_dispatched" and
+            private.get("superseded_v1_public_freeze_sha256") ==
+            superseded["superseded_v1_public_freeze_sha256"] and
+            private.get("superseded_v1_private_freeze_sha256") ==
+            superseded["superseded_v1_private_freeze_sha256"] and
             private.get("original_100_id_plan_sha256") == context["old_sha"] and
             private.get("original_full_failed_journal_sha256") ==
             context["journal_full_sha256"] and
@@ -520,9 +589,10 @@ def run_requalification(ratification_private: Path,
         except Exception as exc:
             child = {
                 "timed_out": False, "sigkill_used": False,
-                "child_terminated": True, "child_pid": None,
+                "child_terminated": False, "child_pid": None,
                 "exit_code": None, "elapsed_seconds": 0.0,
                 "launch_or_supervision_error_type": type(exc).__name__,
+                "termination_unconfirmed": True,
             }
         status = "manual_review_required_no_replay"
         terminal = None

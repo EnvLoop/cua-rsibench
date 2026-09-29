@@ -125,6 +125,8 @@ class RecoveryBranchTests(unittest.TestCase):
     def test_public_freeze_has_no_private_task_identity(self):
         private = {
             "source_bundle_sha256": "a" * 64,
+            "superseded_v1_public_freeze_sha256": "3" * 64,
+            "superseded_v1_private_freeze_sha256": "4" * 64,
             "original_100_id_plan_sha256": "b" * 64,
             "original_full_failed_journal_sha256": "c" * 64,
             "original_failed_terminal_entry_sha256": "d" * 64,
@@ -219,6 +221,35 @@ class RecoveryBranchTests(unittest.TestCase):
             lane.journal_state(
                 lane.read_journal(self.branch, self.old_sha),
                 self.old)["failed"], True)
+        with self.assertRaisesRegex(
+                recovery.RecoveryError,
+                "same_identity_requalification_already_used_or_uncertain"):
+            recovery.run_requalification(
+                self.private / "ratification.json", self.review_sha)
+
+    def test_supervision_oserror_cannot_claim_child_terminated_or_reset(self):
+        def unknown_supervision_failure(*_args, **_kwargs):
+            raise OSError("injected error after possible child spawn")
+
+        parts = self._patch_run(child=unknown_supervision_failure)
+        for item in parts:
+            item.start()
+        self.addCleanup(lambda: [item.stop() for item in reversed(parts)])
+        with patch.object(recovery.one, "exact_cold_reset") as reset:
+            result = recovery.run_requalification(
+                self.private / "ratification.json", self.review_sha)
+        saved = json.loads(
+            (self.supervision / "009-result.private.json").read_bytes())
+        state = lane.journal_state(
+            lane.read_journal(self.branch, self.old_sha), self.old)
+        self.assertEqual(result["status"], "manual_review_required_no_replay")
+        self.assertFalse(saved["child"]["child_terminated"])
+        self.assertTrue(saved["child"]["termination_unconfirmed"])
+        self.assertFalse(saved["post_attempt_baseline_exact"])
+        self.assertIsNone(state["pending"])
+        self.assertFalse(state["failed"])
+        self.assertEqual(state["next_index"], 9)
+        reset.assert_not_called()
         with self.assertRaisesRegex(
                 recovery.RecoveryError,
                 "same_identity_requalification_already_used_or_uncertain"):
