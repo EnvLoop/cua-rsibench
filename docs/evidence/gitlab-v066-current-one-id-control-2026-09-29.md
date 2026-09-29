@@ -1,0 +1,5 @@
+# GitLab CE: first current-profile evaluator GUI control
+
+One original GitLab CE 18.5 final **candidate** completed the frozen v0.6.6 evaluator-operated positive, plausible wrong variant, repeated positive and three cold-reset controls in the preserved disposable world. A separate one-ID child-process supervisor returned with an exact post-attempt baseline and no automatic replay. The [independent raw-receipt audit](gitlab-v066-current-one-id-control-2026-09-29.json) reopened the hash-chained journal, saved PostgreSQL/Git states, original-source bindings, screenshots, reset receipts and preserved historical failures. Its private audit SHA is bound in the field-limited public receipt.
+
+This is **1/100 current-profile evaluator controls**, with 99 identities unrun. It is not a student-model attempt or an official final-task admission. The per-ID proof writer, entitlement and observation/sampling gates, all six qualified cells and the pre-campaign witness remain pending. The earlier 100 GUI trios were historical development controls and were not copied into this new count. No private task identity, credential, GUI trace or source answer is published here.
