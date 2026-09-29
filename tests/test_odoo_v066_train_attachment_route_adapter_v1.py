@@ -170,6 +170,17 @@ class AttachmentGuardTests(unittest.TestCase):
                 self.assertFalse(passed)
                 self.assertEqual(len(saved), 6)
 
+    def test_same_visible_link_rule_covers_other_original_pdf_routes(self):
+        for family in ("sales", "crm"):
+            with self.subTest(family=family):
+                route = f"http://127.0.0.1:8069/odoo/{family}/123"
+                passed, adapter, _saved = self.run_guard(
+                    exact=False, first=self.alternate,
+                    second=self.alternate, route=route)
+                self.assertTrue(passed)
+                self.assertEqual(adapter._physical_guard["target_identity"]
+                                 ["label"], self.label)
+
     def test_bad_source_label_is_rejected(self):
         page = Page([], [])
         with self.assertRaisesRegex(ValueError, "label must bind"):
