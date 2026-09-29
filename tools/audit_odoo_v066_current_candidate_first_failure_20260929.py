@@ -8,6 +8,7 @@ credentials, and the private run nonce.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 from hashlib import sha256
 from io import BytesIO
 import json
@@ -19,6 +20,7 @@ from tools import audit_odoo_v066_current_candidate_no_gui_gate_v4 as gate_audit
 from tools import odoo_v066_current_candidate_one_selection_v4 as runner
 from tools import odoo_v066_scale_controller_v1 as controller
 from tools import odoo_v066_scale_protocol_v1 as protocol
+from tools import odoo_v066_battery_authorized_power_v2 as power
 
 
 SCHEMA = "envloop-odoo-v066-current-candidate-first-gui-failure-audit-v1"
@@ -26,6 +28,14 @@ PUBLIC_PATH = (protocol.ROOT / "docs/evidence" /
                "odoo-v066-current-candidate-first-gui-terminal-failure-audit-2026-09-29.json")
 PIXELS = {(41, 419), (132, 419)}
 RGB = {(235, 237, 239), (235, 237, 240)}
+ORIGINAL_LEASE_PREFIX_BYTES = 2954
+ORIGINAL_LEASE_PREFIX_SHA256 = (
+    "20e410418c07e51c6427b9838be8f27787fcc16e444f243ef218afbc76f405e2"
+)
+ORIGINAL_LEASE_ROWS = 24
+ORIGINAL_LEASE_PID = 94970
+ORIGINAL_LEASE_ACQUIRED = "2026-09-29T05:49:32.405796+00:00"
+ORIGINAL_LEASE_RELEASED = "2026-09-29T05:50:07.467558+00:00"
 
 
 class FailureAuditError(ValueError):
@@ -86,6 +96,41 @@ def two_pixel_alternate(first: bytes, second: bytes) -> bool:
             if len(changed) > 2:
                 return False
     return changed == PIXELS
+
+
+def verify_original_lease_prefix(raw: bytes, *, started: datetime,
+                                 ended: datetime,
+                                 prefix_bytes: int = ORIGINAL_LEASE_PREFIX_BYTES,
+                                 prefix_sha256: str = ORIGINAL_LEASE_PREFIX_SHA256,
+                                 row_count: int = ORIGINAL_LEASE_ROWS,
+                                 pid: int = ORIGINAL_LEASE_PID,
+                                 acquired_at: str = ORIGINAL_LEASE_ACQUIRED,
+                                 released_at: str = ORIGINAL_LEASE_RELEASED) -> None:
+    """Bind original rows exactly; allow only complete later lease pairs."""
+    need(len(raw) >= prefix_bytes and raw.endswith(b"\n") and
+         raw[prefix_bytes - 1:prefix_bytes] == b"\n" and
+         sha256(raw[:prefix_bytes]).hexdigest() == prefix_sha256,
+         "failure_audit_original_lease_prefix_changed")
+    original = [json.loads(line) for line in raw[:prefix_bytes].splitlines()]
+    need(len(original) == row_count and
+         [row.get("event") for row in original[-2:]] ==
+         ["acquired", "released"] and
+         all(row.get("operation") == controller.LEASE_OPERATION and
+             row.get("pid") == pid for row in original[-2:]) and
+         [row.get("at_utc") for row in original[-2:]] ==
+         [acquired_at, released_at] and
+         datetime.fromisoformat(acquired_at) <= started <=
+         datetime.fromisoformat(released_at) <= ended,
+         "failure_audit_original_lease_pair_or_time_window_changed")
+    suffix = [json.loads(line) for line in raw[prefix_bytes:].splitlines()]
+    need(len(suffix) % 2 == 0 and
+         all(suffix[index].get("event") == "acquired" and
+             suffix[index + 1].get("event") == "released" and
+             suffix[index].get("operation") ==
+             suffix[index + 1].get("operation") and
+             suffix[index].get("pid") == suffix[index + 1].get("pid")
+             for index in range(0, len(suffix), 2)),
+         "failure_audit_appended_lease_pair_incomplete")
 
 
 def audit(*, worker_dir: Path, historical_root: Path,
@@ -244,12 +289,13 @@ def audit(*, worker_dir: Path, historical_root: Path,
              for i in range(3)),
          "failure_audit_two_frame_alternation_changed")
     lease = private / "worker-lease-events.jsonl"
-    raw = lease.read_bytes()
-    last = [json.loads(line) for line in raw.splitlines()[-2:]]
-    need([x.get("event") for x in last] == ["acquired", "released"] and
-         all(x.get("operation") == controller.LEASE_OPERATION for x in last) and
-         last[0].get("pid") == last[1].get("pid"),
-         "failure_audit_original_worker_lease_not_released")
+    original_intent = read(attempt / "intent.private.json")
+    started = datetime.fromisoformat(original_intent["started_at_utc"])
+    ended = power.validate(events[-1]["host_power_end"])
+    need(power.validate(events[0]["host_power_pre_dispatch"]) <= started,
+         "failure_audit_dispatch_power_after_case_start")
+    verify_original_lease_prefix(lease.read_bytes(), started=started,
+                                 ended=ended)
     return {
         "schema": SCHEMA,
         "status": "one_original_current_candidate_gui_failure_independently_verified_no_replay",
