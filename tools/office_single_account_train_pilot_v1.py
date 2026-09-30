@@ -31,6 +31,9 @@ EVIDENCE_SCHEMA = 'cua-office-single-account-train-evidence-v1'
 INVENTORY_SCHEMA = 'cua-office-single-account-folder-inventory-v1'
 PRIVATE_RECEIPT_SCHEMA = 'cua-office-single-account-train-audit-v1'
 PUBLIC_SCHEMA = 'cua-office-single-account-train-public-status-v1'
+DEDICATED_ACCOUNT_SCOPE = 'signed_in_dedicated_test_account'
+EXISTING_FOLDER_SCOPE = 'existing_account_dedicated_disposable_folder'
+FOLDER_EVIDENCE_SCHEMA = 'cua-office-existing-account-folder-train-evidence-v1'
 _HEX = re.compile(r'[0-9a-f]{64}\Z')
 _DOC = re.compile(r'\{[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}\}\Z')
 ROOT = Path(__file__).resolve().parents[1]
@@ -392,7 +395,8 @@ def inspect_manual_evidence(spec: dict, spec_raw: bytes,
                             paths: dict[str, Path], *,
                             evidence_schema: str = EVIDENCE_SCHEMA,
                             split: str = 'train',
-                            additional_fields: frozenset[str] = frozenset()
+                            additional_fields: frozenset[str] = frozenset(),
+                            account_scope: str = DEDICATED_ACCOUNT_SCOPE
                             ) -> tuple[dict, dict, dict]:
     """Reuse exact folder, screenshot and download checks across splits."""
     evidence, _ = _json(evidence_path, root)
@@ -406,14 +410,23 @@ def inspect_manual_evidence(spec: dict, spec_raw: bytes,
                  {'before', 'saved', 'reset', 'cleanup'},
              'single_account_evidence_not_bound')
     gui = evidence['manual_gui']
-    _require(type(gui) is dict and set(gui) == {
+    _require(account_scope in {DEDICATED_ACCOUNT_SCOPE, EXISTING_FOLDER_SCOPE} and
+             (account_scope == DEDICATED_ACCOUNT_SCOPE or
+              (split == 'train' and evidence_schema == FOLDER_EVIDENCE_SCHEMA)),
+             'single_account_manual_scope_invalid')
+    folder_mode = account_scope == EXISTING_FOLDER_SCOPE
+    gui_fields = {
         'operator_reviewed', 'original_office_gui',
         'signed_in_dedicated_test_account', 'model_calls',
         'application_api_edits', 'actor_edit_url_sha256',
-        'before_screenshot_ref', 'after_screenshot_ref'} and
+        'before_screenshot_ref', 'after_screenshot_ref'}
+    if folder_mode:
+        gui_fields.add('account_scope')
+    _require(type(gui) is dict and set(gui) == gui_fields and
         gui['operator_reviewed'] is True and
         gui['original_office_gui'] is True and
-        gui['signed_in_dedicated_test_account'] is True and
+        gui['signed_in_dedicated_test_account'] is (not folder_mode) and
+        (not folder_mode or gui['account_scope'] == EXISTING_FOLDER_SCOPE) and
         gui['model_calls'] == 0 and
         gui['application_api_edits'] is False and
         gui['actor_edit_url_sha256'] ==
@@ -487,7 +500,8 @@ def inspect_manual_evidence(spec: dict, spec_raw: bytes,
 
 
 def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
-          work_root: Path, scorer_factory=None) -> dict:
+          work_root: Path, scorer_factory=None,
+          account_scope: str = DEDICATED_ACCOUNT_SCOPE) -> dict:
     """Inspect local private evidence only; no Microsoft/provider capability."""
     root = Path(work_root).resolve()
     spec, spec_raw = _json(spec_path, root)
@@ -537,8 +551,13 @@ def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
              actor['sourcedoc_sha256'] !=
                  reset['sourcedoc_sha256'],
              'single_account_reset_copy_not_distinct')
+    _require(account_scope in {DEDICATED_ACCOUNT_SCOPE, EXISTING_FOLDER_SCOPE},
+             'single_account_manual_scope_invalid')
+    folder_mode = account_scope == EXISTING_FOLDER_SCOPE
     evidence, phase_files, _gui = inspect_manual_evidence(
-        spec, spec_raw, evidence_path, root, actor, reset, paths)
+        spec, spec_raw, evidence_path, root, actor, reset, paths,
+        evidence_schema=FOLDER_EVIDENCE_SCHEMA if folder_mode else EVIDENCE_SCHEMA,
+        account_scope=account_scope)
     fake_test_scorer = scorer_factory is not None
     scorer = (scorer_factory(spec, paths) if fake_test_scorer else
               OfficeTrainScorer(spec, paths))
@@ -587,6 +606,13 @@ def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
         'selection_or_final_admitted': False,
         'official_final_credit': 0,
     }
+    if folder_mode:
+        receipt.update(account_scope=EXISTING_FOLDER_SCOPE,
+                       dedicated_test_account_operator_asserted=False,
+                       automated_model_scope_qualified=False,
+                       selection_or_final_admitted=False)
+        if not fake_test_scorer:
+            receipt['status'] = 'passed_manual_folder_train_development_control'
     receipt_sha = _write_new(out_dir / 'receipt.private.json',
                              _canonical(receipt))
     public = {'schema': PUBLIC_SCHEMA,
@@ -603,4 +629,10 @@ def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
               'model_calls': 0,
               'selection_or_final_admitted': False,
               'official_final_credit': 0}
+    if folder_mode:
+        public.update(account_scope=EXISTING_FOLDER_SCOPE,
+                      dedicated_test_account_operator_asserted=False,
+                      automated_model_scope_qualified=False)
+        if not fake_test_scorer:
+            public['status'] = 'manual_folder_train_development_control_only'
     return public
