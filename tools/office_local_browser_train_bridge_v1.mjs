@@ -178,8 +178,10 @@ export async function createOfficeLocalTrainBridge({tab,binding,artifactRoot,lis
     'envloop-office-account-leases-v1.private') : path.join(root,'leases.private');
   await fs.mkdir(leaseRoot,{recursive:true,mode:0o700});
   const leaseStat=await fs.lstat(leaseRoot);
+  const leaseOwnerUid=os.userInfo().uid;
   require(leaseStat.isDirectory() && !leaseStat.isSymbolicLink() && (leaseStat.mode & 0o077)===0 &&
-    (typeof process.getuid!=='function' || leaseStat.uid===process.getuid()), 'private_account_lease_store_invalid');
+    integer(leaseOwnerUid) && leaseOwnerUid>=0 && leaseStat.uid===leaseOwnerUid,
+    'private_account_lease_store_invalid');
   const leasePath=path.join(leaseRoot,`account-${b.account_principal_sha256}.lease.private.json`);
   const token=randomBytes(16).toString('hex');
   let lease;
@@ -372,6 +374,9 @@ export async function createOfficeLocalQwenBaseFrameSampler({python,repoRoot,art
                                                             visibleInstructionPath}) {
   // Evaluator-owned subprocess transport. The model sees only the verified
   // crop and visible instruction; browser/account capabilities stay here.
+  // This optional transport needs a terminal Node environment. Native CUA
+  // uses the terminal spool and never imports this restricted module.
+  const {default:subprocessProcess}=await import('node:process');
   const repo=await fs.realpath(repoRoot),root=await fs.realpath(artifactRoot);
   require(root.startsWith(path.join(repo,'work')+path.sep) &&
     python===path.join(repo,'work/qwen38-training-runtime/.venv/bin/python'),
@@ -399,7 +404,7 @@ export async function createOfficeLocalQwenBaseFrameSampler({python,repoRoot,art
       schema:'office-local-qwen-frame-launch-v1',step:frame.step,frame_id:frame.frame_id,
       frame_sha256:digest(await fs.readFile(framePath)),single_dispatch_only:true,
       model:'Qwen/Qwen3.8-27B',official_final_credit:0}));
-    const env={...process.env,PYTHONPATH:`${repo}:${path.join(repo,'src')}`,PYTHONNOUSERSITE:'1',
+    const env={...subprocessProcess.env,PYTHONPATH:`${repo}:${path.join(repo,'src')}`,PYTHONNOUSERSITE:'1',
       HF_HUB_OFFLINE:'1',TRANSFORMERS_OFFLINE:'1'};
     for (const key of ['OPENAI_API_KEY','ANTHROPIC_API_KEY','E2B_API_KEY','HF_TOKEN','HUGGING_FACE_HUB_TOKEN']) delete env[key];
     const completed=await new Promise(resolve=>{

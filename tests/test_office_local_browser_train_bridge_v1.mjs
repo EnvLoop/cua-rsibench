@@ -76,6 +76,68 @@ async function admittedNativeFixture(f) {
   return control;
 }
 
+test('native lease and frame work without global process or a node:process import',async t=>{
+  const f=await fixture(t,{mode:'native_development'});
+  await admittedNativeFixture(f);
+  assert.equal(os.userInfo().uid,process.getuid());
+  const bridgeUrl=new URL('../tools/office_local_browser_train_bridge_v1.mjs',import.meta.url).href;
+  const script=`
+    import assert from 'node:assert/strict';
+    import * as fs from 'node:fs/promises';
+    import os from 'node:os';
+    import path from 'node:path';
+    import vm from 'node:vm';
+    const bridgeUrl=${JSON.stringify(bridgeUrl)};
+    const context=vm.createContext({Buffer,URL,structuredClone});
+    assert.equal(vm.runInContext('typeof process',context),'undefined');
+    const allowed=new Set(['node:crypto','node:fs/promises','node:path','node:os','node:url','node:child_process']);
+    let restrictedImports=0;
+    const module=new vm.SourceTextModule(await fs.readFile(new URL(bridgeUrl),'utf8'),{
+      context,identifier:bridgeUrl,initializeImportMeta:meta=>{meta.url=bridgeUrl;},
+      importModuleDynamically:async specifier=>{
+        restrictedImports++;
+        throw new Error('restricted_module_import:'+specifier);
+      },
+    });
+    await module.link(async specifier=>{
+      assert.ok(allowed.has(specifier),'static import is outside the native module allowlist');
+      const real=await import(specifier);
+      return new vm.SyntheticModule(Object.keys(real),function(){
+        for(const name of Object.keys(real)) this.setExport(name,real[name]);
+      },{context});
+    });
+    await module.evaluate();
+    const binding=${JSON.stringify(f.binding)},admission=${JSON.stringify(f.options.admission)};
+    const root=${JSON.stringify(f.root)},calls=[];
+    const tab={id:binding.tab_id,url:async()=>binding.edit_url,getAXState:async()=>${JSON.stringify(ax)},
+      screenshot:async()=>Buffer.from(${JSON.stringify(f.pixels.toString('base64'))},'base64'),
+      click:async()=>calls.push('click'),close:async()=>calls.push('close')};
+    let bridge;
+    try {
+      bridge=await module.namespace.createOfficeLocalTrainBridge({tab,binding,artifactRoot:root,
+        listDocumentTabIds:async()=>[tab.id],admission,clock:()=>100000});
+      assert.equal(restrictedImports,0);
+      const store=path.join(await fs.realpath(os.tmpdir()),'envloop-office-account-leases-v1.private');
+      assert.equal((await fs.lstat(store)).uid,os.userInfo().uid);
+      const frame=await bridge.observe();
+      await bridge.dispatch({version:'scale-computer-use-v0.6',task_id:binding.task_id,
+        task_binding_sha256:binding.task_binding_sha256,step:frame.step,frame_id:frame.frame_id,
+        type:'click',memory:'',target:{x:1000,y:300}});
+    } finally {if(bridge) await bridge.stop();}
+    assert.deepEqual(calls,['click','close']);
+    assert.equal(restrictedImports,0);
+    await assert.rejects(module.namespace.createOfficeLocalQwenBaseFrameSampler({}),
+      /restricted_module_import:node:process/);
+    assert.equal(restrictedImports,1);
+    assert.equal(vm.runInContext('typeof process',context),'undefined');
+    console.log('restricted_module_context_fixture_passed');
+  `;
+  const result=execFileSync(process.execPath,['--experimental-vm-modules','--input-type=module','-e',script],{
+    env:{PATH:process.env.PATH,TMPDIR:os.tmpdir()},encoding:'utf8',timeout:30000,
+  });
+  assert.equal(result.trim(),'restricted_module_context_fixture_passed');
+});
+
 test('current cropped frame dispatches bounded click and focused text; receipts contain hashes only',async t=>{
   const f=await fixture(t);f.bridge=await createOfficeLocalTrainBridge(f.options);
   let frame=await f.bridge.observe();
