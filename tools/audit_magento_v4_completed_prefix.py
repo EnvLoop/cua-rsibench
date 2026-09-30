@@ -263,6 +263,12 @@ def _check_retry(run: Path, rows: list[dict], index: int, case: dict,
     """Reopen the saved invalid attempt and its exact-pair cleanup lineage."""
     previous = v4.attempt_dir(run, index, 0)
     audit, audit_sha = first.read_json(previous / 'reconciliation-audit.private.json')
+    if index == 26 and audit.get('classification') == 'preconfig_operator_interruption_no_task_seed':
+        from tools import magento_v4_case26_startup_interruption_20260930 as recovery
+        first.must(run.resolve() == (recovery.paths(run.parents[2])['run']).resolve(),
+                   'case26 additive recovery belongs to another run')
+        recovery.verify_saved_retry(recovery.paths(run.parents[2]), rows)
+        return recovery.CLASSIFICATION
     intent, intent_sha = first.read_json(previous / 'reconciliation-intent.private.json')
     cleanup, cleanup_sha = first.read_json(previous / 'reconciliation.private.json')
     scoped = [row for row in rows if row.get('index') == index and
