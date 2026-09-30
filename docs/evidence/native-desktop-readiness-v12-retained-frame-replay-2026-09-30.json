@@ -1,0 +1,17 @@
+{
+  "exact_unchanged_current_frame_accepted": true,
+  "model_calls": 0,
+  "native_runtime_successor_executed": false,
+  "new_guest_creates": 0,
+  "no_gui_inputs": true,
+  "official_final_admissions": 0,
+  "original_rejection_reproduced": true,
+  "returned_full_frame_byte_identical_to_retained_tooltip_frame": true,
+  "schema": "cua-native-readiness-v12-retained-frame-offline-replay",
+  "seven_passive_samples": 7,
+  "simulated_elapsed_ns": 2500000000,
+  "source_observation_sha256": "26b3cb2a1849e5d3f2c1fbfed02143db667c107f27ec0ffbd4d3f168bcb0796f",
+  "source_rejected_frame_sha256": "4f89a59b8fa6ab192c3c951b4d8b1c791886b8f77082f52c91d34dedfe32c7d0",
+  "status": "original_tooltip_failure_reproduced_and_passive_readiness_offline_verified",
+  "subsequent_material_change_refused": true
+}
