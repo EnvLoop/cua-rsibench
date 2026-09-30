@@ -40,3 +40,26 @@ Evidence: [Desktop trio](evidence/native-desktop-v20-first-trio-root-result-2026
 [Office native diagnostic](evidence/office-terminal-first-native-diagnostic-2026-10-01.json),
 [Checkpoint interface](FULL_STUDY_CHECKPOINT_RESULT_API_2026-10-01.md),
 [Native frame witness](OFFICE_NATIVE_FRAME_WITNESS_2026-10-01.md).
+
+## Verified execution addendum
+
+The new v21 public TRAIN Qwen episode completed actual saved-state readback,
+independent scoring and a distinct fresh-guest reset. It produced 22 completed
+responses and 22 actual GUI actions; the 23rd turn ended at the 720-second actor
+deadline with its uncertain inference preserved. The saved score is **0**:
+the task was unfinished and the saved input was unchanged. Both guests were
+terminated, no action completed after the deadline, and provider shutdown was
+acknowledged. Billing remains unknown. This is one TRAIN development result,
+not an official outcome or evidence of improvement. [Independent result](evidence/desktop-v21-native-qwen-train-root-result-2026-10-01.json).
+
+GitLab v5 completed three distinct real cold boots, complete native configuration
+and SQL/Git readback, ordered Sidekiq shutdown and owned teardown. Root reopened
+815 raw evidence files. All nine telemetry settings were false, seven critical
+services ran, and the original instance's identity, SQL/Git state, services,
+immutable seed and protected metadata were restored. This qualifies the neutral
+runtime probe; it does not admit task IDs or authorize a task batch. [Independent
+result](evidence/gitlab-neutral-v5-three-coldboots-root-result-2026-10-01.json).
+
+All official counts remain **0/600, 0/24 and 0/3,000**. The completed runtime
+repairs now need the matched six-cell policy, full task qualifications and real
+researcher campaigns before the final paper can claim benchmark results.

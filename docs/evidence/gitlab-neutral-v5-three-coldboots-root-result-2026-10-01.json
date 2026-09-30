@@ -1,0 +1,58 @@
+{
+  "critical_services_disabled_during_task_execution": false,
+  "cycles": [
+    {
+      "container_exit_code": 0,
+      "cycle": 0,
+      "exact_sql_baseline": true,
+      "fresh_compiled_attributes": true,
+      "full_git_tree_baseline_equal": true,
+      "healthy_startup": true,
+      "native_settings_all_nine_false": true,
+      "ordered_sidekiq_shutdown": true,
+      "owned_container_mounts_and_subtree_removed": true,
+      "seven_critical_services_running": true,
+      "six_optional_exporters_absent": true
+    },
+    {
+      "container_exit_code": 0,
+      "cycle": 1,
+      "exact_sql_baseline": true,
+      "fresh_compiled_attributes": true,
+      "full_git_tree_baseline_equal": true,
+      "healthy_startup": true,
+      "native_settings_all_nine_false": true,
+      "ordered_sidekiq_shutdown": true,
+      "owned_container_mounts_and_subtree_removed": true,
+      "seven_critical_services_running": true,
+      "six_optional_exporters_absent": true
+    },
+    {
+      "container_exit_code": 0,
+      "cycle": 2,
+      "exact_sql_baseline": true,
+      "fresh_compiled_attributes": true,
+      "full_git_tree_baseline_equal": true,
+      "healthy_startup": true,
+      "native_settings_all_nine_false": true,
+      "ordered_sidekiq_shutdown": true,
+      "owned_container_mounts_and_subtree_removed": true,
+      "seven_critical_services_running": true,
+      "six_optional_exporters_absent": true
+    }
+  ],
+  "distinct_fresh_clones": 3,
+  "historical_task_credit": 0,
+  "immutable_seed_content_and_protected_metadata_unchanged": true,
+  "model_calls": 0,
+  "new_task_dispatch_authorized": false,
+  "official_final_admissions": 0,
+  "original_identity_sql_git_and_services_restored": true,
+  "plan_sha256": "33f11755ef674a137064f428f6636598839196d67dced953a40a72581a9d20ed",
+  "prior_failures_preserved": true,
+  "raw_files_independently_reopened": 815,
+  "result_sha256": "3aa20fa5534b685acede3ba2f7e2006d9338f4d9af5cf730b6fa3e3d94a24b7f",
+  "schema": "envloop-gitlab-neutral-v5-root-public-result-v1",
+  "status": "three_real_cold_boots_and_original_restoration_independently_replayed",
+  "task_ids_consumed": 0
+}
