@@ -55,8 +55,10 @@ def render_environment(base,port):
     text=profile.render_clone_environment(base).decode()
     require(text.count('http://127.0.0.1:8018')==1 and text.count("nginx['listen_port'] = 8018")==1,
         'Exact original URL and Nginx port required')
-    return text.replace('http://127.0.0.1:8018',f'http://127.0.0.1:{port}').replace(
-        "nginx['listen_port'] = 8018",f"nginx['listen_port'] = {port}").encode()
+    # The immutable base gitlab.rb also sets8018 and wins over Omnibus ENV.
+    # Neutral resource isolation changes only the host mapping, never app origin.
+    return text.encode()
+
 
 
 def parse_services(raw):
@@ -107,7 +109,7 @@ def prepare(*,freeze,out,upstream_bindings,port=8026):
         'epoch_root':str(epoch),'source_freeze_path':str(freeze),'source_freeze_sha256':source.sha(source.private(freeze)),
         'source_sha256s':hashes(Path(__file__).resolve().parents[1]),'frozen_source_sha256s':value['source_sha256s'],
         'cohort_plan_sha256':plan_sha,'original_container':value['clone_container_name'],'image':runtime.IMAGE,
-        'image_id':runtime.IMAGE_ID,'original_base':'http://127.0.0.1:8018','port':port,'neutral_base':f'http://127.0.0.1:{port}',
+        'image_id':runtime.IMAGE_ID,'original_base':'http://127.0.0.1:8018','port':port,'internal_port':8018,'neutral_base':f'http://127.0.0.1:{port}',
         'container_prefix':prefix,'vm_root':'/var/lib/'+prefix,'seed_lowerdirs':cow['seed_volume_lowerdirs'],
         'original_metadata_sha256s':{n:source.sha(source.private(epoch/n)) for n in BOUND_FILES},
         'protected_bound_metadata_sha256s':value['bound_metadata_sha256s'],
@@ -140,7 +142,7 @@ def checked_plan(path):
         doc['vm_root']=='/var/lib/'+doc['container_prefix'],'Owned neutral namespace malformed')
     require(doc.get('wait_bounds')==WAIT_BOUNDS and doc.get('profile')==profile.VERSION and doc.get('image')==runtime.IMAGE and
         doc.get('image_id')==runtime.IMAGE_ID and doc.get('original_container')==value['clone_container_name'] and
-        doc.get('original_base')=='http://127.0.0.1:8018' and doc.get('neutral_base')==f"http://127.0.0.1:{doc['port']}" and
+        doc.get('internal_port')==8018 and doc.get('original_base')=='http://127.0.0.1:8018' and doc.get('neutral_base')==f"http://127.0.0.1:{doc['port']}" and
         source.private(out/'neutral-runtime.env')==render_environment(source.private(epoch/'runtime.env'),doc['port']) and
         doc.get('frozen_source_sha256s')==value['source_sha256s'] and
         doc.get('protected_bound_metadata_sha256s')==value['bound_metadata_sha256s'] and
@@ -300,7 +302,7 @@ print(json.dumps({'base_sha256':hashlib.sha256(base).hexdigest(),'clone_config_s
             for role,lower in self.doc['seed_lowerdirs'].items():reset._mount(role,lower)
             config_delta=self.configure_upper(index,vmroot)
             args=['run','-d','--name',name,'--hostname','gitlab-neutral.local','--restart','no',
-                '--env-file',str(self.out/'neutral-runtime.env'),'-p',f"127.0.0.1:{self.doc['port']}:{self.doc['port']}"]
+                '--env-file',str(self.out/'neutral-runtime.env'),'-p',f"127.0.0.1:{self.doc['port']}:8018"]
             for role,dest in runtime.DESTS.items():args+=['-v',vmroot+'/'+role+'/merged:'+dest]
             args.append(runtime.IMAGE);self.docker(*args)
             ready=scoped.wait_cohort();snapshot=verify.state_snapshot()
@@ -500,7 +502,7 @@ def audit(*,plan,permit):
             all(services.get(s) in {'disabled','absent'} for s in profile.OPTIONAL_SERVICES), 'Raw native service/config semantics changed')
         require(state['Running'] is True and state['ExitCode']==0 and state['OOMKilled'] is False and state['Health']['Status']=='healthy' and
             startup==cycle['startup_proof'] and startup['identity']['container_id_sha256']==cycle['container_id_sha256'] and
-            startup['identity']['image_id']==runtime.IMAGE_ID and startup['restart_policy']=={'Name':'no','MaximumRetryCount':0} and
+            startup['identity']['image_id']==runtime.IMAGE_ID and startup['identity']['ports']=={'8018/tcp':[{'HostIp':'127.0.0.1','HostPort':str(doc['port'])}]} and startup['restart_policy']=={'Name':'no','MaximumRetryCount':0} and
             startup['SVWAIT']=='60' and startup['runtime_env_values_exact'] is True,'Raw native startup boundary changed')
         require(config==cycle['config_delta'] and config['exact_suffix_only'] is True and config['suffix_sha256']==source.sha(profile.SUFFIX.encode()) and
             teardown==cycle['teardown'] and all(teardown.get(k) is True for k in ['owned_container_absent','owned_overlay_mounts_absent','owned_vm_subtree_absent']),

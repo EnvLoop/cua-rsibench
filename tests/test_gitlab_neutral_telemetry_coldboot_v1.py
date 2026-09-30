@@ -32,7 +32,7 @@ class FixtureBackend(probe.NativeBackend):
  def boot(self,index):
   self.calls.append(('boot',index));self.owned_cycles.add(index)
   if self.fail==('boot',index):raise RuntimeError('startup logger failed')
-  startup={'identity':identity(str(index+1)),'running':True,'health':'healthy','runtime_env_values_exact':True,
+  startup={'identity':identity(str(index+1))|{'ports':{'8018/tcp':[{'HostIp':'127.0.0.1','HostPort':str(self.doc['port'])}]}},'running':True,'health':'healthy','runtime_env_values_exact':True,
    'restart_policy':{'Name':'no','MaximumRetryCount':0},'SVWAIT':'60'}
   config={'exact_suffix_only':True,'suffix_sha256':probe.source.sha(probe.profile.SUFFIX.encode()),'base_sha256':'d'*64,'clone_config_sha256':'e'*64}
   services={s:'running' for s in probe.profile.CRITICAL_SERVICES}|{s:'absent' for s in probe.profile.OPTIONAL_SERVICES}
@@ -69,7 +69,7 @@ class FixtureBackend(probe.NativeBackend):
   self.record('original-resumed.private.json',value);return value
 
 class NeutralTests(unittest.TestCase):
- def doc(self):return {'container_prefix':'envloop-gitlab-neutral-telemetry-'+'a'*12,'vm_root':'/var/lib/envloop-gitlab-neutral-telemetry-'+'a'*12,
+ def doc(self):return {'port':8026,'internal_port':8018,'container_prefix':'envloop-gitlab-neutral-telemetry-'+'a'*12,'vm_root':'/var/lib/envloop-gitlab-neutral-telemetry-'+'a'*12,
   'protected_bound_metadata_sha256s':{},'original_metadata_sha256s':{'runtime.env':'d'*64},'frozen_source_sha256s':{'verify.py':'e'*64},'source_sha256s':{'new.py':'f'*64}}
  def run_fixture(self,fail=None):
   folder=tempfile.TemporaryDirectory();self.addCleanup(folder.cleanup);root=Path(folder.name)
@@ -121,7 +121,7 @@ class NeutralTests(unittest.TestCase):
      backend.boot(0)
    mounts=[s for s in vm if 'mount -t overlay' in s];self.assertEqual(len(mounts),3)
    for role in runtime.DESTS:self.assertTrue(any('lowerdir=/immutable/'+role+',' in s for s in mounts))
-   runs=[r for r in docker if r[0]=='run'];self.assertEqual(len(runs),1);self.assertIn('--restart',runs[0]);self.assertIn('no',runs[0])
+   runs=[r for r in docker if r[0]=='run'];self.assertEqual(len(runs),1);self.assertIn('--restart',runs[0]);self.assertIn('no',runs[0]);self.assertIn('127.0.0.1:8026:8018',runs[0])
    self.assertEqual(runtime.WORLD,old_world);self.assertEqual(reset.VM_ROOT,old_vm)
  def test_colliding_namespace_is_never_claimed_or_deleted(self):
   doc=self.doc()|{'neutral_base':'http://127.0.0.1:8026'}
@@ -181,11 +181,12 @@ class NeutralTests(unittest.TestCase):
   tree['monitoring']['node_exporter']['enable']='false'
   bad=subprocess.run(['ruby','-e',probe.effective_reader_ruby()],input=json.dumps(tree),text=True,capture_output=True)
   self.assertNotEqual(bad.returncode,0);self.assertEqual(bad.stderr,'effective settings unavailable\n');self.assertEqual(bad.stdout,'')
- def test_env_has_only_telemetry_suffix_and_neutral_port_delta(self):
+ def test_env_has_only_telemetry_suffix_and_preserves_internal_origin(self):
   env=b"SVWAIT=60\nGITLAB_OMNIBUS_CONFIG=external_url 'http://127.0.0.1:8018'; nginx['listen_port'] = 8018; puma['worker_processes'] = 0\nUNCHANGED=value\n"
   rendered=probe.render_environment(env,8026)
   self.assertIn(b"puma['worker_processes'] = 0",rendered);self.assertIn(b'UNCHANGED=value\n',rendered);self.assertIn(b'SVWAIT=60\n',rendered)
-  self.assertEqual(rendered.count(b' = false'),9);self.assertEqual(rendered.count(b'8026'),2)
+  self.assertEqual(rendered.count(b' = false'),9);self.assertEqual(rendered.count(b'8026'),0)
+  self.assertEqual(rendered,probe.profile.render_clone_environment(env))
   for port in [8018,8100,False]:
    with self.assertRaises(ValueError):probe.render_environment(env,port)
  def audit_fixture(self):
