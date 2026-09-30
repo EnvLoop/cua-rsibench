@@ -1,0 +1,70 @@
+{
+  "data_provenance": "synthetic supplier-confirmation document and isolated benchmark company records",
+  "fresh_train_controls": 1,
+  "historical_positive_credit": 0,
+  "model_calls": 0,
+  "official_final_admissions": 0,
+  "schema": "envloop-odoo-native-material-v1-root-outcome-v1",
+  "selection_attempt": {
+    "attachment_click_dispatched": false,
+    "automatic_replay_authorized": false,
+    "completed_native_controls": 0,
+    "error_code": "stale_frame",
+    "failed_step": 3,
+    "observed_pixel_delta": {
+      "after_rgb": [
+        235,
+        237,
+        239
+      ],
+      "before_rgb": [
+        235,
+        237,
+        240
+      ],
+      "changed_pixels": 2,
+      "coordinates": [
+        [
+          41,
+          419
+        ],
+        [
+          132,
+          419
+        ]
+      ],
+      "selected_tab": "Products"
+    },
+    "private_failure_sha256": "788adf097c6b68c21379d58c822f5cd074a6109b264d299ec334414210156b2f",
+    "reset_exact": true,
+    "services_restored": true,
+    "stage": "source_gui",
+    "status": "failed_preserve_original_attempt_manual_review_required"
+  },
+  "software": "Odoo Community 18",
+  "source_reviews_completed": 1,
+  "status": "fresh_train_control_verified_selection_first_case_terminal",
+  "train_control": {
+    "attempt_sha256": "bb5d379356460b683d66358914d225c0dae9afe42d66fa9ec1bf19fa55c5d33c",
+    "audit_sha256": "69f2f82da6003bce74229bf7ca21ac0fd0c3f95ddbe039dea70ea577bedca3f0",
+    "full_pre_web_filestore_reset_exact": true,
+    "independent_baseline_reward": 0.0,
+    "independent_positive_reward": 1.0,
+    "independent_wrong_object_reward": 0.0,
+    "native_adapter_binding_sha256": "4fe7380f828eed7105ccc4c3541bfc6d0d3d2af301533ac84e5801085aefded8",
+    "native_guard_action_count": 20,
+    "native_guard_pngs_reopened": 120,
+    "native_service_readiness_verified": true,
+    "native_worker_binding_sha256": "d22dff44965f4c1bdf002eb06a5d136ff089b1c2935c1d17da4061d150a59045",
+    "original_services_restored": true,
+    "protected_post_web_source_bytes_equal": true,
+    "protected_source_files_checked": 16,
+    "source_asset_sha256": "94a5b246e1d0906266dcf9fa2b85407144d671856ada1b6ec354b7ec4683e480",
+    "source_attachment_readback": true,
+    "source_frame_sha256": "74765bbcf37fd3f98682947f2d4155b020d606a9defa6ed5e05925dcc285919c",
+    "source_review_sha256": "a93fd1f58c0fe2d0ebd87c8505e84dbaec74644ec6e527791414b3f5a0f888b6",
+    "source_visual_review_verified": true
+  },
+  "train_control_sha256": "aa470a7638364d3e719c2feec5b0dec1afbb74e3c7122690a7cd7502b92fdd8e",
+  "train_plan_sha256": "592e19fcfde98df049d936cbd8a2cfe7d1a848e6cbf177e5a09a22f578b3ae11"
+}
