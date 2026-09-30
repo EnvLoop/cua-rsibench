@@ -1,0 +1,30 @@
+{
+  "adversarial_controls_rejected": 68,
+  "audit_source_sha256": "f5f6b32e3e6e1284a497aa68b4b2871f12798634a1ae18b65aa6486cb3678955",
+  "deterministic_replays": 2,
+  "final_admissions": 0,
+  "generic_office_20_100_qualified": false,
+  "model_benchmark_score": null,
+  "model_calls": 0,
+  "native_student_save_executed": false,
+  "official_final_credit": 0,
+  "original_raw_collection_sha256": "b3a6c0346450c096cdfbc66e548ed3b1767c00f1beda3ec82992c15fb2879d93",
+  "policy_sha256": "8dd9a94edd67a9e8a548693e64a5930f5ce9197e68b74af6982be84f426b4929",
+  "portable_guard_tests_passed": 6,
+  "private_audit_sha256": "4b080c0563d40871c1e32a52443404f50f0e100f0380627949eec46a51b1758b",
+  "provider_calls": 0,
+  "raw_vs_canonical_separate": true,
+  "real_train_snapshots_checked": 7,
+  "schema": "office-ppt-prospective-native-save-train-audit-v1",
+  "selection_admissions": 0,
+  "simulated_fresh_metadata_controls_passed": 7,
+  "source_hashes": {
+    "ppt_wdi_factory/plan.py": "2207475231b3a9b893d22c4b51478352c6b7219ef9608441bc5cc39849756ab6",
+    "ppt_wdi_factory/verify.py": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9",
+    "tools/audit_ppt_wdi_web_train_triad_v1.py": "167f0bfb9239300de4ba46e485ad479377e38a920ae96a29e3bfdb16fc6b02a0",
+    "tools/office_ppt_prospective_native_save_v1.py": "f2ae7124b277d2a2d62ed9b105799439310be730d1393ea1b56782e290fd06b0",
+    "tools/office_single_account_train_pilot_v1.py": "c66c7a199a0273c0c46b11035bd891231f604d8a11dfa4647b291ce80575937f",
+    "tools/ppt_native_train_collection_proposal_v1.py": "ceba4d7ef39ada9c79aaab7935a66dccd2f3eddfe50a0092d07480a018e4e91a"
+  },
+  "status": "offline_train_metadata_policy_pending_independent_and_native_review"
+}
