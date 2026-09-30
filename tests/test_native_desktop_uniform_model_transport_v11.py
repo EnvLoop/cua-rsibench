@@ -81,7 +81,7 @@ def fake_session(study,identities,checkpoint,path,base):
                   'selection_identities_sha256':digest(integration.canonical(identities)),'task_count':20}
  session._check_time=lambda:None
  session._events=lambda kind:[{'data':{'attempt_id':attempt,'checkpoint_path_sha256':checkpoint}}]
- session._checkpoint_result=lambda event:{'sampler_path':path}
+ session.checkpoint_result=lambda event:{'checkpoint_path':path}
  def dispatch(**kwargs):
   result=kwargs['provider'](kwargs['request'])
   session.calls.append({'attempt_id':kwargs['attempt_id'],'category':kwargs['category'],'request':kwargs['request'],

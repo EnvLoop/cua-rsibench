@@ -1089,6 +1089,91 @@ class CampaignSession:
                 'scheduled_tokens': scheduled_tokens,
                 'billing_state': paid['billing_state']}
 
+    def checkpoint_result(self, checkpoint_event: dict) -> dict:
+        """Reopen one registered SFT result; checkpoint paths remain private.
+
+        Selection workers must read the actual ``checkpoint_path`` field
+        from this session's paid result, rather than inventing a sampler
+        path or depending on an accessor supplied only by test fixtures.
+        """
+        self._audit_paid_files()
+        matching = [row for row in self._events('tinker_checkpoint')
+                    if row == checkpoint_event]
+        _require(type(checkpoint_event) is dict and len(matching) == 1,
+                 'checkpoint_event_not_registered_in_session')
+        data = checkpoint_event['data']
+        _require(set(data) == {
+            'round_index', 'paid_attempt_id', 'dataset_manifest_sha256',
+            'training_config_sha256', 'checkpoint_path_sha256',
+            'optimizer_steps', 'scheduled_tokens', 'epoch_seconds'} and
+            type(data['round_index']) is int and data['round_index'] > 0 and
+            type(data['optimizer_steps']) is int and data['optimizer_steps'] > 0 and
+            type(data['scheduled_tokens']) is int and data['scheduled_tokens'] > 0 and
+            all(cell_final.is_hash(data[key]) for key in (
+                'dataset_manifest_sha256', 'training_config_sha256',
+                'checkpoint_path_sha256')) and
+            data['paid_attempt_id'] == f"tinker-{data['round_index']:03d}",
+            'checkpoint_event_shape_invalid')
+        attempt = data['paid_attempt_id']
+        intents = [row for row in self._events('paid_intent')
+                   if row['data']['attempt_id'] == attempt]
+        results = [row for row in self._events('paid_result')
+                   if row['data']['attempt_id'] == attempt]
+        _require(len(intents) == len(results) == 1 and
+                 intents[0]['data']['category'] == 'tinker' and
+                 intents[0]['sequence'] < results[0]['sequence'] <
+                 checkpoint_event['sequence'],
+                 'checkpoint_paid_result_not_registered')
+        request_path = _private_input(
+            self.directory / f'{attempt}.request.private.json',
+            self.study.repo_root, 'checkpoint_request')
+        result_path = _private_input(
+            self.directory / f'{attempt}.result.private.json',
+            self.study.repo_root, 'checkpoint_result')
+        request, _ = _json(request_path, 'checkpoint_request')
+        result, _ = _json(result_path, 'checkpoint_result')
+        training, training_sha = self.study.student_training_configuration()
+        _require(set(request) == {
+            'schema', 'model', 'cell_id', 'researcher_id', 'round_index',
+            'dataset_manifest_sha256', 'rendered_batch_sha256',
+            'training_config_sha256', 'optimizer_steps', 'batch_size',
+            'scheduled_tokens', 'max_sample_tokens'} and
+            request['schema'] == 'cua-full-study-tinker-sft-request-v1' and
+            request['model'] == TINKER_MODEL and
+            all(type(request[key]) is int for key in (
+                'round_index', 'optimizer_steps', 'batch_size',
+                'scheduled_tokens', 'max_sample_tokens')) and
+            cell_final.is_hash(request['rendered_batch_sha256']) and
+            request['cell_id'] == self.intent['cell_id'] and
+            request['researcher_id'] == self.intent['researcher_id'] and
+            self.owner == f"{self.intent['cell_id']}:{self.intent['researcher_id']}" and
+            all(request[key] == data[key] for key in (
+                'round_index', 'dataset_manifest_sha256',
+                'training_config_sha256', 'optimizer_steps', 'scheduled_tokens')) and
+            request['training_config_sha256'] == training_sha and
+            request['optimizer_steps'] == training['optimizer_steps'] and
+            request['batch_size'] == training['batch_size'] and
+            request['max_sample_tokens'] == training['sample_max_tokens'],
+            'checkpoint_request_not_current_campaign_lineage')
+        _require(set(result) == {
+            'checkpoint_path', 'observed_base_model',
+            'optimizer_steps_completed', 'sample_token_count',
+            'sample_token_sha256', 'sdk_operation_count'} and
+            type(result['checkpoint_path']) is str and
+            TINKER_PATH.fullmatch(result['checkpoint_path']) is not None and
+            _sha(result['checkpoint_path'].encode()) ==
+            data['checkpoint_path_sha256'] and
+            result['observed_base_model'] == TINKER_MODEL and
+            type(result['optimizer_steps_completed']) is int and
+            result['optimizer_steps_completed'] == request['optimizer_steps'] and
+            type(result['sample_token_count']) is int and
+            0 < result['sample_token_count'] <= request['max_sample_tokens'] and
+            cell_final.is_hash(result['sample_token_sha256']) and
+            type(result['sdk_operation_count']) is int and
+            result['sdk_operation_count'] >= request['optimizer_steps'] * 2 + 2,
+            'checkpoint_result_not_current_campaign_lineage')
+        return result
+
     def _real_tinker_train(self, rendered_batch: object,
                            training: dict, indices: list[list[int]]) -> dict:
         import tinker

@@ -35,6 +35,8 @@ SOURCE_PATHS=tuple(dict.fromkeys((*controls.SOURCE_FILES,*common.SOURCE_PATHS,
  'native_desktop_factory/shared_base_model_execution_v11.py',
  'native_desktop_factory/qwen_sampler_process_v11.py',
  'native_desktop_factory/train_weak_base_pilot_v11.py',
+ 'src/cursibench/full_study_campaign_dispatch_v1.py',
+ 'tests/test_full_study_checkpoint_result_v1.py',
  'tests/test_native_desktop_uniform_model_transport_v11.py',
  'tests/test_native_desktop_sampler_process_pilot_v11.py')))
 

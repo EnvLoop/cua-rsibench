@@ -289,7 +289,7 @@ class DesktopProspectiveModelWorker:
    events=[r for r in session._events('selection_started') if r['data'].get('attempt_id')==started['attempt_id']]
    integration.require(len(events)==1 and events[0]['data']['checkpoint_path_sha256']==checkpoint,'v11_one_selection_started_event_required')
    found=[r for r in session._events('tinker_checkpoint') if r['data'].get('checkpoint_path_sha256')==checkpoint]
-   integration.require(len(found)==1 and session._checkpoint_result(found[0])['sampler_path']==checkpoint_path,
+   integration.require(len(found)==1 and session.checkpoint_result(found[0])['checkpoint_path']==checkpoint_path,
                        'v11_selected_sampler_not_checkpoint_lineage')
   integration.require(not out_dir.exists() and not out_dir.is_symlink(),'v11_selection_root_consumed_no_replay')
   packages=self._packages(admitted,identities,'selection');out_dir.mkdir(parents=True,mode=0o700)
