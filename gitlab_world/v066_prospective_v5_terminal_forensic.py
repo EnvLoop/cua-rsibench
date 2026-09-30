@@ -1,6 +1,6 @@
 """Read-only terminal audit of the consumed prospective v5 GitLab prefix.
 
-No Docker, application, provider, fresh permit, or unconsumed task is accessed.
+No Docker, application, provider, fresh permit, or unconsumed task evaluation is performed.
 This reports saved positive semantics separately from incomplete reset/trios.
 """
 from __future__ import annotations
@@ -53,6 +53,7 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
             'No exact index-three consumed terminal record')
     folder = root / 'controls/supervision'
     raw = source.private(folder / '003-result.private.json'); result = json.loads(raw)
+    require(result.get('schema') == 'envloop-gitlab-prospective100-supervised-id-private-v5' and result.get('index') == 3 and result.get('passed') is False, 'Failed supervisor result schema/index/pass changed')
     child = result['child']
     require(source.sha(raw) == rows[-1]['supervisor_result_sha256'] and
             child.get('exit_code') == 1 and child.get('timed_out') is False and
@@ -63,7 +64,7 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
             'Saved failed child or supervisor log hashes changed')
     marker = json.loads(source.private(folder / '003-child-started.private.json'))
     intent = rows[-2]
-    require(marker.get('task_index') == 3 and marker.get('child_pid') == child['child_pid'] and
+    require(marker.get('schema') == 'envloop-gitlab-prospective100-child-started-private-v5' and marker.get('task_index') == 3 and marker.get('child_pid') == child['child_pid'] and
             marker.get('parent_pid') == intent['supervisor_pid'] and
             marker.get('pending_intent_sha256') == intent['entry_sha256'] and
             marker.get('permit_sha256') == intent['permit_sha256'] and
@@ -86,7 +87,7 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
                 source.sha(factory.canonical(package)) == identity['package_sha256'],
                 'Consumed positive task/package/baseline/ACL binding changed')
         verdict = verify.evaluate_final_task(task, baseline, after, inspect_live_git=False)
-    require(verdict == receipt['persisted_oracle'] and verdict.get('score') == 1.0 and
+    require(receipt.get('schema') == 'envloop-gitlab-gui-control-attempt-v1' and receipt.get('task_id') == identity['task_id'] and receipt.get('case') == 'positive-1' and receipt.get('negative_variant') == 'correct' and receipt['gui'].get('policy_rendered') is True and verdict == receipt['persisted_oracle'] and verdict.get('score') == 1.0 and
             verdict.get('no_regression') is True and verdict.get('persisted_oracle') is True and
             receipt.get('fresh_browser_context') is True and receipt.get('scoped_non_admin_operator') is True and
             receipt.get('model_calls') == 0 and receipt.get('credential_retained_in_receipt') is False and
@@ -119,8 +120,12 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
     retained = {key: source.private(boot_folder / name) for key, name in names.items()}
     require({key: source.sha(raw) for key, raw in retained.items()} == hashes, 'Raw startup evidence changed')
     cause = classify_boot(json.loads(retained['docker_state_stdout']), retained['docker_logs_stdout'], retained['docker_logs_stderr'])
+    launch = json.loads(source.private(detached / 'launch-intent.private.json'))
+    started = json.loads(source.private(detached / 'worker-start.private.json'))
+    argv = launch.get('argv', [])
+    require(launch.get('schema') == 'envloop.gitlab.prospective100.next_five_controls.detached.v5' and launch.get('source_freeze_sha256') == source.sha(source.private(freeze)) and launch.get('permit_sha256') == intent['permit_sha256'] and launch.get('cwd') == value['evaluator_root'] and launch.get('first_index') == 1 and launch.get('maximum_new_controls') == 5 and started.get('pid') == intent['supervisor_pid'] and '--freeze' in argv and argv[argv.index('--freeze') + 1] == str(freeze) and '--permit' in argv and source.sha(source.private(Path(argv[argv.index('--permit') + 1]))) == intent['permit_sha256'] and launch.get('supervisor_source_sha256') == source.sha(source.private(detached / 'single-dispatch-supervisor.private.py')), 'Detached launch is not bound to the exact source/epoch/permit/process')
     terminal = json.loads(source.private(detached / 'worker-terminal.private.json'))
-    require(terminal.get('exit_code') == 0 and terminal.get('automatic_restarts') == 0 and
+    require(terminal.get('pid') == started['pid'] and terminal.get('exit_code') == 0 and terminal.get('automatic_restarts') == 0 and
             terminal['stdout_sha256'] == source.sha(source.private(detached / 'worker.stdout.private.log')) and
             terminal['stderr_sha256'] == source.sha(source.private(detached / 'worker.stderr.private.log')),
             'Detached supervisor terminal/log hashes changed')
@@ -132,6 +137,7 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
                 for p in sorted(root.rglob('*')) if p.is_file()}
     private = {'schema': 'envloop-gitlab-prospective-v5-terminal-independent-private-v1',
                'source_freeze_sha256': source.sha(source.private(freeze)), 'plan_sha256': plan_sha,
+               'auditor_source_sha256': source.sha(Path(__file__).read_bytes()),
                'journal_sha256': source.sha(source.private(root / 'controls/journal.private.jsonl')),
                'prefix': prefix, 'failed_index': 3, 'failed_positive_semantic_score': 1.0,
                'failed_positive_no_regression': True, 'failed_positive_completion_claim': False,
@@ -139,7 +145,7 @@ def audit(*, freeze: Path, detached: Path, out: Path, public_out: Path) -> dict:
                'child': child, 'cause': cause, 'retained_startup_raw_sha256s': hashes,
                'cleanup_saved_exact_baseline_assertion': result['cleanup'].get('exact_baseline'),
                'cleanup_independent_raw_sql_git_snapshot_available': False,
-               'epoch_file_sha256s': manifest, 'detached_terminal_sha256': source.sha(source.private(detached / 'worker-terminal.private.json')),
+               'epoch_file_sha256s': manifest, 'detached_launch_sha256': source.sha(source.private(detached / 'launch-intent.private.json')), 'detached_terminal_sha256': source.sha(source.private(detached / 'worker-terminal.private.json')),
                'same_intent_replay_authorized': False, 'application_mutations': 0, 'provider_calls': 0,
                'model_calls': 0, 'official_final_admitted': 0}
     digest = source.write_new(out, private)

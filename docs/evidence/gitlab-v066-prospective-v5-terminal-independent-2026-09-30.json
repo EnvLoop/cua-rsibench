@@ -32,7 +32,7 @@
   "observed_failure": "postgresql_log_service_restart_timeout_during_reconfigure",
   "official_final_admitted": 0,
   "pending_intent": false,
-  "private_review_sha256": "bee65f77c1a73d5ed6df6a9a03fc149c57218fa830b2f1b2566d4b7f710cfe9f",
+  "private_review_sha256": "6da5e23cb9690b26a92ff954d1f20769e76d1ec82352bfbcc762d5d1ea169322",
   "prospective_denominator": 100,
   "provider_calls": 0,
   "retained_startup_raw_sha256s": {
