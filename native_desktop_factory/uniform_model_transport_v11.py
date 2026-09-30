@@ -21,6 +21,7 @@ from . import qwen_v066_adapter_v4_strict as strict
 from . import v066_scoped_profile_guard as profile
 from . import pre_observation_readiness_v12 as readiness
 from . import structural_guest_attestation_v16 as runtime_policy
+from . import bounded_guest_transport_v17 as bounded_transport
 from .gui_control_shell import wait_for_document_ready
 from .post_enter_control_proxy_v9 import PostEnterControlProxyV9
 from .v066_post_enter_control_attempt_v9 import RecordingDesktop
@@ -132,7 +133,7 @@ def create_guest(*,root:Path,out:Path,filename:str):
  from e2b_desktop import Sandbox
  sandbox=Sandbox.create(template='desktop',resolution=(1280,800),timeout=LEASE_SECONDS,
                         allow_internet_access=False,metadata={'envloop_purpose':'v11-uniform-model-desktop'})
- return ModelGuest(sandbox,root=root,out=out,filename=filename)
+ return ModelGuest(bounded_transport.BoundedSandbox(sandbox),root=root,out=out,filename=filename)
 
 
 def audit_model_readiness(root:Path,out:Path,actions:list,trace:list):

@@ -17,8 +17,8 @@ from cursibench import full_study_campaign_dispatch_v1 as campaign
 from cursibench import full_study_matrix_v1 as matrix
 from cursibench import shared_action_bundle_v066 as common
 from cursibench.scale_vision_proxy import digest as vision_digest
-from . import selection_control_structural_epoch_v16 as controls
-from . import selection_control_structural_worker_v16 as control_worker
+from . import selection_control_bounded_epoch_v17 as controls
+from . import selection_control_bounded_worker_v17 as control_worker
 from . import v066_post_enter_control_audit_v9 as control_audit
 from . import v066_final_freeze as action_freeze
 from . import uniform_model_transport_v11 as transport
@@ -60,6 +60,8 @@ def proposal(root:Path=ROOT):
   'passive_focus_readiness':'v12-full-frame-before-observation',
   'calc_post_enter_transport':'v9-neutral-five-sample','sampler_runtime':'verified-clean-subprocess',
   'sampling_kinds':['base','checkpoint'],'checkpoint_changes_transport_policy':False,
+  'bounded_guest_transport_recipe':transport.bounded_transport.RECIPE,
+  'bounded_guest_transport_source_sha256':sources['native_desktop_factory/bounded_guest_transport_v17.py'],
   'base_checkpoint_sha256':vision_digest(matrix.STUDENT),
   'task_identity_gold_score_branch_in_transport':False,'evaluator_scripts_used_as_model':False,
   'required_new_control_trios':120,'required_six_cell_admissions':600,

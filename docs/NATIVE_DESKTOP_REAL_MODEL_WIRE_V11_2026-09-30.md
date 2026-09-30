@@ -5,7 +5,7 @@ grammar, 90-turn/action bound, 720-second actor clock, native saved-artifact
 verifier and separate fresh reset for the shared base and all four selected
 checkpoints. Its native transport includes the unchanged v9 neutral Calc Enter
 samples and v12 passive full-frame focus readiness. Current source and control
-admission checks bind the corrected v13 accounting epoch. No evaluator script
+admission checks bind the additive v17 bounded-transfer epoch. No evaluator script
 is used as a student action policy.
 
 The pinned native SDK host uses E2B Desktop 2.2.0, E2B 2.51.0 and Pillow 11.3.0.
@@ -52,7 +52,7 @@ sampler from the root checkout's existing
 
 ```sh
 python -m native_desktop_factory.train_weak_base_pilot_v11 prepare \
-  --control-freeze <current-v13-private-freeze> --task-id <public-TRAIN-id> \
+  --control-freeze <current-v17-private-freeze> --task-id <public-TRAIN-id> \
   --output-root <fresh-work/full-study/pilot-root> --freeze <private-pilot-freeze>
 python -m native_desktop_factory.train_weak_base_pilot_v11 review \
   --freeze <private-pilot-freeze> --permit <new-private-permit>
