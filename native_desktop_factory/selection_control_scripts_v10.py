@@ -9,6 +9,7 @@ from collections import Counter
 import io
 import json
 from pathlib import Path
+import re
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -31,6 +32,13 @@ def _namebox(value:str)->list[str]:
  return ['click 52,170','press ctrl,a','write '+value,'press enter','wait 1']
 
 
+def calc_cell_reference(sheet:str,cell:str)->str:
+ """Calc A1 reference: quote the sheet and double embedded apostrophes."""
+ if not sheet or any(char in sheet for char in '\r\n') or not re.fullmatch(r'[A-Z]{1,3}[1-9][0-9]*',cell):
+  raise ValueError('Calc Name Box requires a single-sheet A1 cell reference')
+ return "'"+sheet.replace("'","''")+"'."+cell
+
+
 def script_from_layout(*,workflow:str,targets:dict,attempt:str,cells=None,slides=None,paragraphs=None,target_slide=None)->str:
  if attempt=='cold-reset':return 'stop\n'
  if attempt not in ['positive','near-miss'] or len(targets) not in [1,2]:raise ValueError('Selection constructor requires one/two target positive/near-miss profile')
@@ -42,13 +50,13 @@ def script_from_layout(*,workflow:str,targets:dict,attempt:str,cells=None,slides
   expected=['B4'] if len(targets)==1 else ['B5','B6']
   if [address.split('!',1)[1] for address,_ in ordered]!=expected or sheet not in ['Review','Two-factor review']:
    raise ValueError('Selection Calc target layout changed')
-  # LibreOffice's documented Name Box supports the full sheet name. Each
-  # Enter uses the same v9 no-action settle transport, followed by a new frame.
-  lines+=_namebox(sheet)
+  # One full Calc sheet.cell reference per target avoids a separate sheet
+  # navigation step. Enter uses v9 neutral settling and a new frame before
+  # the plain formula write begins in the focused grid cell.
   for index,(address,rule) in enumerate(ordered):
    cell=address.split('!',1)[1];formula=rule['formula']
    if attempt=='near-miss' and index==len(ordered)-1:formula='='+cells[sheet][cell]['formula'].lstrip('=')
-   lines+=_namebox(cell)+['write '+historical._formula_for_calc(formula),'press enter']
+   lines+=_namebox(calc_cell_reference(sheet,cell))+['write '+historical._formula_for_calc(formula),'press enter']
  elif workflow.startswith('impress-'):
   if target_slide not in [3,4] or slides is None or not 1<=target_slide<=len(slides):raise ValueError('Selection Impress slide layout changed')
   order=[text for text in slides[target_slide-1] if text in targets]
@@ -104,7 +112,10 @@ def selection_layout_metadata(directory:Path,row:dict)->dict:
  else:
   content=docx_content(next(directory.glob('*.docx')).read_bytes())
   if len(content['tables'])!=1 or len(content['tables'][0])!=4:raise ValueError('Authored selection Writer one-table/three-year input layout invalid')
- return {'package_sha256':row['package_sha256'],'workflow':workflow,'template_group':row['template_group'],'profile':profile,'layout_checked_without_oracle':True}
+ result={'package_sha256':row['package_sha256'],'workflow':workflow,'template_group':row['template_group'],'profile':profile,'layout_checked_without_oracle':True}
+ if workflow.startswith('calc-'):
+  result['namebox_cell_references']=[calc_cell_reference(profile['sheet'],cell) for cell in profile['cells']]
+ return result
 
 
 def metadata_readiness(candidate_root:Path)->dict:

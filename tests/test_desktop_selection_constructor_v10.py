@@ -30,6 +30,26 @@ class ConstructorTests(unittest.TestCase):
     near=scripts.script_from_layout(workflow=workflow,targets=targets,attempt='near-miss',cells=baseline)
     self.assertIn('write =0',near)
 
+ def test_calc_target_uses_one_fully_qualified_namebox_entry_then_plain_formula(self):
+  for sheet,cells in [('Review',['B4']),('Two-factor review',['B5','B6'])]:
+   targets={sheet+'!'+cell:{'formula':'=Evidence!D'+str(index+2)} for index,cell in enumerate(cells)}
+   baseline={sheet:{cell:{'formula':'0'} for cell in cells}}
+   for attempt in ['positive','near-miss']:
+    script=scripts.script_from_layout(workflow='calc-growth',targets=targets,attempt=attempt,cells=baseline)
+    self.assertEqual(script.count('click 52,170'),len(cells))
+    for cell in cells:self.assertIn("write '"+sheet+"'."+cell+'\npress enter\nwait 1\nwrite =',script)
+    self.assertNotIn('write '+sheet+'\n',script)
+    for cell in cells:self.assertNotIn('write '+cell+'\n',script)
+   positive=scripts.script_from_layout(workflow='calc-growth',targets=targets,attempt='positive',cells=baseline)
+   self.assertIn('write =Evidence.D2',positive)
+
+ def test_calc_reference_quotes_spaces_and_escapes_apostrophes(self):
+  self.assertEqual(scripts.calc_cell_reference('Two-factor review','B5'),"'Two-factor review'.B5")
+  self.assertEqual(scripts.calc_cell_reference("This year's sheet",'A1'),"'This year''s sheet'.A1")
+  self.assertEqual(scripts.calc_cell_reference('Review','B4'),"'Review'.B4")
+  for sheet,cell in [('Review\nwrite =9','B4'),('Review','B0'),('Review','B5\nwrite =9')]:
+   with self.assertRaises(ValueError):scripts.calc_cell_reference(sheet,cell)
+
  def test_one_and_two_target_impress_profiles_compile(self):
   for count,slide_count,target_slide in [(1,4,3),(2,5,4)]:
    targets={'old-'+str(i):'new-'+str(i) for i in range(count)}
@@ -76,6 +96,7 @@ class ConstructorTests(unittest.TestCase):
    with patch.object(scripts,'xlsx_cells',return_value=data):
     result=scripts.selection_layout_metadata(root,{'workflow':'calc-growth','package_sha256':'a'*64,'template_group':'selection'})
    self.assertTrue(result['layout_checked_without_oracle']);self.assertEqual(result['profile']['targets'],2)
+   self.assertEqual(result['namebox_cell_references'],["'Two-factor review'.B5","'Two-factor review'.B6"])
 
 
 if __name__=='__main__':unittest.main()
