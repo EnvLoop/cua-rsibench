@@ -28,6 +28,8 @@ def _old_records(*, old_freeze: Path, old_run: Path) -> tuple[dict, dict, list[d
     value, run = runner.old_bindings(old_freeze=old_freeze, old_run=old_run)
     prior.checked_permit(freeze_path=old_freeze, permit_path=Path(run['permit_path']), value=value)
     root = Path(value['output_root']); records = []; ids = set()
+    if len(list(root.glob('*/intent.json')))!=3:
+        raise ValueError('Old terminal root must contain exactly three consumed intents')
     expected = [('wrong-target','case'),('wrong-target','cold-reset'),('modal-stop','case')]
     sources = {s['case']:s for s in value['cases']}
     for ordinal,(case,attempt) in enumerate(expected):
@@ -242,6 +244,7 @@ def audit(*, freeze_path: Path, run_path: Path, active_probe=active_hashes) -> d
     if (run_path!=root/'run-receipt.json' or run.get('schema')!=runner.RUN_SCHEMA or
             run.get('freeze_sha256')!=old.digest(old._private(freeze_path)) or run.get('source_sha256s')!=value['source_sha256s'] or
             run.get('guest_count_maximum')!=runner.MAX_GUESTS or len(run.get('attempts',[]))!=runner.MAX_GUESTS or
+            run.get('original_v7_planned_ordinals')!=[3,4,5] or
             run.get('same_intent_replay_authorized') is not False or run.get('official_final_admissions')!=0 or
             run.get('official_model_results')!=0):
         raise ValueError('One-use remaining-only run journal changed')
@@ -256,6 +259,14 @@ def audit(*, freeze_path: Path, run_path: Path, active_probe=active_hashes) -> d
         intent_raw=old._private(out/'intent.json'); intent=json.loads(intent_raw)
         receipt_raw=old._private(out/'receipt.json'); receipt=json.loads(receipt_raw)
         journal=run['attempts'][ordinal]
+        ancestry_raw=old._private(root/f'intent-ancestry-{ordinal:02d}.private.json')
+        ancestry=json.loads(ancestry_raw)
+        expected_ancestry=runner.ancestry_payload(value=value,planned=planned,ordinal=ordinal,
+            freeze_sha=run['freeze_sha256'],permit_sha=run['permit_sha256'])
+        if (journal.get('original_v7_planned_ordinal')!=ordinal+3 or journal.get('ancestry_sha256')!=old.digest(ancestry_raw) or
+                {k:v for k,v in ancestry.items() if k!='created_utc'}!=expected_ancestry or
+                type(ancestry.get('created_utc')) is not str or ancestry['created_utc']>intent.get('created_utc','')):
+            raise ValueError('Original planned ordinal3/4/5 pre-create ancestry changed')
         if (intent.get('schema')!=old.INTENT_SCHEMA or receipt.get('schema')!=old.RECEIPT_SCHEMA or
                 intent.get('status')!='recorded_before_provider_create' or intent.get('freeze_sha256')!=run['freeze_sha256'] or
                 intent.get('permit_sha256')!=run['permit_sha256'] or intent.get('same_intent_replay_authorized') is not False or
@@ -297,6 +308,7 @@ def audit(*, freeze_path: Path, run_path: Path, active_probe=active_hashes) -> d
         'old_run_sha256':runner.OLD_RUN_SHA256,'original_v7_terminal_status':'stopped_for_reconciliation',
         'saved_wrong_target_score_zero':1,'separate_visual_modal_adjudications':1,'combined_original_byte_resets':3,
         'new_original_byte_resets':2,'new_full_lease_intents_charged':3,'combined_full_lease_intents_charged':6,
+        'original_v7_planned_ordinals_completed':[3,4,5],
         'combined_distinct_guests':len(ids),'no_action_probe_classifications':classifications,
         'material_oscillation_proven':oscillation,'provider_active_after':0,'same_intent_replay_authorized':False,
         'official_final_admissions':0,'official_model_results':0}

@@ -14,7 +14,7 @@ from native_desktop_factory import v066_post_enter_remaining_audit_v8 as audit
 
 
 def sources():
-    return {'cases':[{'case':case,'row':{'package_sha256':case}} for case in ['wrong-target','modal-stop','no-action-probe']]}
+    return {'cases':[{'case':case,'row':{'package_sha256':case,'input_sha256':case}} for case in ['wrong-target','modal-stop','no-action-probe']]}
 
 
 class RemainingTests(unittest.TestCase):
@@ -35,6 +35,7 @@ class RemainingTests(unittest.TestCase):
         self.assertEqual([(p['source']['case'],p['attempt']) for p in sequence],
             [('modal-stop','cold-reset'),('no-action-probe','case'),('no-action-probe','cold-reset')])
         self.assertEqual(runner.MAX_GUESTS,3)
+        self.assertEqual([p['original_v7_planned_ordinal'] for p in sequence],[3,4,5])
         self.assertNotIn(('modal-stop','case'),[(p['source']['case'],p['attempt']) for p in sequence])
 
     def test_three_only_schedule_stops_on_failure_and_run_root_cannot_replay(self):
@@ -55,6 +56,10 @@ class RemainingTests(unittest.TestCase):
                     result=runner.run(freeze_path=freeze,permit_path=permit,enable_paid_remaining_train=True)
                     self.assertEqual(len(calls),1 if fail else 3)
                     self.assertEqual(result['new_full_lease_intents'],len(calls))
+                    journal=json.loads((root/'run-receipt.json').read_bytes())
+                    self.assertEqual(journal['original_v7_planned_ordinals'],[3,4,5])
+                    self.assertEqual([p['original_v7_planned_ordinal'] for p in journal['attempts']],list(range(3,3+len(calls))))
+                    self.assertEqual(len(list(root.glob('intent-ancestry-*.private.json'))),len(calls))
                     with self.assertRaisesRegex(ValueError,'replayed'):
                         runner.run(freeze_path=freeze,permit_path=permit,enable_paid_remaining_train=True)
                 if not fail:self.assertEqual(calls,[('modal-stop','cold-reset',0),('no-action-probe','case',1),('no-action-probe','cold-reset',2)])

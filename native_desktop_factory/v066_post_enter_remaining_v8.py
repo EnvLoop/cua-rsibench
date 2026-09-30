@@ -54,7 +54,24 @@ def old_bindings(*, old_freeze: Path, old_run: Path) -> tuple[dict, dict]:
 
 def _sequence(value: dict) -> list[dict]:
     sources = {source['case']: source for source in value['cases']}
-    return [{'source': sources[case], 'attempt': attempt} for case, attempt in SEQUENCE]
+    return [{'source': sources[case], 'attempt': attempt, 'original_v7_planned_ordinal': 3+index}
+            for index,(case,attempt) in enumerate(SEQUENCE)]
+
+
+def ancestry_payload(*, value: dict, planned: dict, ordinal: int, freeze_sha: str,
+                     permit_sha: str) -> dict:
+    if (not 0 <= ordinal < MAX_GUESTS or planned != value['sequence'][ordinal] or
+            planned['original_v7_planned_ordinal'] != ordinal+3):
+        raise ValueError('Only original planned ordinals 3/4/5 may acquire new intent ancestry')
+    return {'schema':'cua-native-wdi-v066-remaining-intent-ancestry-private-v8',
+        'status':'recorded_before_new_provider_create_no_original_intent_replay',
+        'new_freeze_sha256':freeze_sha,'new_permit_sha256':permit_sha,
+        'old_freeze_sha256':OLD_FREEZE_SHA256,'old_run_sha256':OLD_RUN_SHA256,
+        'new_local_ordinal':ordinal,'original_v7_planned_ordinal':ordinal+3,
+        'case':planned['source']['case'],'attempt':planned['attempt'],
+        'package_sha256':planned['source']['row']['package_sha256'],
+        'input_sha256':planned['source']['row']['input_sha256'],
+        'same_intent_replay_authorized':False,'official_final_admissions':0}
 
 
 def prepare(*, old_freeze: Path, old_run: Path, terminal_audit: Path,
@@ -88,6 +105,7 @@ def prepare(*, old_freeze: Path, old_run: Path, terminal_audit: Path,
         'guest_public_sha256': value['guest_public_sha256'], 'scoped_reference': value['scoped_reference'],
         'scoped_reference_sha256': value['scoped_reference_sha256'], 'output_root': str(output_root),
         'public_path': str(public_path), 'sequence': chosen, 'prior_full_lease_accounting': ledger,
+        'original_v7_planned_ordinals': [3,4,5],
         'maximum_new_full_lease_intents': MAX_GUESTS, 'lease_seconds_each': old.LEASE_SECONDS,
         'new_full_lease_seconds': MAX_GUESTS*old.LEASE_SECONDS, 'new_full_lease_usd_planning_upper': '0.5',
         'lane_spending_cap_usd': None, 'same_intent_replay_authorized': False, 'dispatch_authorized': False,
@@ -100,6 +118,7 @@ def prepare(*, old_freeze: Path, old_run: Path, terminal_audit: Path,
         'old_permit_sha256': OLD_PERMIT_SHA256, 'terminal_audit_sha256': frozen['terminal_audit_sha256'],
         'visual_adjudication_sha256': frozen['visual_adjudication_sha256'],
         'old_paid_intents_preserved': 3, 'old_modal_case_replay_authorized': False,
+        'original_v7_planned_ordinals': [3,4,5],
         'remaining_original_byte_resets': 2, 'unused_train_no_action_probe': 1,
         'maximum_new_full_lease_intents': MAX_GUESTS, 'lease_seconds_each': old.LEASE_SECONDS,
         'new_full_lease_seconds': MAX_GUESTS*old.LEASE_SECONDS, 'full_lease_usd_planning_upper': '0.5',
@@ -122,6 +141,7 @@ def validate_source(freeze_path: Path, *, require_unused: bool = True) -> dict:
             frozen.get('old_permit_sha256') != OLD_PERMIT_SHA256 or
             frozen.get('lease_seconds_each') != old.LEASE_SECONDS or frozen.get('new_full_lease_seconds') != 1800 or
             frozen.get('new_full_lease_usd_planning_upper') != '0.5' or
+            frozen.get('original_v7_planned_ordinals') != [3,4,5] or
             frozen.get('lane_spending_cap_usd') is not None or frozen.get('same_intent_replay_authorized') is not False or
             frozen.get('dispatch_authorized') is not False or frozen.get('official_final_admissions') != 0 or
             frozen.get('official_model_results') != 0):
@@ -169,15 +189,21 @@ def run(*, freeze_path: Path, permit_path: Path, enable_paid_remaining_train: bo
         'freeze_sha256': old.digest(old._private(freeze_path)), 'permit_sha256': old.digest(old._private(permit_path)),
         'permit_path': str(permit_path), 'old_run_sha256': OLD_RUN_SHA256, 'source_sha256s': value['source_sha256s'],
         'guest_count_maximum': MAX_GUESTS, 'attempts': [], 'same_intent_replay_authorized': False,
+        'original_v7_planned_ordinals':[3,4,5],
         'official_final_admissions': 0, 'official_model_results': 0}
     old._write_new(root/'run-receipt.json', journal)
     try:
         from e2b_desktop import Sandbox
         for ordinal, planned in enumerate(value['sequence']):
+            ancestry=ancestry_payload(value=value,planned=planned,ordinal=ordinal,
+                freeze_sha=journal['freeze_sha256'],permit_sha=journal['permit_sha256'])
+            ancestry['created_utc']=old._now()
+            ancestry_sha=old._write_new(root/f'intent-ancestry-{ordinal:02d}.private.json',ancestry)
             receipt = old._one(value=value, source=planned['source'], attempt=planned['attempt'], ordinal=ordinal,
                 freeze_sha=journal['freeze_sha256'], permit_sha=journal['permit_sha256'], sandbox_factory=Sandbox.create)
             name = f'{ordinal:02d}-{planned["source"]["case"]}-{planned["attempt"]}'
             journal['attempts'].append({'ordinal': ordinal, 'case': planned['source']['case'], 'attempt': planned['attempt'],
+                'original_v7_planned_ordinal':planned['original_v7_planned_ordinal'],'ancestry_sha256':ancestry_sha,
                 'status': receipt['status'], 'receipt_sha256': old.digest(old._private(root/name/'receipt.json'))})
             old._persist(root/'run-receipt.json', journal)
             expected = 'cold_reset_observed' if planned['attempt'] == 'cold-reset' else 'no_action_probe_audited'

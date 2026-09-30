@@ -8,17 +8,17 @@ A separate independent visual inspection reopened the original PNG. The native f
 
 The root's independent provider/storage reconciliation is bound by SHA-256 `9c0a6cc8a1cc7d4383f3a39c9ddf2da01c55ba52f2248ecbf942e3ce3b3f1039`. All three guest cleanup receipts confirm termination, the provider query returned active zero, all 77 retained evidence files were verified and no unresolved write remains. The three consumed 600-second intents retain their full lease charge. No model call or official final admission occurred.
 
-The [new executable source freeze](native-wdi-v066-post-enter-remaining-v8-source-freeze-2026-09-30.json) binds that terminal audit and separate adjudication. Its [runner](../../native_desktop_factory/v066_post_enter_remaining_v8.py) permits only this sequence, with at most **three fresh 600-second leases**:
+The [new executable source freeze with explicit ordinal ancestry](native-wdi-v066-post-enter-remaining-v8-ordinal-ancestry-source-freeze-2026-09-30.json) binds that terminal audit and separate adjudication. It supersedes the never-dispatched initial v8 source freeze. Its [runner](../../native_desktop_factory/v066_post_enter_remaining_v8.py) permits only this sequence, with at most **three fresh 600-second leases**:
 
-| New ordinal | Source role | Only permitted work |
-| --- | --- | --- |
-| 0 | Previously used modal source | Fresh guest, neutral open, scoped profile and exact original-byte cold reset |
-| 1 | Unused visible TRAIN source | Contracted navigation, restricted edit-caret stimulus and bounded observation-only probe |
-| 2 | Same unused probe source | Another fresh guest, scoped profile and exact original-byte cold reset |
+| New local ordinal | Original v7 planned ordinal | Source role | Only permitted work |
+| --- | --- | --- | --- |
+| 0 | 3 | Previously used modal source | Fresh guest, neutral open, scoped profile and exact original-byte cold reset |
+| 1 | 4 | Unused visible TRAIN source | Contracted navigation, restricted edit-caret stimulus and bounded observation-only probe |
+| 2 | 5 | Same unused probe source | Another fresh guest, scoped profile and exact original-byte cold reset |
 
 The wrong-target case and modal case cannot be replayed. The used modal package is permitted solely for its remaining fresh reset. The probe package is independently checked absent from every retained historical intent/receipt. The private source binding retains split-disjoint visible TRAIN provenance; heldout, selection and final package contents are not read.
 
-The [independent permit/auditor](../../native_desktop_factory/v066_post_enter_remaining_audit_v8.py) requires exact root review acceptance, immutable evidence/source/lease bindings and current provider active-zero/storage checks. Paid execution also requires its explicit enable flag, consumes a new run root before any create and fsyncs each full-lease intent before its sole create. A failed step stops the sequence, and a consumed root or intent cannot run again. The tested v7 per-guest worker is reused under the new epoch's freeze and permit hashes; the old epoch's output and intent identities are inaccessible through this sequence.
+The [independent permit/auditor](../../native_desktop_factory/v066_post_enter_remaining_audit_v8.py) requires exact root review acceptance, immutable evidence/source/lease bindings and current provider active-zero/storage checks. Paid execution also requires its explicit enable flag, consumes a new run root before any create and fsyncs each full-lease intent before its sole create. A separate pre-create ancestry record binds each new local intent to original planned ordinal 3, 4 or 5, both epoch hashes, its package and the new exact permit. A failed step stops the sequence, and a consumed root or intent cannot run again. The tested v7 per-guest worker is reused under the new epoch's freeze and permit hashes; the old epoch's output and intent identities are inaccessible through this sequence.
 
 The additional reservation is 1,800 seconds or USD 0.50 at the retained USD 1/hour planning upper rate. Historical full lease accounting is preserved, including no-ack creates and longer legacy leases. There is no lane spending cap. This is a planning reserve rather than a provider invoice.
 
