@@ -18,13 +18,13 @@ Explicit `cleanup --execute-cleanup` requires the complete v2 audit supersession
 Commands must run using the loaded original evaluator checkout and its original worker lock, after root review and merge:
 
 ```sh
-PYTHONPATH=src:. /Users/xiaoyong/Documents/Codex/2026-09-22/ya/.venv/bin/python -B \
+PYTHONPATH=src:. python -B \
   -m tools.magento_v4_case26_startup_interruption_20260930 prepare \
-  --root /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix
+  --root /ABS/PATH/TO/ORIGINAL_EVALUATOR
 
-PYTHONPATH=src:. /Users/xiaoyong/Documents/Codex/2026-09-22/ya/.venv/bin/python -B \
+PYTHONPATH=src:. python -B \
   -m tools.magento_v4_case26_startup_interruption_20260930 audit \
-  --root /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix
+  --root /ABS/PATH/TO/ORIGINAL_EVALUATOR
 ```
 
 Root must review the newly saved v2 freeze, original-audit archive, supersession intent/receipt, and canonical v2 audit before explicit cleanup. This source-only change has not created or superseded original private evidence and has not stopped or removed any actual container. Protocol tests run only against temporary files and an in-memory Docker pair.
