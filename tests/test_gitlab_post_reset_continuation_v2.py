@@ -7,6 +7,20 @@ from gitlab_world import v066_case6_saved_reconciliation_v1 as r
 
 
 class ContinuationGuards(unittest.TestCase):
+ def test_progress_counts_only_successful_new_terminals(self):
+  self.assertEqual(c.journal_state([])['completed_new'],0)
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);(root/c.NAMESPACE).mkdir();rows=[]
+   for index in range(7,100):
+    c.append(root,rows,{'kind':'intent','task_index':index})
+    self.assertEqual(c.journal_state(rows)['completed_new'],index-7)
+    c.append(root,rows,{'kind':'terminal','task_index':index,'passed':True})
+   self.assertEqual(c.journal_state(rows)['completed_new'],93)
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);(root/c.NAMESPACE).mkdir();rows=[]
+   c.append(root,rows,{'kind':'intent','task_index':7})
+   c.append(root,rows,{'kind':'terminal','task_index':7,'passed':False})
+   self.assertEqual(c.journal_state(rows)['completed_new'],0)
  def test_only_untouched7_to99_with_same300_reset_math(self):
   self.assertEqual(c.expected_entry_generation(7),23)
   self.assertEqual(c.generations(7),[24,25,26]);self.assertEqual(c.generations(99),[300,301,302])

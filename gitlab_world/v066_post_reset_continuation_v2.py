@@ -224,7 +224,7 @@ def journal_state(rows):
    pending=None
   else:raise ValueError('Unknown continuation journal event')
   previous=row['entry_sha256']
- return {'next_index':next_index,'pending':pending,'terminal_failure':terminal,'head_sha256':previous,'completed_new':next_index-5}
+ return {'next_index':next_index,'pending':pending,'terminal_failure':terminal,'head_sha256':previous,'completed_new':next_index-7}
 
 
 def read_journal(root):
