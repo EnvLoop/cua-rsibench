@@ -1,0 +1,94 @@
+{
+  "closed_passive_audit": {
+    "application_frame_sha256s": [
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6",
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6",
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6",
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6",
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6",
+      "50662f49aaba9c85343efbe9249804f12230fad73cea7e72bad9329aa93f6ae6"
+    ],
+    "applied_actor_steps": 7,
+    "capture_ns": [
+      3942242958,
+      4758546083,
+      5981309083,
+      5628351542,
+      4314772542,
+      3758849834
+    ],
+    "captured_samples": 6,
+    "elapsed_ns": [
+      4635729916,
+      9663876166,
+      15917170458,
+      22058600625,
+      26892426833,
+      31169201125
+    ],
+    "failed_receipt_sha256": "f9e2410eb4e090a4162fe172315060430e77afd3dd2ce4d34f7c09a30d542118",
+    "full_frame_sha256s": [
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b",
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b",
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b",
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b",
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b",
+      "ecced043ead5c9a47cd3f4763f676c14bfaa77f4619bc86ef7af00a8da283f7b"
+    ],
+    "journal_sha256": "b3ed8dbd80f8110115fab90045f7a8f57ad3f87186a893f02b4cce1d98e9c627",
+    "last_four_exact_or_narrow_caret": true,
+    "last_four_full_bytes_equal": true,
+    "model_calls": 0,
+    "native_window_unchanged": true,
+    "new_control_credit": 0,
+    "new_live_readiness_success": false,
+    "old_max_wall_ms": 30000,
+    "proposed_max_wall_ms": 60000,
+    "provider_calls": 0,
+    "required_samples": 7,
+    "schema": "cua-native-v17-passive-readiness-offline-audit-v18",
+    "seventh_sample_captured": false,
+    "status": "raw_six_samples_verified_time_bound_crossed_before_seventh"
+  },
+  "no_fresh_live_control_success_claimed": true,
+  "parent_freeze_sha256": "24b2b441a8e1c09bccfd9eb1f1a8bec90e19f26e901c1c84131ff01d16b7ca51",
+  "passive_readiness_recipe": {
+    "action_retries": 0,
+    "exact_or_original_narrow_caret_required": true,
+    "full_final_png_returned_unchanged": true,
+    "max_actor_wall_seconds": 720,
+    "max_wall_ms": 60000,
+    "pixel_masking": false,
+    "required_samples": 7,
+    "required_settled_suffix": 4,
+    "same_native_window_required": true,
+    "sample_delays_ms": [
+      0,
+      250,
+      250,
+      500,
+      500,
+      500,
+      500
+    ],
+    "schema": "cua-native-passive-readiness-policy-v18"
+  },
+  "schema": "cua-native-v17-passive-readiness-independent-source-v18",
+  "source_only_validation": {
+    "closed_files": 37,
+    "cohort_counts": {
+      "final_candidate": 100,
+      "selection": 20,
+      "train": 20
+    },
+    "historical_accounting_unchanged_after_new_intent": true,
+    "model_calls": 0,
+    "past_full_lease_intents": 577,
+    "past_full_lease_seconds": 201880,
+    "provider_calls": 0,
+    "source_files": 85,
+    "status": "real_v17_to_v18_source_only_prepare_validate_and_new_intent_verified"
+  },
+  "v12_source_sha256": "5b43aad673379523de8f7bda193954db9faa5a77112029812b9ffe8d72f4c59a",
+  "v18_source_sha256": "c16efcfb7ecaaec5160698dc08a3d2c53cd6da2e5e8e785a6eb1f3bdc24e8fbb"
+}
