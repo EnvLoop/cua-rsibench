@@ -16,7 +16,7 @@ new account, VM, disk, seed volume or container is created.
 
 The [maintenance tool](../gitlab_world/v066_overlay_memory_maintenance_v1.py)
 first prepares a read-only owner-only plan. It rejects live/concurrent GitLab
-workers; captures the exact 31-project SQL/Git snapshot, all 16 sealed metadata
+workers; captures the exact 31-project SQL/Git snapshot, all sealed original metadata
 hashes, original core source hashes, container/image/mount identity, three seed
 volume identities, and lower/upper/work directory inode/mode/owner identities.
 Only a healthy original container with no automatic restart is eligible.
@@ -30,7 +30,7 @@ and mounts the exact preserved lower/upper/work paths; it never calls
 container, rewrites COW state or changes the active-volume marker. Only after
 all three overlay mounts and existing directory identities pass does it start
 the exact original container ID. Independent verification requires the full
-31-project snapshot, all 16 metadata/source hashes, original container and seed
+31-project snapshot, all original metadata and core source hashes, original container and seed
 identities, exact overlay topology and 12 GiB/3 CPU resource readback.
 
 The receipt explicitly records the original container's transient stop/restart
@@ -63,3 +63,5 @@ After successful maintenance, rebind the amended prospective cohort source
 freeze and run its separate read-only resource preflight. Maintenance itself
 does not bootstrap the new project or authorize task controls. Native bootstrap,
 new controls, model calls and official final admissions remain zero here.
+
+The maintenance command retains owner-only stdout and stderr from VM stop/start, including partial bytes on timeout or failure. The post-run receipt reports the actual number of original metadata files checked; it does not substitute a fixed count.
