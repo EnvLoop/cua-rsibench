@@ -32,6 +32,8 @@ CT = '{http://schemas.openxmlformats.org/package/2006/content-types}'
 CP = '{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}'
 DC = '{http://purl.org/dc/terms/}'
 EP = '{http://schemas.openxmlformats.org/officeDocument/2006/extended-properties}'
+MC = '{http://schemas.openxmlformats.org/markup-compatibility/2006}'
+XSI = '{http://www.w3.org/2001/XMLSchema-instance}'
 CHANGES = 'ppt/changesInfos/changesInfo1.xml'
 THUMBNAIL = 'docProps/thumbnail.jpeg'
 META = frozenset({'[Content_Types].xml', '_rels/.rels', 'docProps/app.xml',
@@ -61,7 +63,78 @@ def strict_xml(raw: bytes) -> ET.Element:
 
 
 def canon(raw: bytes) -> str:
-    return guard.canonical(strict_xml(raw))
+    return guard.canonical(semantic_xml(raw))
+
+
+def semantic_xml(raw: bytes) -> ET.Element:
+    """Keep QName/prefix-list meaning before ElementTree drops declarations.
+
+    Expanded element/attribute names alone do not protect xsi:type or markup
+    compatibility attribute values. Rebinding an existing prefix must change
+    this comparison; an unbound QName is never an equivalent serialization.
+    """
+    strict_xml(raw)
+    pending=[];stack=[];root=None
+    qnames={XSI+'type',MC+'ProcessContent',MC+'PreserveElements',MC+'PreserveAttributes'}
+    prefixes={MC+'Ignorable',MC+'MustUnderstand'}
+    for event,item in ET.iterparse(io.BytesIO(raw),events=('start-ns','start','end')):
+        if event=='start-ns':
+            pending.append(item)
+        elif event=='start':
+            bindings=dict(stack[-1]) if stack else {'xml':'http://www.w3.org/XML/1998/namespace'}
+            bindings.update(pending);pending=[];stack.append(bindings)
+            if root is None:root=item
+            for key,value in list(item.attrib.items()):
+                prefix_list=key in prefixes or (item.tag==MC+'Choice' and key=='Requires')
+                if key not in qnames and not prefix_list:continue
+                tokens=value.split();require(tokens,'proposal_empty_qname_value')
+                if key==XSI+'type':require(len(tokens)==1,'proposal_invalid_qname_value')
+                normalized=[]
+                for token in tokens:
+                    if prefix_list:
+                        require(':' not in token and token in bindings,'proposal_unbound_namespace_prefix')
+                        normalized.append('{'+bindings[token]+'}')
+                    else:
+                        parts=token.split(':')
+                        require(len(parts) in (1,2) and all(parts),'proposal_invalid_qname_value')
+                        if len(parts)==2:
+                            require(parts[0] in bindings,'proposal_unbound_qname_prefix')
+                            normalized.append('{'+bindings[parts[0]]+'}'+parts[1])
+                        else:
+                            normalized.append('{'+bindings.get('','')+'}'+parts[0])
+                item.set(key,' '.join(normalized))
+        else:
+            stack.pop()
+    require(root is not None,'proposal_invalid_xml')
+    return root
+
+
+def serialize_preserving_bindings(raw: bytes, mutation=None) -> bytes:
+    """Create an equivalent control without dropping QName-only namespaces."""
+    root=semantic_xml(raw)
+    names={prefix for _event,(prefix,_uri) in ET.iterparse(
+        io.BytesIO(ET.tostring(root)),events=('start-ns',))}
+    bindings={}
+    aware={XSI+'type',MC+'ProcessContent',MC+'PreserveElements',MC+'PreserveAttributes',MC+'Ignorable',MC+'MustUnderstand'}
+    for node in root.iter():
+        for key,value in list(node.attrib.items()):
+            prefix_list=key in {MC+'Ignorable',MC+'MustUnderstand'} or (node.tag==MC+'Choice' and key=='Requires')
+            if key not in aware and not prefix_list:continue
+            tokens=re.findall(r'\{([^}]*)\}([^\s]*)',value)
+            require(tokens,'proposal_control_serializer_invalid_qname')
+            rewritten=[]
+            for uri,local in tokens:
+                if not uri:
+                    rewritten.append(local);continue
+                if uri not in bindings:
+                    prefix='qbound'+str(len(bindings))
+                    while prefix in names:prefix+='x'
+                    names.add(prefix);bindings[uri]=prefix
+                rewritten.append(bindings[uri]+(':'+local if not prefix_list else ''))
+            node.set(key,' '.join(rewritten))
+    if mutation is not None:mutation(root)
+    for uri,prefix in bindings.items():root.set('xmlns:'+prefix,uri)
+    return ET.tostring(root,encoding='utf-8',xml_declaration=True)
 
 
 def namespace_uris(raw: bytes) -> set[str]:
@@ -117,7 +190,7 @@ def nested_zip(raw: bytes) -> dict[str, bytes]:
 
 def text_mask(raw: bytes, locations: list[str], *, editing_equivalence=False,
               ledger_inherited_font: str | None = None) -> str:
-    root = strict_xml(raw)
+    root = semantic_xml(raw)
     for location in locations:
         node = verify._target_node(root, location)
         verify._set_text(node, '__TARGET_TEXT__')
@@ -210,7 +283,7 @@ def validate_observed_metadata(before: dict, after: dict, old: str, new: str) ->
             'proposal_doc_security_nonzero')
     a.remove(nodes[0])
     require(guard.canonical(a)==guard.canonical(b), 'proposal_app_property_unknown')
-    a,b=strict_xml(before['docProps/core.xml']),strict_xml(after['docProps/core.xml'])
+    a,b=semantic_xml(before['docProps/core.xml']),semantic_xml(after['docProps/core.xml'])
     for root in (a,b):
         for node in list(root):
             if node.tag in {DC+'modified', CP+'revision', CP+'lastModifiedBy'}:

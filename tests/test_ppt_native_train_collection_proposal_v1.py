@@ -12,6 +12,7 @@ from ppt_wdi_factory import verify
 from tools.ppt_native_train_collection_proposal_v1 import (
     CT, REL, FrozenTrainProposal, ProposalError, canon, content_rows,
     namespace_uris, nested_zip, relation_rows, strict_xml, text_mask,
+    semantic_xml,serialize_preserving_bindings,
 )
 
 
@@ -23,6 +24,28 @@ class NormalizationGuards(unittest.TestCase):
 
     def test_xml_attribute_order_is_equivalent(self):
         self.assertEqual(canon(b'<root a="1" b="2"/>'),canon(b'<root b="2" a="1"/>'))
+
+    def test_existing_qname_namespace_rebinding_changes_semantics(self):
+        old=b'<r xmlns:d="urn:date" xmlns:t="urn:other" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="d:Type"/>'
+        changed=old.replace(b'xmlns:d="urn:date"',b'xmlns:d="urn:other" xmlns:alias="urn:date"')
+        self.assertNotEqual(canon(old),canon(changed))
+        renamed=old.replace(b'xmlns:d=',b'xmlns:alias=').replace(b'xsi:type="d:Type"',b'xsi:type="alias:Type"')
+        self.assertEqual(canon(old),canon(renamed))
+
+    def test_unbound_qname_or_markup_compatibility_prefix_refused(self):
+        for xml in (b'<r xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="missing:T"/>',
+                    b'<r xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="missing"/>'):
+            with self.assertRaises(ProposalError):canon(xml)
+
+    def test_prefix_list_and_choice_requires_meaning_is_preserved(self):
+        old=b'<mc:Choice xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:p="urn:p" xmlns:q="urn:q" Requires="p"/>'
+        rebound=old.replace(b'xmlns:p="urn:p"',b'xmlns:p="urn:q" xmlns:alias="urn:p"')
+        self.assertNotEqual(canon(old),canon(rebound))
+        self.assertEqual(canon(old),canon(serialize_preserving_bindings(old)))
+
+    def test_equivalent_serializer_does_not_drop_qname_only_binding(self):
+        raw=b'<r xmlns:d="urn:date" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="d:Type"/>'
+        self.assertEqual(canon(raw),canon(serialize_preserving_bindings(raw)))
 
     def test_unused_namespace_payload_stays_observable(self):
         self.assertEqual(namespace_uris(b'<root xmlns:e="urn:extra"/>'),{'urn:extra'})

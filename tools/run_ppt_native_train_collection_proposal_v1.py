@@ -12,6 +12,7 @@ from ppt_wdi_factory import verify
 from tools import office_single_account_train_pilot_v1 as manual
 from tools.ppt_native_train_collection_proposal_v1 import (
     CHANGES, CT, REL, THUMBNAIL, FrozenTrainProposal, strict_xml,
+    serialize_preserving_bindings,
 )
 
 
@@ -97,6 +98,14 @@ def adversarial_members(proposal: FrozenTrainProposal) -> dict[str,dict]:
     xml('app_extra_property','docProps/app.xml',lambda r:ET.SubElement(r,'unknown'))
     add('unused_namespace_payload',lambda m:m.update({CHANGES:m[CHANGES].replace(
         b'xmlns:',b'xmlns:unapproved="urn:unapproved-hidden-payload" xmlns:',1)}))
+    def qname_rebinding(m):
+        raw=m['docProps/core.xml']
+        m['docProps/core.xml']=raw.replace(b'xmlns:dcterms="http://purl.org/dc/terms/"',
+            b'xmlns:dcterms="http://purl.org/dc/elements/1.1/" xmlns:dtalias="http://purl.org/dc/terms/"').replace(
+            b'<dcterms:',b'<dtalias:').replace(b'</dcterms:',b'</dtalias:')
+    add('qname_namespace_rebinding',qname_rebinding)
+    add('qname_unbound_prefix',lambda m:m.update({'docProps/core.xml':m['docProps/core.xml'].replace(
+        b'xsi:type="dcterms:W3CDTF"',b'xsi:type="unbound:W3CDTF"')}))
     xml('notes_body','ppt/notesSlides/notesSlide1.xml',lambda r:r.set('unknown','payload'))
     add('thumbnail_binary',lambda m:m.update({THUMBNAIL:m[THUMBNAIL][:-2]+b'X'+m[THUMBNAIL][-1:]}))
     add('unknown_binary',lambda m:m.update({'ppt/media/unknown.bin':b'payload'}))
@@ -129,10 +138,9 @@ def run(collection: Path, out: Path, *, work_root: Path) -> dict:
         if name=='equivalent_xml_attributes':
             for part in members:
                 if part.endswith(('.xml','.rels')):
-                    root=strict_xml(members[part])
-                    for node in root.iter():
-                        node.attrib=dict(reversed(list(node.attrib.items())))
-                    members[part]=ET.tostring(root,encoding='utf-8',xml_declaration=True)
+                    def reverse_attributes(root):
+                        for node in root.iter():node.attrib=dict(reversed(list(node.attrib.items())))
+                    members[part]=serialize_preserving_bindings(members[part],reverse_attributes)
         path=out/(name+'.pptx')
         write_package(path,members,compression=compression)
         controls[name]=proposal.score(path)
