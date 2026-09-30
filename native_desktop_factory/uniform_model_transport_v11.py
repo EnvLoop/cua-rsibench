@@ -19,7 +19,7 @@ from cursibench.scale_vision_proxy import MODEL,PROCESSOR,RENDERER
 from . import runtime_fingerprint_probe, qwen_v064_adapter as pixels
 from . import qwen_v066_adapter_v4_strict as strict
 from . import v066_scoped_profile_guard as profile
-from . import pre_observation_readiness_v18 as readiness
+from . import save_readiness_v20 as readiness
 from . import structural_guest_attestation_v16 as runtime_policy
 from . import bounded_guest_transport_v17 as bounded_transport
 from .gui_control_shell import wait_for_document_ready

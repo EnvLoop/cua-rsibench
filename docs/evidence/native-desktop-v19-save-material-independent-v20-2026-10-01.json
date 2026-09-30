@@ -1,0 +1,212 @@
+{
+  "animation_cause_remains_inference": true,
+  "closed_save_audit": {
+    "animation_cause_is_inference_from_two_frames": true,
+    "changed_pixels": 556,
+    "delta_bbox": [
+      138,
+      59,
+      1269,
+      480
+    ],
+    "direct_probe_sha256": "cc425874de186280ceb17c5dd62e527a76eaededaed63bcce944cafac2446981",
+    "model_calls": 0,
+    "most_common_color_changes": [
+      {
+        "after": [
+          133,
+          133,
+          133
+        ],
+        "before": [
+          132,
+          132,
+          132
+        ],
+        "pixels": 172
+      },
+      {
+        "after": [
+          182,
+          182,
+          182
+        ],
+        "before": [
+          181,
+          181,
+          181
+        ],
+        "pixels": 164
+      },
+      {
+        "after": [
+          160,
+          160,
+          160
+        ],
+        "before": [
+          159,
+          159,
+          159
+        ],
+        "pixels": 16
+      },
+      {
+        "after": [
+          134,
+          135,
+          140
+        ],
+        "before": [
+          133,
+          134,
+          139
+        ],
+        "pixels": 10
+      },
+      {
+        "after": [
+          138,
+          138,
+          138
+        ],
+        "before": [
+          137,
+          137,
+          137
+        ],
+        "pixels": 9
+      },
+      {
+        "after": [
+          152,
+          152,
+          152
+        ],
+        "before": [
+          151,
+          151,
+          151
+        ],
+        "pixels": 7
+      },
+      {
+        "after": [
+          154,
+          154,
+          154
+        ],
+        "before": [
+          153,
+          153,
+          153
+        ],
+        "pixels": 7
+      },
+      {
+        "after": [
+          144,
+          144,
+          144
+        ],
+        "before": [
+          143,
+          143,
+          143
+        ],
+        "pixels": 6
+      },
+      {
+        "after": [
+          137,
+          137,
+          137
+        ],
+        "before": [
+          154,
+          154,
+          154
+        ],
+        "pixels": 6
+      },
+      {
+        "after": [
+          170,
+          170,
+          170
+        ],
+        "before": [
+          169,
+          169,
+          169
+        ],
+        "pixels": 6
+      }
+    ],
+    "native_modal_id_captured_for_comparison": false,
+    "new_control_credit": 0,
+    "new_live_success": false,
+    "observed_frame_sha256": "55ba347515677cbbb81d1d6991f5b289c640f0d44593c247c64fc2cbfd4a574a",
+    "original_single_caret_classifier": false,
+    "pending_action": {
+      "duration_ms": 2000,
+      "type": "wait"
+    },
+    "pending_action_dispatched": false,
+    "preceding_input": {
+      "key": "Control+S",
+      "type": "key"
+    },
+    "probe_sha256": "019c3a3c6baf706a56f4eb9a6f4850f588adc0eeabe11c576e65b5a53eac554e",
+    "provider_calls": 0,
+    "receipt_sha256": "fca0de1cd3c22d30a2c55c98f98690daf673ef3df011b1504ae7b745e76b1794",
+    "recorded_applied_actions": 21,
+    "schema": "cua-native-v19-save-material-offline-audit-v20",
+    "status": "exact_save_then_pending_wait_direct_material_delta_verified"
+  },
+  "no_fresh_live_control_success_claimed": true,
+  "parent_freeze_sha256": "d3751491541a28deb24d6bea742a3c1c7ab7cd480c9459e4f97da666068c9bd4",
+  "passive_readiness_recipe": {
+    "action_retries": 0,
+    "additional_input_trigger": "Control+S",
+    "exact_or_original_narrow_caret_required": true,
+    "full_final_png_returned_unchanged": true,
+    "max_actor_wall_seconds": 720,
+    "max_wall_ms": 60000,
+    "pixel_masking": false,
+    "required_samples": 7,
+    "required_settled_suffix": 4,
+    "reused_capture_source": "pre_observation_readiness_v18.py",
+    "same_native_window_required": true,
+    "sample_delays_ms": [
+      0,
+      250,
+      250,
+      500,
+      500,
+      500,
+      500
+    ],
+    "schema": "cua-native-save-passive-readiness-v20"
+  },
+  "schema": "cua-native-v19-save-material-independent-source-v20",
+  "source_only_validation": {
+    "closed_files": 130,
+    "cohort_counts": {
+      "final_candidate": 100,
+      "selection": 20,
+      "train": 20
+    },
+    "model_calls": 0,
+    "new_intent_keeps_history": true,
+    "parent_source_files": 90,
+    "past_full_lease_intents": 579,
+    "past_full_lease_seconds": 204280,
+    "provider_calls": 0,
+    "source_files": 95,
+    "status": "real_v19_to_v20_source_only_prepare_validate_and_new_intent_verified"
+  },
+  "v20_component_source_sha256": "48180e2aa9005301f984f32641d1cfc007760bbda8d49de9f7684c5e998de3cd",
+  "visual_caption": "Confirm File Format",
+  "visually_reviewed_modal_present_in_both_frames": true
+}

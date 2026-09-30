@@ -17,8 +17,8 @@ from cursibench import full_study_campaign_dispatch_v1 as campaign
 from cursibench import full_study_matrix_v1 as matrix
 from cursibench import shared_action_bundle_v066 as common
 from cursibench.scale_vision_proxy import digest as vision_digest
-from . import selection_control_post_enter_epoch_v19 as controls
-from . import selection_control_post_enter_worker_v19 as control_worker
+from . import selection_control_save_epoch_v20 as controls
+from . import selection_control_save_worker_v20 as control_worker
 from . import v066_post_enter_control_audit_v9 as control_audit
 from . import v066_final_freeze as action_freeze
 from . import uniform_model_transport_v11 as transport
@@ -57,9 +57,9 @@ def proposal(root:Path=ROOT):
   'max_actor_wall_seconds':720,'lease_seconds_each':1200,
   'selection_tasks':20,'final_tasks':100,'configuration_owners':['shared-base',*matrix.RESEARCHERS],
   'researcher_models':matrix.RESEARCHERS,'base_and_selected_transport_identical':True,
-  'passive_focus_readiness':'v18-full-frame-before-observation',
+  'passive_focus_readiness':'v20-save-plus-v18-full-frame-before-observation',
   'passive_readiness_recipe':controls.READINESS_RECIPE,
-  'passive_readiness_source_sha256':sources['native_desktop_factory/pre_observation_readiness_v18.py'],
+  'passive_readiness_source_sha256':sources['native_desktop_factory/save_readiness_v20.py'],
   'calc_post_enter_transport':'v19-neutral-five-sample',
   'post_enter_recipe':transport.post_enter_component.RECIPE,
   'post_enter_source_sha256':sources['native_desktop_factory/post_enter_component_v19.py'],'sampler_runtime':'verified-clean-subprocess',
