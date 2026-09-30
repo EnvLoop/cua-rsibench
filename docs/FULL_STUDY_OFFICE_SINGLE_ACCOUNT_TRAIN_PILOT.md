@@ -87,6 +87,17 @@ hashes the exact independent verifier source files. Injectable fake scorers
 used by offline tests are marked `fake_test_control_only` and cannot be
 mistaken for an independently scored manual control.
 
+The [September 30 transfer source adapter](evidence/office-transfer-train-source-adapter-2026-09-30.md)
+also recognizes the explicitly declared four-target additional PowerPoint
+TRAIN profile under `packages/train_policy_development`. Its source split,
+transfer identity, authored template, rights declaration and workflow target
+contract must match before the unchanged WDI verifier runs. Reserve CSV/ZIP
+context is hash-checked in an evaluator-only temporary directory when freezing
+a separately collected native baseline; downloaded artifact bytes stay
+unchanged. All folder, screenshot, identity and six-download requirements
+above still apply. This does not import the separate one-case Excel native
+normalization proposal into the integrated Excel manual or model worker.
+
 This is intentionally a weaker boundary than the optional
 [two-account Graph lease](FULL_STUDY_OFFICE_PERSONAL_GRAPH_BOOTSTRAP_RUNBOOK.md).
 The signed-in account may still see other files elsewhere in OneDrive.

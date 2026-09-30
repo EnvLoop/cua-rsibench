@@ -15,9 +15,10 @@ import json
 import os
 from pathlib import Path
 import re
+import tempfile
 from urllib.parse import parse_qs, urlsplit
 
-from ppt_wdi_factory import verify as ppt_verify
+from ppt_wdi_factory import plan as ppt_plan, verify as ppt_verify
 from tools.audit_ppt_wdi_web_train_triad_v1 import semantic_source_equal
 from tools import office_web_e2b_train_runner_v1 as ppt_runner
 from tools import excel_web_e2b_train_runner_v1 as excel_runner
@@ -57,13 +58,15 @@ def _canonical(value: object) -> bytes:
 def _verifier_source_hash(cell_id: str) -> str:
     files = (
         ('ppt_wdi_factory/verify.py',
+         'ppt_wdi_factory/plan.py',
          'tools/audit_ppt_wdi_web_train_triad_v1.py')
         if cell_id == 'powerpoint-web' else
         ('tools/sec_excel_web_train_oracle_v1.py',
          'sec_excel_factory/verify_integrated_candidate.py',
          'sec_excel_factory/verify_ooxml.py'))
     return _sha(_canonical({name: _sha((ROOT / name).read_bytes())
-                            for name in files}))
+                            for name in (*files,
+                                         'tools/office_single_account_train_pilot_v1.py')}))
 
 
 def _private(path: Path, root: Path,
@@ -162,6 +165,49 @@ def _write_new(path: Path, raw: bytes) -> str:
     return _sha(raw)
 
 
+def _ppt_train_profile(task: dict, task_id: str) -> str:
+    """Recognize source declarations only; raw WDI freeze remains mandatory."""
+    _require(type(task) is dict and type(task_id) is str and
+             task.get('schema') == 'ppt-wdi-original-candidates-v1' and
+             task.get('task_id') == task_id and
+             task.get('official_final_credit') == 0 and
+             type(task.get('actor_task')) is str,
+             'single_account_ppt_task_not_train_source')
+    if (task.get('split') == 'train' and task.get('target_keys') == ['summary'] and
+            not task_id.startswith('ppt-wdi-transfer-')):
+        return 'original_wdi_single_target_train'
+    workflow = task.get('workflow')
+    _require(type(workflow) is str, 'single_account_ppt_task_not_train_source')
+    expected = ppt_verify.FINAL_TARGETS.get(workflow, ppt_verify.DEFAULT_FINAL_TARGETS)
+    _require(task.get('split') == 'train_policy_development' and
+             task.get('development_source_split') == 'train' and
+             task.get('analogue_role') ==
+                 'additional_train_only_after_private_control_admission' and
+             task.get('source_scope') == 'private_wdi_country_csv_reserve_v1' and
+             task.get('rights_tier') == 'wdi_cc_by_4_0_facts_plus_authored_simulation' and
+             type(task_id) is str and
+             re.fullmatch(r'ppt-wdi-transfer-[0-9a-f]{16}', task_id) is not None and
+             workflow in ppt_plan.WORKFLOWS and
+             task.get('template_group') == f'ppt-transfer-brief-v1:{workflow}' and
+             task.get('presentation_template') ==
+                 'ppt_wdi_factory/build_train_transfer_deck.mjs' and
+             task.get('target_keys') == expected and len(expected) == 4,
+             'single_account_ppt_task_not_train_source')
+    return 'transfer_wdi_four_target_train'
+
+
+def _train_package_path(path: Path, cell_id: str) -> bool:
+    """Require the immediate package namespace, never an earlier nested pair."""
+    allowed = {'train'}
+    if cell_id == 'powerpoint-web':
+        allowed.add('train_policy_development')
+    return (path.name == 'task.private.json' and
+            path.parent.parent.name in allowed and
+            path.parent.parent.parent.name == 'packages' and
+            not any(part.lower() in {'selection', 'selection_candidate', 'final',
+                                    'final_candidate', 'official'} for part in path.parts))
+
+
 class OfficeTrainScorer:
     """Evaluator-only source/positive/reset checks for either Office file."""
 
@@ -173,14 +219,7 @@ class OfficeTrainScorer:
         self.excel_oracle = None
         if spec['cell_id'] == 'powerpoint-web':
             task = json.loads(paths['task'].read_bytes())
-            _require(task.get('schema') ==
-                     'ppt-wdi-original-candidates-v1' and
-                     task.get('split') == 'train' and
-                     task.get('task_id') == spec['task_id'] and
-                     task.get('official_final_credit') == 0 and
-                     type(task.get('actor_task')) is str and
-                     task.get('target_keys') == ['summary'],
-                     'single_account_ppt_task_not_train_source')
+            self.source_profile = _ppt_train_profile(task, spec['task_id'])
             try:
                 ppt_verify.freeze(paths['source'], task)
             except (OSError, KeyError, TypeError, ValueError):
@@ -212,14 +251,45 @@ class OfficeTrainScorer:
                      calibration.get('source_counterfactual_profiles') == 2,
                      'single_account_excel_oracle_not_calibrated')
 
+    def _freeze_ppt_baseline(self, candidate: Path) -> dict:
+        if self.source_profile != 'transfer_wdi_four_target_train':
+            return ppt_verify.freeze(candidate, self.case,
+                                     office_web_normalized=True)
+        # Reserve-source validation reads pinned evidence beside the deck.
+        # Downloads remain separate from evaluator source/gold. Revalidate
+        # trusted source bytes in a temporary evaluator-only context; the
+        # unchanged verifier freezes exactly the original candidate bytes.
+        source_dir = self.paths['source'].parent
+        context = (
+            ('source-snapshot.private.json', 'source_snapshot_sha256'),
+            ('source-provenance.private.json', 'source_provenance_sha256'),
+            ('source-country.private.zip', 'source_zip_sha256'),
+        )
+        with tempfile.TemporaryDirectory(prefix='office-source-context-',
+                                         dir=source_dir) as temporary:
+            directory = Path(temporary)
+            for name, field in context:
+                source = source_dir / name
+                _require(source.is_file() and not source.is_symlink(),
+                         'single_account_ppt_source_context_invalid')
+                raw = source.read_bytes()
+                _require(_sha(raw) == self.case.get(field),
+                         'single_account_ppt_source_context_changed')
+                copy = directory / name
+                copy.write_bytes(raw)
+                copy.chmod(0o600)
+            copy = directory / 'candidate.pptx'
+            copy.write_bytes(candidate.read_bytes())
+            copy.chmod(0o600)
+            return ppt_verify.freeze(copy, self.case,
+                                     office_web_normalized=True)
+
     def baseline(self, candidate: Path) -> dict:
         if self.spec['cell_id'] == 'powerpoint-web':
             try:
                 semantic = semantic_source_equal(
                     self.paths['source'], candidate)
-                self.ppt_oracle = ppt_verify.freeze(
-                    candidate, self.case,
-                    office_web_normalized=True)
+                self.ppt_oracle = self._freeze_ppt_baseline(candidate)
                 neutral = ppt_verify.verify(
                     candidate, candidate, self.ppt_oracle)
             except (OSError, KeyError, TypeError, ValueError):
@@ -440,14 +510,10 @@ def audit(spec_path: Path, evidence_path: Path, out_dir: Path, *,
     paths = {}
     for key in ('task', 'source'):
         paths[key], _ = _ref(spec[key + '_ref'], root)
-    task_parts = paths['task'].parts
-    _require(paths['task'].name == 'task.private.json' and
+    task_record, _ = _json(paths['task'], root)
+    _require(_train_package_path(paths['task'], spec['cell_id']) and
              paths['task'].parent.name == spec['task_id'] and
-             any(task_parts[index:index + 2] ==
-                 ('packages', 'train')
-                 for index in range(len(task_parts) - 1)) and
-             not any(part.lower() in {'selection', 'final', 'official'}
-                     for part in task_parts),
+             task_record.get('split') == paths['task'].parent.parent.name,
              'single_account_train_package_path_required')
     if spec['cell_id'] == 'powerpoint-web':
         _require(spec['cases_ref'] is None and
