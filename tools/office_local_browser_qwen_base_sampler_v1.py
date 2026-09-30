@@ -94,7 +94,7 @@ def open_base_sampler(repo_root: Path, journal: Path, max_steps: int,
 
 
 def admit(admission_path: Path, frame_path: Path, instruction_path: Path,
-          work_root: Path):
+          work_root: Path, *, memory='', previous_action_result=None):
     admission, raw = private._json(admission_path,work_root)
     required={'schema','mode','cell','split','task_id','task_binding_sha256',
               'account_principal_sha256','control_receipt_sha256',
@@ -130,7 +130,8 @@ def admit(admission_path: Path, frame_path: Path, instruction_path: Path,
         frame['task_binding_sha256']==admission['task_binding_sha256'] and
         0<=frame['step']<admission['max_steps'],
         'local_office_sampler_task_or_instruction_changed')
-    make_local_observation(frame,image,instruction.decode(),current_frame_id=frame['frame_id'])
+    make_local_observation(frame,image,instruction.decode(),current_frame_id=frame['frame_id'],
+        memory=memory,previous_action_result=previous_action_result)
     return admission,frame,image,instruction.decode(),{
         'native_admission_sha256':sha(raw),'frame_sha256':sha(frame_raw),
         'image_sha256':sha(image),'visible_instruction_sha256':sha(instruction)}
@@ -141,7 +142,8 @@ def run(admission_path, frame_path, instruction_path, out, *, repo_root,
     repo_root=Path(repo_root).absolute()
     work_root=repo_root/'work'
     admission,frame,image,instruction,binding=admit(
-        admission_path,frame_path,instruction_path,work_root)
+        admission_path,frame_path,instruction_path,work_root,
+        memory=memory,previous_action_result=previous_action_result)
     out=Path(out).absolute()
     private._require(not out.exists() and not out.is_symlink() and
                      out.parent.resolve().is_relative_to(work_root.resolve()),
@@ -189,16 +191,16 @@ def main():
     p.add_argument('--run',action='store_true')
     args=p.parse_args()
     root=Path(__file__).resolve().parents[1]
-    if not args.run:
-        admission,_,_,_,binding=admit(args.admission,args.frame,args.visible_instruction,root/'work')
-        print(json.dumps({'status':'offline_native_frame_admitted_only',**binding,
-                          'provider_calls':0,'official_final_credit':0}))
-        return
     context={'memory':'','previous_action_result':None}
     if args.context is not None:
         context,_=private._json(args.context,root/'work')
         private._require(set(context)=={'memory','previous_action_result'},
                          'local_office_context_invalid')
+    if not args.run:
+        admission,_,_,_,binding=admit(args.admission,args.frame,args.visible_instruction,root/'work',**context)
+        print(json.dumps({'status':'offline_native_frame_admitted_only',**binding,
+                          'provider_calls':0,'official_final_credit':0}))
+        return
     receipt=run(args.admission,args.frame,args.visible_instruction,args.out,repo_root=root,**context)
     print(json.dumps(receipt,sort_keys=True))
 

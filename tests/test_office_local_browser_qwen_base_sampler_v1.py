@@ -102,6 +102,22 @@ class LocalBaseSamplerTests(unittest.TestCase):
             bad={**admission,'mode':'offline_fixture'}
             bad_path=folder/'bad.json';private._write_new(bad_path,private._canonical(bad))
             with self.assertRaises(ValueError):admit(bad_path,frame_path,instruction_path,work)
+            next_frame={**frame,'step':1,'frame_id':'f'*32}
+            next_path=folder/'next-frame.json';private._write_new(next_path,private._canonical(next_frame))
+            with self.assertRaises(ValueError):admit(ap,next_path,instruction_path,work)
+            previous={'status':'applied','code':'ok'}
+            admitted=admit(ap,next_path,instruction_path,work,memory='prior action',previous_action_result=previous)
+            self.assertEqual(admitted[1]['step'],1)
+            seen=[]
+            class StopBeforeProvider:
+                def sample_current_frame(self,*_,**context):
+                    seen.append(context)
+                    raise RuntimeError('synthetic_stop_before_provider')
+            with self.assertRaisesRegex(RuntimeError,'synthetic_stop_before_provider'):
+                run(ap,next_path,instruction_path,folder/'next-sample',repo_root=root,
+                    memory='prior action',previous_action_result=previous,
+                    sampler_factory=lambda *_:(StopBeforeProvider(),None,{}))
+            self.assertEqual(seen,[{'memory':'prior action','previous_action_result':previous}])
 
 
 if __name__=='__main__':unittest.main()
