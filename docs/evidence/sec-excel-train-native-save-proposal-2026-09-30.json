@@ -1,0 +1,702 @@
+{
+  "adversarial_categories": {
+    "calculation_settings": 1,
+    "chain_membership": 3,
+    "chain_shape": 2,
+    "collateral_formula": 1,
+    "external_link": 2,
+    "invalid_cache": 1,
+    "macro": 1,
+    "metadata": 4,
+    "missing_cache": 2,
+    "numeric_formula_hardcode": 12,
+    "one_target_short": 12,
+    "package_membership": 1,
+    "plain_hardcode": 1,
+    "selection": 3,
+    "source_tamper": 1,
+    "stale_cache": 1,
+    "style": 2,
+    "table": 2,
+    "validation": 1,
+    "wrong_formula": 1,
+    "xml_namespace": 1
+  },
+  "adversarial_controls": [
+    {
+      "artifact_sha256": "93cec09878223b3ea6c2be72d6a2651bb87959956727bcb40a08d5d59a214ed3",
+      "category": "one_target_short",
+      "control": "one_target_short_00",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "2c2a12c78614856d2bebfd1463fe8f4037f23d261ccf3e7bcae566042cfdb4ef",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_00",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "832d9a36ab99c78a8a45ba80b757c9198189db9b7df3aa08c44e4d33ecbb374b",
+      "category": "one_target_short",
+      "control": "one_target_short_01",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "374143301689d231cfa1004783f9e933c92571924040a9e3ce8ba57ba2610164",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_01",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "9ef3b427524933b4e7a9a88602610202a29cfd33c6bf2bcdc130c5cda35f3c7d",
+      "category": "one_target_short",
+      "control": "one_target_short_02",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "14ed2d18abb75d7aeb09264fb471881d30dac506424f07cb0f321b4085a13779",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_02",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "877f61c4dd9da1362326cc18d1d9c58b80ab1f36ada26a4497bb9731633ff764",
+      "category": "one_target_short",
+      "control": "one_target_short_03",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "b73bb7b6f5cf19240cccf6489aa60dc9aaa1bbc54a5e86775c2a601e8228ee34",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_03",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "ba8bc644a34675d032bffa4a7d40e2815c3e91ac96084c8320d4081280f14b05",
+      "category": "one_target_short",
+      "control": "one_target_short_04",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "d774a3c45b2ae8b864120d57e25511c6e4b1348bc0aef641ef0c7d13c31fcf5b",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_04",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "54b3beaf22c3925466d282befaf51abedce08fe813a6a5d1e6888bf45df4fa11",
+      "category": "one_target_short",
+      "control": "one_target_short_05",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "43de0bde2000737de19f2d005784943f026167b5cf2ab42d60588a916aaf9889",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_05",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "f5c06e20c5ace5e4c8886a74113e361f9dfac230f8ab442b1e4fe537474a13ac",
+      "category": "one_target_short",
+      "control": "one_target_short_06",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "44380c534eb2d20a6a86c462df7b1dbe747272d09340ab93349ffe8cd200200a",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_06",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "c85ccda17d01bab636c1f6d8511dd9f4f81f7245417233530022b16b3b6b7a66",
+      "category": "one_target_short",
+      "control": "one_target_short_07",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "5eceaaeb779a709881547c3c9ecefd088c6c7bfdf6c539fa8e81b046a12e1abc",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_07",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "d0bbc79749f2d4b6ab478d0ddaaea38311e9d846ab71ceb3c0905fa30aa53d61",
+      "category": "one_target_short",
+      "control": "one_target_short_08",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "cc012c06078406f709f105c66247c3d807ceeaac26434a278a1d14adbba7e2d9",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_08",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "1eb08ff30d74b838dc66d04c9c0bfa572f4867070dcfde6d5d32d2714dcc9cf5",
+      "category": "one_target_short",
+      "control": "one_target_short_09",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "e91a8b32fa3fe2df1d0c02e11ac735a7aa0ed3fd88ac9c875421612597abcacc",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_09",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "86c0e0ebf0cf6683b41fd03905cd99b4363d14a7fb9c238fb2c321dcfe84af03",
+      "category": "one_target_short",
+      "control": "one_target_short_10",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "bc289b984b3333b47bd1af7b0d5c9da1bc2a9103e12c857c1f5e69c100b681d8",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_10",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "1a97969750efeb2cea46346e1965a9dfeaae72862500d2eb3aaf3da26e0811b1",
+      "category": "one_target_short",
+      "control": "one_target_short_11",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "ddcb8a84dafcf458ed1e8df863fe6e66464917981bbec45580d470643c804cf4",
+      "category": "numeric_formula_hardcode",
+      "control": "numeric_formula_hardcode_11",
+      "proposal_pass": false,
+      "reason_codes": [
+        "target_counterfactual_dependency_failed"
+      ]
+    },
+    {
+      "artifact_sha256": "c85ccda17d01bab636c1f6d8511dd9f4f81f7245417233530022b16b3b6b7a66",
+      "category": "wrong_formula",
+      "control": "wrong_formula_current_cache_refreshed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "wrong_target_formula_result"
+      ]
+    },
+    {
+      "artifact_sha256": "0f9d78ce7b83d16226f19a82cb7f8c6f035ac5cf61d3798b62c3e4500318bdda",
+      "category": "plain_hardcode",
+      "control": "target_replaced_by_constant",
+      "proposal_pass": false,
+      "reason_codes": [
+        "formula_cell_membership_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "cd111241d0c81d23f73474deb611ac41d649160a5109e054aa75925d222a1dfb",
+      "category": "stale_cache",
+      "control": "stale_target_cache",
+      "proposal_pass": false,
+      "reason_codes": [
+        "stale_saved_formula_cache"
+      ]
+    },
+    {
+      "artifact_sha256": "4933909487c005e66c0d60d77e908c14a9c6880620748bb3766af8649939778b",
+      "category": "missing_cache",
+      "control": "missing_target_cache",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "dba628d95b7a07f68fac216935eb77b0e8774a00de754d5f40497a8509da9eb3",
+      "category": "missing_cache",
+      "control": "missing_collateral_formula_cache",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "539fe48f52034568a6fa1332bb958378006936018c1a18ea5c2676833a0838cd",
+      "category": "invalid_cache",
+      "control": "nonfinite_numeric_formula_cache",
+      "proposal_pass": false,
+      "reason_codes": [
+        "stale_saved_formula_cache"
+      ]
+    },
+    {
+      "artifact_sha256": "fca9ae80daaa7191f3d6e935134a833de31ba696733335835de50c413d469b10",
+      "category": "source_tamper",
+      "control": "source_constant_modified_current_caches_refreshed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "856571791d78f820695ab42732dffd04e227f023dfbcc5a2dd1da10eeead6cc7",
+      "category": "collateral_formula",
+      "control": "collateral_formula_modified_current_caches_refreshed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "eb510d90f504fdc9fd649e066656410ae0bb7449d2c4933bd3af65801a612a8e",
+      "category": "style",
+      "control": "target_cell_style_changed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "2a75594ba97997d9fac1301199f7a4661cd9607c455ecd3a04fbfe5f241db3a6",
+      "category": "style",
+      "control": "protected_style_part_changed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "0550baadf6894ec012c489264d5b8f7fae82aad043ff78835a6d5a870e4b0d64",
+      "category": "xml_namespace",
+      "control": "qname_only_namespace_binding_rebound",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "9eae69de666892b9d5afd3a530dcdaa58627b01b220d89145fb4401293db01bd",
+      "category": "table",
+      "control": "table_part_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "native_baseline_part_set_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "0deb4c443c7d5b5867de5ad8f4bd3784e925ac86e12cae39f771fa13daeb6144",
+      "category": "table",
+      "control": "worksheet_table_structure_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "4ce30debc399510b282cb81ac3d19f178ed36cb54b342549fd7242bbd07608b9",
+      "category": "validation",
+      "control": "worksheet_validation_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "be07056b919e5c293e2e58e5b5c3ab7f2f14f5b183332d6eb49c070bb3ae3352",
+      "category": "external_link",
+      "control": "external_link_part_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "external_link_or_macro_forbidden"
+      ]
+    },
+    {
+      "artifact_sha256": "bf4d5f004e78d98597f9637a70a13616244e320942ed6c4e48ebb172b72b6fab",
+      "category": "external_link",
+      "control": "external_link_relationship_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "external_link_or_macro_forbidden"
+      ]
+    },
+    {
+      "artifact_sha256": "3c84b3eda3ca38e08ba49e26fd50faa380d6086cd50d72147c8fe3c39c26778c",
+      "category": "macro",
+      "control": "macro_part_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "external_link_or_macro_forbidden"
+      ]
+    },
+    {
+      "artifact_sha256": "49df0b5834a9da4d8ce50e39a38d740cf0e44baba51feaeb005d04083f6d9204",
+      "category": "metadata",
+      "control": "protected_creator_changed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "59b6caf976c57bee770168683caa40b0184fd24d85214c718c322f5e5c478977",
+      "category": "metadata",
+      "control": "unobserved_core_metadata_node_added",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "2f82d5c6fc31629fa94ddc4c795ba88ac1daf3dd913284ffb86e843e0b170e34",
+      "category": "metadata",
+      "control": "invalid_save_timestamp",
+      "proposal_pass": false,
+      "reason_codes": [
+        "invalid_save_timestamp"
+      ]
+    },
+    {
+      "artifact_sha256": "c024875bc1849d53b897622ccbac1e38def12bdb66985ec55edfdff5915ed040",
+      "category": "metadata",
+      "control": "malformed_session_document_id",
+      "proposal_pass": false,
+      "reason_codes": [
+        "invalid_session_document_id"
+      ]
+    },
+    {
+      "artifact_sha256": "c448e21f9fa943e6e66a841a6a0ac0e3d87a0068672f0a1c7edddffc74d32bb3",
+      "category": "calculation_settings",
+      "control": "calculation_settings_changed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "d22000d5cb6bfce949849f492623863ff08579be7000717e56c20395c6bddd76",
+      "category": "chain_membership",
+      "control": "calculation_chain_member_dropped",
+      "proposal_pass": false,
+      "reason_codes": [
+        "calculation_chain_membership_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "0eb3e256627490a81ef113b8ce5b02f7a2112883d64c555174aebe7c8eed740b",
+      "category": "chain_membership",
+      "control": "calculation_chain_member_duplicated",
+      "proposal_pass": false,
+      "reason_codes": [
+        "calculation_chain_membership_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "7a4ef0dc1b63ac67dbea57609c1c7a558592f666e7aaf0b30edd1fa8e7e457f2",
+      "category": "chain_membership",
+      "control": "calculation_chain_sheet_identity_changed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "calculation_chain_membership_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "b4ed30c9ddb17dd92b70aef5840fad1dbb242eaf6bc5bd9f6c870667199a4c13",
+      "category": "chain_shape",
+      "control": "calculation_chain_unknown_attribute",
+      "proposal_pass": false,
+      "reason_codes": [
+        "unobserved_calculation_chain_node"
+      ]
+    },
+    {
+      "artifact_sha256": "03fcd0fe2681ef1ac127ff12322d6509acebca51432f8efdb9ba37ca02bfb8ac",
+      "category": "chain_shape",
+      "control": "calculation_chain_invalid_flag",
+      "proposal_pass": false,
+      "reason_codes": [
+        "invalid_calculation_chain_flag"
+      ]
+    },
+    {
+      "artifact_sha256": "35aef00bf0c1866bb2a7fe41f5c153e7738aa360b68e4ee88efe6493403077c5",
+      "category": "selection",
+      "control": "selection_out_of_bounds",
+      "proposal_pass": false,
+      "reason_codes": [
+        "invalid_or_unobserved_selection_focus"
+      ]
+    },
+    {
+      "artifact_sha256": "01dca717af41c3c7b3b77bb38ba19e66acc9e73ac2469cb867762e7f3d4f03a2",
+      "category": "selection",
+      "control": "selection_pane_modified",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "e311a2cac6e967e14f97f168724f2b90c02083b946aba7ac094efa93354d5999",
+      "category": "selection",
+      "control": "selection_unobserved_attribute",
+      "proposal_pass": false,
+      "reason_codes": [
+        "protected_xml_part_changed"
+      ]
+    },
+    {
+      "artifact_sha256": "a55aac2e964b791019f840e2fa966e2403e6e1e29a3e76b8a67850676da3659c",
+      "category": "package_membership",
+      "control": "protected_part_removed",
+      "proposal_pass": false,
+      "reason_codes": [
+        "native_baseline_part_set_changed"
+      ]
+    }
+  ],
+  "adversarial_controls_rejected": 55,
+  "controls_created_in_private_disposable_directory": true,
+  "controls_deleted_after_audit": true,
+  "equivalent_save_controls": [
+    {
+      "artifact_sha256": "c7f6f46e815f5516caad8fb103c72a6e8cca2768fc47dd6b15eb3f6d2c4052cb",
+      "category": "equivalent_save",
+      "control": "equivalent_valid_utc_save_times",
+      "proposal_pass": true,
+      "reason_codes": []
+    },
+    {
+      "artifact_sha256": "916db43a53e9bc9b7c292d6ec156af69f3436fc33cc252523c955ff86a306987",
+      "category": "equivalent_save",
+      "control": "equivalent_valid_session_uuid",
+      "proposal_pass": true,
+      "reason_codes": []
+    },
+    {
+      "artifact_sha256": "3630c98c020f1ee7bb725a9f95b369a522c695efb9ded5d08a925c90b70a1bf1",
+      "category": "equivalent_save",
+      "control": "equivalent_bounded_selection_focus",
+      "proposal_pass": true,
+      "reason_codes": []
+    },
+    {
+      "artifact_sha256": "0f56f52d811cab3107ae5e129ba0f5bdaac81b8bd35619247728a8845d4f9ec9",
+      "category": "equivalent_save",
+      "control": "equivalent_chain_order_and_boolean_flags",
+      "proposal_pass": true,
+      "reason_codes": []
+    }
+  ],
+  "equivalent_save_controls_passed": 4,
+  "excel_web_admissions": 0,
+  "final_runs": 0,
+  "fresh_native_reset": {
+    "artifact_sha256": "0109d5e5f747c7837688371a84325b6cfe6f76e0183ef1060eaee438f418ce8d",
+    "formula_chain_members": 29,
+    "normalization_equivalent_to_pre_edit_native_baseline": true,
+    "offline_reset_artifact_comparison_only": true,
+    "protected_native_parts": 16,
+    "reason_codes": [
+      "wrong_target_formula_result"
+    ],
+    "rejected_as_unsolved": true,
+    "semantic_cell_count": 169,
+    "source_and_formula_semantic_cells_unchanged": true
+  },
+  "historical_strict_error_counts": [
+    1,
+    1
+  ],
+  "historical_strict_reopened_rejected": true,
+  "historical_strict_saved_rejected": true,
+  "immutable_input_hashes_after": {
+    "fresh-reset-web.xlsx": "0109d5e5f747c7837688371a84325b6cfe6f76e0183ef1060eaee438f418ce8d",
+    "positive-reopened-web.xlsx": "a12d49983353e3af48b6e47e5287f9e4e8bc2d0acc264e73724d820f8d0944ad",
+    "positive-web.xlsx": "7a27251707fb05e19a650923c3a514521b8f4964af1959c711ceea6dc31313dc",
+    "review.private.json": "b8eb2d73511ff19f7b68aa2fae67e309e21d51d2ee4e317ad974f48d500fdf72",
+    "seed.xlsx": "e279e2b24695208282db024210d1c3e46c3bd3cd38f002c7d49b64df96912a40",
+    "untouched-web-baseline.xlsx": "a7923d89481ec66062da23d31a2dfddea2d328d9827a3a6cf8601363a90af122"
+  },
+  "immutable_input_hashes_before": {
+    "fresh-reset-web.xlsx": "0109d5e5f747c7837688371a84325b6cfe6f76e0183ef1060eaee438f418ce8d",
+    "positive-reopened-web.xlsx": "a12d49983353e3af48b6e47e5287f9e4e8bc2d0acc264e73724d820f8d0944ad",
+    "positive-web.xlsx": "7a27251707fb05e19a650923c3a514521b8f4964af1959c711ceea6dc31313dc",
+    "review.private.json": "b8eb2d73511ff19f7b68aa2fae67e309e21d51d2ee4e317ad974f48d500fdf72",
+    "seed.xlsx": "e279e2b24695208282db024210d1c3e46c3bd3cd38f002c7d49b64df96912a40",
+    "untouched-web-baseline.xlsx": "a7923d89481ec66062da23d31a2dfddea2d328d9827a3a6cf8601363a90af122"
+  },
+  "immutable_inputs_unchanged": true,
+  "limitations": [
+    "A TRAIN-derived, one-case source proposal; no task admission or model-effect claim.",
+    "The pre-edit native baseline chronology is supplied collection evidence, not independently established by this offline audit.",
+    "Raw-to-native semantic cells match; broad Office package/style/theme rewriting and visual preservation remain unqualified.",
+    "Numeric cache consistency is independently checked; native recalculation provenance remains unverified by this offline audit.",
+    "Independent second-person source review, GUI reset and cross-worker isolation are outside this audit.",
+    "The observed native package contains no tables or binary parts; table addition is audited here, while existing-table edits and protected-binary equality use synthetic unit controls.",
+    "The source-plan hash is reviewed and pinned; this audit directly verifies source-case bytes and five raw source files, but does not reread the source-plan file."
+  ],
+  "model_calls": 0,
+  "native_unsolved_baseline_rejected": true,
+  "official_final_admissions": 0,
+  "raw_unsolved_seed_rejected": true,
+  "reopened_positive": {
+    "candidate_sha256": "a12d49983353e3af48b6e47e5287f9e4e8bc2d0acc264e73724d820f8d0944ad",
+    "changed_part_count": 7,
+    "checked_formula_caches": 29,
+    "checked_formula_targets": 12,
+    "counterfactual_target_coverage": 12,
+    "excel_web_admissions": 0,
+    "final_runs": 0,
+    "formula_chain_members": 29,
+    "independent_source_review_complete": false,
+    "model_calls": 0,
+    "native_baseline_sha256": "a7923d89481ec66062da23d31a2dfddea2d328d9827a3a6cf8601363a90af122",
+    "native_recalculation_provenance_verified": false,
+    "official_final_admissions": 0,
+    "part_count": 16,
+    "private_review_sha256": "b8eb2d73511ff19f7b68aa2fae67e309e21d51d2ee4e317ad974f48d500fdf72",
+    "raw_seed_sha256": "e279e2b24695208282db024210d1c3e46c3bd3cd38f002c7d49b64df96912a40",
+    "raw_source_files_verified": 5,
+    "raw_source_sha256": {
+      "10k": "0b8340937190ff224215ead8f7f66ac6df31e949294b98d1607f8f7f0ced7fa5",
+      "companyfacts": "2ac80ea17fde0111954d3bacddcaf77a5009bd70745952dfc4e56da804df9a8a",
+      "index": "edac07c8c3caee1ba9b7f2f1119d3e707158a8e5c78f37a23ad78750eb6be934",
+      "submissions": "eec8a75d8c631dda180750d8fdb13b9e7b56c1c280ce99474231b1bf05550e99",
+      "support": "ae8be90dc36f495da242f8b3c1645b4b092640cda20ca406897cebaa54cb38ee"
+    },
+    "raw_to_native_package_qualified": false,
+    "raw_to_native_semantic_cell_count": 169,
+    "raw_to_native_semantic_cells_unchanged": true,
+    "raw_to_native_visual_qualified": false,
+    "reason_codes": [],
+    "reviewed_case_sha256": "6eebe0ecef0227538e8e0fa520f99f9c90756671e13a199b4183385bbc6e7888",
+    "schema": "envloop.sec_excel_train_native_save_proposal.v1",
+    "scope": "one_frozen_bank_TRAIN_source_case",
+    "selection_runs": 0,
+    "sheet_count": 6,
+    "source_case_sha256": "142fe847d4e652c1f2c75e2cb41ef0adff8b50d513083c3c184edfa2ca5e3a0d",
+    "source_driver_replays": 10,
+    "source_plan_sha256": "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa",
+    "table_count": 0,
+    "train_derived_proposal_pass": true,
+    "unchanged_non_target_cells": 157
+  },
+  "saved_positive": {
+    "candidate_sha256": "7a27251707fb05e19a650923c3a514521b8f4964af1959c711ceea6dc31313dc",
+    "changed_part_count": 7,
+    "checked_formula_caches": 29,
+    "checked_formula_targets": 12,
+    "counterfactual_target_coverage": 12,
+    "excel_web_admissions": 0,
+    "final_runs": 0,
+    "formula_chain_members": 29,
+    "independent_source_review_complete": false,
+    "model_calls": 0,
+    "native_baseline_sha256": "a7923d89481ec66062da23d31a2dfddea2d328d9827a3a6cf8601363a90af122",
+    "native_recalculation_provenance_verified": false,
+    "official_final_admissions": 0,
+    "part_count": 16,
+    "private_review_sha256": "b8eb2d73511ff19f7b68aa2fae67e309e21d51d2ee4e317ad974f48d500fdf72",
+    "raw_seed_sha256": "e279e2b24695208282db024210d1c3e46c3bd3cd38f002c7d49b64df96912a40",
+    "raw_source_files_verified": 5,
+    "raw_source_sha256": {
+      "10k": "0b8340937190ff224215ead8f7f66ac6df31e949294b98d1607f8f7f0ced7fa5",
+      "companyfacts": "2ac80ea17fde0111954d3bacddcaf77a5009bd70745952dfc4e56da804df9a8a",
+      "index": "edac07c8c3caee1ba9b7f2f1119d3e707158a8e5c78f37a23ad78750eb6be934",
+      "submissions": "eec8a75d8c631dda180750d8fdb13b9e7b56c1c280ce99474231b1bf05550e99",
+      "support": "ae8be90dc36f495da242f8b3c1645b4b092640cda20ca406897cebaa54cb38ee"
+    },
+    "raw_to_native_package_qualified": false,
+    "raw_to_native_semantic_cell_count": 169,
+    "raw_to_native_semantic_cells_unchanged": true,
+    "raw_to_native_visual_qualified": false,
+    "reason_codes": [],
+    "reviewed_case_sha256": "6eebe0ecef0227538e8e0fa520f99f9c90756671e13a199b4183385bbc6e7888",
+    "schema": "envloop.sec_excel_train_native_save_proposal.v1",
+    "scope": "one_frozen_bank_TRAIN_source_case",
+    "selection_runs": 0,
+    "sheet_count": 6,
+    "source_case_sha256": "142fe847d4e652c1f2c75e2cb41ef0adff8b50d513083c3c184edfa2ca5e3a0d",
+    "source_driver_replays": 10,
+    "source_plan_sha256": "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa",
+    "table_count": 0,
+    "train_derived_proposal_pass": true,
+    "unchanged_non_target_cells": 157
+  },
+  "schema": "envloop.sec_excel_train_native_save_proposal_audit.public.v1",
+  "scope": "one_frozen_bank_TRAIN_source_case",
+  "selection_runs": 0,
+  "source_code_sha256": {
+    "adversarial_audit": "47f45d8d6da2b54b205835933f8e3ea9367e40ce0d34acf3c473ce9e33adeec5",
+    "generic_ooxml_parser_and_evaluator": "dbc75f16b8e3d214e9c144ecaee8e5cf248715cc81f1162e1c2f4c8c48f3c816",
+    "historical_train_scorer": "08fffae2ba762d9727c2cd7dd5fc515ffa4811ee43b026452f1cdadac94dc378",
+    "independent_arithmetic_and_counterfactuals": "08fffae2ba762d9727c2cd7dd5fc515ffa4811ee43b026452f1cdadac94dc378",
+    "normalization_proposal": "ad62a66e77a50b5cadafb6250cd50494c0ae0ec3eae6e1f8d496bfa624f30ea9"
+  },
+  "status": "TRAIN_derived_normalization_proposal_controls_passed"
+}
