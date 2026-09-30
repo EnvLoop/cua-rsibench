@@ -25,7 +25,7 @@ def envelope(phase):
             "phase": phase, "lease": lease(), "task_id": "visible-task-1",
             "task_binding_sha256": "e" * 64, "frame_id": "nonce-123", "step": 3,
             "captured_at": 10.0 if phase == "observation" else 20.0, "expires_at": 100.0,
-            "viewport": [1000, 700], "view_id": "purchase-form", "modal_id": "none",
+            "viewport": [1000, 700], "view_id": "purchase-form", "context_id": "physical-native-view-1", "modal_id": "none",
             "focus_id": "field-1", "allowed_views": ["purchase-form", "product-form"],
             "allowed_modals": ["none", "save-format"], "allowed_focus": ["field-1", "field-2"],
             "owned_surface": True, "targets": [
@@ -131,6 +131,15 @@ class NativeSurfaceGuardTests(unittest.TestCase):
         self.cur["view_id"] = "purchase-form"
         self.cur["modal_id"] = "save-format"
         self.assertEqual(self.decide()["reason"], "native_context_changed")
+
+    def test_context_id_change_within_owned_surface_is_recoverable_rejection(self):
+        self.cur["context_id"] = "physical-native-view-2"
+        result = self.decide()
+        self.assertEqual((result["status"], result["reason"]), ("rejected", "native_context_changed"))
+        self.assertTrue(result["consume_turn"])
+        self.assertTrue(result["invalidate_nonce"])
+        self.cur["owned_surface"] = False
+        self.assertEqual(self.decide()["status"], "hard_stop")
 
     def test_focus_change_rejects_keyboard_but_not_safe_pointer(self):
         self.cur["focus_id"] = "field-2"

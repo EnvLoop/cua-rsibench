@@ -69,7 +69,7 @@ A native envelope has exactly:
 - `phase`: `observation` or `predispatch`; `lease`: the validated lease.
 - `task_id`, `task_binding_sha256`, `frame_id`, `step`.
 - `captured_at`, `expires_at`, `viewport`: `[width, height]`.
-- `view_id`, `modal_id`, `focus_id`.
+- `view_id`, `context_id`, `modal_id`, `focus_id`.
 - `allowed_views`, `allowed_modals`, `allowed_focus`.
 - `owned_surface`, `targets`, `raw_image`, `raw_envelope`.
 
@@ -80,6 +80,13 @@ Unavailable or ambiguous ownership is not inferred from an attractive screenshot
 The immutable lease hashes bind application origin and owned document/workspace
 where appropriate. The allowlists are a declared safety profile, not the set of
 correct answers or controls needed for a particular task.
+
+`view_id` names the authorized surface kind. `context_id` is an opaque native
+view-context token, such as the digest of the actual current physical URL. A
+context change inside the owned application rejects recoverably and consumes the
+turn/nonce; outside application, account, workspace, or window changes hard-stop.
+The plugin must not enlarge `allowed_views` to accommodate changing record URLs
+or derive context tokens from task answers.
 
 Each target has exactly `ref`, `bounds`, `visible`, `enabled`, `obscured`,
 `keyboard`, and `actions`. Bounds are `[x, y, width, height]` in the screenshot

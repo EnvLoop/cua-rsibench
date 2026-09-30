@@ -40,6 +40,7 @@ POLICY = MappingProxyType({
     "primary_gate": "owned_native_surface_and_current_safe_target",
     "coordinate_target_resolution": "most_specific_native_target_unambiguous_or_reject",
     "targeted_keyboard": "safe_editable_target_then_native_focus_recheck_before_keyboard_io",
+    "native_context_binding": "opaque_context_id_within_immutable_authorized_surface_kind",
     "raster_equality_required": False,
     "raw_observation_and_predispatch_evidence_required": True,
     "lease_check": "fresh_trusted_callback_with_bound_durable_evidence",
@@ -235,6 +236,7 @@ class NativeEnvelope:
     expires_at: float
     viewport: tuple[int, int]
     view_id: str
+    context_id: str
     modal_id: str
     focus_id: str
     allowed_views: tuple[str, ...]
@@ -251,7 +253,7 @@ def validate_envelope(value: Any) -> NativeEnvelope:
     if (row["schema"] != "native-surface-envelope-v1" or row["policy_sha256"] != POLICY_SHA
             or row["phase"] not in ("observation", "predispatch")):
         raise GuardError("invalid_envelope")
-    for key in ("task_id", "frame_id", "view_id", "modal_id", "focus_id"):
+    for key in ("task_id", "frame_id", "view_id", "context_id", "modal_id", "focus_id"):
         _id(row[key], "invalid_envelope")
     _sha(row["task_binding_sha256"], "invalid_envelope")
     if type(row["step"]) is not int or row["step"] < 0 or type(row["owned_surface"]) is not bool:
@@ -385,7 +387,7 @@ def decision(observed: Any, current: Any, action: dict, *,
         return result("rejected", "stale_nonce_or_task", check)
     if not obs.captured_at <= cur.captured_at <= tick <= min(obs.expires_at, cur.expires_at):
         return result("rejected", "expired_observation", check)
-    if (obs.view_id, obs.modal_id) != (cur.view_id, cur.modal_id):
+    if (obs.view_id, obs.context_id, obs.modal_id) != (cur.view_id, cur.context_id, cur.modal_id):
         return result("rejected", "native_context_changed", check)
     kind = action["type"]
     if type(kind) is not str or kind not in ACTION_TYPES:
