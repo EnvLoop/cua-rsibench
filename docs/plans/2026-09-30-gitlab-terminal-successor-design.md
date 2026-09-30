@@ -1,0 +1,13 @@
+# GitLab post-positive reset terminal successor
+
+The actual prospective v5 epoch completed three trusted GUI trios. Control index 3 retained its first positive GUI/save/SQL-Git state, then the reset clone exited during reconfiguration when the PostgreSQL log-service restart timed out. This is a consumed terminal failure. Its positive alone cannot become a fourth completed control, and its old intent must not replay.
+
+The narrow proposed startup profile sets `SVWAIT=60` in each successor container environment. Upstream runit's `sv` documentation and source show that this overrides its default wait threshold when no `-w` option is present, while preserving service checks and nonzero timeout status. It is a polling threshold, not a hard deadline for a hung `check` process. The existing 900-second readiness and 7200-second process supervision remain. No service kill, action retry, startup restart loop, or scorer change is introduced. The lower-level logger cause and empirical effectiveness remain unknown until native controls execute.
+
+Continue in a fresh source epoch. Retire all five tasks of the affected family at indices 0 through 4 and use the second already precommitted FIFO reserve family; the prior replacement at indices 10 through 14 remains. All 100 packages bind the new baseline, native ACL proof, source profile, and reset lineage. Historical passes and incomplete positive evidence remain immutable and transfer zero admission credit. No task/gold contents are opened during metadata preparation.
+
+Copy the immutable 32-project seed through read-only mounts into three exclusive new volumes, add exactly one next reserve project, and freeze a 33-project baseline. Preserve the original 31-project runtime and all original/v5 volumes and terminal files. The already terminal v5 clone is stopped explicitly and gracefully only after its exact baseline has been checked, before the new clone starts. This keeps two active GitLab runtimes on the reviewed 12-GiB VM. The stop is retained as pre-result maintenance and is never described as uninterrupted v5 uptime.
+
+Alternative continuation using old indices after a source-profile change would reuse an incomplete prefix and leave a failed identity in the denominator. A new blanket diagnostic loop would consume additional evidence without producing the required 100 controls. Neither is part of this proposal.
+
+Source acceptance, bootstrap permit, native baseline/ACL proof, and exact range permit are distinct gates. This offline design and source preparation authorizes no live Docker/application/provider call. Full native controls and any subsequent model campaigns still require review and actual execution evidence.
