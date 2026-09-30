@@ -24,6 +24,17 @@ class FixtureBackend(probe.NativeBackend):
   with patch.object(verify,'_git',return_value=TREE):return super().git_trees(self.snap,label)
  def original_before(self):
   value={'identity':identity(),'snapshot':self.snap,'full_git_trees':self.trees('original-before')};self.record('original-before.private.json',value);return value
+ def claim_parent(self):
+  self.calls.append(('claim-parent',None))
+  if self.fail=='parent-create':raise RuntimeError('exclusive parent creation uncertain')
+  token=self.parent_token();value={'inode':1,'device':1,'mode':0o700,'uid':0,'gid':0,'owner_token_sha256':probe.source.sha(token.encode()),'exclusive_parent_created':True}
+  self.parent_claim=value;self.record('parent-ownership.private.json',value);return value
+ def release_parent(self):
+  self.calls.append(('release-parent',None))
+  if self.parent_claim is None:return {'parent_claimed':False,'unclaimed_paths_removed':False}
+  if self.fail=='parent-release':raise RuntimeError('parent teardown failed')
+  value={'parent_claimed':True,'owned_parent_absent':True,'unowned_paths_removed':False}
+  self.record('parent-teardown.private.json',value);return value
  def stop_original(self,before):
   self.calls.append(('stop',None));self.running=False
   self.record('original-stopped.private.json',identity()|{'running':False})
@@ -106,7 +117,7 @@ class NeutralTests(unittest.TestCase):
   doc=self.doc()|{'neutral_base':'http://127.0.0.1:8026','port':8026,'seed_lowerdirs':{r:'/immutable/'+r for r in runtime.DESTS}}
   with tempfile.TemporaryDirectory() as folder:
    out=Path(folder);probe.write_raw(out/'neutral-runtime.env',b'SVWAIT=60\n')
-   backend=probe.NativeBackend(doc,out);vm=[];docker=[];old_world=runtime.WORLD;old_vm=reset.VM_ROOT
+   backend=probe.NativeBackend(doc,out);backend.parent_claim={'inode':1,'device':1,'owner_token_sha256':'x'};vm=[];docker=[];old_world=runtime.WORLD;old_vm=reset.VM_ROOT
    def docker_call(*args,**kwargs):
     docker.append(args)
     if args[0]=='inspect':return json.dumps({'Running':True})
@@ -153,6 +164,61 @@ class NeutralTests(unittest.TestCase):
      with self.assertRaises(RuntimeError):backend.teardown(0)
      self.assertIn(('rm',doc['container_prefix']+'-0'),[c.args for c in docker.call_args_list])
    self.assertTrue((Path(folder)/'cycle-0-teardown.private.json').exists())
+ def test_initially_absent_parent_is_exclusively_created_before_real_boot_call_path(self):
+  doc=self.doc()|{'neutral_base':'http://127.0.0.1:8026','seed_lowerdirs':{r:'/immutable/'+r for r in runtime.DESTS}}
+  with tempfile.TemporaryDirectory() as folder:
+   out=Path(folder);mapped=out/'fresh-parent';probe.write_raw(out/'neutral-runtime.env',b'SVWAIT=60\n')
+   backend=probe.NativeBackend(doc,out);vm_calls=[]
+   def vm(script,**kwargs):
+    vm_calls.append(script)
+    if script.startswith("python3 - <<"):
+     body=script.split('\n',1)[1].rsplit('\n',1)[0].replace(doc['vm_root'],str(mapped))
+     return subprocess.run(['python3','-c',body],capture_output=True,check=True,text=True).stdout
+    return ''
+   def docker(*args,**kwargs):
+    if args[0]=='inspect':return json.dumps({'Running':True})
+    if args[:3]==('exec',doc['container_prefix']+'-0','gitlab-ctl'):return '\n'.join('run: '+s+': (pid 1) 1s' for s in probe.profile.CRITICAL_SERVICES)
+    if args[0]=='exec':return json.dumps(probe.EXPECTED_SETTINGS)
+    return 'new-created-id'
+   self.assertFalse(mapped.exists())
+   with patch.object(backend,'vm',side_effect=vm),patch.object(backend,'container_exists',return_value=False),    patch.object(backend,'configure_upper',return_value={'exact_suffix_only':True}),patch.object(backend,'docker',side_effect=docker),    patch.object(backend,'capture_logs'),patch.object(backend,'git_trees',return_value={}),    patch.object(probe.scoped,'wait_cohort',return_value=identity('1')|{'running':True,'health':'healthy'}),    patch.object(verify,'state_snapshot',return_value=snapshot()),patch.object(runtime,'inspect',return_value={'Config':{'Env':['SVWAIT=60']},'HostConfig':{'RestartPolicy':{'Name':'no','MaximumRetryCount':0}}}):
+     owner=backend.claim_parent();self.assertTrue(mapped.is_dir());self.assertEqual((mapped/'neutral-owner.private').read_text(),backend.parent_token())
+     backend.boot(0);self.assertTrue((mapped/'cycle-0').is_dir());self.assertIn(0,backend.owned_cycles)
+     self.assertEqual(sum('mount -t overlay' in s for s in vm_calls),3)
+     (mapped/'cycle-0').rmdir();proof=backend.release_parent()
+   self.assertTrue(owner['exclusive_parent_created']);self.assertTrue(proof['owned_parent_absent']);self.assertFalse(mapped.exists())
+ def test_colliding_parent_and_uncertain_creation_are_never_removed(self):
+  for uncertain in [False,True]:
+   with tempfile.TemporaryDirectory() as folder:
+    out=Path(folder);mapped=out/'parent';backend=probe.NativeBackend(self.doc(),out)
+    if not uncertain:mapped.mkdir();(mapped/'foreign').write_bytes(b'keep')
+    def vm(script,**kwargs):
+     if uncertain:
+      mapped.mkdir();raise TimeoutError('creation response lost')
+     body=script.split('\n',1)[1].rsplit('\n',1)[0].replace(backend.doc['vm_root'],str(mapped))
+     return subprocess.run(['python3','-c',body],capture_output=True,check=True,text=True).stdout
+    with patch.object(backend,'vm',side_effect=vm) as effect:
+     with self.assertRaises((subprocess.CalledProcessError,TimeoutError)):backend.claim_parent()
+     result=backend.release_parent();self.assertEqual(effect.call_count,1)
+    self.assertIsNone(backend.parent_claim);self.assertFalse(result['unclaimed_paths_removed']);self.assertTrue(mapped.exists())
+    if not uncertain:self.assertEqual((mapped/'foreign').read_bytes(),b'keep')
+ def test_parent_release_refuses_unknown_children_without_deleting_them(self):
+  with tempfile.TemporaryDirectory() as folder:
+   out=Path(folder);mapped=out/'parent';backend=probe.NativeBackend(self.doc(),out)
+   def vm(script,**kwargs):
+    body=script.split('\n',1)[1].rsplit('\n',1)[0].replace(backend.doc['vm_root'],str(mapped))
+    return subprocess.run(['python3','-c',body],capture_output=True,check=True,text=True).stdout
+   with patch.object(backend,'vm',side_effect=vm):
+    backend.claim_parent();(mapped/'foreign').write_bytes(b'keep')
+    with self.assertRaises(subprocess.CalledProcessError):backend.release_parent()
+   self.assertEqual((mapped/'foreign').read_bytes(),b'keep');self.assertTrue((mapped/'neutral-owner.private').exists())
+ def test_parent_creation_failure_never_stops_original_and_parent_release_failure_still_resumes(self):
+  for failure in ['parent-create','parent-release']:
+   backend,_=self.run_fixture(failure)
+   with self.assertRaises(RuntimeError):probe.execute_cycles(backend.doc,snapshot(),backend)
+   self.assertTrue(backend.running)
+   if failure=='parent-create':self.assertFalse(any(k in ['stop','boot','resume'] for k,v in backend.calls))
+   else:self.assertEqual(sum(k=='resume' for k,v in backend.calls),1)
  def test_container_absence_rejects_daemon_error(self):
   backend,root=self.run_fixture();backend=probe.NativeBackend(backend.doc,root)
   result=subprocess.CompletedProcess([],1,b'',b'Cannot connect to Docker daemon')

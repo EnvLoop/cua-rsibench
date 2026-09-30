@@ -174,7 +174,7 @@ def review(*,plan,permit,accepted=False,note=''):
 
 
 class NativeBackend:
-    def __init__(self,doc,out):self.doc,self.out,self.seq=doc,out,0;self.owned_cycles=set()
+    def __init__(self,doc,out):self.doc,self.out,self.seq=doc,out,0;self.owned_cycles=set();self.parent_claim=None
     def command(self,args,*,timeout=120):
         number=self.seq;self.seq+=1
         try:result=subprocess.run(args,capture_output=True,timeout=timeout,check=False)
@@ -292,11 +292,60 @@ print(json.dumps({'base_sha256':hashlib.sha256(base).hexdigest(),'clone_config_s
 """.replace('CONFIG',repr(config)).replace('LOWER',repr(lower)).replace('SUFFIX',repr(profile.SUFFIX.encode()))
         raw=self.vm("python3 - <<'NEUTRAL_CONFIG'\n"+script+"\nNEUTRAL_CONFIG")
         result=json.loads(raw);self.record(f'cycle-{index}-config-delta.private.json',result);return result
+    def parent_token(self):
+        return source.sha(factory.canonical({'vm_root':self.doc['vm_root'],'source_sha256s':self.doc['source_sha256s']}))
+    def claim_parent(self):
+        require(self.parent_claim is None,'Owned parent namespace may be claimed only once')
+        require(re.fullmatch('/var/lib/envloop-gitlab-neutral-telemetry-[a-f0-9]{12}',self.doc['vm_root']),
+            'Parent namespace outside bounded neutral root')
+        script="""import hashlib,json,os,stat
+root=ROOT;token=TOKEN
+# Atomic mkdir refuses an existing node, including any symlink or directory.
+os.mkdir(root,0o700)
+marker=root+'/neutral-owner.private'
+fd=os.open(marker,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+with os.fdopen(fd,'wb') as f:f.write(token.encode());f.flush();os.fsync(f.fileno())
+s=os.lstat(root);assert stat.S_ISDIR(s.st_mode)
+print(json.dumps({'inode':s.st_ino,'device':s.st_dev,'mode':stat.S_IMODE(s.st_mode),'uid':s.st_uid,'gid':s.st_gid,
+ 'owner_token_sha256':hashlib.sha256(token.encode()).hexdigest(),'exclusive_parent_created':True}))
+""".replace('ROOT',repr(self.doc['vm_root'])).replace('TOKEN',repr(self.parent_token()))
+        # A timeout/error leaves ownership unclaimed; never adopt or clear it.
+        proof=json.loads(self.vm("python3 - <<'NEUTRAL_PARENT_CLAIM'\n"+script+"\nNEUTRAL_PARENT_CLAIM"))
+        require(proof['exclusive_parent_created'] is True and proof['owner_token_sha256']==source.sha(self.parent_token().encode()) and
+            proof['mode']==0o700,'Exclusive parent ownership proof malformed')
+        self.parent_claim=proof;self.record('parent-ownership.private.json',proof)
+        return proof
+    def parent_check_script(self):
+        require(self.parent_claim is not None,'Parent namespace has not been successfully claimed')
+        return """import os,stat
+root=ROOT;token=TOKEN;claim=CLAIM
+s=os.lstat(root);assert stat.S_ISDIR(s.st_mode) and (s.st_ino,s.st_dev)==(claim['inode'],claim['device'])
+fd=os.open(root+'/neutral-owner.private',os.O_RDONLY|os.O_NOFOLLOW)
+with os.fdopen(fd,'rb') as f:assert f.read()==token.encode()
+""".replace('ROOT',repr(self.doc['vm_root'])).replace('TOKEN',repr(self.parent_token())).replace('CLAIM',repr(self.parent_claim))
+    def release_parent(self):
+        if self.parent_claim is None:
+            # Creation errors/uncertainty do not authorize deleting any node.
+            proof={'parent_claimed':False,'unclaimed_paths_removed':False}
+            self.record('parent-unclaimed-exit.private.json',proof);return proof
+        script=self.parent_check_script()+"""
+assert os.listdir(root)==['neutral-owner.private']
+os.unlink(root+'/neutral-owner.private')
+os.rmdir(root)
+assert not os.path.lexists(root)
+import json
+print(json.dumps({'parent_claimed':True,'owned_parent_absent':True,'unowned_paths_removed':False}))
+"""
+        proof=json.loads(self.vm("python3 - <<'NEUTRAL_PARENT_RELEASE'\n"+script+"\nNEUTRAL_PARENT_RELEASE"))
+        require(proof['parent_claimed'] is True and proof['owned_parent_absent'] is True and proof['unowned_paths_removed'] is False,
+            'Claimed neutral parent namespace remains')
+        self.record('parent-teardown.private.json',proof);return proof
     def boot(self,index):
         name=self.doc['container_prefix']+'-'+str(index);vmroot=self.doc['vm_root']+'/cycle-'+str(index)
         # Refuse preexisting container and VM root; these are never reused.
         require(not self.container_exists(name,f'cycle-{index}-preexisting.private.json'),'Neutral container namespace already exists')
-        self.vm('set -eu; test ! -e '+shlex.quote(vmroot)+'; mkdir '+shlex.quote(vmroot))
+        script=self.parent_check_script()+"\nos.mkdir("+repr(vmroot)+",0o700)\n"
+        self.vm("python3 - <<'NEUTRAL_CYCLE_CLAIM'\n"+script+"\nNEUTRAL_CYCLE_CLAIM")
         self.owned_cycles.add(index)
         with self.scope(name,vmroot,self.doc['neutral_base'],self.out):
             for role,lower in self.doc['seed_lowerdirs'].items():reset._mount(role,lower)
@@ -386,6 +435,7 @@ def execute_cycles(doc,baseline,backend):
     result={'status':'three_fresh_neutral_cold_boots_verified','cycles':cycles,'task_ids_consumed':0,
         'new_task_dispatch_authorized':False,'model_calls':0,'provider_calls':0,'control_credit':0,'official_final_admitted':0}
     try:
+        backend.journal('parent_namespace_claim_intent');result['parent_ownership']=backend.claim_parent()
         paused=True;backend.journal('preserved33_graceful_stop_intent');backend.stop_original(before)
         for index in range(3):
             backend.journal('owned_neutral_boot_intent',index)
@@ -411,12 +461,16 @@ def execute_cycles(doc,baseline,backend):
         require(len({c['container_id_sha256'] for c in cycles})==3,'Neutral container identity reused')
         return result
     finally:
-        if paused:
-            backend.journal('preserved33_resume_intent');result['preserved33_resume']=backend.resume_original(before)
-        after=backend.protected();seed_after=backend.seed_content()
-        backend.record('protected-exit.private.json',after);backend.record('seed-exit.private.json',seed_after)
-        require(after==protected and seed_after==seed,'Preserved source/seed metadata changed on exit')
-        backend.journal('preserved33_exit_verified')
+        try:
+            backend.journal('parent_namespace_release_intent');result['parent_teardown']=backend.release_parent()
+        finally:
+            # Even failed namespace creation/release must not skip restoration.
+            if paused:
+                backend.journal('preserved33_resume_intent');result['preserved33_resume']=backend.resume_original(before)
+            after=backend.protected();seed_after=backend.seed_content()
+            backend.record('protected-exit.private.json',after);backend.record('seed-exit.private.json',seed_after)
+            require(after==protected and seed_after==seed,'Preserved source/seed metadata changed on exit')
+            backend.journal('preserved33_exit_verified')
 
 
 def run(*,plan,permit,execute=False,backend_factory=NativeBackend):
@@ -439,7 +493,7 @@ def run(*,plan,permit,execute=False,backend_factory=NativeBackend):
             'plan_sha256':source.sha(source.private(plan)),'permit_sha256':source.sha(source.private(permit)),
             'worker_and_lease_proof':proof,'cycles':3,'one_use':True,'task_ids_consumed':0,'created_utc':source.now()})
         result=execute_cycles(doc,baseline,backend);result['raw_file_sha256s']=raw_refs(out);source.write_new(out/'result.private.json',result)
-        return {k:v for k,v in result.items() if k not in {'cycles','raw_file_sha256s','preserved33_resume'}}|{'neutral_cycles_verified':3,'result_sha256':source.sha(source.private(out/'result.private.json'))}
+        return {k:v for k,v in result.items() if k not in {'cycles','raw_file_sha256s','preserved33_resume','parent_ownership','parent_teardown'}}|{'neutral_cycles_verified':3,'result_sha256':source.sha(source.private(out/'result.private.json'))}
     except Exception as error:
         if (out/'run-intent.private.json').exists() and not (out/'failure.private.json').exists():
             source.write_new(out/'failure.private.json',{'status':'terminal_neutral_failure_no_retry','exception_type':type(error).__name__,
@@ -466,6 +520,12 @@ def audit(*,plan,permit):
         p['accepted'] is True and p['plan_sha256']==intent['plan_sha256'] and p['source_sha256s']==doc['source_sha256s'] and
         intent['worker_and_lease_proof']['old_worker_processes']==0 and intent['worker_and_lease_proof']['supervisor_locks_exclusive'] is True,
         'One-use plan/permit/native lease binding changed')
+    owner=load('parent-ownership.private.json');parent_teardown=load('parent-teardown.private.json')
+    token=source.sha(factory.canonical({'vm_root':doc['vm_root'],'source_sha256s':doc['source_sha256s']}))
+    require(owner==result['parent_ownership'] and owner['exclusive_parent_created'] is True and owner['mode']==0o700 and
+        owner['owner_token_sha256']==source.sha(token.encode()) and parent_teardown==result['parent_teardown'] and
+        parent_teardown=={'parent_claimed':True,'owned_parent_absent':True,'unowned_paths_removed':False},
+        'Raw parent namespace ownership/absence unproved')
     before=load('original-before.private.json');resumed=load('original-resumed.private.json')
     stopped=load('original-stopped.private.json');stopped_state=load('original-stopped-state.private.json')
     require(before['snapshot']==baseline and resumed['snapshot']==baseline and before['identity']==resumed['identity'] and
@@ -517,9 +577,9 @@ def audit(*,plan,permit):
         require(post['returncode']==1 and ('No such object: '+doc['container_prefix']+'-'+str(index)).encode() in
             source.private(out/f'cycle-{index}-post-teardown.private.json.stderr.private.log'),'Raw owned container absence unproved')
     journal=[json.loads(line) for line in source.private(out/'lifecycle.private.jsonl').splitlines()]
-    expected=[('preserved33_graceful_stop_intent',None)]
+    expected=[('parent_namespace_claim_intent',None),('preserved33_graceful_stop_intent',None)]
     for index in range(3):expected += [('owned_neutral_boot_intent',index),('owned_neutral_teardown_intent',index),('owned_neutral_cycle_verified',index)]
-    expected += [('preserved33_resume_intent',None),('preserved33_exit_verified',None)]
+    expected += [('parent_namespace_release_intent',None),('preserved33_resume_intent',None),('preserved33_exit_verified',None)]
     require([(r['stage'],r['cycle']) for r in journal]==expected,'Native lifecycle chronology includes retry or missing phase')
     require(all(result.get(k)==0 for k in ['task_ids_consumed','model_calls','provider_calls','control_credit','official_final_admitted']) and
         result['new_task_dispatch_authorized'] is False,'Neutral trial cannot authorize task/model credit')
