@@ -66,9 +66,10 @@ class DeadlineFuture:
     ``clock`` is the same host monotonic clock as the actor. No integer floor,
     minimum remaining cutoff, new future, retry or provider cancellation exists.
     """
-    def __init__(self,future,*,actor_deadline,clock=time.monotonic):
-        self.future=future;self.deadline=actor_deadline;self.clock=clock
+    def __init__(self,future,*,actor_deadline,clock=None):
+        self.future=future;self.deadline=actor_deadline;self.clock=clock or time.monotonic
         self.consumed=False;self.last_deadline_proof=None
+        self.late_result=None
 
     def result(self,timeout=None):
         if self.consumed:
@@ -78,6 +79,7 @@ class DeadlineFuture:
         def deadline_error(event,known=False,late_result=None):
             proof=ActorDeadlineProof(self.deadline,started,self.clock(),budget,event,True,known)
             self.last_deadline_proof=proof
+            self.late_result=late_result
             return ActorDeadlineReached(proof,late_result=late_result)
         if budget<=0:
             raise deadline_error('actor_deadline_reached_before_wait')
