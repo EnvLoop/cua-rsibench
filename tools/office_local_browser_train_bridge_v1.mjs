@@ -111,13 +111,29 @@ async function nativeAdmission(b, admission, root) {
   const control=await privateJson(admission.control_ref,root);
   const review=await privateJson(admission.source_review_ref,root);
   require(control.schema==='cua-office-single-account-train-audit-v1' &&
-    ['passed_manual_train_development_control','passed_manual_folder_train_development_control'].includes(control.status) &&
+    ['passed_manual_train_development_control','passed_manual_folder_train_development_control',
+      'passed_manual_folder_train_native_save_development_control'].includes(control.status) &&
     control.cell_id==='powerpoint-web' && control.task_id===b.task_id &&
     control.package_sha256===b.task_binding_sha256 && control.independent_scorer_executed===true &&
     control.original_software_gui_operator_reviewed===true && control.dedicated_folder_empty_after_cleanup===true &&
     control.download_count===6 && control.folder_inventory_count===4 && HEX.test(control.before_sha256) &&
     control.model_calls===0 && control.official_final_credit===0 && control.selection_or_final_admitted===false,
     'native_control_not_accepted');
+  if (control.status==='passed_manual_folder_train_native_save_development_control') {
+    require(control.scoring_policy_id==='ppt-native-save-one-frozen-train-collection-v1' &&
+      control.raw_strict_saved_score===0 && control.one_collection_canonical_saved_score===1 &&
+      control.exact_historical_collection_only===true && control.generic_student_verifier_qualified===false &&
+      control.registered===false && control.account_scope==='existing_account_dedicated_disposable_folder' &&
+      control.dedicated_test_account_operator_asserted===false && HEX.test(control.native_save_policy_sha256) &&
+      review.native_save_policy_sha256===control.native_save_policy_sha256,
+      'native_save_development_policy_not_bound');
+    for (const name of ['tools/office_ppt_native_save_collection_control_v1.py',
+      'tools/office_single_account_train_pilot_v1.py','tools/ppt_native_train_collection_proposal_v1.py',
+      'ppt_wdi_factory/verify.py','ppt_wdi_factory/plan.py','tools/audit_ppt_wdi_web_train_triad_v1.py']) {
+      require(control.scoring_source_hashes?.[name]===digest(await fs.readFile(
+        fileURLToPath(new URL('../'+name,import.meta.url)))),'native_save_development_source_changed');
+    }
+  }
   require(review.schema==='office-local-browser-bridge-source-review-v1' &&
     review.status==='approved_train_development_only' && review.control_receipt_sha256===admission.control_ref.sha256 &&
     review.bridge_source_sha256===digest(await fs.readFile(fileURLToPath(import.meta.url))) &&
@@ -258,7 +274,8 @@ export async function createOfficeLocalTrainBridge({tab,binding,artifactRoot,lis
         local_profile:{action_types:['click','double_click','type','key','scroll','finish'],
           type_mode:'insert',editor_focus_required:true,
           keys:Object.keys(KEY).filter(k=>!['Control+A','Meta+A'].includes(k)),
-          actor_navigation_and_exports:false,safe_regions:structuredClone(b.safe_regions)}};
+          actor_navigation_and_exports:false,scroll_units:'cropped_screenshot_pixels',
+          safe_regions:structuredClone(b.safe_regions)}};
       await writeNew(path.join(framesRoot,`${String(observations).padStart(3,'0')}-${frame.id}.frame.private.json`),JSON.stringify(captured));
       return {...captured,screenshot_bytes:bytes};
     }),
@@ -302,7 +319,9 @@ export async function createOfficeLocalTrainBridge({tab,binding,artifactRoot,lis
         require(action.dx===0 && integer(action.dy) && action.dy!==0 && Math.abs(action.dy)<=720,
           'unsafe_scroll');
         const p=safePoint(action.target);row.gui_attempted=true;
-        await tab.scroll(p,action.dy>0?'down':'up',Math.max(1,Math.ceil(Math.abs(action.dy)/120)));
+        // Native CUA expresses distance in pages. The shared action expresses
+        // pixel distance in this crop, so preserve small/fractional moves.
+        await tab.scroll(p,action.dy>0?'down':'up',Math.abs(action.dy)/b.clip.height);
       } else {
         row.phase='finished';
         await writeNew(prefix+'-terminal.private.json',JSON.stringify(row));

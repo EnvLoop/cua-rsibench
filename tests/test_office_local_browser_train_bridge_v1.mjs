@@ -261,6 +261,43 @@ test('GUI intent is durable before the side effect and terminal failure cannot b
   await assert.rejects(f.bridge.dispatch(action(f,frame,'click',{target:{x:1000,y:300}})),/lease_or_step_expired/);
 });
 
+test('pixel scroll actions become fractional native pages without rounding to six pages',async t=>{
+  const f=await fixture(t);f.bridge=await createOfficeLocalTrainBridge(f.options);
+  let frame=await f.bridge.observe();
+  assert.equal(frame.local_profile.scroll_units,'cropped_screenshot_pixels');
+  await f.bridge.dispatch(action(f,frame,'scroll',{dx:0,dy:120,target:{x:1000,y:300}}));
+  assert.deepEqual(f.calls[0],['scroll',[1000,426],'down',120/750]);
+  frame=await f.bridge.observe();
+  await f.bridge.dispatch(action(f,frame,'scroll',{dx:0,dy:-720,target:{x:1000,y:300}}));
+  assert.deepEqual(f.calls[1],['scroll',[1000,426],'up',720/750]);
+});
+
+test('native-save development control binds distinct policy and reviewed source hashes',async t=>{
+  for (const valid of [true,false]) {
+    const f=await fixture(t,{mode:'native_development'});
+    const control=await admittedNativeFixture(f);
+    Object.assign(control,{status:'passed_manual_folder_train_native_save_development_control',
+      scoring_policy_id:'ppt-native-save-one-frozen-train-collection-v1',raw_strict_saved_score:0,
+      one_collection_canonical_saved_score:1,exact_historical_collection_only:true,
+      generic_student_verifier_qualified:false,registered:false,
+      account_scope:'existing_account_dedicated_disposable_folder',dedicated_test_account_operator_asserted:false,
+      native_save_policy_sha256:'a'.repeat(64),scoring_source_hashes:{}});
+    for (const name of ['tools/office_ppt_native_save_collection_control_v1.py',
+      'tools/office_single_account_train_pilot_v1.py','tools/ppt_native_train_collection_proposal_v1.py',
+      'ppt_wdi_factory/verify.py','ppt_wdi_factory/plan.py','tools/audit_ppt_wdi_web_train_triad_v1.py'])
+      control.scoring_source_hashes[name]=hash(await fs.readFile(fileURLToPath(new URL('../'+name,import.meta.url))));
+    if (!valid) control.generic_student_verifier_qualified=true;
+    const raw=JSON.stringify(control);await fs.writeFile(path.join(f.root,'control.json'),raw,{mode:0o600});
+    f.options.admission.control_ref.sha256=hash(raw);
+    const review=JSON.parse(await fs.readFile(path.join(f.root,'review.json')));
+    review.control_receipt_sha256=hash(raw);review.native_save_policy_sha256=control.native_save_policy_sha256;
+    const rr=JSON.stringify(review);await fs.writeFile(path.join(f.root,'review.json'),rr,{mode:0o600});
+    f.options.admission.source_review_ref.sha256=hash(rr);
+    if (valid) f.bridge=await createOfficeLocalTrainBridge(f.options);
+    else await assert.rejects(createOfficeLocalTrainBridge(f.options),/native_save_development_policy_not_bound/);
+  }
+});
+
 test('failed/proposal/fake controls cannot authorize native entry',async t=>{
   for (const status of ['collected_failed_control','passed_fake_test_control_only','proposal_only']) {
     const f=await fixture(t,{mode:'native_development'});const control=await admittedNativeFixture(f);

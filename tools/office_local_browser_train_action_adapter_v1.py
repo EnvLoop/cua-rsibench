@@ -37,10 +37,11 @@ def make_local_observation(frame: dict, screenshot: bytes,
     profile=frame['local_profile']
     safe_keys={'Enter','Escape','Backspace','Delete','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','Shift+End'}
     if (type(profile) is not dict or set(profile)!={'action_types','type_mode','editor_focus_required',
-            'keys','actor_navigation_and_exports','safe_regions'} or
+            'keys','actor_navigation_and_exports','scroll_units','safe_regions'} or
             profile['action_types']!=['click','double_click','type','key','scroll','finish'] or
             profile['type_mode']!='insert' or profile['editor_focus_required'] is not True or
             profile['actor_navigation_and_exports'] is not False or
+            profile['scroll_units']!='cropped_screenshot_pixels' or
             type(profile['keys']) is not list or not all(type(k) is str for k in profile['keys']) or
             not set(profile['keys'])<=safe_keys or
             type(profile['safe_regions']) is not list or not 1<=len(profile['safe_regions'])<=4 or

@@ -19,7 +19,8 @@ class LocalActionAdapterTests(unittest.TestCase):
             'screenshot_ref':{'path':'private.png','sha256':hashlib.sha256(self.image).hexdigest()},
             'local_profile':{'action_types':['click','double_click','type','key','scroll','finish'],
                 'type_mode':'insert','editor_focus_required':True,'keys':['Home','End','Shift+End','Escape'],
-                'actor_navigation_and_exports':False,'safe_regions':[{'x':10,'y':10,'width':40,'height':30}]}}
+                'actor_navigation_and_exports':False,'scroll_units':'cropped_screenshot_pixels',
+                'safe_regions':[{'x':10,'y':10,'width':40,'height':30}]}}
 
     def call(self,payload,frame=None,image=None):
         return normalize_local_action(json.dumps(payload),frame or self.frame,image or self.image,
