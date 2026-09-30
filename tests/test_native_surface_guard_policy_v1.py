@@ -137,6 +137,17 @@ class NativeSurfaceGuardTests(unittest.TestCase):
         self.assertEqual(self.decide()["status"], "accepted")
         self.assertEqual(self.decide(action("key", key="Enter"))["reason"], "editable_focus_changed_or_unsafe")
 
+    def test_targeted_keyboard_uses_verified_editable_target_without_relocation(self):
+        self.cur["focus_id"] = "field-2"
+        for kind, extra in (("type", {"text": "model proposal", "mode": "fill"}),
+                            ("key", {"key": "Enter"})):
+            proposed = action(kind, target={"x": 50, "y": 50}, **extra)
+            self.assertEqual(self.decide(proposed)["status"], "accepted")
+            self.cur["targets"][0]["keyboard"] = False
+            self.assertEqual(self.decide(proposed)["reason"], "target_not_current_and_safe")
+            self.cur["targets"][0]["keyboard"] = True
+        self.assertIn("focus_recheck", guard.POLICY["targeted_keyboard"])
+
     def test_unsafe_focus_and_disabled_editable_target_reject(self):
         for update in ({"enabled": False}, {"visible": False}, {"obscured": True}, {"keyboard": False}):
             self.cur = envelope("predispatch")

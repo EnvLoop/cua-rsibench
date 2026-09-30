@@ -123,6 +123,16 @@ causes `rejected`. Coordinate actions retain their original coordinates. Ref
 actions must remain current, visible, enabled, unobscured, and owned. Nothing
 relocates coordinates to a newly convenient control.
 
+Untargeted typing and keys require the exact current safe focus. Targeted typing
+and keys instead require the original target to remain an owned, visible,
+enabled, unobscured keyboard target in both envelopes. After the native target
+click and before any keyboard IO, the executor must capture and recheck actual
+editable focus and ownership. It must retain that evidence with the driver
+result. A failed or uncertain second check after IO starts quarantines the
+episode; it never produces an applied shortcut. This permits a model to select
+a currently safe input without requiring that input to have been focused before
+the selection.
+
 The decision includes both image/envelope refs, original action digest, normalized
 envelope digests, lease-check evidence, and `driver_called: false`. It is a safety
 decision, not an execution receipt. `consume_turn` and `invalidate_nonce` are

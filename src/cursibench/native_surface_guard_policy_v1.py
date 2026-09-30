@@ -39,6 +39,7 @@ POLICY = MappingProxyType({
     "all_model_slots": ("base", "selected-1", "selected-2", "selected-3", "selected-4", "teacher", "control"),
     "primary_gate": "owned_native_surface_and_current_safe_target",
     "coordinate_target_resolution": "most_specific_native_target_unambiguous_or_reject",
+    "targeted_keyboard": "safe_editable_target_then_native_focus_recheck_before_keyboard_io",
     "raster_equality_required": False,
     "raw_observation_and_predispatch_evidence_required": True,
     "lease_check": "fresh_trusted_callback_with_bound_durable_evidence",
@@ -394,9 +395,10 @@ def decision(observed: Any, current: Any, action: dict, *,
             or (kind == "drag" and not {"from", "to"} <= set(action))):
         return result("rejected", "invalid_action", check)
     for target in targets:
-        if not _safe_target(target, obs, kind) or not _safe_target(target, cur, kind, keyboard=kind == "type"):
+        if (not _safe_target(target, obs, kind, keyboard=kind in ("type", "key"))
+                or not _safe_target(target, cur, kind, keyboard=kind in ("type", "key"))):
             return result("rejected", "target_not_current_and_safe", check)
-    if kind in ("type", "key"):
+    if kind in ("type", "key") and "target" not in action:
         if (obs.focus_id != cur.focus_id or cur.focus_id not in cur.allowed_focus
                 or not any(item.ref == cur.focus_id and item.keyboard and item.visible and item.enabled
                            and not item.obscured and kind in item.actions for item in cur.targets)):
