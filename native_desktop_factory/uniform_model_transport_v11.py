@@ -52,7 +52,7 @@ class ModelGuest:
  """Trusted setup/readback surrounds a screenshot-only actor interface."""
  def __init__(self,sandbox,*,root:Path,out:Path,filename:str):
   self.sandbox=sandbox;self.root=root;self.out=out;self.filename=filename
-  self.remote='/home/user/'+filename;self.receipt={};self.killed=False
+  self.remote='/home/user/'+filename;self.receipt={};self.killed=False;self.close_attempted=False
   self.proxy=PostEnterControlProxyV9(sandbox,storage_root=root,attempt_dir=out,document_filename=filename)
   self.recorder=RecordingDesktop(self.proxy)
 
@@ -119,7 +119,8 @@ class ModelGuest:
  def read_saved(self):return bytes(self.sandbox.files.read(self.remote,format='bytes'))
 
  def close(self):
-  if self.killed:return True
+  if self.close_attempted:return self.killed
+  self.close_attempted=True  # Consume before kill/status acknowledgement; never replay cleanup HTTP.
   try:
    self.receipt['kill_returned']=bool(self.sandbox.kill())
    self.receipt['is_running_after_kill']=bool(self.sandbox.is_running(request_timeout=12))

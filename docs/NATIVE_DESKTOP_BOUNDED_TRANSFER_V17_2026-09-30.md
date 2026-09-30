@@ -16,7 +16,9 @@ read and write preserves its existing arguments. The pinned E2B 2.51.0 source
 provides the stream iterator, close method and context-manager protocol.
 
 Provider `get_info` and `is_running` requests receive the same 30-second bound
-for controls, the shared base and all four checkpoint slots. A longer bound
+for controls, the shared base and all four checkpoint slots. Model cleanup is
+consumed before its first kill/status acknowledgement; a later `finally` call
+returns the retained result without another HTTP operation. A longer bound
 is a transport proposal; it does not establish that the previous timeout is
 fixed. Sandbox leases stay at 1,200 seconds, probe command/request limits stay
 at 450/480 seconds, and actors retain 90 actions and 720 seconds. The guest

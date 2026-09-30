@@ -85,7 +85,7 @@ class TransferTests(unittest.TestCase):
                 creates.append(kwargs)
                 files = Mock(); files.read.side_effect = lambda *a, **kw: (reads.append((a, kw)) or Stream([b'fixture']))
                 return SimpleNamespace(files=files, commands=Mock(), get_info=Mock(return_value='shape'),
-                                       is_running=Mock(return_value=False))
+                                       is_running=Mock(return_value=False), kill=Mock(return_value=True))
         with TemporaryDirectory() as tmp, patch.dict('sys.modules', {'e2b_desktop': SimpleNamespace(Sandbox=FakeSandbox)}):
             for slot in ['shared-base', *integration.matrix.RESEARCHERS]:
                 out = Path(tmp) / slot / 'actor'; out.mkdir(parents=True)
@@ -102,6 +102,19 @@ class TransferTests(unittest.TestCase):
         self.assertEqual(proposal['bounded_guest_transport_source_sha256'], digest(Path(transfer.__file__).read_bytes()))
         self.assertEqual(proposal['configuration_owners'], ['shared-base', *integration.matrix.RESEARCHERS])
         self.assertEqual(proposal['max_actor_wall_seconds'], 720)
+
+    def test_uncertain_model_cleanup_consumes_one_kill_and_status_for_every_slot(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for slot in ['shared-base', *integration.matrix.RESEARCHERS]:
+                out = root / slot / 'actor'; out.mkdir(parents=True)
+                raw = SimpleNamespace(files=Mock(), commands=Mock(), kill=Mock(return_value=True),
+                                      is_running=Mock(side_effect=TimeoutError()))
+                guest = model.ModelGuest(transfer.BoundedSandbox(raw), root=root, out=out, filename='fixture.xlsx')
+                self.assertFalse(guest.close()); self.assertFalse(guest.close())
+                raw.kill.assert_called_once_with(); raw.is_running.assert_called_once_with(request_timeout=30.0)
+                self.assertEqual(guest.receipt['kill_error_type'], 'TimeoutError')
+                self.assertTrue(guest.close_attempted)
 
     def test_nested_parent_projection_excludes_only_new_root_and_retains_v16_lease(self):
         with TemporaryDirectory() as tmp:
