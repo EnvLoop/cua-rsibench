@@ -1,0 +1,65 @@
+{
+  "child_stderr_sha256": "e400503877c2300a28467444f582c1e688c4399bd81179cc4a0f2a7181009ad3",
+  "container_exit_code": 1,
+  "container_oom_killed": false,
+  "control_credit": 0,
+  "failed_index": 9,
+  "failed_raw_state_sha256": "7b63abc7e1997c04e8567e2921ba4b68281fbaca48817a6b27c57d1f724a9c93",
+  "failed_stage": "third_cold_reset_after_repeated_positive_saved",
+  "failed_startup_log_sha256": "5dd5f8b317183b70b43faf88842559d1d6c214974ad26b06eb7d6f04aea54b4a",
+  "full_git_sidecars_present": 3,
+  "model_calls": 0,
+  "monitoring_configuration_changed_live": false,
+  "native_neutral_proof_completed": false,
+  "new_task_dispatch_authorized": false,
+  "official_final_admitted": 0,
+  "offline_tests_passed": 4,
+  "original_child_exit_code": 1,
+  "original_first_two_reset_generations": [
+    30,
+    31
+  ],
+  "original_terminal_passed": false,
+  "outer_controller_exit_does_not_imply_success": true,
+  "pinned_official_source_bindings": {
+    "prometheus.rb": {
+      "bytes": 27241,
+      "sha256": "a5c60b932ac43f2d285b3075d70b8e7f4ebfd67b32b1a51e36a12f98d96ba44c",
+      "url": "https://gitlab.com/gitlab-org/omnibus-gitlab/-/raw/18.5.0%2Bce.0/files/gitlab-cookbooks/monitoring/libraries/prometheus.rb"
+    },
+    "runit_helpers.rb": {
+      "bytes": 6072,
+      "sha256": "3e0d99fe6537db18c0627158a6f076f8249b7421d8f984ab2c4de2d68ed7f575",
+      "url": "https://gitlab.com/gitlab-org/omnibus-gitlab/-/raw/18.5.0%2Bce.0/files/gitlab-cookbooks/runit/libraries/helpers.rb"
+    },
+    "services.rb": {
+      "bytes": 2990,
+      "sha256": "3deea9781eb8f5eb16698a423edf13fa8e1f4963d34430ad9159034bd605c35b",
+      "url": "https://gitlab.com/gitlab-org/omnibus-gitlab/-/raw/18.5.0%2Bce.0/files/gitlab-cookbooks/package/libraries/config/services.rb"
+    },
+    "services_helper.rb": {
+      "bytes": 9445,
+      "sha256": "395cb2e418188dfe69fcdf0fbc580bdf0b2e90b11825558c198e381f48fdb13c",
+      "url": "https://gitlab.com/gitlab-org/omnibus-gitlab/-/raw/18.5.0%2Bce.0/files/gitlab-cookbooks/package/libraries/helpers/services_helper.rb"
+    }
+  },
+  "provider_calls": 0,
+  "proximate_command": "sv restart",
+  "proximate_service": "gitlab-exporter/log",
+  "root_cause_established": false,
+  "saved_phase_receipt_scores_not_promoted": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "schema": "envloop-gitlab-index9-optional-logger-failure-source-proposal-public-v1",
+  "separate_cleanup_exact_baseline": true,
+  "separate_cleanup_generation": 32,
+  "source_profile_renderer_sha256": "7a418a0b2fa9a953294b0ec108b31350a45287aefa15b28e6b5633a058bff92a",
+  "spectator_stop_not_robustness_guarantee": true,
+  "status": "retained_startup_failure_and_uniform_telemetry_profile_pending_neutral_native_test",
+  "task_data_grader_source_cores_and_lower_seeds_changed": false,
+  "third_original_reset_and_trio_present": false,
+  "uniform_profile": "gitlab18.5-optional-telemetry-off-v1",
+  "wait_bounds_changed": false
+}
