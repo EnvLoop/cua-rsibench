@@ -17,8 +17,8 @@ from cursibench import full_study_campaign_dispatch_v1 as campaign
 from cursibench import full_study_matrix_v1 as matrix
 from cursibench import shared_action_bundle_v066 as common
 from cursibench.scale_vision_proxy import digest as vision_digest
-from . import selection_control_accounting_epoch_v13 as controls
-from . import selection_control_accounting_worker_v13 as control_worker
+from . import selection_control_structural_epoch_v16 as controls
+from . import selection_control_structural_worker_v16 as control_worker
 from . import v066_post_enter_control_audit_v9 as control_audit
 from . import v066_final_freeze as action_freeze
 from . import uniform_model_transport_v11 as transport

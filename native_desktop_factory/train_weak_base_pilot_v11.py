@@ -117,7 +117,8 @@ def run(*, freeze_path, permit_path, enable_paid_pilot=False):
     directory, source, oracle = admit._package(Path(value['candidate_root']), row)
     filename = next(p.name for p in directory.iterdir() if p.suffix in ('.xlsx', '.pptx', '.docx'))
     package = {'identity': {k: row[k] for k in ('task_id', 'package_sha256')}, 'source': source,
-               'oracle': oracle, 'filename': filename, 'instruction': (directory / 'actor_task.txt').read_text()}
+               'oracle': oracle, 'filename': filename, 'instruction': (directory / 'actor_task.txt').read_text(),
+               'guest_reference_path':value['guest_public']}
     output.mkdir(parents=True, mode=0o700)
     worker.write(output / 'started.private.json', {'pilot_freeze_sha256': base.digest(freeze_path.read_bytes()),
                  'permit_sha256': base.digest(permit_path.read_bytes()), 'same_intent_replay_authorized': False})

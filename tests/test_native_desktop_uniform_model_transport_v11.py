@@ -43,7 +43,13 @@ class FakeModelGuest:
                                get_current_window_id=lambda:'native',get_window_title=lambda _:filename)
   self.proxy=SimpleNamespace(enter_count=0);self.killed=False;self.clicked=False
   self.receipt={'sandbox_id_sha256':digest(self.sandbox.sandbox_id.encode()),'profile_application_kind':'calc'}
- def prepare(self,**kwargs):pass
+ def prepare(self,**kwargs):
+  import gzip
+  from tests.test_structural_guest_attestation_v16 import fixture
+  observed,raw,_reference,_rows=fixture()
+  (self.out/'guest-probe-command-v16.private.json').write_text(json.dumps({'exit_code':0,'stdout':json.dumps(observed),'stderr':''}))
+  (self.out/'guest-probe-command-v16.private.json').chmod(0o600)
+  (self.out/'guest-content-files-v16.jsonl.gz').write_bytes(raw)
  def observe(self,*,identity,instruction,step,previous=None,memory=''):
   from tests.test_desktop_focus_readiness_v12 import Clock
   clock=Clock();original=transport.readiness.passive_samples
@@ -217,7 +223,9 @@ class TransportTests(unittest.TestCase):
                'template_group':'fixture','instance_group':f'fixture-{i}'} for i in range(20)]
   for owner in ['shared-base',*integration.matrix.RESEARCHERS]:
    with self.subTest(owner=owner),TemporaryDirectory() as directory:
-    root=Path(directory);root.chmod(0o700);guest_ref=root/'guest.json';guest_ref.write_text('{}')
+    root=Path(directory);root.chmod(0o700);guest_ref=root/'guest.json'
+    from tests.test_structural_guest_attestation_v16 import fixture
+    guest_ref.write_text(json.dumps(fixture()[2]))
     private_map=root/'map.json';private_map.write_text(json.dumps({'variant_salt':'offline-only-'*4}));private_map.chmod(0o600)
     admitted={'guest_public':str(guest_ref),'scoped_reference':str(root/'profile'),'private_map':str(private_map)}
     study=SimpleNamespace(task_views=lambda cell:{'selection':identities},repo_root=root,plan_sha256='c'*64)
@@ -255,7 +263,9 @@ class TransportTests(unittest.TestCase):
   sampling={'seed':23,'max_output_tokens':128,'temperature':0};bindings={'runtime':'b'*64}
   for owner in ['shared-base',*integration.matrix.RESEARCHERS]:
    with self.subTest(owner=owner),TemporaryDirectory() as directory:
-    root=Path(directory);root.chmod(0o700);guest_ref=root/'guest.json';guest_ref.write_text('{}')
+    root=Path(directory);root.chmod(0o700);guest_ref=root/'guest.json'
+    from tests.test_structural_guest_attestation_v16 import fixture
+    guest_ref.write_text(json.dumps(fixture()[2]))
     private_map=root/'map.json';private_map.write_text(json.dumps({'variant_salt':'offline-only-'*4}));private_map.chmod(0o600)
     admitted={'guest_public':str(guest_ref),'scoped_reference':str(root/'profile'),'private_map':str(private_map)}
     study=SimpleNamespace(repo_root=root,plan_sha256='c'*64)

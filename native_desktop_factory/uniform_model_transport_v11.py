@@ -20,6 +20,7 @@ from . import runtime_fingerprint_probe, qwen_v064_adapter as pixels
 from . import qwen_v066_adapter_v4_strict as strict
 from . import v066_scoped_profile_guard as profile
 from . import pre_observation_readiness_v12 as readiness
+from . import structural_guest_attestation_v16 as runtime_policy
 from .gui_control_shell import wait_for_document_ready
 from .post_enter_control_proxy_v9 import PostEnterControlProxyV9
 from .v066_post_enter_control_attempt_v9 import RecordingDesktop
@@ -68,17 +69,11 @@ class ModelGuest:
   self.receipt={'sandbox_id_sha256':digest(self.sandbox.sandbox_id.encode()),
                 'lease_seconds':LEASE_SECONDS,'provider_shape_attested':True}
   self.persist()
-  self.sandbox.files.write('/tmp/native-model-content-probe-v11.py',runtime_fingerprint_probe.GUEST_CONTENT_PROBE.encode())
-  run=self.sandbox.commands.run('sudo -n python3 /tmp/native-model-content-probe-v11.py',timeout=450,request_timeout=480)
-  if run.exit_code!=0:raise ValueError('v11_guest_content_probe_failed')
-  observed=json.loads(run.stdout)
-  if (observed.get('content_tree_sha256')!=guest_reference['static_content_sha256'] or
-      observed.get('counts')!=guest_reference['static_content_counts'] or
-      observed.get('kernel')!=guest_reference['kernel_identity'] or
-      observed.get('excluded_paths')!=guest_reference['static_content_excluded_paths']):
-   raise ValueError('v11_guest_content_changed')
-  raw=run.stdout.encode();reserve_and_write(self.root,self.out/'guest-content.private.json',raw)
-  self.receipt['guest_content_sha256']=observed['content_tree_sha256'];self.persist()
+  _run,observed,attestation=runtime_policy.execute_probe(self.sandbox,root=self.root,out=self.out,reference=guest_reference)
+  self.receipt.update(guest_content_sha256=observed['content_tree_sha256'],
+       guest_content_identity_kind=attestation['identity_kind'],raw_guest_content_sha256=attestation['raw_tree_sha256'],
+       raw_tree_equals_legacy_reference=attestation['raw_tree_equals_legacy_reference'])
+  self.persist()
   if self.sandbox.commands.run('test ! -e /home/user/.config/libreoffice/4/user').exit_code!=0:
    raise ValueError('v11_profile_not_fresh')
   self.receipt['fresh_profile_absent']=True

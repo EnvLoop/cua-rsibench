@@ -150,7 +150,8 @@ class DesktopProspectiveModelWorker:
    directory,source,oracle=admit._package(root,row)
    filename=next(p.name for p in directory.iterdir() if p.suffix in ['.xlsx','.pptx','.docx'])
    packages.append({'identity':{k:identity[k] for k in ['task_id','package_sha256']},'source':source,'oracle':oracle,
-                    'filename':filename,'instruction':(directory/'actor_task.txt').read_text()})
+                    'filename':filename,'instruction':(directory/'actor_task.txt').read_text(),
+                    'guest_reference_path':admitted['guest_public']})
   return packages
 
  def _create(self,*,paid:PaidCalls,package:dict,ordinal:int,phase:str,gui_root:Path):
@@ -172,6 +173,7 @@ class DesktopProspectiveModelWorker:
   return guest
 
  def _episode(self,*,admitted,package:dict,ordinal:int,batch:Path,paid:PaidCalls,sampler:transport.ModelSampler):
+  package={**package,'guest_reference_path':admitted['guest_public']}
   gui_root=batch/'gui';gui_root.mkdir(mode=0o700,exist_ok=True)
   out=gui_root/package['identity']['task_id']/'evaluator';out.mkdir(parents=True,mode=0o700)
   identity=package['identity'];source=package['source'];actor=None;reset=None
@@ -261,6 +263,9 @@ class DesktopProspectiveModelWorker:
     reset['initial_state_sha256']==reset['restored_state_sha256']==digest(package['source']),'v11_cold_reset_audit_failed')
   gui=batch/'gui';actor=gui/Path(task['actor_dir']).relative_to('gui')
   receipt=json.loads(integration.controls.private(actor/'guest.private.json'))
+  command=json.loads(integration.controls.private(actor/'guest-probe-command-v16.private.json'))
+  transport.runtime_policy.verify(json.loads(command['stdout']), (actor/'guest-content-files-v16.jsonl.gz').read_bytes(),
+                                 json.loads(Path(package['guest_reference_path']).read_bytes()))
   trace=json.loads(integration.controls.private(out/'actions.private.json'))
   transport.audit_model_readiness(gui,actor,actions,trace)
   transport_audit.post_enter_samples(gui,actor,actions,receipt)
