@@ -1,0 +1,39 @@
+{
+  "counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "historical_controls_carried_into_new_epoch": 0,
+  "model_calls": 0,
+  "native_controls_qualified": 0,
+  "new_inventory_sha256": "43868362df2cb363b58120b4a1360c682606ba1f50682972bc3bbf105b25a7b1",
+  "new_reserve_oracles_authored_by_trusted_evaluator": true,
+  "numeric_observations_reopened": 30,
+  "official_country_csv_zips_reopened": 1,
+  "official_final_admissions": 0,
+  "offline_positive_artifact_controls_passed": 4,
+  "offline_target_near_miss_controls_rejected": 4,
+  "offline_unrelated_change_controls_rejected": 4,
+  "old_selection_final_oracle_content_inspected": false,
+  "original_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "priority_sha256": "d9d183eb16bad0ed3e1ddc3572a0cf9646b5b2d0c8da77cce4b0a32620cae634",
+  "private_intake_receipt_sha256": "7c81e267c0a018aa206178b5ed7527a1400c90b804134e0be4ad5cd2008ed8c7",
+  "replacement_task_packages": 4,
+  "retained_packages_byte_identical": 136,
+  "retired_task_packages": 4,
+  "schema": "cua-native-wdi-whole-family-source-independent-audit-public-v9",
+  "source_boundary_metadata_files_checked": 184,
+  "source_collision_count_against_frozen_boundary": 0,
+  "source_family_counts": {
+    "final_candidate": 25,
+    "selection": 5,
+    "train": 5
+  },
+  "source_license": "CC BY 4.0",
+  "source_provenance_sha256": "0e208cf165564bd1daaf4e1622c21c11fadfae8bc4219ab857cf52bf71457a30",
+  "source_snapshot_sha256": "2aa5f33fee3364c121f6d4db51aef07963fa2e7bcc3b3ae4c7b271b972e8b0bf",
+  "source_zip_sha256": "17eaf01053d83740acf25edb2e502682d5ebff87f9ea2b4d7c53c941bac2efd8",
+  "status": "one_real_official_source_four_packages_reopened_new_20_20_100_cohort",
+  "whole_retired_source_families": 1
+}
