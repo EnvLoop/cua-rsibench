@@ -22,6 +22,9 @@ SCHEMA='envloop-gitlab-prospective100-source-freeze-private-v5'
 PUBLIC_SCHEMA='envloop-gitlab-prospective100-source-freeze-public-v5'
 RECIPE_SCHEMA='envloop-gitlab-fifo-bootstrap-recipe-private-v5'
 SOURCE_FILES=(
+ 'gitlab_world/v066_prospective_resource_preflight_v5.py',
+ 'tests/test_gitlab_prospective_v5_review_guards.py',
+ 'docs/FULL_STUDY_GITLAB_V5_RESOURCE_AND_REVIEW_AMENDMENT_2026-09-30.md',
  'gitlab_world/v066_prospective_cohort_v5.py','gitlab_world/v066_prospective_cohort_runtime_v5.py',
  'gitlab_world/v066_prospective_cohort_controller_v5.py','tests/test_gitlab_prospective_cohort_v5.py',
  'gitlab_world/bootstrap.py','gitlab_world/pre_result_recovery.py','gitlab_world/factory.py',

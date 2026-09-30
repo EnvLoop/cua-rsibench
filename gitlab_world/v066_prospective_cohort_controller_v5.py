@@ -29,6 +29,16 @@ PLAN_SCHEMA='envloop-gitlab-prospective100-baseline-plan-private-v5'
 JOURNAL_SCHEMA='envloop-gitlab-prospective100-journal-event-private-v5'
 
 
+def cold_seed_binding(value:dict,baseline:dict)->dict:
+ root=Path(value['epoch_root']);state=json.loads(source.private(root/'cow-reset-state.json'))
+ expected={role:'/var/lib/docker/volumes/'+name+'/_data' for role,name in value['clone_volume_names'].items()}
+ if (state.get('schema')!='envloop-gitlab-overlay-cold-reset-v1' or state.get('baseline_business_sha256')!=baseline['business_sha256'] or
+     state.get('seed_volume_lowerdirs')!=expected or type(state.get('clone_generation')) is not int or state['clone_generation']<1 or
+     state.get('first_clone_readback_equal') is not True):
+  raise ValueError('New32-project cold seed must bind exact dedicated new volumes and baseline')
+ return {k:state[k] for k in ('schema','baseline_business_sha256','seed_volume_lowerdirs','first_clone_container_id_sha256','first_clone_readback_equal')}
+
+
 def freeze_baseline_plan(*,value:dict,freeze_path:Path,baseline:dict,acl_sha:str,world:dict)->dict:
  root=Path(value['epoch_root']);world_sha=source.sha(source.private(root/'world-private.json'))
  by_id={t['task_id']:t for t in world['tasks']+world['reserve_tasks']};roster=[]
@@ -42,11 +52,12 @@ def freeze_baseline_plan(*,value:dict,freeze_path:Path,baseline:dict,acl_sha:str
    'historical_control_transferred':False})
  source.validate_roster(roster,value['retired_task_metadata'])
  if len({r['package_sha256'] for r in roster})!=100:raise ValueError('New baseline-bound100 package identities collide')
+ seed_binding=cold_seed_binding(value,baseline)
  plan={'schema':PLAN_SCHEMA,'source_freeze_sha256':source.sha(source.private(freeze_path)),
   'source_sha256s':value['source_sha256s'],'task_roster':roster,'baseline_sha256':source.sha(source.private(root/'baseline-persisted-state.json')),
   'baseline_business_sha256':baseline['business_sha256'],'world_sha256':world_sha,'native_acl_sha256':acl_sha,
   'source_bundle_sha256':lane.sha(lane.canonical(lane.source_sha256s())),
-  'first_clone_generation':1,'fixed_case_scores':[1.0,0.0,1.0],'fresh_cold_resets_per_task':3,
+  'cold_seed_binding':seed_binding,'first_clone_generation':1,'fixed_case_scores':[1.0,0.0,1.0],'fresh_cold_resets_per_task':3,
   'max_wall_seconds_per_task':7200,'historical_controls_transferred':0,'model_calls':0,'official_final_admitted':0}
  sha=source.write_new(root/'cohort-plan.private.json',plan)
  (root/'controls').mkdir(mode=0o700);(root/'controls/attempts').mkdir(mode=0o700);(root/'controls/supervision').mkdir(mode=0o700)
@@ -69,6 +80,8 @@ def baseline_inputs(value:dict,freeze_path:Path)->tuple[dict,str,dict]:
      plan.get('historical_controls_transferred')!=0 or plan.get('model_calls')!=0 or plan.get('official_final_admitted')!=0):
   raise ValueError('New32-project bootstrap/baseline/ACL/readback binding incomplete')
  scoped.validate_snapshot(baseline,32);source.validate_roster(plan['task_roster'],value['retired_task_metadata'])
+ scoped.audit_native_acl(root,acl)
+ if plan.get('cold_seed_binding')!=cold_seed_binding(value,baseline):raise ValueError('Prospective invariant cold seed provenance changed')
  if len({r['package_sha256'] for r in plan['task_roster']})!=100 or any(r['historical_control_transferred'] is not False for r in plan['task_roster']):
   raise ValueError('All100 identities must bind new baseline with no transferred controls')
  return plan,source.sha(plan_raw),baseline
@@ -104,6 +117,7 @@ def read_journal(root:Path)->list[dict]:
 def append(root:Path,rows:list[dict],payload:dict)->dict:
  row={'schema':JOURNAL_SCHEMA,'seq':len(rows)+1,'previous_sha256':rows[-1]['entry_sha256'] if rows else '0'*64,**payload}
  row['entry_sha256']=source.sha(factory.canonical(row));raw=(json.dumps(row,sort_keys=True,separators=(',',':'))+'\n').encode()
+ journal_state([*rows,row])  # Rejected operations must not corrupt the existing journal.
  path=root/'controls/journal.private.jsonl';fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_APPEND,0o600)
  with os.fdopen(fd,'wb') as stream:stream.write(raw);stream.flush();os.fsync(stream.fileno())
  rows.append(row);journal_state(rows);return row
@@ -192,13 +206,24 @@ def audit_prefix(*,freeze_path:Path)->dict:
  if not bootstrap_path.exists() or json.loads(source.private(bootstrap_path)).get('status')!='new32_project_fifo_baseline_acl_exact_cold_clone_frozen':
   return {'status':json.loads(source.private(bootstrap_path)).get('status') if bootstrap_path.exists() else 'pending_bootstrap_intent_no_replay',
    'prospective_denominator':100,'new_baseline_controls_completed':0,'historical_controls_transferred':0,'model_calls':0,'official_final_admitted':0}
- plan,plan_sha,baseline=baseline_inputs(value,freeze_path);state=journal_state(read_journal(root));audits=[]
+ plan,plan_sha,baseline=baseline_inputs(value,freeze_path);rows=read_journal(root);state=journal_state(rows);audits=[]
  with scoped.cohort_context(value):
   for entry in state['completed']:
    index=entry['task_index'];path=root/'controls/supervision'/f'{index:03d}-result.private.json'
    raw=source.private(path);result=json.loads(raw)
    if source.sha(raw)!=entry['supervisor_result_sha256'] or result.get('passed') is not True or result.get('child',{}).get('process_group_terminated') is not True:
     raise ValueError('Earlier prospective supervisor result changed')
+   child=result['child'];marker=json.loads(source.private(root/'controls/supervision'/f'{index:03d}-child-started.private.json'))
+   intents=[r for r in rows if r['kind']=='intent' and r['task_index']==index]
+   if (len(intents)!=1 or marker.get('schema')!='envloop-gitlab-prospective100-child-started-private-v5' or
+       marker.get('task_index')!=index or marker.get('parent_pid')!=intents[0]['supervisor_pid'] or
+       marker.get('child_pid')!=child.get('child_pid') or marker.get('pending_intent_sha256')!=intents[0]['entry_sha256'] or
+       marker.get('source_freeze_sha256')!=source.sha(source.private(freeze_path)) or marker.get('permit_sha256')!=intents[0]['permit_sha256'] or
+       marker.get('same_intent_replay_authorized') is not False or
+       child.get('exit_code')!=0 or child.get('timed_out') is not False or
+       child.get('stdout_sha256')!=source.sha(source.private(root/'controls/supervision'/f'{index:03d}-stdout.private.log')) or
+       child.get('stderr_sha256')!=source.sha(source.private(root/'controls/supervision'/f'{index:03d}-stderr.private.log'))):
+    raise ValueError('Prospective one-shot child marker or retained stdout/stderr bytes changed')
    audited=audit_one(value=value,plan=plan,plan_sha=plan_sha,baseline=baseline,index=index)
    if result.get('independent_audit')!=audited:raise ValueError('Earlier prospective raw control audit changed')
    audits.append(audited)
@@ -215,6 +240,10 @@ def child(*,freeze_path:Path,permit_path:Path,index:int,parent_pid:int)->dict:
  state=journal_state(read_journal(root));pending=state['pending']
  if pending is None or pending['task_index']!=index or pending.get('supervisor_pid')!=parent_pid or not permit['first_index']<=index<permit['first_index']+permit['maximum_control_count']:
   raise ValueError('Prospective child lacks exact one-use supervisor intent')
+ source.write_new(root/'controls/supervision'/f'{index:03d}-child-started.private.json',{
+  'schema':'envloop-gitlab-prospective100-child-started-private-v5','task_index':index,'parent_pid':parent_pid,'child_pid':os.getpid(),
+  'source_freeze_sha256':source.sha(source.private(freeze_path)),'permit_sha256':source.sha(source.private(permit_path)),
+  'pending_intent_sha256':pending['entry_sha256'],'created_utc':source.now(),'same_intent_replay_authorized':False})
  with scoped.cohort_context(value):
   if verify.state_snapshot()!=baseline:raise ValueError('New cohort is not at exact32-project baseline')
   result=asyncio.run(lane.live_one(plan,plan_sha,index,root/'controls',baseline))

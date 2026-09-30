@@ -133,6 +133,35 @@ def capture_forensics(folder:Path)->dict:
  return boot.capture_startup_forensics(folder)
 
 
+def audit_native_acl(root:Path,acl:dict)->dict:
+ from io import BytesIO
+ from PIL import Image
+ if (acl.get('schema')!='envloop-gitlab-prospective32-native-acl-private-v5' or acl.get('operator_count')!=3 or
+     acl.get('own_project_successes')!=3 or acl.get('cross_partition_denials')!=6 or
+     acl.get('new_fifo_project_in_final_operator_probe') is not True or acl.get('non_admin_actors') is not True):
+  raise ValueError('Prospective native ACL aggregate/schema incomplete')
+ cases=acl.get('cases');partitions=set(operators.PARTITIONS)
+ credentials=json.loads(source.private(root/'operator-credentials-private.json'))
+ if type(cases) is not list or len(cases)!=3 or {r.get('partition') for r in cases}!=partitions:
+  raise ValueError('Prospective three actual browser ACL cases missing')
+ own=cross=0
+ for case in cases:
+  partition=case['partition']
+  if (case.get('fresh_browser_context') is not True or set(case.get('access',{}))!=partitions or
+      case.get('user_sha256')!=factory.sha256(credentials[partition]['username'])):
+   raise ValueError('Prospective scoped operator/browser identity changed')
+  for target,access in case['access'].items():
+   allowed=target==partition
+   if (access.get('allowed_expected') is not allowed or access.get('native_http_status')!=(200 if allowed else 404) or
+       access.get('project_title_visible') is not allowed):raise ValueError('Native project ACL response/title disagrees')
+   path=root/'native-acl'/partition/(target+'.png');raw=source.private(path)
+   if source.sha(raw)!=access.get('screenshot_sha256'):raise ValueError('Native ACL screenshot bytes changed')
+   with Image.open(BytesIO(raw)) as image:
+    if image.format!='PNG' or image.size!=(1440,1000):raise ValueError('Native ACL screenshot viewport/format changed')
+   own+=int(allowed);cross+=int(not allowed)
+ return {'native_browser_cases_reopened':3,'native_acl_pngs_reopened':9,'own_successes':own,'cross_denials':cross}
+
+
 async def native_acl(value:dict,world:dict,project:dict)->dict:
  from playwright.async_api import async_playwright
  groups=operators.plan(world)['groups']
@@ -166,7 +195,10 @@ def bootstrap_clone(*,freeze_path:Path,permit_path:Path|None,execute:bool=False)
  if Path(__file__).resolve().parents[1]!=Path(value['evaluator_root']):raise ValueError('Only original evaluator checkout may execute live cohort mutation')
  root=Path(value['epoch_root']);original=Path(value['original_private_root'])
  if root.exists() or root.is_symlink():raise ValueError('Consumed bootstrap epoch cannot be replayed')
+ from .v066_prospective_resource_preflight_v5 import preflight
+ resource=preflight(value)  # Read-only refusal occurs before the bootstrap intent.
  root.mkdir(mode=0o700)
+ source.write_new(root/'resource-preflight.private.json',resource)
  source.write_new(root/'bootstrap-intent.private.json',{'schema':'envloop-gitlab-prospective-bootstrap-intent-v5','freeze_sha256':source.sha(source.private(freeze_path)),
   'permit_sha256':source.sha(source.private(permit_path)),'created_utc':source.now(),'one_new_fifo_project':True,'same_intent_replay_authorized':False,'model_calls':0,'official_final_admitted':0})
  receipt={'schema':'envloop-gitlab-prospective-bootstrap-receipt-private-v5','status':'started','freeze_sha256':source.sha(source.private(freeze_path)),
