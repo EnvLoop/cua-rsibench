@@ -1,0 +1,163 @@
+{
+  "closed_enter_audit": {
+    "completed_focus_windows": 4,
+    "historical_control_credit": 0,
+    "last_enter_has_post_input_captures": true,
+    "last_receipt_status": "validated_pre_dispatch",
+    "model_calls": 0,
+    "new_live_control_success": false,
+    "old_max_wall_ms": 30000,
+    "post_enter_journal_sha256": "7ba5c43d1de505a0f17c30776f7215a3c0ba3bd3f27251f21e9b86e66b4ddf2e",
+    "proposed_max_wall_ms": 60000,
+    "provider_calls": 0,
+    "receipt_applied_actor_steps": 16,
+    "receipt_sha256": "3a63edd1fd80a012ce5f498c58ef941734341a222a7174db95debcd60ae8f442",
+    "recorded_actor_steps": 17,
+    "schema": "cua-native-v18-enter-offline-audit-v19",
+    "status": "last_enter_sample_exceeded_30_with_stable_raw_frames",
+    "windows": [
+      {
+        "all_full_frames_equal": true,
+        "application_frame_sha256s": [
+          "7e44052914522e040e004521df6ead32831e95df29075bae0cf81448bdb19c21",
+          "7e44052914522e040e004521df6ead32831e95df29075bae0cf81448bdb19c21",
+          "7e44052914522e040e004521df6ead32831e95df29075bae0cf81448bdb19c21",
+          "7e44052914522e040e004521df6ead32831e95df29075bae0cf81448bdb19c21",
+          "7e44052914522e040e004521df6ead32831e95df29075bae0cf81448bdb19c21"
+        ],
+        "capture_ns": [
+          6088661584,
+          4080582250,
+          3185775042,
+          3182055458,
+          2925099000
+        ],
+        "elapsed_ns": [
+          6088666709,
+          10438042250,
+          13895236917,
+          17344306667,
+          20538360209
+        ],
+        "final_two_application_equal": true,
+        "full_frame_sha256s": [
+          "e14b3a978ed7e924bab4f58f2d3d6d83f205186fabd8b92f43a9b9889c5ef2ef",
+          "e14b3a978ed7e924bab4f58f2d3d6d83f205186fabd8b92f43a9b9889c5ef2ef",
+          "e14b3a978ed7e924bab4f58f2d3d6d83f205186fabd8b92f43a9b9889c5ef2ef",
+          "e14b3a978ed7e924bab4f58f2d3d6d83f205186fabd8b92f43a9b9889c5ef2ef",
+          "e14b3a978ed7e924bab4f58f2d3d6d83f205186fabd8b92f43a9b9889c5ef2ef"
+        ],
+        "ordinal": 0,
+        "preceding_actor_step": 9
+      },
+      {
+        "all_full_frames_equal": false,
+        "application_frame_sha256s": [
+          "c3d3c59a627d466401513dabce109d072e2984c57955c3c815e1386898a0a03b",
+          "c3d3c59a627d466401513dabce109d072e2984c57955c3c815e1386898a0a03b",
+          "c3d3c59a627d466401513dabce109d072e2984c57955c3c815e1386898a0a03b",
+          "c3d3c59a627d466401513dabce109d072e2984c57955c3c815e1386898a0a03b",
+          "c3d3c59a627d466401513dabce109d072e2984c57955c3c815e1386898a0a03b"
+        ],
+        "capture_ns": [
+          4854655458,
+          5694313542,
+          4862729541,
+          4633410958,
+          4573745417
+        ],
+        "elapsed_ns": [
+          4854658750,
+          10815619125,
+          15947096708,
+          20846316083,
+          25686680500
+        ],
+        "final_two_application_equal": true,
+        "full_frame_sha256s": [
+          "7610dba2d2d8f35311fd632f5315cbabe21f67e379c6a002fc64c4fd5305271d",
+          "7610dba2d2d8f35311fd632f5315cbabe21f67e379c6a002fc64c4fd5305271d",
+          "acde58fb98bd2f08b182175398e46d20fadb4608f2a6d39a5b709205a007e83f",
+          "acde58fb98bd2f08b182175398e46d20fadb4608f2a6d39a5b709205a007e83f",
+          "acde58fb98bd2f08b182175398e46d20fadb4608f2a6d39a5b709205a007e83f"
+        ],
+        "ordinal": 1,
+        "preceding_actor_step": 12
+      },
+      {
+        "all_full_frames_equal": true,
+        "application_frame_sha256s": [
+          "4c48f83906b561800791fb3196c463cc14ccef7c61985ead76cb1e1680452fd5",
+          "4c48f83906b561800791fb3196c463cc14ccef7c61985ead76cb1e1680452fd5",
+          "4c48f83906b561800791fb3196c463cc14ccef7c61985ead76cb1e1680452fd5",
+          "4c48f83906b561800791fb3196c463cc14ccef7c61985ead76cb1e1680452fd5",
+          "4c48f83906b561800791fb3196c463cc14ccef7c61985ead76cb1e1680452fd5"
+        ],
+        "capture_ns": [
+          4877402083,
+          7273112584,
+          6414671792,
+          5245409000,
+          5204087542
+        ],
+        "elapsed_ns": [
+          4877414125,
+          12427224542,
+          19116673750,
+          24644692625,
+          30117549792
+        ],
+        "final_two_application_equal": true,
+        "full_frame_sha256s": [
+          "6b96e06031911710048034b061c6e752a60d0ab5af184a8cfabf03afc6318657",
+          "6b96e06031911710048034b061c6e752a60d0ab5af184a8cfabf03afc6318657",
+          "6b96e06031911710048034b061c6e752a60d0ab5af184a8cfabf03afc6318657",
+          "6b96e06031911710048034b061c6e752a60d0ab5af184a8cfabf03afc6318657",
+          "6b96e06031911710048034b061c6e752a60d0ab5af184a8cfabf03afc6318657"
+        ],
+        "ordinal": 2,
+        "preceding_actor_step": 16
+      }
+    ]
+  },
+  "no_fresh_live_control_success_claimed": true,
+  "parent_freeze_sha256": "d6105961e9142b46b79e156a7c25e6888612ee32d1c692eebb9ebe2378187c94",
+  "post_enter_recipe": {
+    "equal_final_application_frames": 2,
+    "input_retries": 0,
+    "max_actor_wall_seconds": 720,
+    "max_wall_ms": 60000,
+    "maximum_unique_transitions": 2,
+    "native_document_window_required": true,
+    "pixel_masking": false,
+    "raw_full_png_retained": true,
+    "required_samples": 5,
+    "revisited_state_forbidden": true,
+    "sample_delays_ms": [
+      0,
+      250,
+      250,
+      250,
+      250
+    ],
+    "schema": "cua-native-post-enter-component-v19"
+  },
+  "schema": "cua-native-v18-post-enter-independent-source-v19",
+  "source_only_validation": {
+    "closed_files": 95,
+    "cohort_counts": {
+      "final_candidate": 100,
+      "selection": 20,
+      "train": 20
+    },
+    "model_calls": 0,
+    "new_intent_keeps_history": true,
+    "parent_source_files": 85,
+    "past_full_lease_intents": 578,
+    "past_full_lease_seconds": 203080,
+    "provider_calls": 0,
+    "source_files": 90,
+    "status": "real_v18_to_v19_source_only_prepare_validate_and_new_intent_verified"
+  },
+  "v19_component_source_sha256": "4f56a4877bb3b5e3a548b0b63304ce1f573037b4c9fb261715a2a3de4a61f0e0"
+}

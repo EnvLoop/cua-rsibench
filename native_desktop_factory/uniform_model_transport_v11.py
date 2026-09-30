@@ -23,7 +23,8 @@ from . import pre_observation_readiness_v18 as readiness
 from . import structural_guest_attestation_v16 as runtime_policy
 from . import bounded_guest_transport_v17 as bounded_transport
 from .gui_control_shell import wait_for_document_ready
-from .post_enter_control_proxy_v9 import PostEnterControlProxyV9
+from . import post_enter_component_v19 as post_enter_component
+from .post_enter_component_v19 import PostEnterControlProxyV19 as PostEnterControlProxyV9
 from .v066_post_enter_control_attempt_v9 import RecordingDesktop
 from .v066_storage_budget import reserve_and_write
 from .factory import digest

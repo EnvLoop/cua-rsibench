@@ -23,7 +23,7 @@ from cursibench.scale_action_contract import ContractError
 from . import admit
 from . import model_transport_integration_v11 as integration
 from . import uniform_model_transport_v11 as transport
-from . import v066_post_enter_control_audit_v9 as transport_audit
+from . import post_enter_component_v19 as transport_audit
 from . import v066_day_rollover_attrition_audit_v4 as caret_audit
 from .factory import digest
 from .official_saved_verifier import verify_official
