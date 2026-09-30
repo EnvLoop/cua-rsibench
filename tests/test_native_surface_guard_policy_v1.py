@@ -149,6 +149,25 @@ class NativeSurfaceGuardTests(unittest.TestCase):
         self.cur["targets"][0]["enabled"] = False
         self.assertEqual(self.decide(action(target={"ref": "field-1"}))["reason"], "target_not_current_and_safe")
 
+    def test_broad_canvas_cannot_override_unsafe_smaller_control(self):
+        for env in (self.obs, self.cur):
+            env["targets"].append({"ref": "canvas", "bounds": [0, 0, 1000, 700],
+                                   "visible": True, "enabled": True, "obscured": False,
+                                   "keyboard": False, "actions": ["click"]})
+        for update in ({"enabled": False}, {"visible": False}, {"obscured": True},
+                       {"actions": ["type"]}):
+            with self.subTest(update=update):
+                saved = copy.deepcopy(self.cur["targets"][0])
+                self.cur["targets"][0].update(update)
+                self.assertEqual(self.decide()["reason"], "target_not_current_and_safe")
+                self.cur["targets"][0] = saved
+
+    def test_ambiguous_equally_specific_coordinate_targets_fail_closed(self):
+        other = copy.deepcopy(self.cur["targets"][0])
+        other["ref"] = "overlay-same-bounds"
+        self.cur["targets"].append(other)
+        self.assertEqual(self.decide()["reason"], "target_not_current_and_safe")
+
     def test_drag_checks_both_endpoints_and_allowed_action(self):
         proposed = action("drag", **{"from": {"x": 50, "y": 50}, "to": {"x": 350, "y": 50}})
         self.assertEqual(self.decide(proposed)["status"], "rejected")

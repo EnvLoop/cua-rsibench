@@ -38,6 +38,7 @@ POLICY = MappingProxyType({
     "version": VERSION,
     "all_model_slots": ("base", "selected-1", "selected-2", "selected-3", "selected-4", "teacher", "control"),
     "primary_gate": "owned_native_surface_and_current_safe_target",
+    "coordinate_target_resolution": "most_specific_native_target_unambiguous_or_reject",
     "raster_equality_required": False,
     "raw_observation_and_predispatch_evidence_required": True,
     "lease_check": "fresh_trusted_callback_with_bound_durable_evidence",
@@ -320,6 +321,13 @@ def _safe_target(target: Any, envelope: NativeEnvelope, kind: str, *, keyboard: 
         x, y = target["x"], target["y"]
         matches = [item for item in envelope.targets if item.bounds[0] <= x < item.bounds[0] + item.bounds[2]
                    and item.bounds[1] <= y < item.bounds[1] + item.bounds[3]]
+        if matches:
+            # An owned canvas must not override a disabled or obscured smaller
+            # native control. Ambiguous equally specific hit targets fail shut.
+            area = min(item.bounds[2] * item.bounds[3] for item in matches)
+            matches = [item for item in matches if item.bounds[2] * item.bounds[3] == area]
+            if len(matches) != 1:
+                return False
     return any(item.visible and item.enabled and not item.obscured and kind in item.actions
                and (not keyboard or item.keyboard) for item in matches)
 
