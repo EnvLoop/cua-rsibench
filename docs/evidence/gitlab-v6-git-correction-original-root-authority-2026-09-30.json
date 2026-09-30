@@ -1,0 +1,37 @@
+{
+  "captured_live_boolean_is_authority": false,
+  "cleanup_generation": 17,
+  "expected_case_resets": 300,
+  "extra_cleanup_resets": 1,
+  "final_expected_generation": 302,
+  "first_future_reset_generations": [
+    18,
+    19,
+    20
+  ],
+  "legacy_full_git_tree_or_diff_recorded": false,
+  "model_calls": 0,
+  "new_dispatch_authorized": false,
+  "new_fifo_projects": 0,
+  "official_final_admitted": 0,
+  "old_intent_replay_authorized": false,
+  "original_cohort_plan_sha256": "9bdba47e43aeaa66b306c91855820a645e01efc11a85c39f09517cc641a92867",
+  "original_completed_counter": 4,
+  "original_fifth_child_exit_code": 1,
+  "original_freeze_sha256": "6b5dbc5798e56ada98c2b7c12820a49146bb63d0d7dd46fbe69e1c7b00197090",
+  "original_terminal_index": 4,
+  "private_authority_sha256": "5e5b46b7ac05fd7cd5a2fc2bae054f2bca4b8f3b362f4fbd718a3bc3fc8e24b6",
+  "prospective_baseline_action_runtime_grader_data_unchanged": true,
+  "provider_calls": 0,
+  "raw_native_trios_independently_reopened": 5,
+  "remaining_control_count": 95,
+  "schema": "envloop-gitlab-v6-audit-only-correction-public-v1",
+  "source_sha256s": {
+    "docs/FULL_STUDY_GITLAB_V6_SAVED_GIT_AUDIT_CORRECTION_2026-09-30.md": "daa88688469aeda283dfb7736f7568a85bd61cf6925cf0297a75d0ae333a40c0",
+    "gitlab_world/v066_audit_only_continuation_v1.py": "0331160fd438f97c68e3da6c2415ec31d41c971313644ea92f99669bf3b8300f",
+    "gitlab_world/v066_saved_git_oracle_v1.py": "a3d45279c53d1d3a7c8233e4139693384f927742ce7b0ca358f2ae3b5ec308ae",
+    "tests/test_gitlab_audit_only_continuation_v1.py": "0b8e29226733bdd7863a627705a08dd7ce138f4e9302252979626f0e79fd94fc",
+    "tests/test_gitlab_saved_git_oracle_v1.py": "6111001e23d30492dc81a8fdd3701e0948d4a580dcd08c6aa8f05c9dcfd16907"
+  },
+  "status": "audit_only_reconciliation_no_new_native_dispatch"
+}
