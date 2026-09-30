@@ -1,0 +1,30 @@
+{
+  "case_index": 26,
+  "classification": "preconfig_operator_interruption_no_task_seed",
+  "completed_prior_controls": 26,
+  "gui_actions": 0,
+  "journal_sha256": "6494fae429f0eac4f1512242c36265c3c85a8fc443f8073541c6800afc0a6186",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_audit_preserved_before_replacement_required": true,
+  "original_preintent_audit_sha256": "984be8ced69c6909379afebd733a309266cca33a40124336b354514898eba2dd",
+  "private_freeze_sha256": "c76d80dd4c18faa1955ea951727f94b5f930310a4c66bf8b1ebe4a268f6b018a",
+  "retained_v1_private_freeze_sha256": "a5470097ad2490ab4d92d6b3216118162e81e24fb2c2da75e4aed17efaad65f3",
+  "retained_v1_public_freeze_sha256": "c4f217fcc19f94a43dea630b36fc86191305c4149044badd6d29e7e27a7fdd8a",
+  "same_id_whole_case_retry_cap": 1,
+  "schema": "envloop-magento-case26-startup-freeze-public-v2",
+  "source_sha256s": {
+    "docs/FULL_STUDY_MAGENTO_CASE26_STARTUP_INTERRUPTION_V2_2026-09-30.md": "6b4cdd0da6be560091c72efa799d95fb029b06ade3252ddf2b5cf29319687b5e",
+    "tests/test_magento_v4_case26_startup_interruption.py": "8822f4641a67f227b381fed2a8254b8b93d57d2805ee703292c61acd36cbc5e5",
+    "tools/audit_magento_v4_completed_prefix.py": "fa1d3f8c648aa79f9d2af1f3c6f11e5e0e5f25a127119eccd8e9231644db5e64",
+    "tools/magento_clean_100_v4.py": "bfa29a06d0a4ca75f66b81b6ec7189661b40dd61b93ff6c664608b3007dd0741",
+    "tools/magento_v4_case26_startup_interruption_20260930.py": "ff58c633cb837f6a288bf222ec522f913af5fda23a76a97aa298abd61fc06026",
+    "tools/magento_v4_preconfig_startup_amendment_20260929.py": "bae08876fff620def2319083d25996fc9189127a1485270bebadeb462a916808",
+    "tools/reconcile_magento_unseeded_search_drift_v1.py": "9eef732a9f9508daa91cb3c0d68236ec0b7606c145c1cf7c253eb73a076dc955",
+    "tools/start_magento_native_sidecar_clone_v1.py": "0c48169358bcfdaaafa777ceb19b783dd41d835982653852e0b249e2fdc551c2"
+  },
+  "sql_source_tables_verified": 14,
+  "status": "source_frozen_v2_no_audit_supersession_cleanup_or_retry",
+  "task_seeded": false,
+  "unchanged_price_rows": 8156
+}
