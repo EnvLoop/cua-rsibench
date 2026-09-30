@@ -1,0 +1,117 @@
+{
+  "actual_failure_png_audit": {
+    "alternate_and_rejected_sha256": "57266a84eb3439be32d85c8e81141eda67112486b4965ee3afafca92b4541743",
+    "changed_pixels": [
+      {
+        "after": [
+          235,
+          237,
+          239
+        ],
+        "before": [
+          235,
+          237,
+          240
+        ],
+        "point": [
+          41,
+          419
+        ]
+      },
+      {
+        "after": [
+          235,
+          237,
+          239
+        ],
+        "before": [
+          235,
+          237,
+          240
+        ],
+        "point": [
+          132,
+          419
+        ]
+      }
+    ],
+    "extra_business_pixel_mutation_rejected": true,
+    "first_sample_matches_observed": true,
+    "format": "PNG",
+    "geometry_provenance": "screenshot_reconstruction_only_no_historical_dom_witness",
+    "height": 1000,
+    "mode": "RGB",
+    "native_credit": 0,
+    "observed_sha256": "cd09ffdc190707351c739bdb31dd336a7748a61707d9bf180e3650ded439157f",
+    "reconstructed_lower_vector_points": [
+      [
+        16,
+        840
+      ],
+      [
+        17,
+        840
+      ],
+      [
+        16,
+        842
+      ],
+      [
+        17,
+        842
+      ]
+    ],
+    "reconstructed_material_equality_passed": true,
+    "reconstructed_sheet_bounds": [
+      16,
+      154,
+      1424,
+      844
+    ],
+    "reconstructed_tab_bounds": [
+      41,
+      381,
+      133,
+      420
+    ],
+    "width": 1440
+  },
+  "base_commit": "2b72790",
+  "browser_calls": 0,
+  "docker_calls": 0,
+  "fresh_v2_native_gui_controls": 0,
+  "model_attempts": 0,
+  "native_adapter_binding_sha256": "c7d1af625c3972792c2cc7381d82d5b6414e3bc2d17c2ad65b136c37b702e635",
+  "native_geometry_and_style_compatibility": "unverified_until_fresh_native_dom_witness_and_train_control",
+  "native_worker_binding_sha256": "042906ed0319c94edd2a0cd6433030dc73491381aeeb30a7a5ca8bd298fbbe09",
+  "new_source_sha256s": {
+    "enterprise_fallback/odoo18/native_material_workers_v2.py": "f989273c67f57bcf11101f26395168d33e45f93f7c1f7fc418c102fdbec3c453",
+    "enterprise_fallback/odoo18/native_service_readiness_v2.py": "c152d61406460085175cdf0e3cd05b4067e4812c486a85140db74a5d048e95bf",
+    "enterprise_fallback/odoo18/odoo_native_geometry_material_v2.py": "a4936949ccdd8774486b0691342cb271b34efae39184b3db620e564988e61f68",
+    "enterprise_fallback/odoo18/odoo_v066_native_material_adapter_v2.py": "df736235bdc584677a6762d9c65134d3a4177372bf4c35cada30cdf306fda3c3",
+    "tools/odoo_v066_native_material_qualification_v2.py": "391656e5aad08f9eee8975c5eb94d10970e74e44849d06383bdc8aa59e40bafb"
+  },
+  "official_final_tasks_admitted": 0,
+  "old_positive_credit": 0,
+  "preserved_v1_source_sha256s": {
+    "enterprise_fallback/odoo18/native_material_workers_v1.py": "4e062fee0f54bf193a0a6357659d749db3e683e26309266435eff67ea0b29e56",
+    "enterprise_fallback/odoo18/native_service_readiness_v1.py": "6694ffc5187d03c3d37fe96cd20964bc2d7ca59338fdb3646f7cbfe990ffeefe",
+    "enterprise_fallback/odoo18/odoo_v066_native_material_adapter_v1.py": "3e4255b72af1414b4e16fd63f8701358012fe20295dfe7c27c651d83f306f4f0",
+    "enterprise_fallback/odoo18/odoo_v066_train_route_router_v4.py": "be2ce69f4557ab619b084079962cede0a980e98b59318384e7d49f47b8a56da7",
+    "tools/odoo_v066_native_material_qualification_v1.py": "08329ebfc56e48f6bb09ade146a61cae52660d8b04b918466883e682e54cf76d"
+  },
+  "profile": "native-observed-context-geometry-finite-material-v2",
+  "provider_calls": 0,
+  "schema": "envloop-odoo-native-geometry-v2-offline-repair-evidence-v1",
+  "status": "source_and_offline_tests_complete_fresh_native_train_pending",
+  "tests": {
+    "actual_failure_fixture_supplied": true,
+    "all_worker_paths_use_same_adapter_class": true,
+    "durable_observation_control_refs_separately_retained_and_audited": true,
+    "fresh_v1_credit_rejected_by_v2": true,
+    "native_read_js_syntax_checked": true,
+    "one_attempt_intent_and_no_resume_gates_preserved": true,
+    "preserved_v1_tests_passed": 48,
+    "v2_focused_tests_passed": 56
+  }
+}
