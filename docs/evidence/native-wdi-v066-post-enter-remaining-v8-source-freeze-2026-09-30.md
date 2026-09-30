@@ -1,0 +1,27 @@
+# Desktop v7 terminal evidence and v8 remaining-only TRAIN freeze
+
+The [independent terminal receipt](native-wdi-v066-v7-three-intent-terminal-audit-2026-09-30.json) reopens exactly three source-bound intents, receipts, contracted GUI action observations and predispatch frames, saved OOXML, scoped profile/calendar evidence, reset bytes, raw modal sample/window/timing records and the complete storage ledger. It binds the immutable original freeze, permit and terminal run. **The original v7 run remains `stopped_for_reconciliation`; its modal classifier did not pass.**
+
+The completed wrong-target GUI workflow independently scores zero with exactly the frozen wrong cell changed and the intended target unchanged. Its fresh reset returns exact original bytes. The third guest dispatched six contracted navigation actions and one restricted evaluator Save As stimulus. The raw probe captured a new stable window identity with title `Save`, then stopped at the window boundary with no actor action during or afterward. The frozen predicate expected `Save As`, so the original receipt's `other_window_boundary_stop_inconclusive` classification and terminal failure are preserved.
+
+A separate independent visual inspection reopened the original PNG. The native file-save chooser visibly overlays Calc, with Cancel and Save buttons, a Name input and a local directory/file table. The new private adjudication binds the original PNG, sample ledger, window hashes, stimulus timing, intent, receipt, freeze, permit and run by SHA-256. Its digest is `a171163d37e3263b6ce6b83b853d9cc86c0a702d5c601b929471b31174c070b3`. This is separate visual evidence; it does not change or widen the old classifier, rewrite old records or turn the old job into a passed job.
+
+The root's independent provider/storage reconciliation is bound by SHA-256 `9c0a6cc8a1cc7d4383f3a39c9ddf2da01c55ba52f2248ecbf942e3ce3b3f1039`. All three guest cleanup receipts confirm termination, the provider query returned active zero, all 77 retained evidence files were verified and no unresolved write remains. The three consumed 600-second intents retain their full lease charge. No model call or official final admission occurred.
+
+The [new executable source freeze](native-wdi-v066-post-enter-remaining-v8-source-freeze-2026-09-30.json) binds that terminal audit and separate adjudication. Its [runner](../../native_desktop_factory/v066_post_enter_remaining_v8.py) permits only this sequence, with at most **three fresh 600-second leases**:
+
+| New ordinal | Source role | Only permitted work |
+| --- | --- | --- |
+| 0 | Previously used modal source | Fresh guest, neutral open, scoped profile and exact original-byte cold reset |
+| 1 | Unused visible TRAIN source | Contracted navigation, restricted edit-caret stimulus and bounded observation-only probe |
+| 2 | Same unused probe source | Another fresh guest, scoped profile and exact original-byte cold reset |
+
+The wrong-target case and modal case cannot be replayed. The used modal package is permitted solely for its remaining fresh reset. The probe package is independently checked absent from every retained historical intent/receipt. The private source binding retains split-disjoint visible TRAIN provenance; heldout, selection and final package contents are not read.
+
+The [independent permit/auditor](../../native_desktop_factory/v066_post_enter_remaining_audit_v8.py) requires exact root review acceptance, immutable evidence/source/lease bindings and current provider active-zero/storage checks. Paid execution also requires its explicit enable flag, consumes a new run root before any create and fsyncs each full-lease intent before its sole create. A failed step stops the sequence, and a consumed root or intent cannot run again. The tested v7 per-guest worker is reused under the new epoch's freeze and permit hashes; the old epoch's output and intent identities are inaccessible through this sequence.
+
+The additional reservation is 1,800 seconds or USD 0.50 at the retained USD 1/hour planning upper rate. Historical full lease accounting is preserved, including no-ack creates and longer legacy leases. There is no lane spending cap. This is a planning reserve rather than a provider invoice.
+
+Validation: **31 focused post-Enter tests passed, including seven new continuation regressions**, with compilation and whitespace checks. New tests cover the exact remaining sequence, three-guest maximum, first-failure stop, root one-use behavior, explicit paid/review gates, prior-evidence permit mutation, raw modal/window/stimulus binding, visual-adjudication tampering, preserved old failure and refusal of an already paid probe source. Fake tests remain software evidence only.
+
+The v8 launch gate remains closed: **no new paid permit, guest create, model call or final admission is part of this preparation**. After a real run, stable or caret-only probe results remain explicitly material-oscillation inconclusive. Real material oscillation is credited only from its raw bounded probe evidence. This TRAIN continuation grants no final promotion, quarantine release or replay authorization; prospective final source review and required transition/near-negative evidence remain separate prerequisites.

@@ -1,0 +1,31 @@
+{
+  "actor_actions_before_modal_stimulus": 6,
+  "actor_actions_during_or_after_modal_probe": 0,
+  "distinct_guests": 3,
+  "fresh_original_byte_resets": 1,
+  "full_lease_intents_charged": 3,
+  "full_lease_seconds": 1800,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_freeze_sha256": "3d07de0393b4a7239f088be633f71e0959380bd67ed1992d77c4c9b6cc1772c0",
+  "old_permit_sha256": "0b75f9a5f7d052100bac2d5c4717d2d301265ec690362e593bd8f8ebacb7ca0f",
+  "old_receipt_sha256s": [
+    "4997bd9bcc08027724b0a85085d1ae9e82a351d3020927fc98281ccdf9982940",
+    "fc9e01a5eaf65451aea41404bb87d884a88ab6651e4e29c0f888026f5be478d1",
+    "3f7715bf486879e2060889f8d16ffe56ddcbf24ca17f53b64d2f676142e0f1d2"
+  ],
+  "old_run_sha256": "84673c00d2ac7b9d2d7e7542b98c9b1821ff8c56a4cd1f36b00bef7a1d4910a6",
+  "original_modal_classifier_passed": false,
+  "original_v7_terminal_status": "stopped_for_reconciliation",
+  "private_audit_sha256": "ca4ef10bdbc494d7aa7a29122db36750ffaf97bf1e37d8b59b95a5c50071ac4d",
+  "provider_active_at_independent_reconciliation": 0,
+  "reconciliation_sha256": "9c0a6cc8a1cc7d4383f3a39c9ddf2da01c55ba52f2248ecbf942e3ce3b3f1039",
+  "retained_raw_files_verified": 77,
+  "same_intent_replay_authorized": false,
+  "saved_wrong_target_score_zero": 1,
+  "schema": "cua-native-wdi-v066-three-intent-terminal-audit-public-v8",
+  "separate_visual_modal_adjudications": 1,
+  "status": "three_terminal_train_intents_independently_audited_old_stop_preserved",
+  "unresolved_writes": 0,
+  "visual_adjudication_sha256": "a171163d37e3263b6ce6b83b853d9cc86c0a702d5c601b929471b31174c070b3"
+}
