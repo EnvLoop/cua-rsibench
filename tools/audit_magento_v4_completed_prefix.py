@@ -263,12 +263,8 @@ def _check_retry(run: Path, rows: list[dict], index: int, case: dict,
     """Reopen the saved invalid attempt and its exact-pair cleanup lineage."""
     previous = v4.attempt_dir(run, index, 0)
     audit, audit_sha = first.read_json(previous / 'reconciliation-audit.private.json')
-    if index == 26 and audit.get('classification') == 'preconfig_operator_interruption_no_task_seed':
-        from tools import magento_v4_case26_startup_interruption_20260930 as recovery
-        first.must(run.resolve() == (recovery.paths(run.parents[2])['run']).resolve(),
-                   'case26 additive recovery belongs to another run')
-        recovery.verify_saved_retry(recovery.paths(run.parents[2]), rows)
-        return recovery.CLASSIFICATION
+    case26_additive = (index == 26 and audit.get('classification') ==
+                       'preconfig_operator_interruption_no_task_seed')
     intent, intent_sha = first.read_json(previous / 'reconciliation-intent.private.json')
     cleanup, cleanup_sha = first.read_json(previous / 'reconciliation.private.json')
     scoped = [row for row in rows if row.get('index') == index and
@@ -307,7 +303,8 @@ def _check_retry(run: Path, rows: list[dict], index: int, case: dict,
                    cleanup.get('cleanup_intent_sha256') == intent_sha and
                reconciled[0].get('reconciliation_sha256') == cleanup_sha and
                reconciled[0].get('classification') ==
-                   audit.get('classification') in RETRY_CLASSES and
+                   audit.get('classification') and
+               (audit.get('classification') in RETRY_CLASSES or case26_additive) and
                reconciled[0].get('both_containers_absent') is True and
                cleanup.get('both_containers_absent') is True and
                cleanup.get('whole_case_retry_cap_per_id') == 1 and
@@ -333,6 +330,12 @@ def _check_retry(run: Path, rows: list[dict], index: int, case: dict,
                  type(witness.get('containers')) is list and
                  len(witness['containers']) == 2)),
                'retry active pair or material witness changed')
+    if case26_additive:
+        from tools import magento_v4_case26_startup_interruption_20260930 as recovery
+        first.must(run.resolve() == recovery.paths(run.parents[2])['run'].resolve(),
+                   'case26 additive recovery belongs to another run')
+        recovery.verify_saved_retry(recovery.paths(run.parents[2]), rows)
+        return recovery.CLASSIFICATION
     if pair is not None:
         containers = witness['containers']
         first.must([item.get('name') for item in containers] ==
