@@ -13,10 +13,10 @@ The tool's `audit` action only reads the original evaluator and can save a separ
 The audit used the pinned evaluator Python runtime and the original evaluator checkout. Reopen it with:
 
 ```sh
-/Users/xiaoyong/Documents/Codex/2026-09-22/ya/.venv/bin/python -B \
-  /Users/xiaoyong/Documents/Codex/2026-09-30/gitlab-v7-interruption-audit/tools/reconcile_gitlab_v7_train_interruption_20260930.py audit \
-  --repo /Users/xiaoyong/Documents/Codex/2026-09-25/gitlab-full-world \
-  --ratification-private /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix/work/full-study/v066-caret-amended-control-ratification-20260928.private.json
+python -B \
+  tools/reconcile_gitlab_v7_train_interruption_20260930.py audit \
+  --repo /ABS/PATH/TO/ORIGINAL_EVALUATOR \
+  --ratification-private /ABS/PATH/TO/PRIVATE_RATIFICATION.json
 ```
 
 Only after review, `finalize` may be called with the same repo/ratification arguments plus the reviewed tool SHA256, the saved public audit path, the reviewed audit SHA256, and `--execute`. The tool refuses changed source, changed evidence, an active original v7 process, non-owner-only artifacts, changed reset state, a changed live baseline, a mismatched review, or any overwrite. The original supervision evidence remains explicitly missing even if separate reconciliation is performed.

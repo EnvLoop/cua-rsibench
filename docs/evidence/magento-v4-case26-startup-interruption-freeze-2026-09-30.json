@@ -1,0 +1,25 @@
+{
+  "case_index": 26,
+  "classification": "preconfig_operator_interruption_no_task_seed",
+  "completed_prior_controls": 26,
+  "gui_actions": 0,
+  "journal_sha256": "6494fae429f0eac4f1512242c36265c3c85a8fc443f8073541c6800afc0a6186",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "private_freeze_sha256": "a5470097ad2490ab4d92d6b3216118162e81e24fb2c2da75e4aed17efaad65f3",
+  "same_id_whole_case_retry_cap": 1,
+  "schema": "envloop-magento-case26-startup-freeze-public-v1",
+  "source_sha256s": {
+    "tests/test_magento_v4_case26_startup_interruption.py": "c4d17c1fbdc1575b1f5e0cadbe02e4215ae3e8992b438756f0f4f5213d0f5c90",
+    "tools/audit_magento_v4_completed_prefix.py": "5dbe72523447ce74626f71e0d00e6d19f02bcd5b076bb7df8543de27fa9e5e2a",
+    "tools/magento_clean_100_v4.py": "bfa29a06d0a4ca75f66b81b6ec7189661b40dd61b93ff6c664608b3007dd0741",
+    "tools/magento_v4_case26_startup_interruption_20260930.py": "757d9fb6ce606c65b0911737239ef79c3ad8976be2cc39289bb326daf996368b",
+    "tools/magento_v4_preconfig_startup_amendment_20260929.py": "bae08876fff620def2319083d25996fc9189127a1485270bebadeb462a916808",
+    "tools/reconcile_magento_unseeded_search_drift_v1.py": "9eef732a9f9508daa91cb3c0d68236ec0b7606c145c1cf7c253eb73a076dc955",
+    "tools/start_magento_native_sidecar_clone_v1.py": "0c48169358bcfdaaafa777ceb19b783dd41d835982653852e0b249e2fdc551c2"
+  },
+  "sql_source_tables_verified": 14,
+  "status": "source_frozen_no_cleanup_or_retry",
+  "task_seeded": false,
+  "unchanged_price_rows": 8156
+}
