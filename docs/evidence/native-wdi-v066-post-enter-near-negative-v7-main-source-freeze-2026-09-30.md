@@ -1,0 +1,5 @@
+# Desktop v7 TRAIN calibration: main-checkout binding
+
+The [main-checkout source freeze](native-wdi-v066-post-enter-near-negative-v7-main-source-freeze-2026-09-30.json) rebinds the reviewed [six-guest TRAIN protocol](native-wdi-v066-post-enter-near-negative-v7-source-freeze-2026-09-30.md) to new private freeze and review paths. Its private SHA-256 is `3d07de0393b4a7239f088be633f71e0959380bd67ed1992d77c4c9b6cc1772c0`. The source hashes match the isolated proposal; the paid run root remains unused. Main independently reran 19 focused tests and inspected the source/permit, saved wrong-target score, no-following-action window probe, guest/reset, cleanup and ledger gates.
+
+The preparation creates no provider guest and grants no dispatch. Root review may issue only the exact private permit for at most six new 600-second leases, covering three unused visible TRAIN source families and three fresh resets. Model/final contract keys stay unchanged; evaluator-only modal/edit-caret stimuli are recorded separately. A stable or narrow-caret sequence remains inconclusive for material oscillation. No failed final intent is replayable, and official final admissions remain zero.
