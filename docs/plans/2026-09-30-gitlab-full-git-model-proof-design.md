@@ -1,0 +1,9 @@
+# Complete Git proof for model workers
+
+The original GitLab workers read a saved SQL/Git snapshot before their backend finally performs a physical cold reset. The snapshot monitors six blob hashes. Formal model evaluation needs the target project's complete before and after Git trees, exact changed-path diff and the monitored raw blobs to decide the unchanged verifier's Git predicates after reset.
+
+One additive backend wraps the original teacher, Qwen selection, shared-base selection and final backends. It captures raw native Git inside the original backend lease. Model-facing observations and GUI dispatch remain unchanged. Saved proof includes evaluator-private task/project context, the complete sidecar and the original deterministic partition verdict. TRAIN and selection run the unchanged original graders; final invokes the formal saved-task reader and mechanically adapts its score fields for the reused action loop while retaining its exact original verdict. Post-reset audits reopen all raw evidence without a live world lookup. Terminal exits retain a single before-reset snapshot attempt without model credit or capture replay.
+
+An additive shared-base entry point always supplies the full-Git worker to the existing paid runner. The final factory returns one concrete 100-identity worker for all five existing slots and passes it to the existing FinalController. FinalGate, matching source/runtime/action/verifier bindings, checkpoint deduplication, reservations, action and wall limits, ratification and retry rules remain required. Hidden task bodies are read only inside the already gated paid application open.
+
+One supplemental closed source binding covers every wrapper and original dependency. No model-facing oracle tool, legacy six-path projection or captured boolean can grant a formal positive. This source work provides no native control, final admission or model score. Existing control sources and WIP originals are preserved.
