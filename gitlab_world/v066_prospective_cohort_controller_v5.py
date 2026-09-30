@@ -165,15 +165,21 @@ def audit_one(*,value:dict,plan:dict,plan_sha:str,baseline:dict,index:int)->dict
  root=Path(value['epoch_root']);run=root/'controls';folder=run/'attempts'/f'{index:03d}';identity=plan['task_roster'][index]
  trio=json.loads(source.private(folder/'trio-complete.private.json'))
  if (trio.get('schema')!=lane.TRIO_SCHEMA or trio.get('task_id')!=identity['task_id'] or trio.get('package_sha256')!=identity['package_sha256'] or
-     trio.get('plan_sha256')!=plan_sha or trio.get('control_scores')!=[1.0,0.0,1.0] or trio.get('model_calls')!=0 or trio.get('official_final_admitted')!=0):
+     trio.get('plan_sha256')!=plan_sha or trio.get('source_bundle_sha256')!=plan['source_bundle_sha256'] or
+     trio.get('control_scores')!=[1.0,0.0,1.0] or trio.get('model_calls')!=0 or trio.get('official_final_admitted')!=0):
   raise ValueError('Prospective trio source/package/score receipt changed')
  task=gui_controls._task(identity['task_id']);generations=[];screens=0
+ package={'world_sha256':plan['world_sha256'],'baseline_business_sha256':baseline['business_sha256'],
+  'native_acl_sha256':plan['native_acl_sha256'],'task':task}
+ if (source.sha(factory.canonical(task))!=identity['task_object_sha256'] or source.sha(factory.canonical(package))!=identity['package_sha256']):
+  raise ValueError('Prospective current task/baseline/ACL package binding changed')
  for label,_variant,score in lane.CASES[identity['template_group']]:
   out=folder/label;complete=json.loads(source.private(out/'case-complete.private.json'))
   after_raw=source.private(out/'after-persisted-state.json');after=json.loads(after_raw)
   restored_raw=source.private(out/'after-reset-persisted-state.json');restored=json.loads(restored_raw)
   completion_sha=source.sha(source.private(out/'case-complete.private.json'))
   if (complete.get('plan_sha256')!=plan_sha or complete.get('task_id')!=identity['task_id'] or complete.get('expected_score')!=score or
+      complete.get('schema')!=lane.CASE_SCHEMA or complete.get('case')!=label or complete.get('source_bundle_sha256')!=plan['source_bundle_sha256'] or
       complete.get('after_state_sha256')!=source.sha(after_raw) or complete.get('restored_state_sha256')!=source.sha(restored_raw) or
       complete.get('raw_receipt_sha256')!=source.sha(source.private(out/'receipt.json')) or
       {'case':label,'case_completion_sha256':completion_sha} not in trio['cases'] or restored!=baseline):
@@ -194,6 +200,11 @@ def audit_one(*,value:dict,plan:dict,plan_sha:str,baseline:dict,index:int)->dict
  altered=json.loads(source.private(folder/'unrelated-change-state.private.json'))
  rechecked=verify.evaluate_final_task(task,baseline,altered,inspect_live_git=False)
  if rechecked.get('score')!=0.0 or rechecked.get('no_regression') is not False:raise ValueError('Unrelated-change penalty accepted a regression')
+ probe_raw=source.private(folder/'unrelated-probe.private.json');probe=json.loads(probe_raw)
+ if (trio.get('unrelated_probe_sha256')!=source.sha(probe_raw) or probe.get('schema')!=lane.PROBE_SCHEMA or
+     probe.get('task_id')!=identity['task_id'] or probe.get('plan_sha256')!=plan_sha or
+     probe.get('unrelated_state_sha256')!=source.sha(source.private(folder/'unrelated-change-state.private.json')) or
+     probe.get('verifier_response')!=rechecked):raise ValueError('Prospective unrelated-change probe/source binding changed')
  return {'index':index,'trio_sha256':source.sha(source.private(folder/'trio-complete.private.json')),'scores':[1.0,0.0,1.0],
   'fresh_cold_resets':3,'cold_generations':generations,'owner_only_pngs':screens,'model_calls':0,'official_final_admitted':0}
 
