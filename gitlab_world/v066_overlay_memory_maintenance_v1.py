@@ -28,6 +28,21 @@ SCHEMA='envloop-gitlab-overlay-preserving-memory-maintenance-v1'
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 
 
+def retained_command(argv:list[str], output_root:Path, label:str, timeout:int):
+ def retain(suffix,raw):
+  if isinstance(raw,str):raw=raw.encode()
+  fd=os.open(output_root/(label+suffix),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+  with os.fdopen(fd,'wb') as stream:stream.write(raw or b'');stream.flush();os.fsync(stream.fileno())
+ try:
+  result=subprocess.run(argv,capture_output=True,timeout=timeout)
+ except subprocess.TimeoutExpired as exc:
+  retain('.stdout.private.log',exc.stdout);retain('.stderr.private.log',exc.stderr)
+  raise
+ retain('.stdout.private.log',result.stdout);retain('.stderr.private.log',result.stderr)
+ result.check_returncode()
+ return result
+
+
 @contextmanager
 def original_scope(evaluator_root:Path):
  private=evaluator_root/'work/gitlab-full-world';version=(private/'active-volume-version.txt').read_text().strip()
@@ -195,9 +210,9 @@ def execute(*,plan_path:Path,output_root:Path,execute_reviewed:bool=False):
    stopped_mounts=vm_readback(value['overlay_recipe']);verify_mounts(value['overlay_recipe'],stopped_mounts,expected_directories=value['before_overlay_readback'])
    source.write_new(output_root/'stopped-overlay-readback.private.json',stopped_mounts)
    phase('stop_existing_vm_without_force_or_delete')
-   subprocess.run(['colima','stop','--profile','cua-gitlab'],check=True,capture_output=True,timeout=300)
+   retained_command(['colima','stop','--profile','cua-gitlab'],output_root,'colima-stop',300)
    phase('start_same_disk_vm_with12GiB_memory')
-   subprocess.run(value['resize_argv'],check=True,capture_output=True,timeout=600)
+   retained_command(value['resize_argv'],output_root,'colima-start',600)
    phase('confirm_original_container_stays_stopped_and_seed_identities_exact')
    stopped=runtime.inspect(runtime.WORLD)
    if stopped['Id']!=value['original_container_id'] or stopped['State']['Running'] or seed_identities()!=value['original_seed_volume_identities']:raise ValueError('Unsafe automatic container restart or changed seed identities')
@@ -225,7 +240,7 @@ def verify_operation(plan_path:Path,output_root:Path):
   if verify.state_snapshot()!=value['original31_snapshot'] or seed_identities()!=value['original_seed_volume_identities']:raise ValueError('Original31 business state or seed volume identities changed')
   info=json.loads(runtime.docker('info','--format','{{json .}}'))
   if not 11*1024**3<info['MemTotal']<13*1024**3 or info['NCPU']!=3:raise ValueError('Expected12GiB/3CPU VM resource readback failed')
-  return {'exact31_snapshot':True,'all16_metadata_sha256s_unchanged':True,'core_source_unchanged':True,'seed_volume_identities_unchanged':True,
+  return {'exact31_snapshot':True,'all_original_metadata_sha256s_unchanged':True,'original_metadata_files_checked':len(value['metadata_sha256s']),'core_source_unchanged':True,'seed_volume_identities_unchanged':True,
           'original_container_identity_unchanged':True,'existing_upper_work_directory_identities_unchanged':True,'all_three_exact_overlay_mounts_verified':True,
           'docker_vm_memory_bytes':info['MemTotal'],'cpu':3,'disk_gib':24,'original_transient_stop_recorded':True,
           'cow_generation_and_active_version_unchanged':True,'reset_reset_called':False,'model_calls':0,'official_final_admitted':0}

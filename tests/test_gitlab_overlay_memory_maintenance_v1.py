@@ -1,6 +1,8 @@
 """Overlay recovery never clears directories or starts before exact mounts."""
 from __future__ import annotations
 import copy
+import json
+import subprocess
 from pathlib import Path
 from contextlib import nullcontext
 from tempfile import TemporaryDirectory
@@ -23,6 +25,24 @@ def fixture(mounted=True):
 
 
 class OverlayMaintenanceTests(unittest.TestCase):
+ def test_vm_command_output_retained_before_failure(self):
+  with TemporaryDirectory() as d:
+   root=Path(d)
+   result=subprocess.CompletedProcess(['offline-command'],2,b'partial progress',b'failure details')
+   with patch.object(m.subprocess,'run',return_value=result):
+    with self.assertRaises(subprocess.CalledProcessError):m.retained_command(['offline-command'],root,'vm',1)
+   self.assertEqual((root/'vm.stdout.private.log').read_bytes(),b'partial progress')
+   self.assertEqual((root/'vm.stderr.private.log').read_bytes(),b'failure details')
+   self.assertEqual((root/'vm.stderr.private.log').stat().st_mode&0o777,0o600)
+
+ def test_vm_command_timeout_retains_partial_bytes(self):
+  with TemporaryDirectory() as d:
+   root=Path(d);error=subprocess.TimeoutExpired(['offline-command'],1,output=b'booting',stderr=b'waiting')
+   with patch.object(m.subprocess,'run',side_effect=error):
+    with self.assertRaises(subprocess.TimeoutExpired):m.retained_command(['offline-command'],root,'vm',1)
+   self.assertEqual((root/'vm.stdout.private.log').read_bytes(),b'booting')
+   self.assertEqual((root/'vm.stderr.private.log').read_bytes(),b'waiting')
+
  def test_exact_three_overlay_options_are_required(self):
   recipe,before=fixture();self.assertTrue(m.verify_mounts(recipe,before))
   for alteration in ('filesystem','lower','upper','readonly'):
@@ -68,10 +88,13 @@ class OverlayMaintenanceTests(unittest.TestCase):
    with patch.object(m,'validate',return_value=value),patch.object(m,'original_scope',side_effect=lambda _:nullcontext()),\
         patch.object(m,'worker_proof',return_value={}),patch.object(m.verify,'state_snapshot',return_value={'baseline':'exact'}),\
         patch.object(m.runtime,'inspect',return_value=stopped),patch.object(m,'vm_readback',return_value=readback),\
-        patch.object(m.runtime,'docker',side_effect=lambda *a,**k:commands.append(a)),patch.object(m.subprocess,'run'),\
+        patch.object(m.runtime,'docker',side_effect=lambda *a,**k:commands.append(a)),\
+        patch.object(m.subprocess,'run',return_value=subprocess.CompletedProcess(['offline-command'],0,b'',b'')),\
         patch.object(m,'seed_identities',return_value={'preserved':True}),patch.object(m,'remount_existing',side_effect=ValueError('Wrong mount')):
     result=m.execute(plan_path=plan,output_root=root/'operation',execute_reviewed=True)
    self.assertIn('failure',result['status']);self.assertEqual(commands,[('stop','--time','300','exact-original-id')])
+   receipt=json.loads((root/'operation/receipt.private.json').read_bytes())
+   self.assertEqual(receipt['phases'][-1]['phase'],'remount_exact_existing_overlay_directories')
 
 
 if __name__=='__main__':unittest.main()
