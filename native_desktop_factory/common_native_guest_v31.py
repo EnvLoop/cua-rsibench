@@ -19,6 +19,7 @@ from . import semantic_native_transport_v23 as previous
 from . import native_atspi_bootstrap_v25 as bootstrap
 from . import native_atspi_epoch_v25 as supplemental
 from . import native_visible_surface_probe_v31 as reader
+from . import native_atspi_warning_policy_v32 as warning_policy
 
 PROBE_SOURCE=Path(__file__).with_name('native_visible_surface_probe_v31.py')
 PROBE_SCHEMA=reader.SCHEMA
@@ -28,6 +29,7 @@ ACTOR_PATHS=('teacher','control','shared-base','astra','sol56','sol6','luna6')
 _CURRENT=ContextVar('envloop_native_common_v31_factory',default=None)
 PEERS=('native_accessibility_probe_v23.py','native_accessibility_probe_v24.py','native_visible_surface_probe_v27.py','native_visible_surface_probe_v30.py','native_visible_surface_probe_v31.py')
 NEW_SOURCES=('native_desktop_factory/common_native_guest_v31.py','native_desktop_factory/common_native_episode_v31.py','native_desktop_factory/native_visible_surface_probe_v30.py','native_desktop_factory/native_visible_surface_probe_v31.py',
+ 'native_desktop_factory/native_atspi_warning_policy_v32.py','tests/test_native_desktop_atspi_warning_policy_v32.py',
  'tests/test_native_desktop_common_native_guest_v31.py','tests/test_native_desktop_visible_surface_probe_v30.py','tests/test_native_desktop_visible_surface_probe_v31.py')
 
 def source_manifest(root=None):
@@ -99,9 +101,11 @@ class CommonNativeModelGuest(previous.SemanticModelGuest):
    error_raw=bytes(self.sandbox.files.read(str(reader.PRIVATE_ERROR_PATH),format='bytes'));ref=value['private_error_file']
    require(digest(error_raw)==ref['sha256'] and len(error_raw)==ref['bytes'] and ref['mode']==0o600,'Native private error readback differs')
    json_put(self.root,self.out/f'native-error-{self.native_sequence-1:03d}.private.json',json.loads(error_raw))
-  # Deprecation/runtime warnings are retained, but success still requires the
-  # actual typed native output. Unknown stderr is not silently accepted.
-  require(not result.stderr,'Common native probe emitted unexplained stderr')
+  # Preserve full raw stderr above. Only fixed AT-SPI getter deprecation
+  # blocks from exact source lines are informational; native success still
+  # requires the independently checked typed output below.
+  classification=warning_policy.classify(result.stderr,source_root=self.source_root,source_sha256s=self.native_manifest['source_sha256s'])
+  json_put(self.root,self.out/f'native-stderr-{self.native_sequence-1:03d}.private.json',classification)
   require(value.get('schema')==PROBE_SCHEMA and value.get('status')=='observed' and value.get('probe_source_sha256')==digest(PROBE_SOURCE.read_bytes()) and
    value.get('native_mutations')==0 and value.get('raster_equality_used') is False and value.get('recursive_collection_query_called') is False and value.get('focus_from_selection') is False,'Actual bounded native metadata unavailable')
   if value.get('focus_editable'):

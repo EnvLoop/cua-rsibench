@@ -74,7 +74,7 @@ class CommonGuestTests(unittest.TestCase):
 import tests.test_native_desktop_semantic_native_transport_v23 as semantic_fixtures
 class CommonNativeDispatchTests(semantic_fixtures.SemanticTests):
  def setUp(self):
-  super().setUp();self.actor.__class__=native.CommonNativeModelGuest;self.actor.bootstrap_completed=True;self.actor.requested_points=[];self.actor.last_native_point=None;self.actor.native_manifest_sha256='f'*64
+  super().setUp();self.actor.__class__=native.CommonNativeModelGuest;self.actor.bootstrap_completed=True;self.actor.requested_points=[];self.actor.last_native_point=None;self.actor.native_manifest_sha256='f'*64;self.actor.source_root=Path(__file__).resolve().parents[1];self.actor.native_manifest=native.source_manifest()
   self.meta.update(schema=native.PROBE_SCHEMA,probe_source_sha256=digest(native.PROBE_SOURCE.read_bytes()),recursive_collection_query_called=False,focus_from_selection=False,actual_native_focus_proof=True)
  def test_actual_model_point_is_in_native_predispatch_query_without_retarget(self):
   obs=self.observation();_,evidence=self.actor.dispatch_model('{"type":"click","target":{"x":40,"y":40}}',obs,actor_deadline=time.monotonic()+720)
@@ -83,6 +83,22 @@ class CommonNativeDispatchTests(semantic_fixtures.SemanticTests):
  def test_declared_editable_focus_without_native_focused_proof_is_refused(self):
   self.meta['actual_native_focus_proof']=False
   with self.assertRaisesRegex(ValueError,'focused object proof'):self.observation()
+  self.assertEqual(self.native_calls,[])
+
+ def test_saved_actual_deprecation_warning_is_retained_with_successful_typed_native_output(self):
+  from tests.test_native_desktop_atspi_warning_policy_v32 import ACTUAL_WARNING
+  self.sandbox.commands.run=lambda *args,**kwargs:SimpleNamespace(exit_code=0,stdout=json.dumps(self.meta),stderr=ACTUAL_WARNING)
+  self.observation()
+  commands=[json.loads(p.read_bytes()) for p in self.out.glob('native-probe-*.private.json')]
+  self.assertTrue(commands);self.assertTrue(all(r['stderr']==ACTUAL_WARNING for r in commands))
+  classifications=[json.loads(p.read_bytes()) for p in self.out.glob('native-stderr-*.private.json')]
+  self.assertTrue(all(r['status']=='known_atspi_getter_deprecations' and not r['native_success_inferred'] for r in classifications));self.assertEqual(self.native_calls,[])
+ def test_known_warning_cannot_promote_failed_native_output_or_unrelated_stderr(self):
+  from tests.test_native_desktop_atspi_warning_policy_v32 import ACTUAL_WARNING
+  self.meta['status']='unavailable_or_unsafe';self.sandbox.commands.run=lambda *args,**kwargs:SimpleNamespace(exit_code=0,stdout=json.dumps(self.meta),stderr=ACTUAL_WARNING)
+  with self.assertRaisesRegex(ValueError,'metadata unavailable'):self.observation()
+  self.meta['status']='observed';self.sandbox.commands.run=lambda *args,**kwargs:SimpleNamespace(exit_code=0,stdout=json.dumps(self.meta),stderr=ACTUAL_WARNING+'RuntimeError: unknown native failure\n')
+  with self.assertRaisesRegex(ValueError,'stderr'):self.observation()
   self.assertEqual(self.native_calls,[])
 
 class CreationBoundaryTests(unittest.TestCase):
