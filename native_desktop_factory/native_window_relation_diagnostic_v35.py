@@ -34,7 +34,7 @@ def transient(raw):
  return {'available':match is not None,'xid':int(match[1],16) if match else None,'not_ownership_authority':True}
 
 def direct_tree(raw):
- root=re.search(r'^\s*Root window id:\s*(0x[0-9a-fA-F]+)',raw,re.M);parent=re.search(r'^\s*Parent window id:\s*(0x[0-9a-fA-F]+)',raw,re.M);count=re.search(r'^\s*([0-9]+) children?[.:]\s*$',raw,re.M)
+ root=re.search(r'^\s*Root window id:\s*(0x[0-9a-fA-F]+)',raw,re.M);parent=re.search(r'^\s*Parent window id:\s*(0x[0-9a-fA-F]+)',raw,re.M);count=re.search(r'^\s*([0-9]+) (?:child|children)[.:]\s*$',raw,re.M)
  require(root is not None and parent is not None and count is not None,'Actual direct X11 tree unavailable');number=int(count[1]);require(number<=MAX_X11_CHILDREN,'Direct X11 child count exceeds bound')
  children=re.findall(r'^\s+(0x[0-9a-fA-F]+)\s+',raw[count.end():],re.M);require(len(children)==number,'Actual direct X11 child IDs incomplete');ids=[int(n,16) for n in children];require(len(ids)==len(set(ids)),'Actual direct X11 child IDs duplicated')
  return {'root_xid':int(root[1],16),'parent_xid':int(parent[1],16),'child_xids':ids,'recursive_tree_enumerated':False}

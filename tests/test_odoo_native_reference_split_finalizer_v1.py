@@ -113,11 +113,15 @@ class FinalizerTests(unittest.TestCase):
 
 class ActualSavedReplay(unittest.TestCase):
  def test_production_read_only_actual_root_review_twenty_cases(self):
-  stage=Path('/Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix/work/odoo-native-reference-v1-root-20261001.private')
+  stage_value=os.environ.get('ENVLOOP_ODOO_V12_SAVED_STAGE')
+  worker_value=os.environ.get('ENVLOOP_ODOO_V12_SELECTION_WORKER')
+  if not stage_value or not worker_value:self.skipTest('private actual20 proof locations are not configured')
+  stage=Path(stage_value)
   review=stage/'root-full20-source-visual-review.private.json'
   if not review.exists():self.skipTest('private actual20 proof is unavailable')
-  worker=Path('/Users/xiaoyong/Documents/Codex/2026-09-25/odoo-four-workflows/enterprise_fallback/odoo18/partition_workers/selection')
-  run=worker/'private/v066_native_surface_controls_v12/native-v12-2bb7c47798fa4713cf207c274f56d469'
+  worker=Path(worker_value)
+  plan=json.loads((stage/'selection-plan.private.json').read_bytes())['native_core_plan']
+  run=worker/'private/v066_native_surface_controls_v12'/plan['fresh_run_directory_name']
   before=(run/'result.private.json').read_bytes()
   value=target.derive(plan_path=stage/'selection-plan.private.json',worker_dir=worker,run_dir=run,
    source_review_path=review,source_review_sha256='4539fd602b5c8ebf4f43c0cecabb963473a1d7adc246f53eb73a2c556ec6af09')

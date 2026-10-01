@@ -15,6 +15,11 @@ class RelationTests(unittest.TestCase):
   self.assertEqual(relations.transient('WM_TRANSIENT_FOR(WINDOW): window id # 0x100')['xid'],256)
   raw='Root window id: 0x1\nParent window id: 0x200\n2 children:\n 0x300 (has no name): () 20x20+0+0\n 0x301 (has no name): () 20x20+0+0\n';result=relations.direct_tree(raw);self.assertEqual(result['parent_xid'],512);self.assertEqual(result['child_xids'],[768,769]);self.assertFalse(result['recursive_tree_enumerated'])
   self.assertEqual(relations.direct_tree('Root window id: 0x1\nParent window id: 0x200\n0 children.\n')['child_xids'],[])
+ def test_one_direct_child_singular_colon_and_period_preserve_identity(self):
+  for ending in (':','.'):
+   raw=f'Root window id: 0x1\nParent window id: 0x200\n1 child{ending}\n 0x300 (has no name): () 20x20+0+0\n'
+   self.assertEqual(relations.direct_tree(raw)['child_xids'],[768])
+  with self.assertRaises(ValueError):relations.direct_tree('Root window id: 0x1\nParent window id: 0x200\n1 child:\n')
  def test_incomplete_or_overflow_tree_and_extents_refuse(self):
   for raw in ['Root window id: 0x1\nParent window id: 0x200\n2 children:\n 0x300 data\n','Root window id: 0x1\nParent window id: 0x200\n65 children:\n']:
    with self.assertRaises(ValueError):relations.direct_tree(raw)
