@@ -1,0 +1,19 @@
+{
+  "all_saved_audits_independently_rederived": true,
+  "all_source_and_packages_equivalent": true,
+  "derived_receipt_sha256": "5c4dfe26f57e5bd55ac54fa17cc4d29c7e25097c6ada435a75f8aeda065d3da1",
+  "formal_registration_performed": false,
+  "independent_root_source_review_sha256": "4539fd602b5c8ebf4f43c0cecabb963473a1d7adc246f53eb73a2c556ec6af09",
+  "model_calls": 0,
+  "native_adapter_binding_sha256": "43743ae0214e7e9be8f374d6837bf494dd406943412fb02178b549037a249bb9",
+  "native_worker_binding_sha256": "a28f1bc7ec661a40d9a4a595ceaa1e2fd5018e394864740dc3c1f8fb71c8c0bc",
+  "official_final_admitted": 0,
+  "original_pending_result_sha256": "758dcece7184deac295b6fd590bd641cb8752158875cfe334b4234aae3152721",
+  "originals_preserved": true,
+  "provider_calls": 0,
+  "qualified_control_case_count": 20,
+  "reference_binding_sha256": "338a755c03e1d0edfa0566fac459b9c64819bbb2cbff69927cc4f67529369a60",
+  "schema": "envloop-odoo-v066-derived-full-split-native-qualification-v1",
+  "split": "selection",
+  "status": "full_split_saved_controls_and_independent_source_visual_review_verified"
+}
