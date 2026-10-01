@@ -98,3 +98,20 @@ qualification, all24 campaigns or the final3000 outcomes.
 [Supplemental source preparation](evidence/odoo-v11-final-source-root-plan-2026-10-01.json).
 
 Official counts remain **0/600,0/24 and0/3000**.
+
+## Terminal qualification update
+
+The v11 Odoo full20 selection batch subsequently stopped at its first sales
+case. Root replayed all10 completed purchase/inventory controls, including260
+actual actions and520 raw guard images, all saved0/1/0 verdicts and exact reset.
+The failed sales reference kept the native My Quotations facet, so the desired
+order was filtered from the list; its original frame, timeout and exact reset
+are preserved. This prefix does not complete the20-task split. A new reference
+source epoch is being prepared alongside explicit actor-clock receipts.
+[Terminal prefix10 proof](evidence/odoo-v11-selection-prefix10-root-result-2026-10-01.json).
+
+GitLab V10 also stopped before input on an unhydrated issue page. Root inspected
+the original native screenshot with visible loading skeletons. V11 now adds a
+bounded visible-control precondition to the reference controller and its fresh
+TRAIN run is in progress. Existing failed source epochs remain unchanged.
+All official result counts remain zero.

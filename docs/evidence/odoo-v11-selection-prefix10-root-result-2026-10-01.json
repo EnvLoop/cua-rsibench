@@ -1,0 +1,27 @@
+{
+  "actual_applied_actions": 260,
+  "all_completed_reset_exact": true,
+  "all_completed_scores_0_1_0": true,
+  "batch_terminal_sha256": "51a85a6bd6d34fce342487dc65caca234a4153f8baeb7d9bf6973537ce8f8241",
+  "completed_cases": 10,
+  "expected_cases": 20,
+  "failed_family": "sales",
+  "failed_ordinal": 10,
+  "failed_reset_exact": true,
+  "failed_services_restored": true,
+  "failed_stage": "source_gui",
+  "failure": "Reference search retained the native My Quotations facet; target order was hidden by that default filter. Original raw frame independently inspected.",
+  "failure_sha256": "c97ce7d07a06bcf0de3291d0aeb1daf1e96e72ed5d66f243132768d1b06cc0b4",
+  "family_counts": {
+    "crm": 0,
+    "inventory": 5,
+    "purchase": 5,
+    "sales": 0
+  },
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "old_credit_promoted": false,
+  "raw_guard_images_reopened": 520,
+  "schema": "envloop-odoo-v11-selection-prefix-root-result-v1",
+  "status": "terminal_full20_control_batch_with_verified_prefix10"
+}
