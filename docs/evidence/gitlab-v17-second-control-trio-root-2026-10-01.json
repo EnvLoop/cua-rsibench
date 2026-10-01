@@ -1,0 +1,18 @@
+{
+  "completed_unique_current_runtime_control_trios": 2,
+  "expected_control_tasks": 100,
+  "full100_completed": false,
+  "model_calls": 0,
+  "native_actor_epoch": "v12_unchanged",
+  "native_binding_sha256": "5285908f284f05475baeec61da9098a7df92e48014e7d5dd733580cfff47fbcd",
+  "official_final_admitted": 0,
+  "prior_ordinal0_trio_reference": "v14_preserved_separately",
+  "saved_scores": [
+    1,
+    0,
+    1
+  ],
+  "schema": "envloop-gitlab-second-complete-control-trio-v17-root",
+  "status": "actual_saved_sql_git_reset_source_proofs_reopened",
+  "trio_sha256": "6f09c642a2ac8a51fe005a8cd1485caf7d265fcf18088bce79a99e447449fafa"
+}
