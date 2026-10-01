@@ -19,3 +19,11 @@ journal and source binding. The original journal source and previous 52
 development controls remain unchanged. Eleven focused original pipeline,
 admission and raw-result tests passed. A fresh source-bound TRAIN namespace is
 required; no native qualification or formal result is claimed by this repair.
+
+The next actual launch reached the intentional stopped cron service. Its
+`supervisorctl status cron` returned code 3 and `cron STOPPED Not started`.
+The additive journal accepts only that exact owned-app/status-command reply;
+it preserves code 3, records the checked classification and retains original
+stdout bytes. Other service failures remain terminal. Two created containers
+and the empty network were matched against their creation-result hashes and
+removed by an explicit root recovery. The prior failure remains preserved.

@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
-from magento_catalog_factory.native_command_journal_v2 import CommandJournal, exact_absence
+from magento_catalog_factory.native_command_journal_v2 import CommandJournal, exact_absence, expected_stopped_service
 
 
 class ExactAbsenceTests(unittest.TestCase):
@@ -42,6 +42,24 @@ class ExactAbsenceTests(unittest.TestCase):
         result = SimpleNamespace(returncode=1, stdout='[]', stderr='Error response from daemon: network envloop-magento-v066-teacher-network not found')
         self.assertTrue(exact_absence(args, result))
         self.assertFalse(exact_absence(('rm', args[-1]), result))
+
+    def test_only_exact_owned_cron_stopped_reply_is_known_nonzero_success(self):
+        args = ('exec', 'envloop-magento-original-v066-teacher-app-a', 'supervisorctl', 'status', 'cron')
+        result = SimpleNamespace(returncode=3, stdout='cron                             STOPPED   Not started\n', stderr='')
+        self.assertTrue(expected_stopped_service(args, result))
+        self.assertFalse(expected_stopped_service(args[:-1] + ('mysql',), result))
+        self.assertFalse(expected_stopped_service(('exec', 'other-container', *args[2:]), result))
+        self.assertFalse(expected_stopped_service(args, SimpleNamespace(returncode=3, stdout='cron FATAL failed\n', stderr='')))
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            root.chmod(0o700)
+            journal = CommandJournal(root, runner=lambda *a, **kw: result)
+            self.assertEqual(journal.run('owned_cron_status', args, mutating=False), result.stdout)
+            rows = [json.loads(line) for line in journal.path.read_text().splitlines()]
+            self.assertEqual(rows[-1]['returncode'], 3)
+            self.assertEqual(rows[-1]['stdout_sha256'], hashlib.sha256(result.stdout.encode()).hexdigest())
+            self.assertTrue(rows[-1]['expected_stopped_service'])
+            self.assertEqual((root / 'process-diagnostics/owned_cron_status.stdout.private.bin').read_bytes(), result.stdout.encode())
 
 
 if __name__ == '__main__':
