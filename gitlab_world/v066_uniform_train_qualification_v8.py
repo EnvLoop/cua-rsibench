@@ -92,6 +92,22 @@ def audit(*,plan_path,binding_path,out):
    cohort_source_file_sha256=world.cold.source.sha(world.cold.source.private(plan_path)))
   world.require(saved['independent_score']['reward']==record['actual_score']==expected and record['cold_reset_exact'] is True,'TRAIN saved verdict changed')
   local_count=0
+  native=artifacts/'native-runtime'
+  for group in ['protected','seed']:
+   world.require(world.cold.source.private(native/(group+'-before.private.json'))==world.cold.source.private(native/(group+'-exit.private.json')),
+    'TRAIN native protected source/seed exit changed')
+  world.require(json.loads(world.cold.source.private(native/'parent-teardown.private.json'))['owned_parent_absent'] is True,
+   'TRAIN owned VM parent remains')
+  resumed=json.loads(world.cold.source.private(native/'original-resumed.private.json'))
+  world.require(resumed['same_identity'] is True and resumed['exact_business_snapshot'] is True and resumed['healthy'] is True,
+   'TRAIN original runtime was not restored')
+  for generation in [0,1]:
+   snapshot=json.loads(world.cold.source.private(native/f'cycle-{generation}-snapshot.private.json'))
+   attrs=json.loads(world.cold.source.private(native/f'cycle-{generation}-native-attributes.private.json'))
+   docker_state=json.loads(world.cold.source.private(native/f'cycle-{generation}-state.private.json'))
+   world.cold.validate_attributes(attrs,started_at=docker_state['StartedAt'])
+   world.require(snapshot==before['business_snapshot'] and attrs['effective_settings']==world.cold.EXPECTED_SETTINGS,
+    'TRAIN task reset SQL/native profile changed')
   for path in sorted((artifacts/'native-safety').glob('turn-*/receipt.private.json')):
    receipt=policy.validate_receipt(json.loads(world.cold.source.private(path)));prefix=path.parent
    world.require(receipt['status']=='applied' and receipt['driver_result']=='succeeded','Reference control native action was not applied')
