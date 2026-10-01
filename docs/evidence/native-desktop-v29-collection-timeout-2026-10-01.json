@@ -1,0 +1,23 @@
+{
+  "actor_actions": 0,
+  "actual_cleanup_sha256": "ed436d1d6e94defb2a39d3f251c1df9650b476dc77a857d61b7853f4962edc0d",
+  "actual_namespace_available": true,
+  "actual_native_result_sha256": "553b93803b5a0c40b6bc6f5609dbc330d782142020325772dc73fbfa31a8d2b8",
+  "first_failed_stage": "collection_queries",
+  "historical_failures_preserved": true,
+  "match_rule_constructor_completed": true,
+  "model_calls": 0,
+  "native_error_code": 1,
+  "native_error_domain": "atspi_error",
+  "native_error_sha256": "6f62ca3d54229ecbd392de6002c74fe51ac2286893d7752fd6bb20fa77fab51d",
+  "native_qualification_passed": false,
+  "native_raw_error_publicly_released": false,
+  "official_task_credit": 0,
+  "owned_kill_acknowledged": true,
+  "owned_sandbox_running_after_kill": false,
+  "owned_window_completed": true,
+  "private_error_sha_bytes_verified": true,
+  "raw_error_file_mode": 384,
+  "schema": "cua-native-desktop-v29-collection-timeout-public-evidence",
+  "worker_exit_code": 0
+}
