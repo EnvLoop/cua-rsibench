@@ -1,0 +1,32 @@
+{
+  "actual_renderer_loaded": true,
+  "datum_count": 1,
+  "formal_task_credit": 0,
+  "model": "Qwen/Qwen3.8-27B",
+  "native_environment_launched": false,
+  "provider_requests": 0,
+  "receipts": [
+    {
+      "native_environment_launched": false,
+      "provider_requests": 0,
+      "receipt_sha256": "07631e128fb8023aacee20b06746f9e095b3a416c322bd5a9835cd21467628bc",
+      "schema": "envloop-odoo20-renderer-local-preflight-v1"
+    },
+    {
+      "native_environment_launched": false,
+      "provider_requests": 0,
+      "receipt_sha256": "5ae2e66e53ad5f80914bf0b3abd19e347663b20888f0cf48ba26025e531390b9",
+      "schema": "envloop-odoo20-renderer-prompt-prefix-preflight-v1"
+    }
+  ],
+  "renderer_identity": {
+    "image_processor": "Qwen2VLImageProcessorPil",
+    "model": "Qwen/Qwen3.8-27B",
+    "processor_config_sha256": "f30d048e3fda7839c8b3e0e9b8559e5f4581ce7d4f9b15ccd893b9bf5c6ac45b",
+    "renderer": "qwen3_5_disable_thinking",
+    "tokenizer_vocabulary_sha256": "420ab4b96193b4325156f56cd7c3876a8a0d46f515fe4f711a7a6bf5553bf8fa"
+  },
+  "schema": "envloop-odoo20-local-vision-preflight-v1",
+  "student_inference_prompt_equality_checked": true,
+  "synthetic_prompt_prefix_checked": true
+}

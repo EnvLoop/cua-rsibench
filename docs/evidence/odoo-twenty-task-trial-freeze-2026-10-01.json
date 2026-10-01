@@ -1,7 +1,20 @@
 {
+  "actual_sol6_researcher": {
+    "actual_cost_usd": null,
+    "authentic_usage": {
+      "input_tokens": 6101,
+      "output_tokens": 421,
+      "total_tokens": 6522
+    },
+    "provider_status": "completed",
+    "receipt_sha256": "ed910d93654b7380ce11708a42645444a5fc132483f63a46008c044f401fe61a",
+    "reported_model": "gpt-6-sol",
+    "response_sha256": "a696ad0bac4907422ffb2a1c2f724433f987a6b3f63a5a26bf91d3bd4a285390"
+  },
   "cell_id": "odoo-community",
   "checkpoint_selection_before_final_outcomes_required": true,
   "completed_training_chains": 0,
+  "configuration_change_reason": "Human instruction: continue and do not use Sol 6.1.",
   "family_counts": {
     "crm": 5,
     "inventory": 5,
@@ -12,10 +25,10 @@
   "final_selected_checkpoint_outcomes": 0,
   "final_task_count": 20,
   "full_six_environment_publication_claim": false,
-  "initial_researcher": "gpt-6.1-sol",
+  "initial_researcher": "gpt-6-sol",
   "native_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
-  "previous_configuration_sha256": "a329427a74f6658a8b0a7a51617c27af642895a3db5ea29e1318022bb901863f",
-  "provider_readiness": "blocked_model_not_found",
+  "previous_configuration_sha256": "6158ab9c81e34f2b82d66ed2abc05ccf478b426577b487fd7ab898aa5b304e11",
+  "provider_readiness": "actual_sol6_researcher_completed_native_teacher_in_progress",
   "sampling_seed": "envloop-odoo20-human-request-20261001-v1",
   "sampling_uses_model_outcomes": false,
   "schema": "envloop-single-environment-twenty-task-trial-v1",
@@ -30,7 +43,8 @@
     "task_content_sent": false
   },
   "student": "Qwen/Qwen3.8-27B",
-  "teacher": "gpt-6.1-sol",
+  "teacher": "gpt-6-sol",
   "train_task_count": 20,
-  "trial_plan_sha256": "6158ab9c81e34f2b82d66ed2abc05ccf478b426577b487fd7ab898aa5b304e11"
+  "trial_plan_sha256": "126dfcdd9b270a489d0e7a34a64538a546738c81a04179bd089e454f6633436e",
+  "trial_training_sha256": "599287bd38a7d673e29031d2554862df47251fd7fe9ace9c8eb9a02b267feb20"
 }
