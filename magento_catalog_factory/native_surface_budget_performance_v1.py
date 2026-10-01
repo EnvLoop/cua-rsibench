@@ -167,10 +167,11 @@ def verify_budget_performance(*,study,owner_slot,verification):
     # Reopen the actual durable SDK request cache. A typed declaration alone
     # cannot establish whether a request was dispatched or completed.
     import sqlite3
+    from contextlib import closing
     from urllib.parse import quote
     sdk=root/'sampling-journal/requests.sqlite3'
     require(sdk.is_file() and not sdk.is_symlink() and sdk.stat().st_mode&0o077==0,'magento_actual_sdk_request_journal_missing')
-    with sqlite3.connect('file:'+quote(str(sdk.resolve()))+'?mode=ro',uri=True) as connection:
+    with closing(sqlite3.connect('file:'+quote(str(sdk.resolve()))+'?mode=ro',uri=True)) as connection:
         record=connection.execute('SELECT state,result FROM requests WHERE id=?',(stop['request_id'],)).fetchone()
     require(record is not None and record[0]=='complete' and record[1] is not None,'magento_actual_sdk_terminal_request_missing')
     sdk_result=json.loads(record[1]);pending=[r for r in row['samples'] if r['status']=='actor_deadline_proven']
