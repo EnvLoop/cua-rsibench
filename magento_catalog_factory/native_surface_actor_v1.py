@@ -12,7 +12,7 @@ from native_desktop_factory.actor_deadline_future_v21 import ActorDeadlineReache
 from tools import magento_dedicated_train_lane_v066 as original
 from . import verify
 from .native_surface_guard_v1 import NATIVE_JS
-from .native_surface_adapter_v2 import NativeAdapter
+from .native_surface_adapter_v3 import NativeAdapter
 from .native_surface_lease_v1 import OwnedOperation,LeaseBoundary
 from .native_command_journal_v2 import CommandJournal as NativeCommandJournal
 
