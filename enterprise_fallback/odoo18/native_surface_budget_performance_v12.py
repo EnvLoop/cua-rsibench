@@ -95,14 +95,17 @@ def verify_budget_performance(*,study,owner_slot,verification):
         sample['sampling_failure']['new_dispatch'] is True and sample['sampling_failure']['reused'] is False,
         'odoo_budget_unknown_response_not_retained_or_completed')
     completed=sum(item['status']=='completed' for item in usage['samples'])
+    inference_status=('not_submitted_before_actor_deadline' if not checked.model_dispatch_may_have_occurred else
+        'late_completed_withheld_from_gui' if checked.model_completion_known else 'completion_unknown_after_actor_deadline')
     return {'schema':'cua-verified-budget-performance-with-unknown-billing-v22',
         'task_id':task['task_id'],'package_sha256':task['package_sha256'],'owner_slot':owner_slot,
         'checkpoint_sha256':task['checkpoint_sha256'],
         'performance':{'status':'independently_saved_scored_and_reset','score':row['score']},
-        'inference':{'unknown_response_is_completed':False,'request_replayed':False,'completed_model_response_count':completed},
+        'inference':{'status':inference_status,'unknown_response_is_completed':False,'request_replayed':False,'completed_model_response_count':completed},
         'billing':{'actual_usd':None},'provider_close_acknowledged':True,
         'sample_paid_attempt_id':verification['sample_paid_attempt_id'],
-        'saved_state_sha256':saved_sha,'verifier_sha256':verdict_sha,'reset_sha256':reset_sha,
-        'actor_clock_sha256':clock_sha,'actor_budget_stop_sha256':stop_sha,'task_sha256':task_sha,
+        'evidence_sha256':{'saved-state.private.json':saved_sha,'verifier.private.json':verdict_sha,
+            'reset.private.json':reset_sha,'actor-clock.private.json':clock_sha,
+            'actor-budget-stop.private.json':stop_sha,'task.private.json':task_sha},
         'amendment_sha256':task['amendment_sha256'],'performance_coverage_eligible':True,
         'formal_registration_performed':False}

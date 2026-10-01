@@ -54,6 +54,9 @@ class BudgetPerformanceTests(unittest.TestCase):
             verified=reader.verify_budget_performance(study=study,owner_slot='shared-base',verification=descriptor)
             self.assertEqual(verified['performance']['score'],0)
             self.assertFalse(verified['inference']['unknown_response_is_completed'])
+            self.assertEqual(verified['inference']['status'],'completion_unknown_after_actor_deadline')
+            self.assertEqual(set(verified['evidence_sha256']),{'saved-state.private.json','verifier.private.json',
+                'reset.private.json','actor-clock.private.json','actor-budget-stop.private.json','task.private.json'})
             self.assertEqual(verified['inference']['completed_model_response_count'],0)
             self.assertIsNone(verified['billing']['actual_usd'])
             self.assertTrue(verified['provider_close_acknowledged'])
