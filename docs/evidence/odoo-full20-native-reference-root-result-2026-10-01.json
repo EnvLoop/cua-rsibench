@@ -1,0 +1,21 @@
+{
+  "all_exact_reset": true,
+  "all_scores_0_1_0": true,
+  "all_services_restored": true,
+  "completed_count": 20,
+  "family_counts": {
+    "crm": 5,
+    "inventory": 5,
+    "purchase": 5,
+    "sales": 5
+  },
+  "full100_launched": false,
+  "model_calls": 0,
+  "native_guard_actions_reopened": 487,
+  "official_final_admitted": 0,
+  "raw_guard_pngs_reopened": 974,
+  "result_sha256": "758dcece7184deac295b6fd590bd641cb8752158875cfe334b4234aae3152721",
+  "schema": "envloop-odoo-full20-native-root-result-v1",
+  "source_visual_review_pending": true,
+  "status": "all20_saved_native_guard_reset_proofs_independently_reopened"
+}
