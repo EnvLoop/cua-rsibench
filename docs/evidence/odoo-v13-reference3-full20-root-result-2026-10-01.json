@@ -1,0 +1,28 @@
+{
+  "all_saved_audits_independently_rederived": true,
+  "formal_campaign_credit": 0,
+  "formal_final_outcome_credit": 0,
+  "formal_task_credit": 0,
+  "historical_reference_credit": 0,
+  "independent_scores_all_cases": [
+    0,
+    1,
+    0
+  ],
+  "independent_source_review_sha256": "9feaf8732dd5c81ee99b031cb1591d6e3d225d427be416a015d9d572a6d10e80",
+  "independent_visual_source_review_complete": true,
+  "model_calls": 0,
+  "native_guard_actions": 486,
+  "native_worker_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
+  "new_full100_pending": true,
+  "ordered_roster_and_four_families_preserved": true,
+  "original_pending_files_unchanged": true,
+  "private_derived_receipt_sha256": "887bbc919f0baa87dadbadfcc85f05c2296af09d7a0e6548b2a4add5bd3ae65d",
+  "qa_manifest_sha256": "cc4ce876a4b891edee3e7c766a2692719c1d7af7406fe75d7ec8d22f4195f86f",
+  "qualified_control_cases": 20,
+  "raw_guard_images_reopened": 972,
+  "reference_binding_sha256": "8e7696c8c56967675ed491c4302f68f6c05424a50011cafc460ef7010ab67781",
+  "schema": "envloop-public-odoo-v13-reference3-full20-root-result-v1",
+  "source_data_kind": "explicitly_labeled_synthetic_business_documents_and_notes",
+  "status": "full_split_saved_controls_and_independent_source_visual_review_verified"
+}
