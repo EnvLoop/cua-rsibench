@@ -110,7 +110,8 @@ class FrozenStudy:
 
     def admit_shared_base_selection(self,cell_id,source):
         value,_=private(source,self.repo_root/'work')
-        if cell_id=='desktop-native' and value.get('schema')=='cua-native-desktop-v22-shared-base-performance':
+        if ((cell_id=='desktop-native' and value.get('schema')=='cua-native-desktop-v22-shared-base-performance') or
+            (cell_id=='magento-admin' and value.get('schema')=='magento-native-v22-shared-base-performance')):
             result,digest=verify_shared_receipt(self,self.budget,cell_id,source,require_registry=False)
             root=shared_receipt_path(self,cell_id).parent
             campaign._private_write_new(root/'accepted.private.json',policy.canonical({'schema':shared.REGISTRY_SCHEMA,'cell_id':cell_id,'receipt_sha256':digest}))
@@ -282,7 +283,7 @@ def source_manifest(repo_root):
         'src/cursibench/full_study_campaign_dispatch_v1.py','src/cursibench/full_study_shared_base_selection_v1.py',
         'src/cursibench/full_study_shared_base_execution_v1.py','src/cursibench/full_study_final_dispatch_v1.py',
         'src/cursibench/full_study_results_v1.py','tools/full_study_campaign_dispatch_v1.py'}
-    for folder in ('enterprise_fallback/odoo18','gitlab_world','native_desktop_factory'):
+    for folder in ('enterprise_fallback/odoo18','gitlab_world','native_desktop_factory','magento_catalog_factory'):
         directory=root/folder
         if directory.is_dir():
             names.update(p.relative_to(root).as_posix() for p in directory.glob('*.py') if p.is_file() and not p.is_symlink())
@@ -456,6 +457,9 @@ def verify_shared_receipt(study,budget,cell_id,source,*,require_registry=True):
     if cell_id=='desktop-native' and value.get('schema')=='cua-native-desktop-v22-shared-base-performance':
         from native_desktop_factory.policy_execution_v22 import verify_shared_receipt as native_verify
         return native_verify(study,budget,cell_id,source,require_registry=require_registry)
+    if cell_id=='magento-admin' and value.get('schema')=='magento-native-v22-shared-base-performance':
+        from magento_catalog_factory.native_surface_shared_base_v1 import verify_shared_receipt as magento_verify
+        return magento_verify(study,budget,cell_id,source,require_registry=require_registry)
     return _checked_shared_verifier(study).verify_receipt(study,budget,cell_id,source,require_registry=require_registry)
 
 
@@ -721,7 +725,7 @@ def _portable_budget_verification(study,owner_slot,descriptor):
     import importlib
     import re
     registered=descriptor['adapter']
-    if type(registered) is not dict or set(registered)!={'module','function','source_sha256'} or registered['function']!='verify_budget_performance' or not re.fullmatch(r'enterprise_fallback\.odoo18\.native_surface_budget_performance_v[1-9][0-9]*',registered['module']):
+    if type(registered) is not dict or set(registered)!={'module','function','source_sha256'} or registered['function']!='verify_budget_performance' or not re.fullmatch(r'(?:enterprise_fallback\.odoo18|magento_catalog_factory)\.native_surface_budget_performance_v[1-9][0-9]*',registered['module']):
         raise ValueError('registered_readonly_budget_counterpart_required')
     name=registered['module'].replace('.','/')+'.py'
     sources=source_manifest(Path(__file__).resolve().parents[2])['source_sha256s']
