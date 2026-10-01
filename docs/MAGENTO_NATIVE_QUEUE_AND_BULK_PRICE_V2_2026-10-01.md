@@ -77,3 +77,15 @@ PHP programs were parsed as PHP8.2 with zero syntax errors; no host PHP runtime
 was available. This is source validation, not native startup qualification.
 No new Docker resource, consumer, GUI episode or provider call was launched
 for this change.
+
+## First native schema read and correction
+
+The first new native TRAIN startup subsequently failed before consumer launch:
+its SQL selected nonexistent `queue_message.message_id`. Original owned
+application/search/network cleanup completed; no startup or task credit is
+inferred. The [pinned 2.4.6 MySQL queue schema](https://github.com/magento/magento2/blob/2.4.6/app/code/Magento/MysqlMq/etc/db_schema.xml)
+defines message `id`, and the status table's `message_id` references that `id`.
+The read now selects `id AS message_id` and joins status rows on `m.id`.
+Executable schema fixtures cover all three actual SELECT queries and reject
+the original invalid column. This is a source repair, not a native success;
+the consumed namespace remains unchanged and fresh TRAIN is required.

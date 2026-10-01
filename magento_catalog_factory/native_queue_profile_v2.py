@@ -28,8 +28,8 @@ QUEUE_READ_PHP=r'''$cfg=include '/var/www/magento2/app/etc/env.php';$c=$cfg['db'
 $db=new PDO('mysql:host='.$c['host'].';dbname='.$c['dbname'],$c['username'],$c['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
 $p=$cfg['db']['table_prefix']??'';if(!preg_match('/^[a-zA-Z0-9_]*$/',$p))throw new Exception('prefix');
 $topic='product_action_attribute.update';
-$messages=$db->query("SELECT message_id,topic_name,body FROM `{$p}queue_message` WHERE topic_name='product_action_attribute.update' ORDER BY message_id")->fetchAll(PDO::FETCH_ASSOC);
-$states=$db->query("SELECT s.message_id,s.queue_id,s.status,s.updated_at FROM `{$p}queue_message_status` s JOIN `{$p}queue_message` m ON m.message_id=s.message_id WHERE m.topic_name='product_action_attribute.update' ORDER BY s.message_id,s.queue_id")->fetchAll(PDO::FETCH_ASSOC);
+$messages=$db->query("SELECT id AS message_id,topic_name,body FROM `{$p}queue_message` WHERE topic_name='product_action_attribute.update' ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+$states=$db->query("SELECT s.message_id,s.queue_id,s.status,s.updated_at FROM `{$p}queue_message_status` s JOIN `{$p}queue_message` m ON m.id=s.message_id WHERE m.topic_name='product_action_attribute.update' ORDER BY s.message_id,s.queue_id")->fetchAll(PDO::FETCH_ASSOC);
 $operations=$db->query("SELECT id,bulk_uuid,topic_name,status,error_code,result_message,serialized_data FROM `{$p}magento_operation` WHERE topic_name='product_action_attribute.update' ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
 foreach($messages as &$m){$m['body_sha256']=hash('sha256',$m['body']);unset($m['body']);}unset($m);
 foreach($operations as &$o){$o['serialized_data_sha256']=hash('sha256',$o['serialized_data']);unset($o['serialized_data']);}unset($o);
