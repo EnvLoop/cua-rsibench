@@ -13,6 +13,7 @@ from tools import magento_dedicated_train_lane_v066 as original
 from . import verify
 from .native_surface_guard_v1 import NativeAdapter,NATIVE_JS
 from .native_surface_lease_v1 import OwnedOperation,LeaseBoundary
+from .native_command_journal_v2 import CommandJournal as NativeCommandJournal
 
 
 async def run_task(*,case,task,output,runtime,sampler,username,attempt_id,paid_attempt_id):
@@ -142,7 +143,7 @@ class Runtime(original.DedicatedMagentoTrainRuntime):
             if spec.index==0:runtime.prepared_for_current_episode=result
             return result
         from unittest.mock import patch
-        with patch.object(original.DedicatedCloneManager,'prepare',prepare):
+        with patch.object(original,'CommandJournal',NativeCommandJournal), patch.object(original.DedicatedCloneManager,'prepare',prepare):
             async with super().open_case(case,out_dir) as active:
                 # Preserve the original saved SQL/search readback, while also
                 # retaining the full unmasked post-reload native image.

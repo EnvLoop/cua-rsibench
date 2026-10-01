@@ -20,6 +20,7 @@ from enterprise_fallback.odoo18.odoo_actor_transport_v1 import sampler_class
 ROOT=Path(__file__).resolve().parents[1]
 CELL='magento-admin'
 SOURCES=('magento_catalog_factory/native_surface_workers_v1.py',
+ 'magento_catalog_factory/native_command_journal_v2.py',
  'magento_catalog_factory/native_surface_actor_v1.py','magento_catalog_factory/native_surface_guard_v1.py',
  'magento_catalog_factory/native_surface_lease_v1.py','magento_catalog_factory/seed.py',
  'magento_catalog_factory/native_surface_budget_performance_v1.py',
