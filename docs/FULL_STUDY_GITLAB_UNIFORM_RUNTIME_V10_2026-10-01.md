@@ -1,0 +1,7 @@
+# GitLab native reference qualification v10
+
+The real V9 TRAIN attempt reached an owned native observation but stopped before input when GitLab rerendering removed the reference element's transient attribute. The source image/envelope, no-input failure and reset/restoration evidence remain preserved. No actual model or task result is inferred.
+
+The additive V10 TRAIN reference controller chooses the currently visible label editor through one nonwaiting native element lookup, obtains its real bounds and submits the corresponding unchanged coordinate click to the common native gate. It does not require a transient reference attribute to survive rerendering. This is reference action choice; no model action is modified or retargeted. The same observed/current safe-target, physical hit, nonce, account/project/window/lease and input receipt rules remain authoritative and a rejected control still stops. Full reference controls already support the same coordinate primitive. Teacher/base/four checkpoint interfaces share the exact V10 source and safety runtime.
+
+The V9 lazy requested-ref resolution, semantic role options, matched90/720 actor budget and teacher timing after exact reset remain unchanged. Every consumed V8/V9 failure stays terminal. New metadata/source preparation and phase review, actualTRAIN1/0/1 and independent raw/reset audit are required before full20/100 qualification, source ratification or inference. The V5 coldboot proof alone gives no task credit.
