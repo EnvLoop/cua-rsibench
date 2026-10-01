@@ -1,0 +1,38 @@
+{
+  "all_independent_baseline_positive_wrong_object_scores": [
+    0,
+    1,
+    0
+  ],
+  "all_sources_and_packages_equivalent": true,
+  "all_twenty_saved_audits_independently_rederived": true,
+  "all_twenty_sources_visually_reviewed": true,
+  "derived_private_receipt_sha256": "1593f1d61c5d8766b8a67875ad7d63d855ed11badb35408fa0c3db0bf2373df1",
+  "family_counts": {
+    "crm": 5,
+    "inventory": 5,
+    "purchase": 5,
+    "sales": 5
+  },
+  "formal_campaigns_completed": 0,
+  "formal_model_outcomes": 0,
+  "formal_task_registration_count": 0,
+  "full100_control_pending": true,
+  "historical_control_credit": 0,
+  "independent_visual_review_sha256": "c05e761c3ff69d88da01d2901678e465c222e0dd4c7002f17f84daa1ac6fa54a",
+  "model_calls": 0,
+  "native_adapter_binding_sha256": "5ad6522ea25d3fc9727b1f3a197917ce1d57113a8b16c2cba170db111b27ea5c",
+  "native_guard_actions": 492,
+  "native_worker_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
+  "original_pending_result_sha256": "696152e2e42fdc3d4cb37a36d2d9034a72c0e3491242d8b827952830d96fd7df",
+  "originals_preserved": true,
+  "qa_manifest_sha256": "ef55ee6423a3898563392cb4b0293b9a64aa21508c56847f5ec4ae38d51b6e8f",
+  "qualified_control_tasks": 20,
+  "raw_native_guard_images_reopened": 984,
+  "raw_native_panel_pixels_preserved": true,
+  "reference_binding_sha256": "c7587e67e79da0996cb14a1396139972ab54f47e5bdffc0af455d656d067c5b4",
+  "schema": "envloop-public-odoo-v13-full20-root-result-v1",
+  "source_data_kind": "explicitly_labeled_synthetic_business_documents_and_planning_notes",
+  "source_epoch": "v13_ref2",
+  "status": "full_split_saved_controls_and_independent_source_visual_review_verified"
+}
