@@ -241,6 +241,7 @@ class ProductionV22Tests(unittest.TestCase):
             stack.enter_context(patch.object(self.selection.RealOdooSelectionEnvironment,'_compose',side_effect=AssertionError('unexpected native compose in fixture')))
             stack.enter_context(patch.object(readiness,'ensure_ready',side_effect=ready))
             stack.enter_context(patch.object(self.selection,'RealTinkerSelectionSampler',Sampler))
+            stack.enter_context(patch('enterprise_fallback.odoo18.odoo_no_retry_sampler_v22.sampler_class',side_effect=lambda current:current.RealTinkerSelectionSampler))
             stack.enter_context(patch.object(self.gate.frozen,'student_training_configuration',return_value=(training,'c'*64)))
             stack.enter_context(patch.object(source.runtime_gate,'pre_dispatch',return_value=None))
             stack.enter_context(patch.object(workers,'audit_readiness_receipt',side_effect=lambda path,*_:json.loads(path.read_bytes())))

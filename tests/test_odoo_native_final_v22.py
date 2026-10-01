@@ -76,4 +76,27 @@ class MeteringTests(unittest.TestCase):
    with self.assertRaises(ActorDeadlineReached):wrapped.sample(observation,task_index=0,step=0,task_dir=root)
    self.assertIsNone(wrapped.calls[0]['result']);self.assertTrue((root/wrapped.calls[0]['intent']['path']).is_file())
 
+class NoRetrySDKTests(unittest.TestCase):
+ def test_real_installed_sdk_no_retry_configuration_base_and_four_checkpoint_slots(self):
+  from enterprise_fallback.odoo18.odoo_no_retry_sampler_v22 import sampler_class
+  from cursibench.scale_vision_proxy import MODEL,digest,QwenVisionRenderer
+  import tinker
+  _,selection=workers._model_modules(workers.public_binding())
+  calls=[]
+  class Client:
+   def get_base_model(self):return MODEL
+  class Service:
+   def __init__(self,**kwargs):calls.append(('service',kwargs))
+   def create_sampling_client(self,**kwargs):calls.append(('sampling',kwargs));return Client()
+  with patch.object(tinker,'ServiceClient',Service),patch.object(QwenVisionRenderer,'load',return_value=SimpleNamespace(identity={'model':MODEL})):
+   for owner in ['shared-base','astra','sol','luna','reference']:
+    base=owner=='shared-base';path=MODEL if base else 'tinker://fixture/sampler_weights/'+owner
+    actual=sampler_class(selection)(checkpoint_path=path,config={'seed':0},output_root=Path('/unused'),attempt_id='source-test-'+owner,
+      base_mode=base,expected_base_checkpoint_sha256=digest(MODEL) if base else None)
+    actual.__enter__();self.assertEqual(actual.backend.identity['checkpoint_sha256'],digest(path))
+  self.assertEqual(len(calls),10)
+  for kind,value in calls:
+   if kind=='service':self.assertEqual(value['max_retries'],0)
+   else:self.assertFalse(value['retry_config'].enable_retry_logic)
+
 if __name__=='__main__':unittest.main()

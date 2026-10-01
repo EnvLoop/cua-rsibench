@@ -83,9 +83,8 @@ the exact accepted V13 TRAIN control and current factory/guard, an explicit
 root-reviewed public TRAIN task, and genuine paid Tinker/provider intent.
 It must not reconstruct a fake 600-task/24-chain gate to run that pilot.
 The final worker intentionally cannot serve as that development endpoint.
-A separate development-only pilot interface and its private reviewed request
-will be supplied before native/model dispatch; no final bodies or formal
-admissions are required or permitted for it.
+The development-only pilot interface below uses a separate private reviewed
+request; no final bodies or formal admissions are required or permitted for it.
 
 ## Source validation
 
@@ -96,3 +95,62 @@ missing paid reservation, no replay after uncertain dispatch, actual SDK request
 IDs, typed deadline retention, independent saved score/reset/provider close,
 null billing, and the actual V22 outcome parser. It is source verification,
 not a live Tinker or Odoo model result.
+
+## Executable public TRAIN paid pilot
+
+After importing both the final counterpart and its no-retry/pilot follow-up,
+prepare a fresh private request without a native or model call:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$REPO:$REPO/src" "$PY" \
+  -m tools.odoo_public_train_model_pilot_v22 prepare-request \
+  --worker-dir "$ORIGINAL_TRAIN" \
+  --native-binding "$V13_BINDING" --native-binding-sha256 "$V13_BINDING_FILE_SHA" \
+  --train-control "$ACCEPTED_V13_TRAIN" --train-control-sha256 "$ACCEPTED_TRAIN_SHA" \
+  --task-id "$PUBLIC_TRAIN_TASK" --attempt-id "$FRESH_PUBLIC_TRAIN_ATTEMPT" \
+  --output-run "$REPO/work/$FRESH_PUBLIC_TRAIN_ATTEMPT.private" \
+  --output-stage "$PRIVATE_STAGE/$FRESH_PUBLIC_TRAIN_ATTEMPT-plan.private"
+```
+
+The selected task must be in the exact public 20-task TRAIN manifest. The
+accepted V13 TRAIN receipt is independently qualified by the root operator.
+Preparation emits an **unsigned** review with authorization false. The root
+operator must reopen request/source/TRAIN hashes and write a new private review
+with `one_public_train_paid_pilot_authorized=true`; the unsigned template cannot
+execute. This is development authorization, not FinalGate authority.
+
+```bash
+ENVLOOP_ODOO_WORKER_DIR="$ORIGINAL_TRAIN" \
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$REPO:$REPO/src:$REPO/enterprise_fallback/odoo18" \
+  "$PY" -m tools.odoo_public_train_model_pilot_v22 run-once \
+  --request "$REQUEST" --request-sha256 "$REQUEST_SHA" \
+  --root-review "$ROOT_REVIEW" --root-review-sha256 "$ROOT_REVIEW_SHA" --execute
+```
+
+`TINKER_API_KEY` must already be securely injected. No key enters request files
+or command output. The endpoint consumes one attempt before SDK/native setup,
+uses current V13 source/guard and the original public TRAIN clone, preserves
+paid setup and actual per-frame sampling IDs/results, then independently reads
+saved state, resets and closes the exact owned sampler. Both HTTP SDK retries
+and SamplingClient retry logic are explicitly disabled. Request failure stays
+consumed; a new run requires a newly reviewed namespace. The resulting private
+pilot receipt has formal credit zero, authentic invoice/cost null, and cannot
+register any formal task. The 20-task/four-family roster is checked even though
+only one explicitly reviewed public task is dispatched.
+
+For a genuine campaign teacher check after the separate six-cell pre-result
+ratification, use `native_surface_workers_v13.train_worker(...)` with the exact
+native/TRAIN refs and `campaign_ratification_path/sha256`; pass that worker to
+`full_study_teacher_adapter_v1.collect_train_batch` using a real V22
+CampaignSession's `dispatch_paid`, proposal and public TRAIN context. That path
+records `teacher_rollout` intents/results and uses the current AgentRouterHub
+Responses image provider. It requires no 24-chain final completion, but its
+campaign authority must be genuine. The current frozen matrix teacher is
+`gpt-5.6-sol`; changing that model is a separately witnessed configuration epoch,
+not an implicit pilot override.
+
+The SDK retry setup was checked against the installed ServiceClient and
+RetryConfig signatures. Official documentation confirms a separate sampling
+retry configuration: [Tinker SDK configuration](https://github.com/thinking-machines-lab/tinker/blob/main/_autodocs/configuration.md).
+The installed SDK exposes `RetryConfig(enable_retry_logic=False)`; documented
+example parameter names from a different SDK revision are not substituted.

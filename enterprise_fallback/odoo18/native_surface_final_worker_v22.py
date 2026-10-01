@@ -28,6 +28,7 @@ module_from_binding=legacy.module_from_binding
 OdooFinalWorkerError=legacy.OdooFinalWorkerError
 FILES=('enterprise_fallback/odoo18/native_surface_final_worker_v22.py','tools/odoo_native_surface_final_v22.py',
  'enterprise_fallback/odoo18/native_surface_final_worker_v1.py','enterprise_fallback/odoo18/native_surface_budget_performance_v13.py',
+ 'enterprise_fallback/odoo18/odoo_no_retry_sampler_v22.py',
  'src/cursibench/full_study_runtime_v2.py','src/cursibench/full_study_final_performance_v2.py')
 
 
@@ -102,7 +103,8 @@ class OdooNativeSurfaceFinalWorkerV22(legacy.OdooNativeSurfaceFinalWorker):
   environment._native_readiness_sink=lambda value:write(episode,'db-readiness.private.json',value)
   environment.load_command_task(identity,episode)
   base=command['owner_slot']=='shared-base'
-  actual=selection.RealTinkerSelectionSampler(checkpoint_path='Qwen/Qwen3.8-27B' if base else command['sampler_path'],
+  from .odoo_no_retry_sampler_v22 import sampler_class
+  actual=sampler_class(selection)(checkpoint_path='Qwen/Qwen3.8-27B' if base else command['sampler_path'],
    config=config,output_root=episode,attempt_id=command['attempt_id'],base_mode=base,
    expected_base_checkpoint_sha256=command['checkpoint_sha256'] if base else None)
   metered=MeteredSampler(actual,episode,command);metered.parent_paid_attempt_id=command['attempt_id']
