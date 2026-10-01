@@ -14,7 +14,10 @@ from cursibench import full_study_final_dispatch_v1 as final
 from cursibench import native_surface_guard_policy_v1 as policy
 from magento_catalog_factory import native_surface_actor_v1 as actor
 from magento_catalog_factory import native_surface_workers_v1 as workers
-from magento_catalog_factory import native_surface_budget_performance_v1 as audit
+from magento_catalog_factory import native_surface_budget_performance_v2 as audit
+from magento_catalog_factory import native_queue_runtime_v2 as queued
+from tests.test_magento_native_queue_v2 import process as queue_process,queue as queue_state,owner as queue_owner,TOKEN
+from enterprise_fallback.odoo18.odoo_native_surface_evidence_v6 import EvidenceStore
 from tests.test_magento_catalog_saved_state import CASE
 from tests.test_magento_native_surface_guard_v1 import Page
 from tests.test_magento_dedicated_train_lane_v066 import FakeDocker
@@ -23,9 +26,9 @@ from tools import magento_dedicated_train_lane_v066 as original
 
 class Runtime:
     """Original manager and reset method; fake process/native page only."""
-    def __init__(self,positive=True,missing_reset=False,missing_saved=False,uncertain=False):
+    def __init__(self,positive=True,missing_reset=False,missing_saved=False,uncertain=False,queue_pending=False):
         self.page=Page();self.positive=positive;self.missing_reset=missing_reset;self.missing_saved=missing_saved;self.uncertain=uncertain
-        self.events=[]
+        self.events=[];self.queue_pending=queue_pending
         old=self.page.mouse.click
         async def click(*args):
             if uncertain:raise TimeoutError('synthetic native IO unknown')
@@ -51,8 +54,23 @@ class Runtime:
                 return {'snapshot':state,'native_save_observed':not self.missing_saved}
             session=SimpleNamespace(page=self.page,baseline_state=baseline,spec=original.pair(0),manager=manager,
                 saved_state=saved,reset_proof=None)
+            store=EvidenceStore(output);started=time.monotonic();qstate=queue_state(self.queue_pending)
+            class PassiveFixture:
+                def __init__(self):self.probes=[]
+                async def observe(self,metadata):
+                    row={'schema':'magento-native-passive-queue-observation-v2','native_context_sha256':policy.digest(metadata),'observed_monotonic':time.monotonic(),'native_process':queue_process(),'queue':qstate,'synthetic_native_transport_only':True}
+                    ref=store.json(f'queue/probe-{len(self.probes):04d}.private.json',row,'native_observation_envelope');self.probes.append({'reference':ref,'observed_monotonic':row['observed_monotonic']})
+            observer=PassiveFixture();session.page=queued.PassivePage(self.page,observer)
+            store.json('queue/startup.private.json',{'native':queue_process(),'scope_token':TOKEN,'observed_monotonic':started,'synthetic_native_transport_only':True},'native_observation_envelope')
+            store.json('queue/baseline.private.json',qstate,'native_observation_envelope')
             try:yield session
             finally:
+                empty=sha256(b'').hexdigest();owner=queue_owner()
+                (Path(output)/'queue/consumer.stdout.private.bin').touch(mode=0o600);(Path(output)/'queue/consumer.stderr.private.bin').touch(mode=0o600)
+                store.json('queue/close.private.json',{'exit':{'schema':'magento-native-consumer-exit-v2','token':TOKEN,'child':owner['child'],'reason':'owned_close_request','child_pid_absent':True,'stop_signal_returned':True,'first_observed_exitcode':143,'stdout_sha256':empty,'stderr_sha256':empty},'supervisor_pid_absent':True,'observed_monotonic':time.monotonic(),'synthetic_native_transport_only':True},'driver_result')
+                store.json('queue/probes.private.json',{'probes':observer.probes},'native_observation_envelope')
+                store.json('queue/reset.private.json',{'full_channel_exact':True,'fresh_app_b_before_original_cleanup':True,'baseline':qstate,'restored':qstate},'native_observation_envelope')
+                store.json('queue/lifecycle.private.json',{'started_monotonic':started,'ended_monotonic':time.monotonic(),'seconds_limit':1200,'original_clone_reset_completed':True},'native_observation_envelope')
                 reset=original.DedicatedMagentoTrainRuntime({'source_search_sha256':process.source_sha},Path(output)/'synthetic-lane',runner=process,seeder=manager.seeder)
                 session.reset_proof=await reset._prove_fresh_reset(manager,case,process.source_sha,prepared,baseline)
                 self.events.append('actual_original_fresh_clone_reset')
@@ -86,7 +104,7 @@ class ProductionPipelineTests(unittest.TestCase):
     def run_episode(self,**kwargs):
         runtime=Runtime(**kwargs);sampler=Sampler();output=self.root/('episode-'+str(len(list(self.root.iterdir()))));output.mkdir(mode=0o700)
         with patch('time.monotonic',lambda:runtime.page.tick):
-            row=asyncio.run(actor.run_task(case=self.case,task=self.task,output=output,runtime=runtime,sampler=sampler,
+            row=asyncio.run(queued.run_task(case=self.case,task=self.task,output=output,runtime=runtime,sampler=sampler,
                 username=runtime.page.uid,attempt_id='synthetic-owned',paid_attempt_id='synthetic-paid'))
             sampler.__exit__(None,None,None)
         row.update(provider_close_ref=sampler.provider_close_reference,complete_lifecycle_wall_time_ms=row['lifecycle_wall_time_ms'])
@@ -137,6 +155,10 @@ class ProductionPipelineTests(unittest.TestCase):
         usage=json.loads((outer/value['usage']['path']).read_bytes())
         self.assertEqual(usage['output_tokens'],10);self.assertEqual(len(usage['paid_calls']),2)
         self.assertTrue(all(r['paid_attempt_id']=='synthetic-paid' for r in usage['paid_calls']))
+    def test_saved_price_success_cannot_rescue_native_pending_finish(self):
+        output,row,_,_=self.run_episode(queue_pending=True)
+        self.assertEqual(row['original_sql_score'],1);self.assertEqual(row['score'],0)
+        self.assertEqual(audit.audit_episode(output,row)['independent_queue_clock']['score'],0)
     def test_source_closure_covers_all_slots_and_constructors_do_not_launch(self):
         binding=workers.public_binding();self.assertTrue(binding['all_teacher_control_base_and_four_checkpoint_slots_same_source'])
         self.assertEqual(binding['old_control_credit'],0)

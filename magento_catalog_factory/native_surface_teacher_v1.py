@@ -8,8 +8,8 @@ from cursibench import full_study_runtime_v2 as v22
 from cursibench import full_study_teacher_adapter_v1 as teacher
 from native_desktop_factory.actor_deadline_future_v21 import DeadlineFuture,ActorDeadlineReached
 from .native_surface_workers_v1 import CELL,require,digest,write,public_binding,study_source_snapshot,verify_environment_scope
-from .native_surface_actor_v1 import run_task
-from .native_surface_budget_performance_v1 import audit_episode
+from .native_queue_runtime_v2 import run_task
+from .native_surface_budget_performance_v2 import audit_episode
 
 
 class TeacherSampler:
@@ -54,7 +54,7 @@ class TeacherWorker:
         self.session=session;self.inputs=inputs;self.round_index=round_index;self.enable_live=enable_live
         self.runtime_sha256=inputs.binding['binding_sha256']
         self.adapter_sha256=inputs.binding['source_sha256s']['magento_catalog_factory/native_surface_guard_v1.py']
-        self.verifier_sha256=inputs.binding['source_sha256s']['magento_catalog_factory/verify.py']
+        self.verifier_sha256=inputs.binding['verifier_sha256']
         cell=next(r for r in session.study.plan['cells'] if r['cell_id']==CELL)
         require(cell['matched_bindings']['runtime']==self.runtime_sha256 and cell['matched_bindings']['source_snapshot']==digest(teacher._canonical(study_source_snapshot())) and cell['matched_bindings']['verifier']==self.verifier_sha256 and
             session.study.ratification['cell_profiles'][CELL]['adapter_sha256']==self.adapter_sha256,'magento_teacher_source_not_ratified')

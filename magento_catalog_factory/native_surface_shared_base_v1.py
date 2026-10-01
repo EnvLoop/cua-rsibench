@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 from cursibench import full_study_runtime_v2 as runtime
 from .native_surface_workers_v1 import CELL,Inputs,digest,private_json,write,require,public_binding
-from .native_surface_budget_performance_v1 import audit_episode
+from .native_surface_budget_performance_v2 import audit_episode
 
 SCHEMA='magento-native-v22-shared-base-performance'
 

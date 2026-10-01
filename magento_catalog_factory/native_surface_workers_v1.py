@@ -12,7 +12,8 @@ from cursibench import full_study_matrix_v1 as matrix
 from cursibench import native_surface_guard_policy_v1 as policy
 from cursibench import full_study_selection_environment_v2 as environment
 from . import seed,verify
-from .native_surface_actor_v1 import Runtime,run_task
+from .native_queue_runtime_v2 import Runtime,run_task
+from .native_surface_budget_performance_v2 import verifier_sha256
 from .native_surface_guard_v1 import PROFILE
 from enterprise_fallback.odoo18 import selection_worker_v066 as qwen
 from enterprise_fallback.odoo18.odoo_actor_transport_v1 import sampler_class
@@ -23,6 +24,8 @@ SOURCES=('magento_catalog_factory/native_surface_workers_v1.py',
  'magento_catalog_factory/native_command_journal_v2.py',
  'magento_catalog_factory/native_surface_adapter_v2.py',
  'magento_catalog_factory/native_surface_adapter_v3.py',
+ 'magento_catalog_factory/native_queue_profile_v2.py','magento_catalog_factory/native_queue_runtime_v2.py',
+ 'magento_catalog_factory/native_surface_budget_performance_v2.py','magento_catalog_factory/native_reference_bulk_price_v2.py',
  'magento_catalog_factory/native_surface_actor_v1.py','magento_catalog_factory/native_surface_guard_v1.py',
  'magento_catalog_factory/native_surface_lease_v1.py','magento_catalog_factory/seed.py',
  'magento_catalog_factory/native_surface_budget_performance_v1.py',
@@ -62,6 +65,8 @@ def public_binding():
         'owned_lifecycle_seconds':1200,'environment_category':environment.category(CELL),
         'native_environment':environment.NATIVE_BY_CELL[CELL],'environment_policy_sha256':environment.binding_sha256(),'original_sql_search_scorer_and_fresh_clone_reset':True,
         'whole_raster_equality_required':False,'old_control_credit':0,
+        'native_queue_service_profile':'magento-native-single-attribute-consumer-v2','queue_completion_before_actor_end_required':True,
+        'verifier_sha256':verifier_sha256(),
         'source_sha256s':{name:digest((ROOT/name).read_bytes()) for name in SOURCES}}
     return {**value,'binding_sha256':digest(final.canonical(value))}
 
@@ -105,7 +110,7 @@ class Inputs:
         if not control_preparation_only:self.validate_train_admission()
 
     def validate_train_admission(self):
-        from .native_surface_budget_performance_v1 import audit_episode
+        from .native_surface_budget_performance_v2 import audit_episode
         control_ref=self.lane.get('native_train_controls_ref');review_ref=self.lane.get('root_source_visual_review_ref')
         require(type(control_ref) is dict and type(review_ref) is dict,'magento_fresh_native_train_evidence_required')
         control=private_json(control_ref['path'],control_ref['sha256']);review=private_json(review_ref['path'],review_ref['sha256'])
@@ -196,7 +201,7 @@ class SelectionWorker:
         require(not inputs.control_preparation_only,'native_train_admission_required_before_model')
         inputs.validate_train_admission()
         self.runtime_sha256=inputs.binding['binding_sha256']
-        self.verifier_sha256=inputs.binding['source_sha256s']['magento_catalog_factory/verify.py']
+        self.verifier_sha256=inputs.binding['verifier_sha256']
         cell=next(r for r in study.plan['cells'] if r['cell_id']==CELL)
         require(cell['matched_bindings']['runtime']==self.runtime_sha256 and
             cell['matched_bindings']['source_snapshot']==digest(final.canonical(study_source_snapshot())) and
@@ -275,7 +280,7 @@ class SelectionWorker:
             tracked_dispatch(attempt_id=identifier,category='storage_application',work=request,request=request,
                 reserve_usd='1',resource_reservation={},provider=provider)
             row=private_json(task_dir/'native-row.private.json')
-            from .native_surface_budget_performance_v1 import audit_episode,prepare_budget_performance
+            from .native_surface_budget_performance_v2 import audit_episode,prepare_budget_performance
             audited=audit_episode(task_dir,row)
             if any(r['status']=='actor_deadline_proven' for r in row['samples']):
                 stopped=next(r for r in row['samples'] if r['status']=='actor_deadline_proven')
@@ -398,12 +403,12 @@ def final_worker_factory(*,gate,inputs=None,inputs_path=None,inputs_sha256=None,
 
 
 def final_outcome(command,output,episode,row,*,study=None):
-    from .native_surface_budget_performance_v1 import audit_episode
+    from .native_surface_budget_performance_v2 import audit_episode
     audit_episode(episode,row)
     saved_path=episode/'saved-state.private.json';verifier=private_json(episode/'verifier.private.json')
     saved=private_json(saved_path);reset=private_json(episode/'reset.private.json')
     independent=verify.score_saved_state(verifier['case'],verifier['baseline'],saved['snapshot'])
-    require(independent==verifier['verdict'] and row['score']==int(independent['score']==1.0),
+    require(independent==verifier['verdict'] and row['original_sql_score']==int(independent['score']==1.0),
         'magento_saved_score_changed_after_readback')
     verify.check_material_reset(verifier['baseline'],reset['restored_snapshot'])
     actor=private_json(episode/'actor-clock/end.private.json')
@@ -440,7 +445,7 @@ def final_outcome(command,output,episode,row,*,study=None):
         'raw_actor_clock':final.reference(output,episode/'actor-clock/end.private.json')})
     budget=None
     if any(r['status']=='actor_deadline_proven' for r in samples):
-        from .native_surface_budget_performance_v1 import prepare_budget_performance
+        from .native_surface_budget_performance_v2 import prepare_budget_performance
         require(study is not None,'magento_real_budget_performance_study_required')
         budget=prepare_budget_performance(command=command,output=output,episode=episode,row=row,study=study)
     return {'schema':final.OUTCOME_SCHEMA,'status':'scored','score':row['score'],'failure_type':None,

@@ -20,7 +20,7 @@ class SelectionTests(unittest.TestCase):
         f=gates.FullStudyFinalDispatchTests();f.setUp();self.addCleanup(f.tearDown)
         study=fixture.study(f.frozen);cell=next(r for r in study.plan['cells'] if r['cell_id']==source.CELL)
         binding=source.public_binding();cell['matched_bindings']['runtime']=binding['binding_sha256'];cell['matched_bindings']['source_snapshot']=source.digest(source.final.canonical(source.study_source_snapshot()))
-        cell['matched_bindings']['verifier']=binding['source_sha256s']['magento_catalog_factory/verify.py']
+        cell['matched_bindings']['verifier']=binding['verifier_sha256']
         identities=list(study.task_views(source.CELL)['selection'])
         inputs=SimpleNamespace(control_preparation_only=False,binding=binding,roster={'splits':{'selection':[{k:r[k] for k in ('task_id','package_sha256')} for r in identities]}},validate_train_admission=lambda:None,
             username=lambda:'synthetic-admin')

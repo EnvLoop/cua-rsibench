@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 import time
 from .native_surface_workers_v1 import Inputs,ROOT,require,private_json,public_binding,study_source_snapshot,write
-from .native_surface_actor_v1 import run_task
-from .native_surface_budget_performance_v1 import audit_episode
+from .native_queue_runtime_v2 import run_task
+from .native_surface_budget_performance_v2 import audit_episode
 from . import seed,verify
 
 
@@ -21,37 +21,8 @@ class ReferenceSampler:
                 'target_price':case['target_variants'][0]['target_price']}] if mode=='wrong_variant' else [])
     def bind_native_adapter(self,adapter,loop):self.adapter=adapter
     async def control_sample(self,observation):
-        page=self.adapter.page
-        if self.index>=len(self.edits):return {'type':'finish','memory':''}
-        row=self.edits[self.index]
-        if self.stage==0:
-            loc=page.locator('[data-ui-id="menu-magento-catalog-catalog-products"] > a')
-            if not await loc.is_visible():loc=page.locator('#menu-magento-catalog-catalog > a');next_stage=0
-            else:next_stage=1
-            action={'type':'click'}
-        elif self.stage==1:loc=page.locator('input#fulltext:visible').first;next_stage=2;action={'type':'type','mode':'fill','text':row['sku']}
-        elif self.stage==2:loc=page.locator('input#fulltext:visible').first;next_stage=3;action={'type':'key','key':'Enter'}
-        elif self.stage==3:
-            loc=page.locator('table.data-grid tbody tr').filter(has_text=row['sku']).first.get_by_text('Edit',exact=True)
-            next_stage=4;action={'type':'click'}
-        elif self.stage==4:
-            loc=page.locator('input[name="product[price]"]:visible').first
-            sku=page.locator('input[name="product[sku]"]:visible').first
-            if not await sku.is_visible():return {'type':'wait','duration_ms':250}
-            require(await sku.input_value()==row['sku'],'reference_native_product_identity_changed')
-            next_stage=5;action={'type':'type','mode':'fill','text':row['target_price']}
-        elif self.stage==5:loc=page.get_by_role('button',name='Save',exact=True);next_stage=6;action={'type':'click'}
-        else:
-            if not await page.get_by_text('You saved the product.',exact=True).is_visible():return {'type':'wait','duration_ms':250}
-            self.index+=1;self.stage=0;return {'type':'wait','duration_ms':250}
-        # Resolution is bounded and occurs after the exact current observation.
-        # An absent transient candidate consumes only an ordinary wait action;
-        # an unknown dispatched action is never replayed or retargeted.
-        if not await loc.is_visible():return {'type':'wait','duration_ms':250}
-        box=await loc.bounding_box(timeout=min(1000,max(1,int((self.adapter.actor.deadline-time.monotonic())*1000))))
-        if not box:return {'type':'wait','duration_ms':250}
-        self.stage=next_stage
-        return {**action,'target':{'x':round(box['x']+box['width']/2),'y':round(box['y']+box['height']/2)}}
+        from .native_reference_bulk_price_v2 import control_sample
+        return await control_sample(self,observation)
 
 
 def prepare(*,plan_path,plan_sha256,lane_path,lane_sha256,output,final_output_root):

@@ -19,7 +19,7 @@ class MagentoFinalTests(unittest.TestCase):
         self.protocol=gates.FullStudyFinalDispatchTests();self.protocol.setUp();self.addCleanup(self.protocol.tearDown)
         self.gate,_,_=fixture.final_gate(self.protocol);self.cell=next(r for r in self.gate.plan['cells'] if r['cell_id']==source.CELL)
         self.binding=source.public_binding()
-        for key,value in [('source_snapshot',source.digest(final.canonical(source.study_source_snapshot()))),('runtime',self.binding['binding_sha256']),('verifier',self.binding['source_sha256s']['magento_catalog_factory/verify.py'])]:
+        for key,value in [('source_snapshot',source.digest(final.canonical(source.study_source_snapshot()))),('runtime',self.binding['binding_sha256']),('verifier',self.binding['verifier_sha256'])]:
             self.cell['matched_bindings'][key]=value
             for slot in [self.cell['base'],*self.cell['researcher_plans'].values()]:slot['bindings'][key]=value
         self.gate.frozen.ratification['cell_profiles'][source.CELL]['adapter_sha256']=self.binding['source_sha256s']['magento_catalog_factory/native_surface_guard_v1.py']
