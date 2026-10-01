@@ -79,6 +79,10 @@ def prepare(*,plan_path,plan_sha256,lane_path,lane_sha256,output,final_output_ro
 def run_controls(*,inputs,split,output,enable_live=False,train_index=None):
     require(enable_live and split in ('train','selection','official_candidate'),'explicit_native_control_run_required')
     require(inputs.binding==public_binding(),'control_source_changed')
+    if split!='train':
+        # Preparation may open roster metadata; the full controls may proceed
+        # only after reopening the actual current TRAIN/reset/visual proof.
+        inputs.validate_train_admission()
     identities=inputs.roster['splits'][split]
     if split=='train':require(type(train_index) is int and 0<=train_index<20,'explicit_train_case_required');identities=[identities[train_index]]
     output=Path(output);require(not output.exists() and not output.is_symlink(),'fresh_control_namespace_required');output.mkdir(mode=0o700,parents=True)
