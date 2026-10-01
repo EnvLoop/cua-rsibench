@@ -1,0 +1,23 @@
+{
+  "schema": "cua-native-accessibility-observed-ownership-facts-v24",
+  "status": "actual_readonly_diagnostic_observed_not_native_qualification",
+  "diagnostic_result_sha256": "22fec0a1ae5375494d5f96f73d4bc6fcf1257209320d74d41cf3241c6a2322a5",
+  "frozen_probe_sha256": "fd7663808d3ad48b6999d949fe65e46026a12db7dca42e69dea389fb1155edb8",
+  "native_uid": 1000,
+  "probe_uid": 1000,
+  "all_four_process_uids_equal": true,
+  "native_wm_instance": "libreoffice",
+  "native_wm_class": "libreoffice-calc",
+  "process_executable": "/usr/lib/libreoffice/program/soffice.bin",
+  "process_executable_bytes": 14488,
+  "process_executable_sha256": "65bab645455ca7fe2f38e61f5d36b84dc02c229594d6c0598b5078a819d4f43a",
+  "executable_matches_reopened_guest_content_manifest": true,
+  "original_rejection_retained": "native_application_account_not_owned",
+  "original_failure_cause": "class_predicate_requires_soffice_substring",
+  "gi_or_atspi_native_observed": false,
+  "native_ownership_policy_corrected_source_only": true,
+  "native_model_calls": 0,
+  "actor_gui_steps": 0,
+  "cleanup_status": "transport_write_error_root_recovery_pending",
+  "official_model_results": 0
+}
