@@ -20,7 +20,7 @@ class NavigationReadTests(unittest.IsolatedAsyncioTestCase):
         value = self.actor(True)
         metadata = {'native': 'actual-current'}
         reader = AsyncMock(side_effect=[Error('Execution context was destroyed'), metadata])
-        with patch.object(OriginalNativeAdapter, 'meta', reader):
+        with patch('magento_catalog_factory.native_surface_adapter_v2._meta_current', reader):
             self.assertEqual(await value.meta(), metadata)
         self.assertEqual(reader.await_count, 2)
         proof = value.store.json.call_args.args[1]
@@ -30,7 +30,7 @@ class NavigationReadTests(unittest.IsolatedAsyncioTestCase):
     async def test_predispatch_or_keyboard_scope_error_is_never_replayed(self):
         value = self.actor(False)
         reader = AsyncMock(side_effect=Error('Execution context was destroyed'))
-        with patch.object(OriginalNativeAdapter, 'meta', reader):
+        with patch('magento_catalog_factory.native_surface_adapter_v2._meta_current', reader):
             with self.assertRaises(Error):
                 await value.meta()
         reader.assert_awaited_once()
@@ -39,7 +39,7 @@ class NavigationReadTests(unittest.IsolatedAsyncioTestCase):
     async def test_closed_browser_remains_terminal(self):
         value = self.actor(True)
         reader = AsyncMock(side_effect=Error('Target page, context or browser has been closed'))
-        with patch.object(OriginalNativeAdapter, 'meta', reader):
+        with patch('magento_catalog_factory.native_surface_adapter_v2._meta_current', reader):
             with self.assertRaises(Error):
                 await value.meta()
         reader.assert_awaited_once()

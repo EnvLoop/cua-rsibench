@@ -17,3 +17,14 @@ checkpoints bind the same new adapter source.
 Ten focused adapter/original actor/scorer/reset tests passed. The frozen V1
 adapter bytes and prior neutral evidence remain unchanged. Fresh source-bound
 TRAIN/20/100 controls are required before formal activation.
+
+The next actual positive reached the native Products page, where the grid's
+loading mask obscured the search input. The guard correctly rejected typing
+without a driver call. The current getter now recognizes the native
+`admin__data-grid-loading-mask` as busy and allows up to 30 seconds of bounded
+readiness sampling inside the same actor deadline. It neither clicks through
+the mask nor changes a disabled/obscured target into an enabled one. Nineteen
+current getter, overlay, actor/scorer/reset and navigation tests passed.
+
+The native grid-mask behavior is also documented in the official
+[Magento issue](https://github.com/magento/magento2/issues/4299).

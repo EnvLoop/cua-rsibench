@@ -28,7 +28,8 @@ class Page:
         image=Image.new('RGB',(1440,1000),'white');image.putpixel((1000,900),(self.capture%255,1,2));self.capture+=1
         out=BytesIO();image.save(out,'PNG');return out.getvalue()
     async def evaluate(self,script,points):
-        if script!=NATIVE_JS:raise AssertionError('only actual native context getter allowed')
+        from magento_catalog_factory.native_surface_adapter_v2 import NATIVE_JS as CURRENT_NATIVE_JS
+        if script not in (NATIVE_JS, CURRENT_NATIVE_JS):raise AssertionError('only source-bound native context getters allowed')
         target={'ref':'price','bounds':[20,30,200,40],'visible':True,'enabled':self.enabled,'obscured':False,
             'keyboard':True,'actions':['click','double_click','type','key','scroll','drag'],'role':'textbox','label':'Price'}
         return {'schema':'magento-native-context-v1','physical_url':self.url,'viewport':[1440,1000],
