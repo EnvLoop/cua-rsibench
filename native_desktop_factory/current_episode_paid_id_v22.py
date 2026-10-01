@@ -49,7 +49,24 @@ class PaidCalls(_module.PaidCalls):
    request['step']==step and dispatched['intent_sha256']==hashlib.sha256(intent_raw).hexdigest(),'actual_model_paid_intent_or_dispatch_changed')
   if self.session is not None:
    self.session._audit_paid_files();events=[r['data'] for r in self.session._events('paid_intent') if r['data']['attempt_id']==identifier]
-   integration.require(len(events)==1 and events[0]['category']=='tinker' and events[0]['request_sha256']==intent['request_sha256'],'actual_model_paid_session_provenance_missing')
+   if events:
+    integration.require(len(events)==1 and events[0]['category']=='tinker' and events[0]['request_sha256']==intent['request_sha256'],'actual_model_paid_session_provenance_missing')
+   else:
+    # Shared-base deliberately has no campaign paid_intent events; its real
+    # ledger binds a normalized envelope and an exact worker-request ref.
+    session=self.session;record=session.budget.owner_attempts(session.owner).get(identifier)
+    envelope_raw=integration.controls.private(Path(session.directory)/'paid'/(identifier+'.request.private.json'));envelope=json.loads(envelope_raw)
+    envelope_sha=hashlib.sha256(envelope_raw).hexdigest();ref=envelope.get('worker_request_ref',{})
+    integration.require(type(record) is dict and record['category']=='tinker' and record['status'] in ['dispatched','uncertain','settled'] and
+     record['request_sha256']==record['work_sha256']==envelope_sha and envelope['schema']=='cua-full-study-shared-base-paid-request-v1' and
+     envelope['category']=='tinker' and envelope['cell_id']=='desktop-native' and envelope['selection_attempt']==session.attempt_id and
+     envelope['action_profile']=='scale-action-profile-v0.6.6' and envelope['task_id']==request['task_id'] and
+     envelope['package_sha256']==request['package_sha256'] and envelope['checkpoint_path_sha256']==request['checkpoint_path_sha256'] and
+     envelope['frame_sha256']==request['frame_sha256'],'authentic_shared_base_paid_envelope_missing')
+    integration.require(set(ref)=={'path','sha256'} and not Path(ref['path']).is_absolute() and '..' not in Path(ref['path']).parts,'shared_base_worker_ref_escaped')
+    worker_raw=integration.controls.private(Path(session.directory)/ref['path'])
+    integration.require(hashlib.sha256(worker_raw).hexdigest()==ref['sha256']==intent['request_sha256'] and worker_raw==request_raw,
+     'shared_base_worker_request_does_not_match_actual_native_intent')
   return identifier
 
 # Class-local replacement in this isolated source namespace only. All five
