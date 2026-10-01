@@ -91,12 +91,37 @@ class NoRetrySDKTests(unittest.TestCase):
   with patch.object(tinker,'ServiceClient',Service),patch.object(QwenVisionRenderer,'load',return_value=SimpleNamespace(identity={'model':MODEL})):
    for owner in ['shared-base','astra','sol','luna','reference']:
     base=owner=='shared-base';path=MODEL if base else 'tinker://fixture/sampler_weights/'+owner
-    actual=sampler_class(selection)(checkpoint_path=path,config={'seed':0},output_root=Path('/unused'),attempt_id='source-test-'+owner,
-      base_mode=base,expected_base_checkpoint_sha256=digest(MODEL) if base else None)
+    actual=sampler_class(selection)(checkpoint_path=path,config={'model':selection.QWEN_MODEL,'seed':0},output_root=Path('/unused'),attempt_id='source-test-'+owner,
+      base_mode=base,expected_base_checkpoint_sha256=source.digest(MODEL.encode()) if base else None)
     actual.__enter__();self.assertEqual(actual.backend.identity['checkpoint_sha256'],digest(path))
+  self.assertNotEqual(selection.vision_digest(selection.QWEN_MODEL),source.digest(selection.QWEN_MODEL.encode()))
+  self.assertEqual(selection.QWEN_MODEL,MODEL)
   self.assertEqual(len(calls),10)
   for kind,value in calls:
    if kind=='service':self.assertEqual(value['max_retries'],0)
    else:self.assertFalse(value['retry_config'].enable_retry_logic)
+
+ def test_actual_checked_namespace_distinguishes_command_path_hash_from_backend_identity(self):
+  from enterprise_fallback.odoo18.odoo_no_retry_sampler_v22 import sampler_class
+  from cursibench import scale_vision_proxy as vision
+  _,selection=workers._model_modules(workers.public_binding())
+  current=selection.QWEN_MODEL
+  self.assertEqual(current,'Qwen/Qwen3.8-27B')
+  raw=source.digest(current.encode());backend=selection.vision_digest(current)
+  self.assertEqual(raw,'cd680c8d5b395e742c84c22886205c729c9911d625684a3101c9680877a99299')
+  self.assertEqual(backend,'12c2833dc468df030402315b505a8f6a45dc01597e48be1318558da148bf9e02')
+  # The actual production-shaped configuration reaches the renderer only
+  # after the public command identity check; no SDK or provider is constructed.
+  cls=sampler_class(selection)
+  config={'model':current,'seed':0,'sample_max_tokens':4096}
+  actual=cls(checkpoint_path=current,config=config,output_root=Path('/unused'),attempt_id='public-train-metadata-fixture',base_mode=True,
+    expected_base_checkpoint_sha256=raw)
+  with patch.object(vision.QwenVisionRenderer,'load',side_effect=RuntimeError('renderer reached before SDK')) as render:
+   with self.assertRaisesRegex(RuntimeError,'renderer reached'):actual.__enter__()
+   self.assertEqual(render.call_count,1)
+  wrong=cls(checkpoint_path=current,config=config,output_root=Path('/unused'),attempt_id='public-train-wrong-digest',base_mode=True,
+    expected_base_checkpoint_sha256=backend)
+  with patch.object(vision.QwenVisionRenderer,'load',side_effect=AssertionError('bad hash must stop before renderer')):
+   with self.assertRaisesRegex(selection.SelectionWorkerError,'base_checkpoint_unbound'):wrong.__enter__()
 
 if __name__=='__main__':unittest.main()

@@ -167,3 +167,15 @@ control metadata. Extra or answer-bearing metadata fields are rejected.
 A metadata preflight failure is preserved in its original plan directory and
 is never promoted into a paid/native attempt. Use a fresh reviewed namespace
 and source binding after this preparer correction.
+
+The no-retry sampler keeps two checkpoint identities distinct. The reviewed
+command uses SHA-256 of the literal UTF-8 model/path. The pinned vision backend
+uses `scale_vision_proxy.digest`, which hashes the JSON value of a string.
+For `Qwen/Qwen3.8-27B`, these are respectively
+`cd680c8d5b395e742c84c22886205c729c9911d625684a3101c9680877a99299` and
+`12c2833dc468df030402315b505a8f6a45dc01597e48be1318558da148bf9e02`.
+The constructor checks the command identity before renderer/SDK setup, then
+checks the separate actual backend identity after client creation. It resolves
+the same checked model/renderer/backend namespace as the V13 production
+sampler. These hashes are never substituted for one another or fabricated.
+Any consumed pre-SDK pilot failure is preserved; use a new reviewed namespace.
