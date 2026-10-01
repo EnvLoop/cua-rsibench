@@ -1,0 +1,36 @@
+{
+  "cell_id": "odoo-community",
+  "checkpoint_selection_before_final_outcomes_required": true,
+  "completed_training_chains": 0,
+  "family_counts": {
+    "crm": 5,
+    "inventory": 5,
+    "purchase": 5,
+    "sales": 5
+  },
+  "final_base_outcomes": 0,
+  "final_selected_checkpoint_outcomes": 0,
+  "final_task_count": 20,
+  "full_six_environment_publication_claim": false,
+  "initial_researcher": "gpt-6.1-sol",
+  "native_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
+  "previous_configuration_sha256": "a329427a74f6658a8b0a7a51617c27af642895a3db5ea29e1318022bb901863f",
+  "provider_readiness": "blocked_model_not_found",
+  "sampling_seed": "envloop-odoo20-human-request-20261001-v1",
+  "sampling_uses_model_outcomes": false,
+  "schema": "envloop-single-environment-twenty-task-trial-v1",
+  "selection_task_count": 20,
+  "sol61_exact_route_preflight": {
+    "actual_cost_usd": null,
+    "error_message": "Model \"gpt-6.1-sol\" is not supported by any configured account in this group",
+    "error_type": "model_not_found",
+    "http_status": 404,
+    "model_fallback_used": false,
+    "receipt_sha256": "26f42489d5d0e66a152fdd27ef19e30411ef4b378ec26cccfa08294e6295cbc2",
+    "task_content_sent": false
+  },
+  "student": "Qwen/Qwen3.8-27B",
+  "teacher": "gpt-6.1-sol",
+  "train_task_count": 20,
+  "trial_plan_sha256": "6158ab9c81e34f2b82d66ed2abc05ccf478b426577b487fd7ab898aa5b304e11"
+}
