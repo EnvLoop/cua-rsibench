@@ -50,6 +50,8 @@ def build_manifest(parent_plan,amendment,*,parent_protocol_sha256,ratification_s
         'distinct_official_task_identities':600,'initial_slot_task_results':3000,
         'configuration_slots':amendment['configuration_slots'],'compute_limits':amendment['retained_campaign_compute_limits'],
         'task_limits':amendment['retained_task_limits'],'dollar_ceiling_usd':None,
+        'native_environment_by_cell':amendment['native_environment_by_cell'],
+        'environment_policy_sha256':amendment['environment_policy_sha256'],
         'cost_completeness_separate_from_performance':True,'official_model_results_before_freeze':0}
 
 
@@ -284,6 +286,9 @@ def source_manifest(repo_root):
         directory=root/folder
         if directory.is_dir():
             names.update(p.relative_to(root).as_posix() for p in directory.glob('*.py') if p.is_file() and not p.is_symlink())
+    if (root/'tools/office_owned_folder_runtime_v2.py').is_file():
+        from tools.office_owned_folder_runtime_v2 import SOURCE_FILES as office_sources
+        names.update(office_sources)
     values={name:policy.sha((root/name).read_bytes()) for name in sorted(names)}
     return {'schema':'cua-full-study-policy-runtime-source-manifest-v2','source_sha256s':values,
         'legacy_final_gate_sha256':'70be662737d101e5a3f7d6712f359a3d47a758ea4537e56281d3717c717d9c76',

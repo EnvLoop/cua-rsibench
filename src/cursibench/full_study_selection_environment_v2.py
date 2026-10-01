@@ -5,6 +5,9 @@ from . import full_study_selection_environment_v1 as old
 from .full_study_matrix_v1 import CELLS
 SCHEMA='cua-full-study-selection-environment-v2'
 BY_CELL={**old.BY_CELL,'powerpoint-web':'storage_application','excel-web':'storage_application'}
+NATIVE_BY_CELL={'powerpoint-web':'owned_local_browser_cloud_account','excel-web':'owned_local_browser_cloud_account',
+    'desktop-native':'owned_e2b_native_desktop','odoo-community':'owned_self_hosted_original_application',
+    'gitlab':'owned_self_hosted_original_application','magento-admin':'owned_self_hosted_original_application'}
 if set(BY_CELL)!=set(CELLS):raise RuntimeError('six_cell_environment_scope_changed')
 
 
@@ -19,4 +22,4 @@ def paid_categories_valid(cell_id,categories):
 
 
 def binding_sha256():
-    return sha256((json.dumps({'schema':SCHEMA,'by_cell':BY_CELL,'native_account_lease_seconds':1200},sort_keys=True,separators=(',',':'))+'\n').encode()).hexdigest()
+    return sha256((json.dumps({'schema':SCHEMA,'by_cell':BY_CELL,'native_by_cell':NATIVE_BY_CELL,'native_account_lease_seconds':1200},sort_keys=True,separators=(',',':'))+'\n').encode()).hexdigest()

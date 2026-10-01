@@ -31,7 +31,6 @@
   "provider_calls_by_this_implementation_task": 0,
   "public_benchmark_published": false,
   "remaining_native_requirements": [
-    "fresh_actual_paid_id_hook_base_provenance_fix",
     "fresh_odoo_actor_clock_verifier_epoch",
     "current_desktop_teacher_paid_callback_factory",
     "remaining_cell_native_qualification_and_24_campaign_freezes"
@@ -39,10 +38,12 @@
   "schema": "cua-full-study-v22-source-counterpart-verification",
   "status": "source_implementation_with_synthetic_surface_tests",
   "verification": {
+    "actual_paid_id_hook_shared_base_provenance_verified": true,
     "actual_rpc_saved_reset_budget_adapter_tested": true,
     "all_24_chain_final_gate_tested": true,
     "base_and_four_checkpoint_twenty_task_orchestration_tested": true,
     "core_and_regression_test_count": 50,
+    "cross_source_office_formal_environment_mapping_verified": true,
     "tests_use_synthetic_provider_and_native_surfaces": true,
     "unknown_usage_no_retry_tested": true
   }

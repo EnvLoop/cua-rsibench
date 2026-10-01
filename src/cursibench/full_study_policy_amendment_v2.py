@@ -47,7 +47,7 @@ def build(plan,*,user_authorization_sha256,pre_result_review_sha256,official_mod
         'earlier_provider_fault_is_infrastructure_invalid':True,
         'unknown_cost_is_null_not_zero':True,'unknown_inference_is_not_completed':True,
         'same_request_replay_authorized':False,'old_results_reclassified':False,
-        'effective_environment_categories':environment.BY_CELL,
+        'effective_environment_categories':environment.BY_CELL,'native_environment_by_cell':environment.NATIVE_BY_CELL,
         'environment_policy_sha256':environment.binding_sha256(),
         'owned_native_office_account_lease_seconds':1200,
         'e2b_calls_not_fabricated_for_owned_office_account':True}
