@@ -27,6 +27,10 @@ class StudyBudgetLedger:
         self.global_cap=None
         self.limits={owner:{'all_in':None,'categories':{k:None for k in row['categories']}}
                      for owner,row in original.items()}
+        for owner,row in self.limits.items():
+            cell,slot=owner.split(':')
+            if slot=='shared-base' and cell in ('powerpoint-web','excel-web'):
+                row['categories'].pop('e2b',None);row['categories']['storage_application']=None
         with self._lock():
             if not self.path.exists():self._append({'schema':SCHEMA,'kind':'header',
                 'plan_sha256':self.plan_sha256,'amendment_sha256':self.amendment_sha256,

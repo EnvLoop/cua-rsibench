@@ -5,6 +5,7 @@ import hashlib
 import json
 from . import full_study_budget_v1 as legacy
 from . import full_study_matrix_v1 as matrix
+from . import full_study_selection_environment_v2 as environment
 
 SCHEMA='cua-full-study-unlimited-dollar-and-budget-performance-policy-v2'
 
@@ -45,7 +46,11 @@ def build(plan,*,user_authorization_sha256,pre_result_review_sha256,official_mod
             'owned_guest_cleanup','proven_no_late_gui','provider_close_ack'],
         'earlier_provider_fault_is_infrastructure_invalid':True,
         'unknown_cost_is_null_not_zero':True,'unknown_inference_is_not_completed':True,
-        'same_request_replay_authorized':False,'old_results_reclassified':False}
+        'same_request_replay_authorized':False,'old_results_reclassified':False,
+        'effective_environment_categories':environment.BY_CELL,
+        'environment_policy_sha256':environment.binding_sha256(),
+        'owned_native_office_account_lease_seconds':1200,
+        'e2b_calls_not_fabricated_for_owned_office_account':True}
 
 
 def validate(value,plan):

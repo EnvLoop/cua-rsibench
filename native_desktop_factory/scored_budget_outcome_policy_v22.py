@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import re
 import sqlite3
+from contextlib import closing
 
 from cursibench import full_study_policy_amendment_v2 as policy
 from . import prospective_model_worker_v21 as worker
@@ -28,22 +29,24 @@ def private_json(path,root):
     return value
 
 
-def verify(*,plan,amendment,owner_slot,batch,evaluator,package,private_salt,checkpoint_sha256):
+def verify(*,plan,amendment,owner_slot,batch,evaluator,package,private_salt,checkpoint_sha256,policy_manifest_sha256=None,sampler_process=None):
     amendment_sha=policy.validate(amendment,plan)
     if owner_slot not in amendment['configuration_slots']:raise ValueError('unmatched_owner_slot')
     return verify_artifacts(owner_slot=owner_slot,batch=batch,evaluator=evaluator,package=package,
-        private_salt=private_salt,checkpoint_sha256=checkpoint_sha256,amendment_sha256=amendment_sha)
+        private_salt=private_salt,checkpoint_sha256=checkpoint_sha256,amendment_sha256=amendment_sha,policy_manifest_sha256=policy_manifest_sha256,sampler_process=sampler_process)
 
 
-def verify_artifacts(*,owner_slot,batch,evaluator,package,private_salt,checkpoint_sha256,amendment_sha256=None):
+def verify_artifacts(*,owner_slot,batch,evaluator,package,private_salt,checkpoint_sha256,amendment_sha256=None,policy_manifest_sha256=None,sampler_process=None):
     if owner_slot not in ['shared-base',*integration.matrix.RESEARCHERS]:raise ValueError('unmatched_owner_slot')
     if not isinstance(checkpoint_sha256,str) or not re.fullmatch('[a-f0-9]{64}',checkpoint_sha256):
         raise ValueError('checkpoint_sha256_required')
     batch=Path(batch).resolve();out=Path(evaluator).absolute()
     if out.resolve()!=out or not out.is_relative_to(batch):raise ValueError('owned_episode_path_required')
     task=private_json(out/'task.private.json',batch)
-    if any(task.get(k)!=v for k,v in package['identity'].items()) or task.get('model_outcome')!='actor_wall_budget' or type(task.get('score')) is not int or task['score']!=0:
+    if any(task.get(k)!=v for k,v in package['identity'].items()) or task.get('model_outcome')!='actor_wall_budget' or type(task.get('score')) is not int or task['score'] not in (0,1):
         raise ValueError('verified_budget_ended_task_required_no_score_inference')
+    for field,name in [('saved_state_sha256','saved-state.private.json'),('verifier_receipt_sha256','verifier.private.json'),('reset_receipt_sha256','reset.private.json')]:
+        if task.get(field)!=sha(out/name):raise ValueError('task_saved_reset_private_hash_changed')
     trace=json.loads(integration.controls.private(out/'actions.private.json'))
     actions=[row['action'] for row in trace if row.get('status')=='applied']
     model=worker.DesktopProspectiveModelWorker(study=None,admissions_path=Path('/unused'),proposal_path=Path('/unused'))
@@ -56,10 +59,14 @@ def verify_artifacts(*,owner_slot,batch,evaluator,package,private_salt,checkpoin
     proof=budget['actor_deadline_proof']
     if budget.get('gui_applied') is not False or not any(row.get('status')=='not_applied_actor_deadline' for row in trace):
         raise ValueError('explicit_unapplied_deadline_sample_required')
-    process=batch/'sampler-process';matches=[]
+    process=Path(sampler_process).resolve() if sampler_process is not None else batch/'sampler-process'
+    if not process.is_relative_to(batch) or process.is_symlink():raise ValueError('owned_sampler_process_path_required')
+    matches=[]
     setups=[]
     for path in process.glob('[0-9]*.request.private.json'):
         request=private_json(path,batch)
+        if policy_manifest_sha256 is not None and request.get('plan_sha256')!=policy_manifest_sha256:
+            raise ValueError('old_episode_cannot_be_reclassified_under_new_policy')
         if request.get('kind')=='setup':
             result_path=path.with_name(path.name.replace('.request.','.result.'))
             result=private_json(result_path,batch)
@@ -89,7 +96,7 @@ def verify_artifacts(*,owner_slot,batch,evaluator,package,private_salt,checkpoin
     private_json(intent,batch);sent=private_json(dispatch,batch)
     if sent.get('intent_sha256')!=sha(intent) or (paid/(paid_id+'.result.private.json')).exists():
         raise ValueError('uncertain_paid_intent_changed_or_result_invented')
-    with sqlite3.connect('file:'+str(out/'sampling-journal/requests.sqlite3')+'?mode=ro',uri=True) as db:
+    with closing(sqlite3.connect('file:'+str(out/'sampling-journal/requests.sqlite3')+'?mode=ro',uri=True)) as db:
         rows=[json.loads(raw) for state,raw in db.execute('select state,result from requests') if state=='complete' and raw]
     completed=sum(row.get('status')=='completed' for row in rows)
     failed=sum(row.get('status')=='error' for row in rows)
@@ -113,5 +120,5 @@ def verify_artifacts(*,owner_slot,batch,evaluator,package,private_salt,checkpoin
             'reset.private.json','actor-clock.private.json','actor-budget-stop.private.json','task.private.json']},
         'sample_paid_attempt_id':paid_id,'paid_intent_sha256':sha(intent),
         'rpc_result_sha256':sha(matches[0]),'shutdown_sha256':sha(close_path),
-        'performance_coverage_eligible':amendment_sha256 is not None,'invoice_complete_eligible':False,
+        'performance_coverage_eligible':amendment_sha256 is not None and policy_manifest_sha256 is not None,'invoice_complete_eligible':False,
         'formal_registration_performed':False,'official_final_credit':0}

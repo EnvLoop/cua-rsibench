@@ -25,7 +25,7 @@ class PerformanceCoverageTests(unittest.TestCase):
             **tasks[0],'owner_slot':'shared-base','checkpoint_sha256':checkpoint,
             'performance_coverage_eligible':True,'provider_close_acknowledged':True,
             'performance':{'status':'independently_saved_scored_and_reset','score':0},
-            'inference':{'unknown_response_is_completed':False,'request_replayed':False},
+            'inference':{'status':'completion_unknown_after_actor_deadline','unknown_response_is_completed':False,'request_replayed':False},
             'billing':{'actual_usd':None},'formal_registration_performed':False,
             'evidence_sha256':{name:'d'*64 for name in ['saved-state.private.json','verifier.private.json','reset.private.json',
                 'actor-clock.private.json','actor-budget-stop.private.json','task.private.json']}}
