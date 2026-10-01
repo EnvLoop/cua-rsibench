@@ -1,0 +1,29 @@
+{
+  "exact_filestore_reset": true,
+  "formal_campaigns_completed": 0,
+  "formal_model_outcomes": 0,
+  "full20_and_full100_pending": true,
+  "historical_credit": 0,
+  "independent_saved_rewards": {
+    "baseline": 0.0,
+    "positive": 1.0,
+    "wrong_object": 0.0
+  },
+  "independent_source_visual_review_sha256": "8397d3791b4126fdf291eb9a2e348a64890b467008b8cc6c288513c6f8a983a0",
+  "model_calls": 0,
+  "native_actions": 20,
+  "native_adapter_binding_sha256": "5ad6522ea25d3fc9727b1f3a197917ce1d57113a8b16c2cba170db111b27ea5c",
+  "native_worker_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
+  "official_tasks_admitted": 0,
+  "original_services_restored": true,
+  "protected_source_bytes_equal": true,
+  "raw_native_guard_pngs_reopened": 40,
+  "same_seven_actor_source_binding": true,
+  "schema": "envloop-public-odoo-v13-native-train-root-result-v1",
+  "source_data_kind": "explicitly_labeled_synthetic_supplier_confirmation",
+  "source_epoch": "v13_ref2",
+  "source_pdf_visually_readable_and_matches_package": true,
+  "status": "fresh_native_owned_surface_train_flow_verified",
+  "task_id": "ELPO-TRN-0001",
+  "train_control_sha256": "562567cb1b8c3a064869f34fa55b0a24310d6e4a01e18b3a6edd8e3196b0655c"
+}
