@@ -12,14 +12,11 @@ For the completed actual20 run, after source review:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=.:src:tests:enterprise_fallback/odoo18 \
-/Users/xiaoyong/Documents/Codex/2026-09-22/ya/.venv/bin/python \
-  -m enterprise_fallback.odoo18.native_reference_split_finalizer_v1 \
-  --plan /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix/work/odoo-native-reference-v1-root-20261001.private/selection-plan.private.json \
-  --worker-dir /Users/xiaoyong/Documents/Codex/2026-09-25/odoo-four-workflows/enterprise_fallback/odoo18/partition_workers/selection \
-  --run-dir /Users/xiaoyong/Documents/Codex/2026-09-25/odoo-four-workflows/enterprise_fallback/odoo18/partition_workers/selection/private/v066_native_surface_controls_v12/native-v12-2bb7c47798fa4713cf207c274f56d469 \
-  --source-review /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix/work/odoo-native-reference-v1-root-20261001.private/root-full20-source-visual-review.private.json \
-  --source-review-sha256 4539fd602b5c8ebf4f43c0cecabb963473a1d7adc246f53eb73a2c556ec6af09 \
-  --out /Users/xiaoyong/Documents/Codex/2026-09-22/magento-observer-fix/work/odoo-native-reference-v1-root-20261001.private/full20-derived-qualification.private.json
+"$PYTHON" -m enterprise_fallback.odoo18.native_reference_split_finalizer_v1 \
+  --plan "$CURRENT_SPLIT_PLAN" --worker-dir "$ORIGINAL_SPLIT_WORKER" \
+  --run-dir "$COMPLETED_NATIVE_RUN" --source-review "$ROOT_VISUAL_REVIEW" \
+  --source-review-sha256 "$ROOT_VISUAL_REVIEW_SHA256" \
+  --out "$FRESH_PRIVATE_DERIVED_QUALIFICATION"
 ```
 
 The same CLI supports the official-hidden100 plan/run only after that entire batch completes and root supplies a complete independently inspected100-case review. A signed native launch authorization is not a visual review and is intentionally rejected.
