@@ -1,0 +1,19 @@
+{
+  "full100_completed": false,
+  "full_git_tree_verified": true,
+  "full_trio_completed": false,
+  "immutable_seed_exact": true,
+  "model_calls": 0,
+  "native_actor_epoch": "v12_unchanged",
+  "native_binding_sha256": "5285908f284f05475baeec61da9098a7df92e48014e7d5dd733580cfff47fbcd",
+  "official_final_admitted": 0,
+  "original_exact_business_snapshot": true,
+  "original_healthy": true,
+  "original_same_identity": true,
+  "owned_parent_absent": true,
+  "protected_source_exact": true,
+  "saved_artifact_sha256": "d683c2adefe86fc7d6a89f5618ab64f7fc307756a347a34ae0036502317d745b",
+  "saved_independent_score": 1.0,
+  "schema": "envloop-gitlab-native-milestone-positive-root-v16",
+  "status": "first_milestone_saved_sql_git_reset_reopened"
+}
