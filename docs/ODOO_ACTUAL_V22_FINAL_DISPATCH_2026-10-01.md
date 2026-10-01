@@ -154,3 +154,16 @@ RetryConfig signatures. Official documentation confirms a separate sampling
 retry configuration: [Tinker SDK configuration](https://github.com/thinking-machines-lab/tinker/blob/main/_autodocs/configuration.md).
 The installed SDK exposes `RetryConfig(enable_retry_logic=False)`; documented
 example parameter names from a different SDK revision are not substituted.
+
+The public TRAIN metadata bridge validates the original five-field rows
+(`task_id`, `package_sha256`, `source_groups`, `template_group`,
+`instance_group`) across the full 20-task roster before projecting the two
+actor identity fields. It preserves split isolation and five tasks per family.
+At dispatch it reopens the full public partition and independently checks each
+row's template/instance identity, original source asset hash and package hash.
+The actor receives only its visible task instruction, screenshot and ordinary
+control metadata. Extra or answer-bearing metadata fields are rejected.
+
+A metadata preflight failure is preserved in its original plan directory and
+is never promoted into a paid/native attempt. Use a fresh reviewed namespace
+and source binding after this preparer correction.

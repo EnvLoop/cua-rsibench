@@ -35,15 +35,62 @@ class PublicTrainTests(unittest.TestCase):
             (self.f.private/'partition_cases.json').write_bytes(source.legacy.final.canonical(world))
             manifest=json.loads((self.f.private/'task_set_manifest.json').read_bytes())
             ids={case['id'] for rows in world['cases'].values() for case in rows}
-            manifest['train']=[row for row in manifest['official'] if row['task_id'] in ids];manifest['official']=[]
+            asset=b'synthetic source-only package asset'
+            manifest['train']=[];manifest['official']=[]
+            for family,cases in world['cases'].items():
+                for index,case in enumerate(cases):
+                    case['template_group']='odoo-causal-'+source.digest(family.encode())[:16]
+                    case['instance_group']=f'odoo-instance-public-fixture-{family}-{index+1:04d}'
+                    row={'task_id':case['id'],'package_sha256':source.digest(json.dumps(case,sort_keys=True).encode()+b'\n'+asset),
+                        'source_groups':['odoo-source-'+source.digest(asset)],'template_group':case['template_group'],'instance_group':case['instance_group']}
+                    manifest['train'].append(row)
+            (self.f.private/'partition_cases.json').write_bytes(source.legacy.final.canonical(world))
             (self.f.private/'task_set_manifest.json').write_bytes(source.legacy.final.canonical(manifest))
-            request,review=self.request({k:command[k] for k in ('task_id','package_sha256')})
+            actor_task=next(row for row in source.project_train_manifest(manifest) if row['task_id']==command['task_id'])
+            request,review=self.request(actor_task)
             original_enter=self.f.selection.RealTinkerSelectionSampler.__enter__
             def entered(delegate):
                 returned=original_enter(delegate);delegate.backend=__import__('types').SimpleNamespace(identity={'model':'Qwen/Qwen3.8-27B','sampling_kind':'base','checkpoint_sha256':source.digest(b'Qwen/Qwen3.8-27B')});return returned
             with patch.object(self.f.selection.RealTinkerSelectionSampler,'__enter__',entered),patch.object(factory,'local_config',return_value={'ODOO_PORT':'8069','ODOO_PROJECT':'source_fixture','ODOO_PARTITION':'train'}), \
                  patch.object(source,'sampler_class',side_effect=lambda selection:selection.RealTinkerSelectionSampler):
                 yield request,review,details
+    def test_actual_five_field_prepare_request_projects_identity_and_keeps_unsigned_review(self):
+        from tools.odoo_public_train_model_pilot_v22 import main
+        with self.environment() as (request,_,_):
+            manifest=json.loads((self.f.private/'task_set_manifest.json').read_bytes())
+            self.assertTrue(all(set(row)==source.METADATA_FIELDS for row in manifest['train']))
+            stage=self.f.protocol.work/'five-field-prepare.private'
+            argv=['prepare-request','--worker-dir',str(self.f.worker_dir),'--native-binding',str(self.f.binding_path),
+                '--native-binding-sha256',self.f.binding_sha,'--train-control',str(self.proof_path),'--train-control-sha256',self.proof_sha,
+                '--task-id',request['task']['task_id'],'--attempt-id','public-train-five-field-fixture','--output-run',str(self.owned),'--output-stage',str(stage)]
+            self.assertEqual(main(argv),0)
+            prepared=json.loads((stage/'request.private.json').read_bytes())
+            self.assertEqual(prepared['task'],request['task']);self.assertEqual(set(prepared['task']),{'task_id','package_sha256'})
+            review=json.loads((stage/'unsigned-root-review.private.json').read_bytes())
+            self.assertFalse(review['one_public_train_paid_pilot_authorized'])
+            review['one_public_train_paid_pilot_authorized']=True
+            with patch.object(source,'modules',side_effect=AssertionError('native setup')),patch.object(formal,'FinalGate',side_effect=AssertionError('fake authority')):
+                source.PublicTrainPilot(prepared,review)
+            self.assertEqual(json.loads((self.f.private/'task_set_manifest.json').read_bytes()),manifest)
+            self.assertFalse(self.owned.exists())
+
+    def test_full_metadata_roster_and_source_groups_not_discarded_by_projection(self):
+        with self.environment() as (_,_,_):
+            original=json.loads((self.f.private/'task_set_manifest.json').read_bytes())
+            for defect in ('duplicate_task','missing_family','source_format','split_overlap','unknown_field'):
+                value=copy.deepcopy(original)
+                if defect=='duplicate_task':value['train'][1]['task_id']=value['train'][0]['task_id']
+                if defect=='missing_family':value['train'][-1]['instance_group']='odoo-instance-fixture-purchase-0099'
+                if defect=='source_format':value['train'][0]['source_groups']=['unbound']
+                if defect=='split_overlap':value['selection']=[copy.deepcopy(value['train'][0])]
+                if defect=='unknown_field':value['train'][0]['answer']='never projected'
+                with self.subTest(defect=defect),self.assertRaises(ValueError):source.project_train_manifest(value)
+            world=json.loads((self.f.private/'partition_cases.json').read_bytes())
+            for defect in ('source_groups','template_group','instance_group','package_sha256'):
+                rows=copy.deepcopy(original['train']);rows[0][defect]=['odoo-source-'+'0'*64] if defect=='source_groups' else 'wrong'
+                with self.subTest(defect=defect),self.assertRaisesRegex(ValueError,'source_group_or_package_changed'):
+                    source.validate_train_world_metadata(rows,world)
+
     def test_constructor_metadata_only_no_final_gate_or_case_body(self):
         task={'task_id':'public-train-synthetic','package_sha256':'a'*64};request,review=self.request(task)
         with patch.object(source,'modules',side_effect=AssertionError('native')),patch.object(formal,'FinalGate',side_effect=AssertionError('fake600')):

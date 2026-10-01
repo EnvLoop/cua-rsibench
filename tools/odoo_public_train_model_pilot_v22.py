@@ -19,7 +19,7 @@ def main(argv=None):
     if args.operation=='prepare-request':
         worker=Path(args.worker_dir).resolve();pilot.require(worker.name=='train','pilot_public_train_partition_required')
         manifest=json.loads(pilot.private(worker/'private/task_set_manifest.json'))
-        rows=manifest.get('train');pilot.require(type(rows) is list and len(rows)==20,'pilot_full_public_train_manifest_required')
+        rows=pilot.project_train_manifest(manifest)
         matches=[row for row in rows if row['task_id']==args.task_id];pilot.require(len(matches)==1,'pilot_unique_public_train_task_required')
         request={'schema':'odoo-public-train-model-pilot-request-v22','attempt_id':args.attempt_id,'worker_dir':str(worker),
             'output_root':str(Path(args.output_run).resolve()),'native_binding':{'path':str(Path(args.native_binding).resolve()),'sha256':args.native_binding_sha256},

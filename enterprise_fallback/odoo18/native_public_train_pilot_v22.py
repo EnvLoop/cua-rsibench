@@ -33,6 +33,55 @@ def read_ref(reference):
     return json.loads(raw)
 
 
+METADATA_FIELDS={'task_id','package_sha256','source_groups','template_group','instance_group'}
+FAMILIES=('purchase','inventory','sales','crm')
+
+
+def project_train_manifest(manifest):
+    """Validate full public metadata before projecting actor identity only."""
+    require(type(manifest) is dict,'pilot_public_train_manifest_required')
+    rows=manifest.get('train')
+    require(type(rows) is list and len(rows)==20,'pilot_full_public_train_manifest_required')
+    families=[]
+    for row in rows:
+        require(type(row) is dict and set(row)==METADATA_FIELDS and type(row['task_id']) is str and row['task_id'] and
+            re.fullmatch(r'[0-9a-f]{64}',str(row['package_sha256'])) and type(row['source_groups']) is list and len(row['source_groups'])==1 and
+            re.fullmatch(r'odoo-source-[0-9a-f]{64}',str(row['source_groups'][0])) and
+            re.fullmatch(r'odoo-causal-[0-9a-f]{16}',str(row['template_group'])),'pilot_public_train_metadata_invalid')
+        match=re.fullmatch(r'odoo-instance-.+-(purchase|inventory|sales|crm)-[0-9]{4}',str(row['instance_group']))
+        require(match is not None,'pilot_public_train_instance_family_invalid');families.append(match[1])
+    require(len({r['task_id'] for r in rows})==20 and len({r['instance_group'] for r in rows})==20 and
+        all(families.count(family)==5 for family in FAMILIES),'pilot_public_train_full_roster_invalid')
+    for split,others in manifest.items():
+        if split=='train':continue
+        require(type(others) is list and all(type(row) is dict for row in others),'pilot_other_split_metadata_invalid')
+        for name in ('task_id','instance_group','template_group'):
+            require(not {r[name] for r in rows}&{r.get(name) for r in others},'pilot_public_train_split_identity_overlap')
+        other_sources={group for row in others for group in row.get('source_groups',[])}
+        require(not {group for row in rows for group in row['source_groups']}&other_sources,'pilot_public_train_split_source_overlap')
+    return [{'task_id':row['task_id'],'package_sha256':row['package_sha256']} for row in rows]
+
+
+def validate_train_world_metadata(rows,world):
+    """Trusted public source readback; metadata is never given to the actor."""
+    import importlib
+    package=importlib.import_module('partition_factory')
+    require(Path(package.__file__).resolve()==ROOT/'enterprise_fallback/odoo18/partition_factory.py','pilot_package_factory_unbound')
+    cases=[(family,case) for family,items in world['cases'].items() for case in items]
+    require(len(cases)==20 and len({case['id'] for _,case in cases})==20 and all(sum(name==f for name,_ in cases)==5 for f in FAMILIES),
+        'pilot_public_train_case_roster_invalid')
+    by_id={case['id']:(family,case) for family,case in cases}
+    require(set(by_id)=={r['task_id'] for r in rows},'pilot_public_train_case_identity_changed')
+    for row in rows:
+        family,case=by_id[row['task_id']]
+        asset=package.source_asset(case,world)
+        require(case.get('family')==family and row['template_group']==case.get('template_group') and
+            row['instance_group']==case.get('instance_group') and
+            row['source_groups']==['odoo-source-'+digest(asset)] and
+            row['package_sha256']==digest(json.dumps(case,sort_keys=True).encode()+b'\n'+asset),
+            'pilot_public_train_source_group_or_package_changed')
+
+
 def modules(worker,binding):
     code=ROOT/'enterprise_fallback/odoo18';os.environ['ENVLOOP_ODOO_WORKER_DIR']=str(worker)
     if str(code) not in sys.path:sys.path.insert(0,str(code))
@@ -54,12 +103,13 @@ def modules(worker,binding):
 def train_environment(selection,worker,identities,binding):
     # An exact checked partition bridge; actor/scorer/reset implementations stay V13.
     source=inspect.getsource(legacy.environment_factory)
-    replacements=(("rows=manifest.get('official')","rows=manifest.get('train')"),
+    replacements=(("rows=manifest.get('official')","metadata_rows=manifest.get('train');rows=project_train_manifest(manifest)"),
         ('len(rows)==100','len(rows)==20'),('len(all_cases)==100','len(all_cases)==20'),
-        ('==25 for family','==5 for family'),('})==100','})==20'),("split!='official'","split!='train'"))
+        ('==25 for family','==5 for family'),('})==100','})==20'),("split!='official'","split!='train'"),
+        ("world=json.loads(private(factory.PRIVATE/'partition_cases.json'))","world=json.loads(private(factory.PRIVATE/'partition_cases.json'));validate_train_world_metadata(metadata_rows,world)"))
     for before,after in replacements:
         require(source.count(before)==1,'pilot_checked_partition_bridge_source_changed');source=source.replace(before,after)
-    namespace=dict(legacy.environment_factory.__globals__);namespace['_modules']=modules
+    namespace=dict(legacy.environment_factory.__globals__);namespace['_modules']=modules;namespace['project_train_manifest']=project_train_manifest;namespace['validate_train_world_metadata']=validate_train_world_metadata
     exec(compile(source,'checked-odoo-public-train-partition-bridge-v22','exec'),namespace)
     return namespace['environment_factory'](selection,worker,identities,binding)
 
@@ -114,7 +164,7 @@ class PublicTrainPilot:
         require(bool(os.environ.get('TINKER_API_KEY')),'pilot_tinker_key_missing')
         _,selection=workers._model_modules(self.binding)
         factory,_,_,_,_=modules(self.worker,self.binding)
-        manifest=json.loads(private(factory.PRIVATE/'task_set_manifest.json'));identities=manifest.get('train')
+        manifest=json.loads(private(factory.PRIVATE/'task_set_manifest.json'));identities=project_train_manifest(manifest)
         require(type(identities) is list and len(identities)==20 and self.request['task'] in identities,'pilot_task_not_in_public_train_partition')
         environment=train_environment(selection,self.worker,identities,self.binding)
         environment._native_readiness_sink=lambda value:write(self.output,'db-readiness.private.json',value)
