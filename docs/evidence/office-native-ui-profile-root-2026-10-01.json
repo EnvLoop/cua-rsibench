@@ -1,0 +1,51 @@
+{
+  "actor_actions": 0,
+  "document_bytes_unchanged_after_open_and_close": true,
+  "download_sha256": "04565296c07bf324947e11576f4fb1a7f8d7f88361c0057e2cab6d0295a36aa4",
+  "file_bytes": 37865,
+  "formal_admission_credit": 0,
+  "generic_save_reset_qualified": false,
+  "model_calls": 0,
+  "native_opened_tab_derived_from_actual_inventory": true,
+  "observed_at_utc": "2026-10-01T02:14:17.063265+00:00",
+  "powerpoint_profile": {
+    "canvas_rect": [
+      256,
+      124,
+      1664,
+      722
+    ],
+    "canvas_selector": "#WACViewPanel",
+    "focus_dynamic_id_not_frozen": true,
+    "focus_native_role": "option",
+    "focus_native_tag": "DIV",
+    "frame_selector": "iframe#WacFrame_PowerPoint_0",
+    "frame_title": "Office on the web Frame",
+    "geometry_extracted_with_read_only_cua_dom_api": true,
+    "iframe_rect": [
+      0,
+      0,
+      1920,
+      873
+    ],
+    "mode_native_label": "Mode Menu;Editing Selected",
+    "mode_selector": "#ModeSwitcher",
+    "save_status_native_label": "Saved to OneDrive\nClick the cloud icon to view file location",
+    "save_status_selector": "#SaveStatusButton",
+    "thumbnail_rect": [
+      0,
+      124,
+      256,
+      726
+    ],
+    "thumbnail_selector": "#pptonline-sorter-view-id",
+    "viewport": [
+      1920,
+      873
+    ]
+  },
+  "prior_development_input_sha256": "04565296c07bf324947e11576f4fb1a7f8d7f88361c0057e2cab6d0295a36aa4",
+  "schema": "envloop-office-native-ui-profile-root-v1",
+  "source_profile_inspection_only": true,
+  "status": "native_profile_observed_no_actor_or_model_qualification"
+}

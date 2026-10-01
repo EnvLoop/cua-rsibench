@@ -1,0 +1,20 @@
+{
+  "cold_reset_generations_per_case": 2,
+  "distinct_control_cases": 3,
+  "model_calls": 0,
+  "native_dispatch_receipts": 15,
+  "official_final_admitted": 0,
+  "official_model_results": 0,
+  "original_identity_sql_git_services_restored": true,
+  "owned_teardown_verified": true,
+  "result_sha256": "3213aee488046a90d8475c096c77abfda4f871dd49d7f7c6a7d184fdbc1d2e45",
+  "root_acceptance_sha256": "9786f1f5b6230e5dd31b9bb9ffb52d9562eb8daf36dac1198cc3197f18fc23c4",
+  "saved_scores": [
+    1,
+    0,
+    1
+  ],
+  "schema": "envloop-gitlab-v12-native-train-root-result-v1",
+  "source_binding_sha256": "5285908f284f05475baeec61da9098a7df92e48014e7d5dd733580cfff47fbcd",
+  "status": "actual_three_train_controls_independently_replayed_and_accepted"
+}

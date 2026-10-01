@@ -115,3 +115,46 @@ the original native screenshot with visible loading skeletons. V11 now adds a
 bounded visible-control precondition to the reference controller and its fresh
 TRAIN run is in progress. Existing failed source epochs remain unchanged.
 All official result counts remain zero.
+
+## Accepted current native TRAIN and source integration
+
+GitLab V12 completed actual TRAIN1/0/1 controls with15 native action receipts.
+Root independently replayed the raw native envelopes/images, full savedSQL/Git
+verifier, six reset generations and original identity/state/services/protected
+seed restoration, then accepted the exact saved proof. The full100 control
+source uses the same unchanged V12 actor and separately reviewed V13 reference
+chooser. That batch stopped at its first issue-triage assignee option, which did
+not become painted; its original one-action failure remains terminal. No final
+control trio or official task is admitted by this partial batch.
+[Accepted TRAIN](evidence/gitlab-v12-native-train-root-result-2026-10-01.json).
+
+Odoo V12 actual TRAIN was independently replayed with scores0/1/0,20 native
+control actions and40 raw guard images, exact reset and original service
+restoration. Root visually reviewed its sourcePDF and accepted the new TRAIN
+control. Its full20 selection control run is in progress, with no historical
+V11 credit imported.
+[Accepted Odoo TRAIN](evidence/odoo-v12-native-train-root-result-2026-10-01.json).
+
+The witnessed V22 source envelope now contains the unlimited-dollar ledger,
+nullable authentic billing, checked actor-deadline performance, actual all600
+admission/all24-chain final gate, matched90/720/1200 execution and explicit
+originalOffice cloud-account environment mapping. Root's28 core/counterpart
+checks passed with synthetic native/provider fixtures; the printed fixture
+qualification is not a real study freeze. The currentDesktop teacher facade
+and actual-paid-ID hook passed7 source checks and preserve the existing native
+engine; the separate common semanticDesktop guard migration remains unqualified.
+
+Office V2 source is integrated and19 Python/8 Node checks passed, including the
+actual frozen TRAIN package's strict scorer replay. Root inspected original
+OneDrive/PowerPoint native controls/geometry and verified that opening/closing
+the staging presentation left all37865 downloaded bytes unchanged. A new empty
+disposable folder was created for qualification. Generic native lifecycle,
+signed-in identity, folder cardinality, typed keyboard and original folder
+readback source corrections remain under review. No Office model pilot or
+formal native-save qualification is inferred from source fixtures or this
+read-only inspection.
+[Native profile observation](evidence/office-native-ui-profile-root-2026-10-01.json).
+
+All formal denominators remain0/600,0/24 and0/3000. Fresh native qualification,
+source ratification, actual researcher/training runs, final evaluation and final
+English paper/PDF/publication remain required.
