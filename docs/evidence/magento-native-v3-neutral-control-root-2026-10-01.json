@@ -1,0 +1,15 @@
+{
+  "actor_source": "trusted_reference_neutral_finish",
+  "distinct_clone_reset_verified": true,
+  "full_train_trio_completed": false,
+  "model_calls": 0,
+  "native_row_sha256": "bab0e707633b2c75b57172d8abd1203cc9108f70e5ae053808d13a4815e5f528",
+  "native_source_binding_sha256": "8452f651130f6294bb1c942ce5adc9c4d02890538c92c3830b0dc3fcafebfa70",
+  "official_final_admitted": 0,
+  "schema": "envloop-magento-current-native-neutral-control-root-v3",
+  "score": 0,
+  "source_frame_visually_reviewed": true,
+  "source_sku_and_price_readable": true,
+  "status": "actual_native_baseline_guard_saved_scorer_distinct_reset_reopened",
+  "whole_frame_unmasked": true
+}
