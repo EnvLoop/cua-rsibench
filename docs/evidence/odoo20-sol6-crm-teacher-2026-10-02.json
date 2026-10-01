@@ -1,0 +1,30 @@
+{
+  "actual_cost_usd": null,
+  "authentic_provider_usage": {
+    "input_tokens": 178996,
+    "output_tokens": 1937,
+    "total_tokens": 180933
+  },
+  "difference_codes": [],
+  "episode_receipt_sha256": "511b30563d811802c40466bcd0e3f4842894810a48367341596067c766f2b412",
+  "family": "crm",
+  "final_evaluation_task_credit": 0,
+  "formal_large_study_credit": 0,
+  "independent_saved_score": 1.0,
+  "model_reported": "gpt-6-sol",
+  "model_requested": "gpt-6-sol",
+  "outstanding_callbacks": 0,
+  "positive_training_turns": 20,
+  "provider_identity_is_weight_attestation": false,
+  "provider_response_count": 20,
+  "real_provider_client_close": true,
+  "rejected_turns_excluded": 0,
+  "rendered_multimodal_sha256": "b40faf31b779dd2b3b92f8a026f880498ab5a2d4438a1827845aafa2758d20a0",
+  "reset_semantics_exact": true,
+  "schema": "envloop-odoo20-actual-public-train-teacher-result-v1",
+  "source_data_label": "Synthetic business fixture in real Odoo Community",
+  "student_inference_prompt_equality_checked": true,
+  "task_id": "ELCRM-TRN-0001",
+  "training_optimizer_steps_completed": 0,
+  "trial_plan_sha256": "126dfcdd9b270a489d0e7a34a64538a546738c81a04179bd089e454f6633436e"
+}
