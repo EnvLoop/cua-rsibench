@@ -1,0 +1,16 @@
+{
+  "formal_final_dispatch_authorized": false,
+  "legacy_final_gate_retained": true,
+  "legacy_interface_tests_passed": 11,
+  "model_calls": 0,
+  "native_worker_binding_sha256": "02beb8d7341ea1ccaee38c05eedaf94dc2615c1020d74a80205bf05a39f08ac3",
+  "official_final_admitted": 0,
+  "official_final_outcomes_completed": 0,
+  "same_pre_campaign_snapshot_required_all_five_slots": true,
+  "schema": "envloop-odoo-v11-supplemental-final-source-root-v1",
+  "source_files": 48,
+  "status": "source_only_prepared_no_final_execution",
+  "study_source_snapshot_sha256": "1dea2d7e069c8890e26b7cfc8a67886e33215c23abc50d176a764a470c01eec8",
+  "supplemental_final_source_binding_sha256": "c718e6cacc93c47d5ea9273dd1df506d3de6e62666f9f2dc22a858235dd937e6",
+  "v22_actor_clock_nullable_billing_counterpart_qualified": false
+}

@@ -63,3 +63,38 @@ result](evidence/gitlab-neutral-v5-three-coldboots-root-result-2026-10-01.json).
 All official counts remain **0/600, 0/24 and 0/3,000**. The completed runtime
 repairs now need the matched six-cell policy, full task qualifications and real
 researcher campaigns before the final paper can claim benchmark results.
+
+## Current native integration addendum
+
+Odoo v11 completed one new actual TRAIN control with independent saved scores
+0/1/0, 20 applied GUI actions and 40 reopened raw observation/predispatch
+images. Root independently replayed the exact saved/reset/driver audit and
+visually inspected the source PDF frame against its deterministic TRAIN package.
+The final TRAIN control was accepted with exact database/filestore/source reset
+and original service restoration. The full20 selection control batch is now
+in progress; its first8 completed cases (5 purchase,3 inventory) were independently
+replayed with206 actions,412 raw guard images, scores0/1/0 and exact reset.
+This is a completed prefix, not a finished split or final-task admission.
+[Actual TRAIN proof](evidence/odoo-v11-native-train-root-result-2026-10-01.json).
+
+GitLab v8 and v9 task qualifiers stopped before input on transient native control
+lookup errors. Root independently reopened the v8 two-generation cold reset,
+198 original Git raw files, original identity/SQL/health restoration, seed and
+protected-source equality and complete owned teardown. V10 now chooses the
+current native coordinates in the reference qualifier through the same model
+safety gate. Its fresh TRAIN qualifier is in progress. No provider or model
+call is made by these qualification runs.
+[Preserved v8 failure and restoration](evidence/gitlab-v8-native-observation-failure-root-result-2026-10-01.json).
+
+The concrete Odoo final/shared-base bridges are source-integrated;11 root tests
+passed with synthetic native/provider services and the actual original actor
+loop, cooperative lease, independent scorer and saved-artifact auditor. The
+48-file supplemental source snapshot is prepared for all five Odoo slots.
+The legacy interface still requires an explicit v22 actor-clock/unlimited-budget
+and unknown-billing counterpart before formal activation. Office generic native
+lifecycle/geometry and the remaining concrete workers are still being completed.
+No source tests or prepared source snapshot substitute for fresh native
+qualification, all24 campaigns or the final3000 outcomes.
+[Supplemental source preparation](evidence/odoo-v11-final-source-root-plan-2026-10-01.json).
+
+Official counts remain **0/600,0/24 and0/3000**.

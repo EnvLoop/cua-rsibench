@@ -37,3 +37,13 @@ PYTHONPATH=.:src:enterprise_fallback/odoo18 "$BENCH_PY" tools/odoo_native_surfac
 ```
 
 The config has exactly the factory's native module/binding/source binding/worker directory/output root/cost authority fields. Run final in a fresh interpreter with the sealed worker selected before original top-level factory imports; a previously loaded TRAIN/selection worker fails closed. The original native qualification namespaces and consumed attempts are preserved unchanged. Formal results remain blocked until fresh qualification, ratification and all campaigns pass.
+
+## Root integration boundary
+
+Root imported this legacy interface and all11 focused checks passed. The
+source-only snapshot contains48 source files. Formal v22 activation remains
+unqualified: its actual actor start/end/deadline receipt, typed budget-stop path,
+nullable provider billing and separate lifecycle time must be source-bound and
+verified. The v1 exact legacy gate type, nominal reservation check and aggregate
+wall check are retained as historical protocol behavior; they do not implement
+the user's unlimited-spending amendment. No final command has been dispatched.
