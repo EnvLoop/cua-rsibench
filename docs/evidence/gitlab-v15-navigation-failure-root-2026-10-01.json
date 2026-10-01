@@ -1,0 +1,19 @@
+{
+  "schema": "envloop-gitlab-reference-navigation-failure-v15",
+  "status": "terminal_read_context_loss_after_navigation_preserved",
+  "completed_control_tasks": 0,
+  "native_actor_epoch": "v12_unchanged",
+  "native_binding_sha256": "5285908f284f05475baeec61da9098a7df92e48014e7d5dd733580cfff47fbcd",
+  "root_visual_review": "native_new_milestone_form_visible_title_empty",
+  "original_same_identity": true,
+  "original_exact_business_snapshot": true,
+  "original_healthy": true,
+  "protected_source_exact": true,
+  "immutable_seed_exact": true,
+  "saved_restored_git_reference_hashes_reopened": true,
+  "owned_parent_absent": true,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "prior_completed_ordinal0_trio": "v14_preserved_separately",
+  "full100_finished": false
+}

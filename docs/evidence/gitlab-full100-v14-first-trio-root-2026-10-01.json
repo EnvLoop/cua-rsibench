@@ -1,0 +1,16 @@
+{
+  "completed_control_tasks": 1,
+  "expected_control_tasks": 100,
+  "full100_finished": false,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "schema": "envloop-gitlab-first-full-control-trio-root-v14",
+  "scores": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "source_binding_sha256": "5285908f284f05475baeec61da9098a7df92e48014e7d5dd733580cfff47fbcd",
+  "status": "first_trio_saved_sql_git_reset_independently_reopened",
+  "task_identity_sha256": "908e5cd161575e2f7f955326bc08391c6fd88da75e124cf965ee12f8864bb18c"
+}
