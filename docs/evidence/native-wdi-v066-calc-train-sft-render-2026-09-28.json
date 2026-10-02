@@ -1,0 +1,27 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "action_type_counts": {
+    "click": 3,
+    "key": 4,
+    "type": 2,
+    "wait": 3
+  },
+  "benchmark_score": null,
+  "cell_id": "desktop-native",
+  "exporter_source_sha256": "320c5bda9b25eb0a948e35c361cf38952a761b60c8f10199398cc09fad3f1058",
+  "independent_v2_audit_sha256": "ae65aa15a3d90ea046b146e25eb0310a8af14fdc3b62ebf27efac1f40350ec01",
+  "model": "Qwen/Qwen3.8-27B",
+  "official_final_admissions": 0,
+  "private_render_sha256": "a28d32675440199a83bd0b2220b73116f83cbea641a3d203602020aa06349f77",
+  "prompt_tokens_total": 19845,
+  "provider_calls": 0,
+  "ratification_sha256": "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359",
+  "real_gui_train_turns": 12,
+  "saved_artifact_sha256": "deb905a726a78c4cde9484b7e1bdc8a68b229e32de48376024998cefe31791cf",
+  "schema": "envloop-desktop-v066-calc-writer-train-sft-render-public-v1",
+  "shared_helper_source_sha256": "6930d2473b31118ebc0b2dbaf779cf7a69f7c14c80b89c8fb6469a63c642115f",
+  "source_gui_receipt_sha256": "7be30e3930c31d9fb4ec4ebe2fffd1e8fce15bbf9f38ef06a05b720b6309ae1a",
+  "status": "evaluator_scripted_public_train_gui_rendered_offline",
+  "supervised_datum_tokens_max": 1684,
+  "supervised_datum_tokens_total": 20024
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "sec-lease-public-development-inventory-v1",
+  "status": "four public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "six-bucket operating-lease maturity, liability/ROU reconciliation, and synthetic occupancy stress",
+  "issuer_families": 4,
+  "original_10k_accessions": 4,
+  "excerpt_sha256_by_ticker": {
+    "KO": "8683c5dc2dcc902a8f5c7e120e94beaba73c688b8a071eb658e68977bbb1e192",
+    "GOOGL": "41913f4411aaff4678ecffdffb55fe8a531f36d9d7107f4bdfd894fda980b36a",
+    "WMT": "b7838dfd9108e2b046148dfc240155b79d70c682e3fe52aac5039e9e901927e9",
+    "ORCL": "2a8b4ec2b6a8d20565280fba52a0177fc5e78e75c7cb6e66c58c0113f0e6ec5c"
+  },
+  "official_final_credit": 0
+}

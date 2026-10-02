@@ -1,0 +1,210 @@
+{
+  "actual_billed_usd": null,
+  "billing_note": "Provider invoices and any credits, discounts, or plan fees were not exposed by the SDK receipts; USD values above are reservation estimates, not billed usage.",
+  "calibrated_application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "calibrated_source_family_count": 25,
+  "candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-25",
+  "distinct_calibrated_actor_sandboxes": 300,
+  "final_gui_control_invalid_count": 0,
+  "final_gui_control_missing_count": 0,
+  "final_gui_control_passed_count": 100,
+  "final_impress_normalized_count": 25,
+  "final_template_counts": {
+    "final-four-sheet-escalation-case-v2": 25,
+    "final-four-sheet-resilience-case-v2": 25,
+    "final-seven-slide-committee-case-v2": 25,
+    "final-two-table-policy-case-v2": 25
+  },
+  "invalid_receipt_error_types": {},
+  "lane_budget_cap_usd": "40",
+  "lane_budget_snapshot_sha256": "515c951b8f15ad584026c0ea6564a51be732db46ce51d9c9d9f7b08bbf0577fd",
+  "lane_full_server_lease_reserve_usd": "31.92777777777777777777777778",
+  "lane_historical_attempt_status_counts": {
+    "cleanup_unverified": 2,
+    "cold_reset_observed": 104,
+    "control_failed": 6,
+    "control_passed": 217,
+    "error": 17,
+    "finished": 2,
+    "healthy_and_terminated": 3,
+    "neutral_save_observed": 2
+  },
+  "lane_no_acknowledged_sandbox_id_count": 14,
+  "lane_recorded_sandbox_or_batch_attempt_count": 353,
+  "lane_records_by_kind": {
+    "gui_attempt": 344,
+    "health_probe": 3,
+    "neutral_batch": 2,
+    "neutral_single": 4
+  },
+  "libreoffice_runtime_probe": "LibreOffice 7.3.7.2 30(Build:2)\n\neb926ee03b6ba1b18e89b4a94cbb7a060ceac31f171b4bf9db5677e848451f86  /usr/bin/libreoffice",
+  "observed_resource_shapes": [
+    {
+      "memory_kib": 8146768,
+      "vcpu": 8
+    }
+  ],
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "provider_envd_versions_observed": [
+    "0.9.0"
+  ],
+  "provider_template_ids_observed": [
+    "k0wmnzir0zuzye6dndlw"
+  ],
+  "published_8vcpu_8gib_marginal_compute_usd_per_hour": 0.5328,
+  "schema": "cua-native-wdi-private-gui-sweep-aggregate-v1",
+  "source_catalog_url": "https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators",
+  "source_license": "CC BY 4.0",
+  "source_license_url": "https://datacatalog.worldbank.org/public-licenses",
+  "source_snapshot_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+  "status": "gui_controls_complete_official_gates_pending",
+  "sweep_runs": [
+    {
+      "actual_started_attempts": 3,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 3,
+      "planned_task_count": 1,
+      "receipt_sha256": "9a2b5a03795fd7e0ca1794042a6b6d789ce25d7d542b94f9c48faf677688701e",
+      "reserved_usd_upper": "0.2500",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 3,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 3,
+      "planned_task_count": 1,
+      "receipt_sha256": "578ef6e7ea72348aebaa12ea9b15a77f169f64f75b76f326cf36399ae8de628e",
+      "reserved_usd_upper": "0.2500",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 1,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 1,
+      "planned_task_count": 1,
+      "receipt_sha256": "884a2a20bd7c1bed4206f1261b932ed3242bc3c0d0e979f76b2b09d815a4a9cf",
+      "reserved_usd_upper": "0.08333333333333333333333333333",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 145,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 147,
+      "planned_task_count": 49,
+      "receipt_sha256": "048c3b6b0ea47d37ebd0752c1cba334850e58dababee6e08dd45fcce85e75b51",
+      "reserved_usd_upper": "12.08333333333333333333333333",
+      "task_status_counts": {
+        "gui_controls_passed": 47,
+        "post_attempt_audit_failed": 1,
+        "stopped_after_failed_or_uncertain_attempt": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 3,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 3,
+      "planned_task_count": 1,
+      "receipt_sha256": "bb0fde4fa9785557e4d061ed9a06d468b004cf6e45bf4ad28fa29195518caf70",
+      "reserved_usd_upper": "0.2500",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 4,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 4,
+      "planned_task_count": 2,
+      "receipt_sha256": "3e3b28e831b1ef34d256246de6ba38a7b417b91dd8d47577d76d3b3fe5e23ffc",
+      "reserved_usd_upper": "0.3333333333333333333333333333",
+      "task_status_counts": {
+        "gui_controls_passed": 1,
+        "post_attempt_audit_failed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 3,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 3,
+      "planned_task_count": 1,
+      "receipt_sha256": "9aaaec34bd431f99de2f99c372416a74fa4f1d2bdd1b55d0148d24d35c130d91",
+      "reserved_usd_upper": "0.2500",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 6,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 6,
+      "planned_task_count": 2,
+      "receipt_sha256": "919bd5f20ae537f01c609e82e1c57a989f0c3d6088ed93dea76d359a10072ea9",
+      "reserved_usd_upper": "0.500",
+      "task_status_counts": {
+        "gui_controls_passed": 2
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 2,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 2,
+      "planned_task_count": 1,
+      "receipt_sha256": "e5dcf6ebef687fbb33b21aebae489235154188a378276c500f7ce59cfd47096d",
+      "reserved_usd_upper": "0.1666666666666666666666666667",
+      "task_status_counts": {
+        "gui_controls_passed": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 5,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 5,
+      "planned_task_count": 3,
+      "receipt_sha256": "3b5943cda6208e5c73c47cf02167c8840dcf120830fdef3764134a069e30d634",
+      "reserved_usd_upper": "0.4166666666666666666666666667",
+      "task_status_counts": {
+        "gui_controls_passed": 3
+      },
+      "usd_per_hour_upper": "1.00"
+    },
+    {
+      "actual_started_attempts": 37,
+      "lease_seconds": 300,
+      "planned_new_sandboxes": 39,
+      "planned_task_count": 13,
+      "receipt_sha256": "64c55bcc798f151f6230eb5a7602cf0301e696f2ad1aacbced00b69fab1cbb73",
+      "reserved_usd_upper": "3.083333333333333333333333333",
+      "task_status_counts": {
+        "gui_controls_passed": 12,
+        "stopped_after_failed_or_uncertain_attempt": 1
+      },
+      "usd_per_hour_upper": "1.00"
+    }
+  ]
+}

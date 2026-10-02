@@ -1,0 +1,15 @@
+{
+  "country_iso3": "MEX",
+  "edits": 1,
+  "input_sha256": "d109286764e413c32d06668c74aeaf16fe2c75a11666e5ba75eb795fce113d7c",
+  "schema": "cua-native-wdi-oracle-v1",
+  "source_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+  "split": "train",
+  "target_slide": 3,
+  "targets": {
+    "SIGNAL_1_REVIEW_1": "2024 nominal GDP growth: 2.01%"
+  },
+  "task_id": "wdi-native-mex-impress-deck",
+  "variant": 1,
+  "workflow": "impress-deck"
+}

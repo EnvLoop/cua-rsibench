@@ -1,0 +1,5 @@
+# Real Desktop GUI data rendered for Qwen vision SFT
+
+The [source-bound offline receipt](desktop-v066-public-train-sft-render-2026-09-28.json) reopens a successful **public training** LibreOffice Impress E2B control. Its 18 actual observation frames and applied GUI actions, exact pre-dispatch image checks, saved PPTX, independent OOXML verifier, guest identity and teardown were revalidated before rendering. The pinned Qwen/Qwen3.8-27B multimodal renderer produced 18 image-bearing supervised datums totaling 29,876 supervised tokens.
+
+This is an end-to-end **training-data rendering check**, not a Tinker optimizer step, selection result or final benchmark score. All screenshots, action payloads, task text and source receipts remain evaluator-private; the public JSON contains only aggregate counts and hashes. One Impress task is too narrow to support a claim that fine-tuning improves computer use. Distinct Calc and Writer train demonstrations and a disjoint, independently scored selection set are needed before spending on a meaningful training-effect comparison.

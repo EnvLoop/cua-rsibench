@@ -1,0 +1,172 @@
+{
+  "base_commit": "148cd4d",
+  "browser_calls": 0,
+  "cause": "accepted_native_styles_but_floor_ceil_projected_wrong_fractional_edge_pixels",
+  "disjoint_candidate_metadata_identities": 140,
+  "docker_calls": 0,
+  "finite_pixel_budget_unchanged": 9,
+  "finite_rgb_vectors_unchanged": 8,
+  "fresh_native_train_controls": 0,
+  "metadata_prepared": [
+    {
+      "plan_sha256": "4b17339c88628351587509d334e4ff576441309785e3e41fe2c7ee9c8b7b1b50",
+      "run_nonce_sha256": "5e2f9c22aa084a8b7326608237bf63ca49a02aab7c75dba701201df9068a1ff5",
+      "split": "train",
+      "task_count": 20
+    },
+    {
+      "plan_sha256": "d24920dea773b53c6c7f5a6e469596e9c347517487cedd813925e1fd86a31660",
+      "run_nonce_sha256": "1e3f028c686b95be36d8937713f87a441cf35237cbb0dd47063a292c81dc8136",
+      "split": "selection",
+      "task_count": 20
+    },
+    {
+      "plan_sha256": "49196ddf1417817f3c33923269c6f249b5095d26cf10d8a07f2753338dc80eb6",
+      "run_nonce_sha256": "6291a4f1d104b4cf0f85b3c1d3dc62794ee764cedf209efb1fff1505e20cb5f3",
+      "split": "official_hidden",
+      "task_count": 100
+    }
+  ],
+  "model_attempts": 0,
+  "native_adapter_binding_sha256": "519fb4c9b78d01007cd7413f6bb67b83ffc3730e2eb8a851858c4482639e8650",
+  "native_calls": 0,
+  "native_worker_binding_sha256": "f24a373679a4715e5bfc1b8065522e4292eb84523499d4e4cdeb0fbbec00a999",
+  "official_final_tasks_admitted": 0,
+  "old_positive_credit": 0,
+  "preserved_v2_source_sha256s": {
+    "enterprise_fallback/odoo18/native_material_workers_v2.py": "f989273c67f57bcf11101f26395168d33e45f93f7c1f7fc418c102fdbec3c453",
+    "enterprise_fallback/odoo18/odoo_native_geometry_material_v2.py": "a4936949ccdd8774486b0691342cb271b34efae39184b3db620e564988e61f68",
+    "enterprise_fallback/odoo18/odoo_v066_native_material_adapter_v2.py": "df736235bdc584677a6762d9c65134d3a4177372bf4c35cada30cdf306fda3c3",
+    "tools/odoo_v066_native_material_qualification_v2.py": "391656e5aad08f9eee8975c5eb94d10970e74e44849d06383bdc8aa59e40bafb"
+  },
+  "provider_calls": 0,
+  "retained_native_witness": {
+    "alternate_guard_png_sha256": "12867e3c62f8b5865ff5801d416989123de33bcc5fbbf538889557d37436de5b",
+    "direct_context_pairing": "retained_guard_samples_only",
+    "existing_finite_vector_samples": 20,
+    "existing_whole_state_indices": [
+      4,
+      0,
+      6
+    ],
+    "geometry_sha256": "ba5fef8f41b9dad98adef1ea4408e87256da61d5b54027de513398004409665a",
+    "guard_sample_contexts_exact_equal": true,
+    "no_projection_samples": 18,
+    "observed_png_sha256": "c4153f543872da0a92d19dd7e5fe15d241c2eeb8379006a6a120760b41c91981",
+    "projected_points": {
+      "bottom": [
+        [
+          16,
+          861
+        ],
+        [
+          17,
+          861
+        ],
+        [
+          16,
+          863
+        ],
+        [
+          17,
+          863
+        ]
+      ],
+      "selected_tab": [
+        [
+          41,
+          419
+        ],
+        [
+          132,
+          419
+        ]
+      ],
+      "top": [
+        [
+          16,
+          155
+        ],
+        [
+          16,
+          157
+        ],
+        [
+          17,
+          157
+        ]
+      ]
+    },
+    "raw_guard_samples_reopened": 50,
+    "rejected_png_sha256": "5980f2ac9762cd6dafd4aba8aa330ea77aa70b47c54e9e78e7a88229e0d455e5",
+    "rejection_screenshot_context_independently_retained": false,
+    "selected_tab_bounds": [
+      41,
+      380.9375,
+      133.109375,
+      419.9375
+    ],
+    "sheet_bounds": [
+      16,
+      153.75,
+      1424,
+      865.03125
+    ],
+    "strict_invalid_or_dimmed_samples": 12,
+    "styles_match_v2_policy": true
+  },
+  "schema": "envloop-odoo-native-projection-v3-offline-v1",
+  "source_frame_reviews": 0,
+  "source_sha256s": {
+    "enterprise_fallback/odoo18/compose.yaml": "b68c4907d640d61c199893dd26fd065b8fdc3123d0e85fc5ae374b23aae4ba58",
+    "enterprise_fallback/odoo18/factory.py": "49ce5d3747c257d6e40c52a352f560efe7af3ea9229f9686a45c4bf9379ce008",
+    "enterprise_fallback/odoo18/gui_controls.py": "6a1085ab4d697ed63ddc16e36a550e29cc7cfa7baf99854675c94b3724925830",
+    "enterprise_fallback/odoo18/native_compat_source_loader_v1.py": "11890d1f7e81738ba8e11023b6639e23f5c308e603754bdddc294838378278c2",
+    "enterprise_fallback/odoo18/native_material_workers_v2.py": "f989273c67f57bcf11101f26395168d33e45f93f7c1f7fc418c102fdbec3c453",
+    "enterprise_fallback/odoo18/native_material_workers_v3.py": "7fc5525d79bb0373a479f399e7284031cabcf3d84878ffb2c2081db8b4f2aef0",
+    "enterprise_fallback/odoo18/native_service_readiness_v2.py": "c152d61406460085175cdf0e3cd05b4067e4812c486a85140db74a5d048e95bf",
+    "enterprise_fallback/odoo18/odoo_native_adapter.py": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+    "enterprise_fallback/odoo18/odoo_native_geometry_material_v2.py": "a4936949ccdd8774486b0691342cb271b34efae39184b3db620e564988e61f68",
+    "enterprise_fallback/odoo18/odoo_native_geometry_material_v3.py": "d1c0fbe8d647f3288d789e2d0d253d0a0d59b300c74ff72b836fd96fa1112cde",
+    "enterprise_fallback/odoo18/odoo_v066_native_material_adapter_v2.py": "df736235bdc584677a6762d9c65134d3a4177372bf4c35cada30cdf306fda3c3",
+    "enterprise_fallback/odoo18/odoo_v066_native_material_adapter_v3.py": "deeef2ba8d5672794bc179cff892f495ecfa887c25345fff31a1d3c0bdeac8ca",
+    "enterprise_fallback/odoo18/odoo_v066_train_adapter.py": "fb5b2cba08e7d9e71d372bad3cee6b38763ccb2a76033d6f89a5be37e92de168",
+    "enterprise_fallback/odoo18/partition_factory.py": "7e5aa6f5b53949eec77e6e263be9e458c6e903665af9baf5b6b8c5f5c112162e",
+    "enterprise_fallback/odoo18/reset.py": "8fcf06f28f83928dece44aa376a9d5abaf716c8e089fb60835092477dbca3883",
+    "enterprise_fallback/odoo18/selection_worker_v066.py": "eeded6e7a1daea9eb3bf53d977654f5d0396be732644f6d6191966145be84831",
+    "enterprise_fallback/odoo18/teacher_episode_worker_v066.py": "23235eb5c3b6c71225164f86330ffef6af2bae71628a187c1602b094831d9c73",
+    "enterprise_fallback/odoo18/v066_requalification_pilot.py": "1124c6ae6688e9890c339bd3f79c4cebefd5a2ffd010531b1c36d04b53f59e4d",
+    "enterprise_fallback/odoo18/verify.py": "5f7339fe5bca27bca68daaf33362375a7459fdc9a616dd80373e494e39569a55",
+    "enterprise_fallback/odoo18/worker_lease.py": "e9bddf8dd07d799c529d8cf75765abaa921e9a7360b6ed1db1d92686321dd9be",
+    "native_desktop_factory/v066_final_freeze.py": "8d6c9a2a4711b51fc18203b922a32b1de169a0bfd52b59bbafae0617f15c81aa",
+    "src/cursibench/full_study_campaign_dispatch_v1.py": "8131c6e6465a3750563849bf90f41ea580e694e870f13eb9895f71e6a7d488c7",
+    "src/cursibench/full_study_selection_environment_v1.py": "94f68fe14dd96162bc0f0aba953e250e37e50b2f3241c0bda9a97f589f05229b",
+    "src/cursibench/full_study_teacher_adapter_v1.py": "b5a6b434a03e1079a7db28982dc482527c0893aa809892d848daaa20cd0952fc",
+    "src/cursibench/scale_action_contract.py": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+    "src/cursibench/scale_action_contract_v066.py": "68569a1ed06984985600d367975d3e5c1e6935ec9571b24e3d3ba637174dc24b",
+    "src/cursibench/scale_action_output_v066.py": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+    "src/cursibench/scale_vision_proxy.py": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2",
+    "tools/audit_odoo_v066_current_candidate_case_v1.py": "40d33342a2320b720bfe85fde7d067a0c920d3d61d63eb28d7bc60c7c20c2690",
+    "tools/odoo_v066_current_candidate_case_v5.py": "15051f84887ae46f238be9894d4a000caa90ad3d7cbff296fd6fda7dd67af32f",
+    "tools/odoo_v066_native_material_qualification_v2.py": "391656e5aad08f9eee8975c5eb94d10970e74e44849d06383bdc8aa59e40bafb",
+    "tools/odoo_v066_native_material_qualification_v3.py": "f6c5167a89c8ae9b591d220e70c279256a37e92b47c28af136a658d8bfc990f2",
+    "tools/odoo_v066_scale_audit_v1.py": "6b0a650fe8fff4349fec0b2ae30ab33be5126173fe98cff4c46d4afcaec9888b",
+    "tools/odoo_v066_scale_controller_v1.py": "c4f14f2d6da7e2f6bd4810f075213d81836886eed36513bca1cccfd964dc19b3",
+    "tools/odoo_v066_scale_protocol_v1.py": "b24afb68cb090687601c1efac3e988935df492591b5ae6fca781f981bc69fb33",
+    "tools/odoo_v066_scale_recipes_v1.py": "ba51d22415dd2f84c6f083ee80b129d377ebd74c136ae39458fcd1c8282427d6",
+    "tools/odoo_v066_train_attachment_calibration_v13.py": "5a39f5972849e7c384fe246484d1c269794f2415828889471d96e47485dd4695",
+    "tools/record_odoo_v066_train_gui_v1.py": "7a3c1065c582352a17108d0727c5d305315dd974f29c32e722a168246e1590dd"
+  },
+  "status": "source_repair_and_offline_checks_complete_fresh_native_train_pending",
+  "styles_and_viewport_unchanged": true,
+  "task_roster_unchanged": true,
+  "tests": {
+    "actual_native_witness_fixture_supplied": true,
+    "all_worker_binding_and_fresh_proof_seams_reused": true,
+    "cached_ancestor_source_mutation_refused": true,
+    "preserved_v2_tests_passed": 56,
+    "protected_business_pixel_mutation_refused": true,
+    "v3_tests_passed": 39
+  },
+  "unknown_fractional_phases_and_ties_keep_strict_guards": true
+}

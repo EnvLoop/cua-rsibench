@@ -1,0 +1,7 @@
+# Corrected a private award-workbook source explanation
+
+The [aggregate correction receipt](sec-private-award-note-correction-2026-09-27.json) records a factual wording repair in one older evaluator-private final candidate. Its original SEC filing disclosed a signed restricted-award forfeiture, and the workbook’s source cells already contained that amount, but an explanatory note called the forfeiture absent. Two related labels were ambiguous. The actor and reference now describe the filed activity correctly.
+
+The original actor and reference packages were preserved privately. An independent semantic diff found **exactly three changed explanatory cells per workbook**. Source facts, formulas, task text, private oracle, sheets and tables are unchanged. Both corrected award references pass all **154** saved-OOXML targets; both unrepaired seeds fail and all **18** injected faults remain individually detectable. The newer award case and the integrated **50-case** private screen also pass. The case remains an offline candidate.
+
+This correction adds no task or model result. The 20/20/100 ledger remains **6 train, 6 selection and 38 final offline candidates**, with **90 empty slots**. Structural qualification is **0**, and official hidden-final Microsoft Excel for the web admission is **0/100**. The source methodology follows [SEC EDGAR](https://www.sec.gov/search-filings/edgar-application-programming-interfaces); the SEC does not endorse this benchmark.

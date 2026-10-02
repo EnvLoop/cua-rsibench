@@ -1,0 +1,59 @@
+{
+  "builder_source_sha256": "94e11efb32156d22cf8f5c6165236ed826c8b6e783ca48e3d3db74e61f2a9162",
+  "case_count": 8,
+  "cross_split_overlap_counts": {
+    "official_hidden": {
+      "instance": 0,
+      "partner": 0,
+      "principal": 0,
+      "product": 0,
+      "source": 0,
+      "task": 0,
+      "template": 0
+    },
+    "selection": {
+      "instance": 0,
+      "partner": 0,
+      "principal": 0,
+      "product": 0,
+      "source": 0,
+      "task": 0,
+      "template": 0
+    },
+    "train": {
+      "instance": 0,
+      "partner": 0,
+      "principal": 0,
+      "product": 0,
+      "source": 0,
+      "task": 0,
+      "template": 0
+    }
+  },
+  "distinct_source_asset_count": 8,
+  "gui_qualified_count": 0,
+  "model_results": 0,
+  "official_final_admitted": 0,
+  "original_train_selection_final_counts_unchanged": [
+    20,
+    20,
+    100
+  ],
+  "original_world_sha256": {
+    "official_hidden": "1597a3588f1dd217ba771f84f72f2efec832a570146f5486352141b449c95cda",
+    "selection": "d8134081b5d64d390d00e6b0823c3782141601044060ec87cb139e1a2f21e5bd",
+    "train": "1ec6a8aa6a569ffc86c8ef877d2d494555ff18d730eca0562d35c416ef315036"
+  },
+  "per_workflow": {
+    "crm": 2,
+    "inventory": 2,
+    "purchase": 2,
+    "sales": 2
+  },
+  "private_staged_sha256": "f3d707fc117a9e3f228ea436485e1fe8e132918763409149f2db241354207a67",
+  "schema": "envloop-odoo-train-transfer-analogues-public-v1",
+  "sft_episode_count": 0,
+  "source_snapshot_binding_sha256": "9c4746e2f961d84e1d701fbf720afb8f3040cbe434a216f8646c493f2335e514",
+  "source_tier": "original_synthetic_business_records; SEC reference is not task gold",
+  "status": "eight_offline_train_candidates_source_audited"
+}

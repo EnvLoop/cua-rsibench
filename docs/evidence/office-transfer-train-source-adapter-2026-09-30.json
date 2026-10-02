@@ -1,0 +1,32 @@
+{
+  "actor_reset_upload_candidates_byte_identical": true,
+  "adapter_sha256": "142266d1a77301ae6650937fbf3c5c1ad0d7f76fcc370aef73b5ee1a16e79882",
+  "automated_model_worker_runs": 0,
+  "browser_calls": 0,
+  "core_ppt_verifier_changed": false,
+  "core_ppt_verifier_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9",
+  "current_aggregate_controls_promoted_to_primary_evidence": false,
+  "exact_independent_download_pairs_required": 3,
+  "excel_one_case_proposal_imported_into_general_worker": false,
+  "final_runs": 0,
+  "focused_and_existing_tests_passed": 27,
+  "graph_calls": 0,
+  "independent_saved_replay_scores": [
+    0,
+    1,
+    0
+  ],
+  "model_calls": 0,
+  "new_accounts": 0,
+  "official_final_admissions": 0,
+  "paid_provider_calls": 0,
+  "primary_manual_inventory_phases_required": 4,
+  "private_adapter_replay_sha256": "5c19d0ebf74ed079344db32858e70d9512f14b58f4d17a3daff5db8446703c66",
+  "private_next_stage_sha256": "89fbe1d56d1fa811c9818cfa1bb97619653c5e1cccf8c552dbe6b4f66bf36d54",
+  "registered_manual_controls": 0,
+  "schema": "envloop.office_transfer_train_source_adapter.public.v1",
+  "selection_runs": 0,
+  "status": "offline_adapter_and_real_native_artifact_replay_passed",
+  "supported_ppt_train_profiles": 2,
+  "transfer_targets": 4
+}

@@ -1,0 +1,19 @@
+{
+  "active_unfinished_attempts": 1,
+  "candidate_final_count": 100,
+  "checked_at_utc": "2026-09-28T00:04:11.893646+00:00",
+  "complete_100_case_audit": false,
+  "completed_calibration_chain_sha256": "12094517c395e3cedb629add9f910b5391967e3b92f249eccf04273bb9250b17",
+  "completed_distinct_gui_controls": 10,
+  "freeze_v2_sha256": "27c7103e1c66d2954eeedf9a7c0f001dc32e751e22f0b0c33630a00499984147",
+  "fresh_reset_required": true,
+  "infrastructure_retries": 0,
+  "live_journal_snapshot_sha256": "02421b779b71479d4954b9245d5a30b152ceb2f3e0028143b0a41f2fe9f45aef",
+  "model_calls": 0,
+  "official_final_admissions": 0,
+  "positive_score_required": 1.0,
+  "private_audit_sha256": "4eeb0d79c11485627d557ab0538e6e85abc3f7c66f075b144f4837e05affbd39",
+  "schema": "envloop-magento-resumable-progress-public-v1",
+  "status": "partial_evaluator_gui_controls_not_model_results",
+  "wrong_variant_score_required": 0.0
+}

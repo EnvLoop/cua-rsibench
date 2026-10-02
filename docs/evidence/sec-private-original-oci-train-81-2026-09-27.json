@@ -1,0 +1,61 @@
+{
+  "schema": "sec-private-original-oci-train-81-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "one additional original SEC 10-K filing-distinct offline train calibration candidate; final Excel-web admission remains zero",
+  "additional_original_sec_10k_accessions_accepted": 1,
+  "additional_new_issuer_families": 0,
+  "additional_selected_original_numeric_facts": 12,
+  "additional_supporting_original_numeric_controls": 5,
+  "additional_offline_actor_reference_pairs": 1,
+  "additional_checked_formula_targets": 57,
+  "additional_individually_detected_faults": 9,
+  "additional_positive_references_passed": 1,
+  "additional_unrepaired_actors_rejected": 1,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcoded_target_and_collateral_original_fact_edit_controls_rejected": true,
+  "original_source_label_and_equity_population_preserved": true,
+  "cumulative_private_issuer_families_disjoint_from_public_development": 28,
+  "cumulative_offline_actor_reference_pairs": 81,
+  "cumulative_original_numeric_facts_checked": 1191,
+  "cumulative_private_semantic_workflow_graphs": 15,
+  "cumulative_final_semantic_workflow_graphs": 12,
+  "cumulative_checked_formula_targets": 5710,
+  "cumulative_individually_detected_faults": 729,
+  "private_split_reservations": {
+    "train": 20,
+    "selection": 20,
+    "final": 100
+  },
+  "offline_candidates": {
+    "train": 8,
+    "selection": 7,
+    "final": 66
+  },
+  "empty_reservations": {
+    "train": 12,
+    "selection": 13,
+    "final": 34
+  },
+  "maximum_offline_cases_per_issuer": 5,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "pre_result_reservation_amendment": "One previously empty train slot of a reserved issuer was assigned a distinct original 10-K accession before model outcomes.",
+  "private_evidence_sha256": {
+    "original_filing_numeric_controls": "ca5f5bf60fce1f08dfec0692311a7cc7b498a700e5eeb79daa589f1d9956517d",
+    "source_acceptance": "7ce337cb17c908ff5e14d6a15a725f9ea150f371e028431a4ada868ae5139695",
+    "verified_source_excerpt": "f3311d992bda2de7fc5ad2ea740bd224125473cdc03569a75672930559746ed8",
+    "case_manifest": "eb56fb3fc5e479c587aea421bb663db3eade319c76ba45edebd0d9040613fd81",
+    "offline_ooxml_audit": "16ee0215522f4d3abc5ba651b7bf2fab6cfb7db249b1b453f108c0e1c3175660",
+    "source_specific_workbook_builder": "998fb10093d964232651f34f859a4036b8d5dfc41fbc0887285bef21d260e6fb",
+    "independent_ooxml_verifier": "4aba11cc78f512263ad63dee8b676c4b009723ca8d86b58f2dd5bbe25d61464b",
+    "private_split_slot_reservations": "e1118dc16466e7682ac730ca95dee5b48c7b0c0940598fc5464ec2c618a5b5ad",
+    "integrated_offline_audit": "3bba31bf9c09dba13e60cca3a0a903ee330ebffe5d8091e521d16e76309c1cc7",
+    "integrated_auditor": "7bda2f5caba5d075c1ab991e5b0c0d65885c48c51352d5a447c4b6ea790f4b30",
+    "private_slot_allocator": "f612003d995753bb729ee83d429a804de9286e0befb3fbc33001fb3a88c839be"
+  },
+  "limitations": [
+    "This case uses a previously pinned direct-original-SEC control manifest and did not fetch a new SEC source during the current rate-limit cooldown.",
+    "The filing calls its retained balance Accumulated income and presents total equity without a separate noncontrolling-interest line; source labels and assets-less-liabilities scope are preserved.",
+    "The remaining 59 reservations are empty, including 34 of 100 final slots. No hidden-final ID has its own Microsoft Excel for the web saved/downloaded readback and fresh-copy reset."
+  ]
+}

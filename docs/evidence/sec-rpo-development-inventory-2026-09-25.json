@@ -1,0 +1,14 @@
+{
+  "schema": "sec-rpo-public-development-inventory-v1",
+  "status": "four source-distinct public development cases; zero hidden or GUI admission",
+  "distinct_issuer_families": 4,
+  "distinct_annual_accessions": 4,
+  "structural_workflow": "contract liability classification, recognition, RPO scenario, and liquidity coverage",
+  "source_excerpt_sha256": {
+    "GOOGL": "73ee1e582bef122fa097d24a8109cf4321fa9bcf62f9a34e6a86e755b3e1e650",
+    "ORCL": "408fb7d871063ee7b7b792e3f6c129f72534ab65e15990992b60f9bd4651b993",
+    "NVDA": "a03ce6b8ed8df30af5436c4f04f308c46c10dd84b32f9763d440aaf6e6e16de6",
+    "DIS": "03bddcf58a0ec8ba82da2192b34304cd804bd3e38c8ff5cefcff5ed3a724e7fe"
+  },
+  "official_final_credit": 0
+}

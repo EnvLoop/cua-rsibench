@@ -1,0 +1,30 @@
+{
+  "builder_source_sha256": "e13776f6b79883fa6098e13a0651ba9fa66cf19ba74fc7d564645ec59d9c0676",
+  "case_count": 8,
+  "gui_qualified_count": 0,
+  "model_results": 0,
+  "near_miss_rejected_count": 8,
+  "official_final_admitted": 0,
+  "original_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "original_map_sha256": "c09eb0720d6a90770583a575284dc4ee90e48648336e2a3279ab3837ab1cae36",
+  "original_train_selection_final_counts_unchanged": [
+    20,
+    20,
+    100
+  ],
+  "per_workflow": {
+    "calc-growth": 2,
+    "calc-risk": 2,
+    "impress-deck": 2,
+    "writer-brief": 2
+  },
+  "positive_saved_artifact_pass_count": 8,
+  "private_staged_sha256": "7bea6d8563d96d9eb710669273b3f12bed0a09459cdd86545b8728a1697c85fc",
+  "schema": "cua-native-wdi-train-transfer-analogues-public-v1",
+  "sft_episode_count": 0,
+  "source_tier": "pinned_World_Bank_WDI_observations; authored_policy_and_artifacts",
+  "status": "eight_offline_three_target_train_packages_source_audited",
+  "train_source_country_count": 2,
+  "unrelated_change_rejected_count": 8,
+  "wdi_snapshot_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f"
+}

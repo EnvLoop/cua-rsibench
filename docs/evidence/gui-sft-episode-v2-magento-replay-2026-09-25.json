@@ -1,0 +1,81 @@
+{
+  "evidence_class": "offline_cross_cell_contract_and_single_magento_replay",
+  "limits": {
+    "entity_tags_cover_only_declared_source_hints": true,
+    "official_final_tasks_added": 0,
+    "other_cells_have_real_gui_episode_replays": false,
+    "private_screenshots_or_oracle_payload_published": false,
+    "selection_and_final_tasks_are_provisional": true,
+    "trained_improvement_measured_by_v2": false
+  },
+  "offline_renderer": {
+    "cookbook_commit": "1e53aa3d1cdd6389b3290c2574641eccc0503242",
+    "image_plus_action_datums": 36,
+    "image_processor": "Qwen2VLImageProcessorPil",
+    "max_image_tokens": 1395,
+    "max_supervised_tokens": 2610,
+    "minimum_positive_assistant_loss_sum": 6.0,
+    "model": "Qwen/Qwen3.8-27B",
+    "optimizer_steps_in_v2_replay": 0,
+    "paid_provider_calls_in_v2_replay": 0,
+    "renderer": "qwen3_5_disable_thinking",
+    "renderer_identity": {
+      "image_processor": "Qwen2VLImageProcessorPil",
+      "model": "Qwen/Qwen3.8-27B",
+      "processor_config_sha256": "f30d048e3fda7839c8b3e0e9b8559e5f4581ce7d4f9b15ccd893b9bf5c6ac45b",
+      "renderer": "qwen3_5_disable_thinking",
+      "tokenizer_vocabulary_sha256": "420ab4b96193b4325156f56cd7c3876a8a0d46f515fe4f711a7a6bf5553bf8fa"
+    },
+    "tinker_sdk_version": "0.30.1"
+  },
+  "private_artifact_sha256": {
+    "candidate_plan": "5a0abe8943fa022c1c204800c82f31d057de5102170a8d35bd68f4545749971a",
+    "offline_render_receipt": "96857307bec8acb0e70d9f7bff7f4c0cb09c87a9a6cdf22597bff358a95176eb",
+    "source_qualification": "d3a8c0b6103511aaeee9564557dd1c21615af75462a19e7cf1040bec7fc593c0"
+  },
+  "provenance_gates": {
+    "negative": "57121a488766b8f5a10efa2d198ec2e9a0a63b8dc65e4ce6c8f2849f35b6e615",
+    "positive": "1c339adf37b406fe31b33149e55603bd6225116d1743820c87dfc7269a5be1e3",
+    "reset": "82c36e98f001a026c82a1ed9ee8cccc1d1e218e60ca6813d75cb0b64fd523f96",
+    "saved_state": "1bcf6759425abd67afc54616aa05614db305dc73c53a928224c02f7ffc78e076"
+  },
+  "replay": {
+    "executed_actions_and_masked_frames_unchanged": true,
+    "source_cell": "magento_admin",
+    "source_dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+    "source_name": "WebArena-Verified",
+    "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+    "source_task_id": "777",
+    "source_template_id": "742",
+    "unchanged_action_sha256": "d0233b24214960dc096000b94fe3ed6d67185a320ee92bddbdc97d7abe11726e",
+    "unchanged_frame_sha256": "7ec6a313b2cbb2372346f1e5aad5152feff57d7d17e4a8aa490d57d25e4b2836",
+    "v1_episode_sha256": "8ae9143ab98ea96572a19c3e5cd4a8a529f5dc320cb61044a57acddc2c5b22f0",
+    "v2_episode_sha256": "637e2680d6c1d6ac3871e7935c903d650dc9743869093e53eda96c12f5d1bd38",
+    "validated_current_frame_actions": 36
+  },
+  "schema": "gui-sft-v2-public-replay-v1",
+  "selection_final_exclusion": {
+    "entity_coverage": [
+      "declared_hints_only",
+      "declared_hints_only"
+    ],
+    "final_count": 100,
+    "final_sha256": "23062e3ef8b267b485d85d2e5b1a41d01461cc5e3aed584b49b39cd083d42a54",
+    "final_status": "provisional",
+    "official_final_admitted": false,
+    "selection_count": 20,
+    "selection_final_declared_entities_disjoint": true,
+    "selection_final_task_template_disjoint": true,
+    "selection_sha256": "1207c09328912ac48cf5cf55f16bb53cb9929b49d5d82806bc35b925c7c20365",
+    "selection_status": "provisional",
+    "train_source_task_template_and_declared_entities_disjoint": true
+  },
+  "supported_cell_identifiers": [
+    "magento_admin",
+    "gitlab_project",
+    "odoo_erp",
+    "office_excel_web",
+    "office_powerpoint_web",
+    "libreoffice_desktop"
+  ]
+}

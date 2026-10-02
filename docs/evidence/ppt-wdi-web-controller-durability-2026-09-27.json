@@ -1,0 +1,25 @@
+{
+  "collateral_preservation_pass": false,
+  "collateral_score": 0.0,
+  "controller_source_sha256": "51f65a1d18bb3f92b3bc7d38b27bacb221b767de0fcc33a7cdf0b94bbe3fda59",
+  "fresh_reset_changed_targets": 0,
+  "fresh_reset_score": 0.0,
+  "independent_saved_pptx_readback": true,
+  "initial_downloads_stale": 2,
+  "model_calls": 0,
+  "near_miss_changed_targets": 3,
+  "near_miss_score": 0.0,
+  "official_final_admitted": 0,
+  "positive_score": 1.0,
+  "private_receipt_sha256": "f28cb83fa5fba2c069822c6f64c4ff8edaa8f2148f09e2141975f21e189dbdc7",
+  "schema": "envloop-ppt-web-train-durable-controls-public-v1",
+  "source_equivalence": {
+    "embedded_workbook_bytes_equal": true,
+    "native_chart_cache_semantically_equal": true,
+    "native_chart_cache_values_checked": 26,
+    "slide_count": 7,
+    "slide_text_equal": true
+  },
+  "status": "train_only_web_controls_not_final_admission",
+  "train_target_count": 4
+}

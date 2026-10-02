@@ -1,0 +1,32 @@
+{
+  "schema": "sec-ppe-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 5,
+  "distinct_issuer_families": 5,
+  "distinct_original_10k_accessions": 5,
+  "issuers": [
+    "BA",
+    "CAT",
+    "COST",
+    "NFLX",
+    "PFE"
+  ],
+  "sheets_per_case": 9,
+  "formula_targets_per_case": 55,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 5,
+  "unsolved_seed_rejections": 5,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "8c270227e434887fa27df95fadbc0df6ef35a3b3c9c193ce2d54cb6053a12013",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Gross less accumulated and separately reported net PPE may differ by rounding.",
+    "D&A may include non-PPE assets; net PPE movement less capex plus D&A is unexplained, with no disposition or impairment inferred.",
+    "The write-down and maintenance-capex stress is synthetic, not a booked charge or SEC forecast.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

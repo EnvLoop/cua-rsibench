@@ -1,0 +1,18 @@
+{
+  "schema": "envloop-odoo-global-business-identity-development-control-v1",
+  "status": "development_verifier_control_not_official_task",
+  "application": "original_odoo_community_18",
+  "actor_interface": "role_scoped_native_browser_gui",
+  "evaluator_interface": "separate_postgresql_select_only_reader",
+  "control": "After a correct Inventory min/max update, the actor created an unrelated Product through the Odoo GUI.",
+  "source_note_visible_in_native_gui": true,
+  "positive_reward_before_unrelated_creation": 1.0,
+  "positive_difference_codes": [],
+  "negative_reward_after_unrelated_creation": 0.0,
+  "negative_difference_codes": [
+    "global_business_record_identity_changed"
+  ],
+  "guarded_business_identity_groups": 15,
+  "official_final_tasks_admitted": 0,
+  "model_attempts": 0
+}

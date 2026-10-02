@@ -1,0 +1,5 @@
+# GitLab CE: two current-profile evaluator GUI controls
+
+The original GitLab CE 18.5 source-bound v0.6.6 control lane has now completed **two of 100** distinct final-candidate identities. Each completed case was executed by the bounded one-ID child-process supervisor, with independently saved positive, plausible wrong-variant, repeated positive, and three cold-reset controls. The [second read-only aggregate](gitlab-v066-current-two-id-controls-2026-09-29.json) reopened both raw receipts and the hash-chained journal; it reports no pending intent or terminal failure and binds its evaluator-private audit by SHA-256. The first one-ID receipt remains preserved.
+
+These are evaluator-operated GUI solvability controls, not student-model attempts or official final admissions. Ninety-eight current-profile controls and the later per-ID proof, six-cell ratification, checkpoint selection and matched final evaluations remain outstanding. The six historical same-ID first-attempt failures remain in their separate development evidence trail. No private task identity, answer, GUI trace, or credential is published.

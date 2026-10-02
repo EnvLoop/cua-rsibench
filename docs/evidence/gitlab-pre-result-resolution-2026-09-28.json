@@ -1,0 +1,17 @@
+{
+  "eligible_one_time_requalification_count": 6,
+  "eligible_status_counts": {
+    "cold_reset_or_verifier_failed": 1,
+    "development_gui_trio_failed": 2,
+    "driver_or_environment_failed": 3
+  },
+  "failure_ledger_head_sha256": "b962e355722cfbb82c75221436ed6b439b2662454914ac9cc90cfd9c71240e11",
+  "first_attempt_failures_retained": 6,
+  "first_attempt_passes": 94,
+  "immediate_retirement_task_count": 0,
+  "official_final_admitted": 0,
+  "original_active_denominator": 100,
+  "original_active_roster_sha256": "226d57fa297be232b5838043ae565ee8c9724310552b7d2d97b9ba977a16e006",
+  "original_first_attempts_sha256": "f9d1f68ab9a017eaf0753544c204d1a13aee6308fb5b491806ea69273a4c43cf",
+  "schema": "envloop-gitlab-pre-result-recovery-resolution-public-v1"
+}

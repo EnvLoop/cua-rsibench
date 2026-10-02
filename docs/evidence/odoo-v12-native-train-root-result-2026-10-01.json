@@ -1,0 +1,19 @@
+{
+  "applied_actions": 20,
+  "model_calls": 0,
+  "native_adapter_binding_sha256": "43743ae0214e7e9be8f374d6837bf494dd406943412fb02178b549037a249bb9",
+  "native_worker_binding_sha256": "a28f1bc7ec661a40d9a4a595ceaa1e2fd5018e394864740dc3c1f8fb71c8c0bc",
+  "official_final_admitted": 0,
+  "raw_guard_images_reopened": 40,
+  "reset_exact": true,
+  "saved_scores": [
+    0,
+    1,
+    0
+  ],
+  "schema": "envloop-odoo-v12-native-train-root-result-v1",
+  "services_restored": true,
+  "source_frame_sha256": "74765bbcf37fd3f98682947f2d4155b020d606a9defa6ed5e05925dcc285919c",
+  "status": "fresh_train_control_saved_reset_and_source_visual_review_passed",
+  "train_control_sha256": "d5a9520f5c1a44c41973211bce23668deb6ebe49f5d465a3722a6a6aad345504"
+}

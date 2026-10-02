@@ -1,0 +1,7 @@
+# GitLab native reference readiness v11
+
+The actual V10 qualifier stopped before input because the reference edit button did not yet exist. Root visually inspected its original observation: the owned issue page still showed native loading skeletons. The no-input failure remains terminal and receives no task credit.
+
+The additive V11 reference controller waits at most30 seconds for its requested native control to be visibly present before taking a current observation and choosing its real coordinate action. This is an observation-only reference-action precondition; it performs no input, evaluator mutation, task scoring or model-action retargeting. It cannot turn a rejected action into an applied action. Afterward the unchanged common gate still checks both images/envelopes, actual target/hit, account/project/window/lease, nonce and TTL immediately before input. Teacher/base/four checkpoint action primitives and native safety remain identical. A control that never appears or becomes unsafe still stops without replay.
+
+The complete V10 declared rosters, 90/720 actor policy, lazy requested-ref resolution, semantic role options, native V5 lifecycle and original source/scorer/reset boundaries remain. Fresh source preparation, exact TRAIN phase review and actual1/0/1 saved/reset proof precede full20/100 qualification and formal model execution. Old consumed V8-V10 attempts and source remain immutable.

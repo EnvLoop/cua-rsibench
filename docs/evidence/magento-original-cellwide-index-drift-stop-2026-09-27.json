@@ -1,0 +1,28 @@
+{
+  "benchmark_quote_pages": 0,
+  "candidate_gui_controls_passed_before_stop": 35,
+  "current_attempt_ordinal": 35,
+  "date": "2026-09-27",
+  "derived_fields_changed": {
+    "final_price": 2552,
+    "max_price": 223,
+    "min_price": 2776
+  },
+  "derived_price_rows_differing_from_replica": 2776,
+  "diagnostic_search_response_sha256": "6a30dfa702e32801236e405308c15194779d8554352ab9ed7ff15c9d268616ba",
+  "diagnostic_sql_sha256": "2caf347ebf075f50e57b0b51da05b26f1fd546c0bb5817243284fb3dc0b656ef",
+  "failed_journal_sha256": "79e8478f0aea4142a26eb32c9aa88b19fbc3ee397428b2b9532df022148de856",
+  "failed_process_sha256": "0f3aece3dafb10d7fd28f62537bde50c440be8d6a8c66652422f752fe756a0ec",
+  "failed_stderr_sha256": "262e9a860cd4fd76827c86281163438da064af237418f27d5c0e4a049d66040e",
+  "frozen_search_sha256": "54ca1d8ef5cb82ed879338e6740a589a930e50cd8a54f495c234c5f5b0acf6fb",
+  "further_per_case_retry_allowed": false,
+  "live_price_index_rows": 8156,
+  "model_calls": 0,
+  "observed_search_sha256": "4bd64ae0b2032f221f8c2e56c1dd243f09677ce386860a6f4eb6d582e36ddc20",
+  "official_final_admitted": 0,
+  "previous_one_case_recovery_rule_triggered_stop": true,
+  "schema": "envloop-magento-cellwide-index-drift-stop-v1",
+  "search_documents": 181,
+  "status": "cell_stopped_before_case_35_task_seed",
+  "task_seeded": false
+}

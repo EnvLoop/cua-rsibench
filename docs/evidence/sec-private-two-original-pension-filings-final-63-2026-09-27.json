@@ -1,0 +1,65 @@
+{
+  "schema": "sec-private-two-original-pension-filings-final-63-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "two additional original SEC 10-K filing-distinct offline final candidates; zero official Excel-web hidden-final admission",
+  "reviewed_original_sec_10k_accessions": 3,
+  "accepted_original_sec_10k_accessions": 2,
+  "rejected_for_missing_line_readable_original_report": 1,
+  "additional_new_issuer_families": 0,
+  "additional_selected_original_numeric_facts": 24,
+  "additional_original_funded_status_bridges": 4,
+  "additional_original_plan_asset_movement_bridges": 4,
+  "additional_offline_actor_reference_pairs": 2,
+  "additional_checked_formula_targets": 124,
+  "additional_individually_detected_faults": 18,
+  "additional_positive_references_passed": 2,
+  "additional_unrepaired_actors_rejected": 2,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcoded_target_and_collateral_original_fact_edit_controls_rejected": true,
+  "cumulative_private_issuer_families_disjoint_from_public_development": 28,
+  "cumulative_offline_actor_reference_pairs": 63,
+  "cumulative_original_numeric_facts_checked": 948,
+  "cumulative_private_semantic_workflow_graphs": 14,
+  "cumulative_final_semantic_workflow_graphs": 11,
+  "cumulative_checked_formula_targets": 4561,
+  "cumulative_individually_detected_faults": 567,
+  "private_split_reservations": {
+    "train": 20,
+    "selection": 20,
+    "final": 100
+  },
+  "offline_candidates": {
+    "train": 7,
+    "selection": 7,
+    "final": 49
+  },
+  "empty_reservations": {
+    "train": 13,
+    "selection": 13,
+    "final": 51
+  },
+  "maximum_offline_cases_per_issuer": 5,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "pre_result_reservation_amendment": "Two empty final slots for an already reserved issuer were assigned distinct original 10-K accessions before model outcomes; source and template split isolation and five-case issuer cap remain enforced.",
+  "private_evidence_sha256": {
+    "original_filing_numeric_controls": "edb0218512df6e093df5583732268db60f7304455d2f76443a86722c40a78b4a",
+    "source_acceptance_and_one_rejection": "37d8d97caeb26624f4c7065d4f2f2cbd516a16cda9ee46f4728c2964d0a1d0e0",
+    "first_verified_source_excerpt": "8f26766da27b1ef129b8b7f23e256ab87b4c2d2e51d2d235781c74c892f3ffbb",
+    "second_verified_source_excerpt": "acf0c7ad697ccdf334dac0c663ae4ff8826bfad0f80968a5091925f68521aa02",
+    "case_manifest": "6fd94d9ca9c91bac486cf5e6ad15d5b8fea71e7f1e7eaacd7b02761c932e031c",
+    "offline_ooxml_audit": "8289e36e87a1d5aaf46c06d168b8c9b1d665b2ac5d7e013b9c31506fde2821a0",
+    "private_workbook_builder": "494db02d27454bb81686f7f5172d65eec7fcb69c95e821b0ae01a03936969c61",
+    "independent_ooxml_verifier": "437cee35ea34dedac0f042611f89eec3847f1076b9abcbd506c5b8a0eb0c7fde",
+    "private_split_slot_reservations": "e380388d4c1aca252d0be6c2bd2e76ce21ac62d507e5835655e17b2ec3d285aa",
+    "integrated_offline_audit": "8f15e9c288cad00ecf65961d5700b870689dd9dc888d5291cd0655ce88e721d1",
+    "integrated_auditor": "71162200ddb077adc717eecb3a31ab13ac8705a64ea65bf424f81d4704391219",
+    "private_slot_allocator": "cbe8d6abcd03ef964ef69d4e0f6679025ccbd0db11ede4a86f9f302d55cc6060"
+  },
+  "limitations": [
+    "One reviewed filing was excluded because complete original SEC note/report numeric authentication was unavailable; no proxy-only values were frozen into a task.",
+    "The selected pension scope excludes separate medical and international plans. Each accepted filing has two-year funded-status and plan-asset movement identities verified exactly.",
+    "The remaining 77 reservations are empty, including 51 of 100 final slots; accepted source identity alone is not structural qualification.",
+    "No hidden-final ID has its own Microsoft Excel for the web saved/downloaded readback and fresh-copy reset, so official hidden-final admission remains zero."
+  ]
+}

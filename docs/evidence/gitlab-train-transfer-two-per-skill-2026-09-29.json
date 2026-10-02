@@ -1,0 +1,26 @@
+{
+  "distinct_train_source_families_per_workflow": 2,
+  "gui_controls_passed": 0,
+  "model_results": 0,
+  "multi_target_and_near_miss_no_regression_contracts_present": true,
+  "official_final_admitted": 0,
+  "original_train_count": 20,
+  "private_cases_sha256": "fca051b4a7544c68aad214e55bb6cce04c7a7b6512c89877689919719937fed9",
+  "protected_partition_source_and_entity_overlap": 0,
+  "schema": "envloop-gitlab-train-transfer-analogues-public-v1",
+  "source_binding": {
+    "aggregate_receipt_sha256": "b7fe56f3780fe086f3fdaf2975818077d7a5d8eb51fcc70d923175bd4b7b4367",
+    "cisa_excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+    "factory_source_sha256": "7689296b0b1285d093a2af4377322bbcffb6f886bc72d3d37a3ff72e6009dc38",
+    "train_analogue_source_sha256": "ce7593040933569d621e0e452da3ce57aac3582988c487fc7764dae2c3316c34"
+  },
+  "status": "source_only_two_per_skill_staged_offline_no_gui_admission",
+  "supplemental_train_count": 10,
+  "workflow_counts": {
+    "approved_merge_request_merge": 2,
+    "ci_and_runbook_reconciliation": 2,
+    "cross_record_issue_triage": 2,
+    "least_privilege_access_handoff": 2,
+    "release_milestone_coordination": 2
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "sec-private-excel-split-structural-screen-v1",
+  "status": "blocked",
+  "task_counts": {
+    "train": 0,
+    "selection": 0,
+    "final": 0
+  },
+  "registered_private_issuer_families": 0,
+  "registered_final_issuer_families": 0,
+  "registered_final_workflow_families": 0,
+  "public_development_issuer_families_excluded": 28,
+  "public_development_workflow_families_excluded": 10,
+  "max_tasks_per_issuer": 5,
+  "requirements": {
+    "split_sizes": {
+      "train": 20,
+      "selection": 20,
+      "final": 100
+    },
+    "minimum_private_issuer_families": 28,
+    "minimum_final_issuer_families": 20,
+    "minimum_final_workflow_families": 10,
+    "source_issuer_and_template_isolation": true
+  },
+  "errors": [
+    "fewer_than_ten_final_workflow_families",
+    "fewer_than_twenty_eight_private_issuer_families",
+    "fewer_than_twenty_final_issuer_families",
+    "split_counts_must_be_20_train_20_selection_100_final"
+  ],
+  "official_excel_web_admissions": 0,
+  "boundary": "Passing this screen never substitutes for independent source review, saved/downloaded Excel-web readback, fresh-copy reset, or hidden answer custody."
+}

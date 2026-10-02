@@ -1,0 +1,30 @@
+{
+  "annual_period_count": 8,
+  "caveats": [
+    "No issuer, accession, document name, account identifier, or private graph is disclosed.",
+    "This is source availability and semantic review, not task admission or a model result.",
+    "One zero restricted-cash field is derived from exact total-minus-cash figures.",
+    "Dimension-specific debt-note amounts are supported by original filing rows, not CompanyFacts."
+  ],
+  "checks": [
+    "filing identity, accession, form and original raw-byte SHA",
+    "two annual contexts and USD-million scale/sign",
+    "same-accession CompanyFacts where non-dimensional facts exist",
+    "cash-flow, restricted-cash, interest and debt-principal/carrying identities"
+  ],
+  "created_utc": "2026-09-28T19:38:24.372689+00:00",
+  "field_count_reviewed": 50,
+  "official_task_admission_count": 0,
+  "review_commitments_sha256": [
+    "4187dd9448ee80cdf30b9611a9d6f903246be63f341e949b9b80f515c0fca698",
+    "02bd70a9757dfe026d6da3a51d1ffc6c1b841688fa3eca27cfbf360716591e75",
+    "068c6e50835421b525b80c2936b5e77b704f205dd26f4ba32f249c8203f5650d",
+    "39d93c073bed97b697fd5d8b26ea0c2c03a14e95069721a5c04b45bd1cb5f968"
+  ],
+  "schema": "envloop.sec_transfer_semantic_aggregate.v1",
+  "scope": "four saved official SEC 10-K/index/CompanyFacts bundles; training-source transfer only",
+  "source_count_accepted": 4,
+  "source_count_pending": 0,
+  "source_count_rejected": 0,
+  "source_count_reviewed": 4
+}

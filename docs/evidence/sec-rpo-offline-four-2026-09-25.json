@@ -1,0 +1,30 @@
+{
+  "schema": "sec-rpo-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 4,
+  "issuer_families": 4,
+  "distinct_original_10k_accessions": 4,
+  "issuers": [
+    "DIS",
+    "GOOGL",
+    "NVDA",
+    "ORCL"
+  ],
+  "sheets_per_case": 8,
+  "formula_targets_per_case": 43,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 4,
+  "unsolved_seed_rejections": 4,
+  "each_fault_isolated_detectable_under_baseline_or_two_replays": true,
+  "source_snapshot_transport": "read-only SEC proxy with exact prior direct-SEC raw-hash match",
+  "semantic_artifact_commitment_sha256": "d26873a0cf0061db7f8eac844db9aaf157fa8e41b2d4335caf177dc655801216",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Only four public source-filing development cases.",
+    "No Microsoft Excel for the web saved/downloaded readback or reset on these cases.",
+    "The scenario parameters are synthetic, not SEC guidance or a cash forecast."
+  ]
+}

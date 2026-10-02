@@ -1,0 +1,16 @@
+{
+  "fresh_full_task_retries_allowed": 1,
+  "fresh_full_task_retries_dispatched": 1,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_failed_attempts_retained": 1,
+  "original_reconciled_journal_private_sha256": "adc64ef488d29756effd0775c00a3a8db0bcaa6d04e651911f1cc8a017166ca4",
+  "retry_app_search_pairs_cleaned": 2,
+  "retry_calibration_private_sha256": "a6e6659ce6a68342814296d277a164fc157bf50d0036ffd0a0c998d593b8b0f0",
+  "retry_fresh_clone_material_reset": true,
+  "retry_journal_private_sha256": "e7c2f9d882d4c6774be8384cfdf98c4900e5b4bbd323d97a07eebf91ee71c61a",
+  "retry_positive_score": 1,
+  "retry_wrong_variant_score": 0,
+  "schema": "envloop-magento-negative-neutral-retry-public-v1",
+  "status": "one_bounded_fresh_clone_gui_retry_passed_development_only"
+}

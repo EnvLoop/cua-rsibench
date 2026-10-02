@@ -1,0 +1,91 @@
+{
+  "append_only_failure_ledger": {
+    "all_records_hash_chained": true,
+    "entry_count": 4,
+    "head_sha256": "2d604c11f24d624a60cee41194540b51f01a2dcd031a0f87bed3ba92cbc1d3db",
+    "schema": "envloop-gitlab-failure-ledger-public-v1"
+  },
+  "cell": "gitlab",
+  "cumulative": {
+    "append_only_failure_ledger": {
+      "all_records_hash_chained": true,
+      "entry_count": 4,
+      "head_sha256": "2d604c11f24d624a60cee41194540b51f01a2dcd031a0f87bed3ba92cbc1d3db",
+      "schema": "envloop-gitlab-failure-ledger-public-v1"
+    },
+    "attempted_source_family_count": 20,
+    "attempted_workflow_counts": {
+      "approved_merge_request_merge": 15,
+      "ci_and_runbook_reconciliation": 14,
+      "cross_record_issue_triage": 17,
+      "least_privilege_access_handoff": 14,
+      "release_milestone_coordination": 15
+    },
+    "candidate_families": {
+      "approved_merge_request_merge": 20,
+      "ci_and_runbook_reconciliation": 20,
+      "cross_record_issue_triage": 20,
+      "least_privilege_access_handoff": 20,
+      "release_milestone_coordination": 20
+    },
+    "candidate_final_total": 100,
+    "complete_100_per_id_gui_admission": false,
+    "development_gui_trio_passed": 71,
+    "failed_source_family_count": 4,
+    "failed_workflow_counts": {
+      "ci_and_runbook_reconciliation": 1,
+      "cross_record_issue_triage": 3
+    },
+    "generated_final_and_reserve_candidates": 105,
+    "implemented_gui_families": [
+      "approved_merge_request_merge",
+      "ci_and_runbook_reconciliation",
+      "cross_record_issue_triage",
+      "least_privilege_access_handoff",
+      "release_milestone_coordination"
+    ],
+    "individually_attempted_ids": 75,
+    "no_model_scores": true,
+    "official_final_admitted": 0,
+    "passed_source_family_count": 19,
+    "passed_workflow_counts": {
+      "approved_merge_request_merge": 15,
+      "ci_and_runbook_reconciliation": 13,
+      "cross_record_issue_triage": 14,
+      "least_privilege_access_handoff": 14,
+      "release_milestone_coordination": 15
+    },
+    "quarantined_final_candidate_ids": 5,
+    "quarantined_source_families": 1,
+    "refill_complete_as_inventory_only": true,
+    "reserve_replacement_candidate_ids": 5,
+    "retained_prior_failed_attempts": 4,
+    "schema": "envloop-gitlab-development-sweep-summary-v1",
+    "source_excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+    "statuses": {
+      "development_gui_trio_failed": 1,
+      "development_gui_trio_passed": 71,
+      "driver_or_environment_failed": 3,
+      "not_attempted": 25
+    },
+    "still_unexposed_final_candidates": 100,
+    "unexposed_100_candidate_inventory_intact": true,
+    "verified_cold_resets_for_passed_ids": 213
+  },
+  "date": "2026-09-27",
+  "interpretation": "Evaluator-private native GUI admission controls only; no official exam or model score.",
+  "model_calls": 0,
+  "new_bounded_batch": {
+    "attempted_ids": 10,
+    "new_failed_or_invalid_ids": 0,
+    "new_passed_ids": 10,
+    "new_source_families": 0,
+    "prior_failed_attempts_preserved": 4,
+    "prior_passes_preserved": 61
+  },
+  "official_final_admitted": 0,
+  "pre_existing_demo_restored_same_identity_healthy": true,
+  "previous_public_receipt_sha256": "25764a2cd5616d89ef601a6c1897162b0209b9d3d39317f2d1f9881b24b364b8",
+  "researcher_campaigns_executed": 0,
+  "schema": "envloop-gitlab-sweep-progress-public-v1"
+}

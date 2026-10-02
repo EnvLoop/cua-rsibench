@@ -1,0 +1,24 @@
+{
+  "application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-27",
+  "final_task_count": 100,
+  "near_miss_exactly_one_semantic_error_task_count": 100,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "positive_target_semantics_passed": 300,
+  "positive_target_semantics_total": 300,
+  "private_full_audit_sha256": "ca347651b3e836e76e6de3a8443ba89cd9459f2595e9aa6daaf801e73737bc90",
+  "private_map_sha256": "c09eb0720d6a90770583a575284dc4ee90e48648336e2a3279ab3837ab1cae36",
+  "private_perturbation_salt_sha256": "f5dc4d67bd91581c1623b7f2a19f6649f3fd31e3cd62d350fcd5ce2862006128",
+  "saved_artifact_hash_manifest_sha256": "8d34cf84fe658eeb218920ff5b51b9e47182f9d94f221304b7b0d759f04a6e71",
+  "schema": "cua-native-wdi-saved-semantic-audit-public-v1",
+  "scope": "Read-only evaluator re-audit of known GUI controls, not a model attempt or campaign result. The semantic guards are not yet frozen in the official scorer.",
+  "semantic_failure_task_count": 0,
+  "source_family_count": 25,
+  "status": "all_private_saved_semantic_checks_passed"
+}

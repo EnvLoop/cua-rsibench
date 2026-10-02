@@ -33,10 +33,28 @@ class ResearcherModelTests(unittest.TestCase):
                 with self.subTest(model=model), patch('cursibench.agentrouter.post_json', return_value=body) as post:
                     output, receipt = response_receipt('unit-test prompt', model)
                     self.assertEqual(post.call_args.args[1]['model'], model)
+                    self.assertEqual(post.call_args.args[1]['reasoning'], {'effort': 'low'})
+                    self.assertNotIn('temperature', post.call_args.args[1])
                     self.assertEqual(output, 'mock-result')
                     self.assertEqual(receipt['requested_model'], model)
                     self.assertEqual(receipt['reported_model'], 'provider-reported-model')
                     self.assertNotIn('unit-test-key', json.dumps(receipt))
+
+    def test_explicit_frozen_reasoning_settings_reach_responses(self):
+        body = {'id': 'mock', 'model': 'gpt-6-astra', 'status': 'completed',
+                'output': [{'type': 'message', 'content': [
+                    {'type': 'output_text', 'text': 'ok'}]}]}
+        with patch.dict('os.environ', {'OPENAI_API_KEY': 'unit-test-key'}), \
+                patch('cursibench.agentrouter.post_json', return_value=body) as post:
+            _, receipt = response_receipt('test', 'gpt-6-astra',
+                                          reasoning_effort='high',
+                                          reasoning_mode='pro')
+        self.assertEqual(post.call_args.args[1]['reasoning'],
+                         {'effort': 'high', 'mode': 'pro'})
+        self.assertEqual(receipt['requested_reasoning_effort'], 'high')
+        self.assertEqual(receipt['requested_reasoning_mode'], 'pro')
+        with self.assertRaisesRegex(ValueError, 'unsupported frozen reasoning'):
+            response_receipt('test', 'gpt-6-astra', reasoning_effort='none')
 
     def test_transport_failure_retains_exact_requested_model(self):
         with patch.dict('os.environ', {'OPENAI_API_KEY': 'unit-test-key'}), \

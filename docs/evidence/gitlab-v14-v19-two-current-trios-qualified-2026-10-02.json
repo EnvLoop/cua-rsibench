@@ -1,0 +1,53 @@
+{
+  "actual_cost_usd": null,
+  "all_six_production_verdicts_independently_rederived": true,
+  "cold_reset_sql_git_exact": true,
+  "complete_rendered_page_approved": false,
+  "data_provenance": "Public CISA KEV advisory metadata with generated operational policies, assets, sites, principals and issue workflows.",
+  "expected_control_trios": 100,
+  "final_issue_link_list_visually_verified": false,
+  "formal_campaign_credit": 0,
+  "formal_model_outcomes": 0,
+  "full100_finished": false,
+  "independent_root_source_review_sha256s": [
+    "bcf4ee6e269b9eb551d2c974ae9fd224968417823b60916511a0090209a421a8",
+    "c29f5603949a534f844c7c011db13af3971224c0681e42b574831474bf39a2b1"
+  ],
+  "independent_scores": [
+    [
+      1.0,
+      0.0,
+      1.0
+    ],
+    [
+      1.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "native_dispatch_receipts_reopened": 84,
+  "native_lifecycle_max_seconds": 525.7312501249835,
+  "new_model_calls": 0,
+  "new_native_calls": 0,
+  "official_final_admitted": 0,
+  "old_source_epoch_credit": 0,
+  "original_raw_files_reopened": 5673,
+  "original_services_restored": true,
+  "parent_and_clone_teardown_verified": true,
+  "persisted_relationships_verified_by": "Original independent SQL and complete Git saved-state production verifier.",
+  "private_audit_sha256s": [
+    "185f3a4b34db355bea026ad075cd17b04e89cc070d86bfce4aa4eca740e1e366",
+    "b4bb1436f10d2f603deba7e2658932d058599649944db5e603f203c232db818d"
+  ],
+  "private_combined_receipt_sha256": "32451cdc43403a2c3fc77c240900679b14e9aef8f37cf5c1eaeb0d10371594b2",
+  "protected_source_and_seed_unchanged": true,
+  "qualified_control_trios": 2,
+  "raw_baseline_reset_resumed_git_tree_blobs_reopened": 2376,
+  "raw_guard_images_reopened": 168,
+  "real_customer_business_data_claimed": false,
+  "schema": "envloop-public-gitlab-v14-v19-two-current-control-trios-v1",
+  "source_binding_sha256": "e9806accbbe7fee6ee0e74400bde0a177912d84a119d0aa5b2ab7cc6b8d76598",
+  "source_visual_review_scope": "Policy readability and relevant visible title, dates, object identity, owner and priority; workflow-stage screenshots only.",
+  "status": "two_current_saved_control_trios_and_stage_limited_source_visual_reviews_verified",
+  "task_identity_set_sha256": "bb7d8548047d71ade1f1d58b1b47f11a1f9d2cd33f900181bfd27747f379360f"
+}

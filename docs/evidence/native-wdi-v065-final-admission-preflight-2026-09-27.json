@@ -1,0 +1,59 @@
+{
+  "actual_provider_billed_usd": null,
+  "application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-27",
+  "fair_near_misses_rejected": 100,
+  "fair_positive_controls_passed": 100,
+  "guest_content_public_sha256": "1173ec245897bfc1d50919212c01736d67f128229231d57344e522e5a15ef911",
+  "held_out_source_family_count": 25,
+  "historical_action_gap_task_counts": {
+    "historical_actions_lack_per_step_current_frame": 100,
+    "historical_actor_uses_action_outside_v065": 50,
+    "historical_gui_sandboxes_lack_scoped_guest_attestation": 100,
+    "historical_provider_identity_fields_missing": 14,
+    "historical_write_lacks_v065_target": 100
+  },
+  "historical_gui_receipts_missing_provider_identity": 40,
+  "historical_gui_receipts_with_provider_identity": 260,
+  "historical_gui_receipts_with_scoped_guest_attestation": 0,
+  "historical_gui_trios_passed": 100,
+  "historical_gui_trios_with_complete_provider_identity": 86,
+  "historical_positive_unsupported_key_chords": {
+    "Control+End": 1,
+    "Control+F": 24,
+    "Shift+End": 1
+  },
+  "inputs_with_world_bank_ccby_and_derived_attribution": 100,
+  "native_lane_cap_usd": "40",
+  "native_lane_full_lease_reserve_usd": "39.16111111111111111111111111",
+  "neutral_normalized_final_impress_inputs": 25,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "positive_double_click_task_count": 25,
+  "positive_unsupported_key_task_count": 25,
+  "private_admission_preflight_sha256": "842b0fe6987f062bc8425b0f24e46bb81f7d71bb8d0c8e8be3acecd6fbd179e1",
+  "profile_private_manifest_sha256": "fc17c8858170dc4ff7e473e64bb1399445adecc21854073f9021de41ec0f63e9",
+  "qualified_under_current_v065": 0,
+  "schema": "cua-native-wdi-v065-final-admission-preflight-public-v1",
+  "scorer_bundle_sha256": "ab1a735bd00d28fb27df6f47cac6ff9a73d12403685344711d9be971d6fcf156",
+  "shared_v06_split_validator_passed": true,
+  "source_catalog_url": "https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators",
+  "source_license": "CC BY 4.0",
+  "source_license_url": "https://datacatalog.worldbank.org/public-licenses",
+  "status": "blocked_action_and_runtime_parity_not_frozen",
+  "task_bound_profiles_qualified": 100,
+  "task_count_with_per_action_current_frame_proof": 0,
+  "task_count_with_per_gui_sandbox_scoped_guest_attestation": 0,
+  "v065_model_output_source_sha256": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+  "v065_train_only_live_public_sha256": "016741bc65624d8caa5ec1187375a405a50e102f6631e6d5505638d7491c6be2"
+}

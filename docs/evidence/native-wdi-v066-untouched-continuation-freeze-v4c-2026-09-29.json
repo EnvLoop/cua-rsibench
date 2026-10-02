@@ -1,0 +1,26 @@
+{
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "charged_four_root_full_lease_intents": 55,
+  "durable_budget_intent_and_receipt_required": true,
+  "historical_caret_prototype_freeze_sha256": "5d3f0ad7ce4ee33e9270f98934d3aa4aa98f44f92c808cba3d1d2aa5cb39f67a",
+  "historical_v3_freeze_sha256": "bfc8e6a108524d4660e497c226b5fc9dacc3c354b12153992a722deba0dab481",
+  "initial_complete_gui_trios_independently_audited": 8,
+  "never_intended_task_count": 89,
+  "new_stopped_v3_partial_task_count": 1,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "one_or_two_ids_per_root_batch": true,
+  "original_quarantined_task_count": 2,
+  "private_freeze_sha256": "8c584256933db5c38cd52ccab468fc13c289128c8c427780889298b0c626620c",
+  "projected_four_root_full_lease_intents": 322,
+  "projected_four_root_reserved_usd_upper": "53.66666666666666666666666667",
+  "same_id_retry_authorized": false,
+  "schema": "cua-native-wdi-v066-untouched-continuation-freeze-public-v4",
+  "source_sha256s": {
+    "native_desktop_factory/qwen_v066_adapter_v4_strict.py": "8565ef15784b1de9d20f79b08d0d17ac4e108f3e2c7e5a0e0dbe42e4e142b29b",
+    "native_desktop_factory/v066_day_rollover_attrition_audit_v4.py": "5ab1673711569f78dbdf3708dfd433da3e88623d07d6011244eddc4ca62181bf",
+    "native_desktop_factory/v066_day_rollover_continuation_v4.py": "0df9e3b9f16d2f394227c702fdd2f0c20863f3edc0fbac5a115205275a02b1ad",
+    "native_desktop_factory/v066_day_rollover_durable_child_v4.py": "15799a5daa592b96508ef1fef779cf675c1fee7f8e4ed838572104556bdbb201"
+  },
+  "status": "source_frozen_before_new_v4_untouched_create"
+}

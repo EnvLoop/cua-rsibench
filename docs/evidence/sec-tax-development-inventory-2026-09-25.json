@@ -1,0 +1,13 @@
+{
+  "schema": "sec-tax-public-development-inventory-v1",
+  "status": "three public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "current/deferred tax provision, cash taxes, deferred-tax assets, and synthetic tax-rate stress",
+  "issuer_families": 3,
+  "original_10k_accessions": 3,
+  "excerpt_sha256_by_ticker": {
+    "GOOGL": "9703fd3cb09f79759a20751bbe791b5ea328467323c1de44f8a11d7e5fee732e",
+    "CRM": "e703e61b56d7192cb3b39d7aedc23806fe37704542097cd751390403f822a16b",
+    "META": "91864a403588f985e4be56cbf7b459f76eba5f35e667dfb3492da1291642a21b"
+  },
+  "official_final_credit": 0
+}

@@ -1,0 +1,51 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "actual_docker_calls_for_this_worker": 0,
+  "actual_e2b_leases": 0,
+  "actual_teacher_model_calls": 0,
+  "adapter_sha256": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+  "cell_id": "magento-admin",
+  "checked_date": "2026-09-28",
+  "dedicated_backend_implemented": false,
+  "dedicated_cron_free_train_clone_lifecycle_qualified": false,
+  "fake_provider_exact_upstream_episode_contract_passed": true,
+  "fake_provider_worker_tests_passed": 8,
+  "frozen_v2_evaluator_source_checks": {
+    "tools/audit_magento_cron_requalification_v1.py": {
+      "same_as_base_82cfdb4": true,
+      "sha256": "d96a86590f67bb41409eb1f2759f43198a738341c9fd42f372af709049b85673"
+    },
+    "tools/magento_resumable_100_v2.py": {
+      "same_as_base_82cfdb4": true,
+      "sha256": "24a5b2c9efb68557e09d3d413d2f75c95e130f2d1e1863b9fb1aac1bd580baa0"
+    },
+    "tools/sweep_magento_original_gui_controls_v1.py": {
+      "same_as_base_82cfdb4": true,
+      "sha256": "09285a06f0fb7f247c1fb83ca2505a67d8dad2cba34e209204ce2ffd2c89f471"
+    }
+  },
+  "local_cost_category": "storage_application",
+  "local_opportunity_cost_is_not_provider_invoice": true,
+  "official_final_admissions": 0,
+  "official_training_episodes": 0,
+  "original_software": "Magento Open Source original admin",
+  "production_backend_live_enabled": false,
+  "provider_invoice_usd": null,
+  "requires_e2b": false,
+  "researcher_campaigns": 0,
+  "runtime_bundle_sha256": "e259383c705c364e4f1ab497ec1fe73f5b2a1157ee8ea61e19c34dd7aaa7bb9f",
+  "runtime_source_sha256s": {
+    "magento_catalog_factory/plan.py": "c2acae52a27d653b71d2d2df317801f3f2bf1c42a87452225ef10818f94160ea",
+    "magento_catalog_factory/seed.py": "6bca87ef9aeaf8aac74d0e284b91167ae885a516eb12a093d935e153d986afa5",
+    "magento_catalog_factory/verify.py": "bb2ca77c90f403713ef0d2ffb1f7a8f0bd1fe4e21fe5c06e10f1669b56ecdd1b",
+    "tools/magento_cron_runtime_contract_v1.py": "36e1e76059370055be3f6cc9e50fbecb640d0d19061d4f99da6e813979c8b73b",
+    "tools/magento_teacher_episode_worker_v066.py": "ebb302238581ffc0c8edbe4aeb83dc994d7e64c44cc01c028c60c57761b77700",
+    "tools/magento_v066_train_adapter.py": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+    "tools/run_magento_model_pilot_v06.py": "25f32928ff11e7ebdeb426be943680ddc8e05fa72f1caea3117a18a67bdebeeb",
+    "tools/run_magento_model_pilot_v063.py": "c2869f0cc1455045b51bc4ada78089ff82b7d9bd0dcec9c128bab3f1120b3520",
+    "tools/start_magento_native_sidecar_clone_v1.py": "0c48169358bcfdaaafa777ceb19b783dd41d835982653852e0b249e2fdc551c2"
+  },
+  "schema": "envloop-magento-v066-teacher-worker-offline-readiness-v1",
+  "status": "fake_provider_interface_only_dedicated_clone_backend_unqualified",
+  "verifier_sha256": "bb2ca77c90f403713ef0d2ffb1f7a8f0bd1fe4e21fe5c06e10f1669b56ecdd1b"
+}

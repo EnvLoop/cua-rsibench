@@ -1,0 +1,14 @@
+{
+  "checked_utc": "2026-09-27T02:39:45.574561+00:00",
+  "downloaded_deck_unchanged": true,
+  "edit_data_or_excel_control_observed": false,
+  "model_calls": 0,
+  "native_chart_selected": true,
+  "official_final_admitted": 0,
+  "old_workflow_final_candidate_count": 10,
+  "pre_result_workflow_revision": "chart_series_relabel_to_chart_caption_reconciliation",
+  "private_receipt_sha256": "b6c0587a754e1b1898dc94ab29839d9edcaa85604f609e1c0934d20acedcdd6a",
+  "schema": "envloop-ppt-web-chart-feasibility-public-v1",
+  "scope": "one imported native chart in one dedicated personal PowerPoint-web account",
+  "status": "imported_train_source_native_chart_edit_control_not_observed"
+}

@@ -1,0 +1,33 @@
+{
+  "actual_provider_billed_usd": null,
+  "candidate_final_count": 100,
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-27",
+  "common_profile_and_lane_ratified": true,
+  "full_six_cell_pre_campaign_freeze_completed": false,
+  "invalid_gui_trios": 0,
+  "missing_gui_trios": 93,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "private_detailed_audit_sha256": "2e985d8e8415c4f30b1de443ba9f1d2f4bd6e888e1f0deeb759dc2d6cceeda30",
+  "private_raw_frame_storage_budget": {
+    "dispatch_storage_ready": true,
+    "evidence_cap_bytes": 4294967296,
+    "host_free_bytes": 18607468544,
+    "host_free_floor_bytes": 8589934592,
+    "reserved_evidence_bytes": 208550165,
+    "retained_file_count": 1435,
+    "unresolved_write_count": 0
+  },
+  "prospective_gui_trios_independently_accepted": 7,
+  "schema": "cua-native-wdi-v066-final-control-audit-public-v1",
+  "separate_final_control_intent_budget": {
+    "actual_provider_billed_usd": null,
+    "combined_full_lease_reserved_usd": "3.666666666666666666666666667",
+    "combined_intents": 22,
+    "existing_intents": 22,
+    "lane_cap_usd": "60",
+    "proposed_new_intents": 0
+  },
+  "status": "blocked_before_full_study_final_cell_manifest"
+}

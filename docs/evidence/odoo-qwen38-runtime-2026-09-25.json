@@ -1,0 +1,22 @@
+{
+  "schema": "envloop-odoo-qwen38-runtime-binding-v1",
+  "status": "one_train_only_provider_sample_completed_action_rejected",
+  "student_model": "Qwen/Qwen3.8-27B",
+  "renderer": "qwen3_5_disable_thinking",
+  "image_processor": "Qwen2VLImageProcessorPil",
+  "tinker_sdk_version": "0.30.0",
+  "torch_version": "2.13.0",
+  "tinker_cookbook_version": "0.5.8.dev5+g1e53aa3d1",
+  "tinker_cookbook_commit": "1e53aa3d1cdd6389b3290c2574641eccc0503242",
+  "bindings_sha256": {
+    "shared_action_contract": "6954f1fc8c8cc64d3aef4cca8c647d115f39412b469a0cc707a2eeb2a3e8a2f6",
+    "shared_qwen_vision_proxy": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2",
+    "odoo_native_adapter": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+    "public_train_frame_sample": "4cd63af02272b597bf16302281a201af591fcf04e312b76a127d3ecd876e0b0b"
+  },
+  "provider_billed_tokens": null,
+  "provider_cost_usd": null,
+  "official_hidden_task_used": false,
+  "model_action_dispatched": false,
+  "official_final_model_attempt": false
+}

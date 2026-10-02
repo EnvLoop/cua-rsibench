@@ -1,0 +1,21 @@
+{
+  "country_source_family_count": 8,
+  "direct_file_controls_rechecked": 80,
+  "future_reserve_collision_count": 0,
+  "heldout_source_collision_count": 0,
+  "historical_final_source_collision_count": 0,
+  "historical_plan_revisions_checked": 12,
+  "model_calls": 0,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "package_and_layout_rechecked": 80,
+  "private_contact_sheet_sha256": "ea9b488f191790e7e62f085b794489f46600cbdf0dfd1372523d5cb1da221e01",
+  "private_manifest_sha256": "bb5baafdded0384a3069be5d22707269e191744a995f83b2512a58b9afdda2c7",
+  "private_receipt_sha256": "e06e47005fa95286e43d6c17c284a76a92e4f00386e3fe092215a1b8a52dc80d",
+  "representative_pdf_pages": 70,
+  "representative_pdfs": 10,
+  "schema": "envloop-ppt-wdi-train-calibration-80-audit-public-v1",
+  "status": "reopened_offline_train_analogues_not_model_or_gui_result",
+  "train_only_analogue_tasks_rechecked": 80,
+  "workflow_count": 10
+}

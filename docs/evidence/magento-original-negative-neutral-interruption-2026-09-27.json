@@ -1,0 +1,16 @@
+{
+  "cleanup_receipt_private_sha256": "c8eb5eed0b3813dce6e02c3d1e38d4d9e796a50e0c720078d0209198c0c2f09e",
+  "exact_disposable_container_identities_cleaned": 2,
+  "failed_clone_material_state_unchanged": true,
+  "failed_step": "negative_neutral_cms_quote_open",
+  "fresh_copy_retries_dispatched": 0,
+  "maximum_fresh_copy_retries_allowed": 1,
+  "model_calls": 0,
+  "negative_gui_edit_attempted": false,
+  "official_final_admitted": 0,
+  "original_stopped_journal_private_sha256": "1bb7317e7305d1b205765c4672f525fb0a66d3e17454d0c7812a6ec04282f91b",
+  "positive_saved_state_score": 1,
+  "reconciled_journal_private_sha256": "adc64ef488d29756effd0775c00a3a8db0bcaa6d04e651911f1cc8a017166ca4",
+  "schema": "envloop-magento-negative-neutral-interruption-public-v1",
+  "status": "one_evaluator_gui_infrastructure_stop_reconciled_before_retry"
+}

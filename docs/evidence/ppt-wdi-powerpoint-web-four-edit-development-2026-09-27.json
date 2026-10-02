@@ -1,0 +1,58 @@
+{
+  "cloud_item_url_sha256": {
+    "baseline": "4c42c1ca3a38ad9e5bc6bb15937a65d9ed23030f372561719d215800d4c402de",
+    "fresh_reset": "4a2a4cf23670e310ef752a3d3d7364267bcbdcd04576a3b1a370fa802eb783f4",
+    "invalid_near_01": "af783b717c9d97aba0b24e118d4b4b276bbd89c9111196a061f5f5c89e57ba12",
+    "invalid_near_02": "a1074154af2385eb897d88f4369c5e20d87bf10368061c01d73a333e219d9f84",
+    "near_miss": "26783995ec244e815a9015fd20759a05e633ec4a7f195b7b6e77d1b9c334eff0",
+    "positive": "765427fc0035e29f3e68242cde290289d39e82b1061e00fd34b10e71bdcf4707"
+  },
+  "control_scores": {
+    "fresh_reset": {
+      "correct_target_count": 0,
+      "preservation_pass": true,
+      "score": 0.0
+    },
+    "near_miss": {
+      "correct_target_count": 3,
+      "preservation_pass": true,
+      "score": 0.0
+    },
+    "positive": {
+      "correct_target_count": 4,
+      "preservation_pass": true,
+      "score": 1.0
+    }
+  },
+  "download_sha256": {
+    "fresh_reset": "cddf5ee54f30430961ebe0691a84e48cea3c8a629b48154813f2f1dc27cd9cb9",
+    "near_miss": "de6a6984632a28929da150b9644720710585b25a48c8c4adad111975f48284a9",
+    "positive": "8011c9a1b4302cdfbad8c1ebad44d38737b9fc6a07b917d17f521b6c59c7b661"
+  },
+  "model_calls": 0,
+  "normalized_baseline_sha256": "cddf5ee54f30430961ebe0691a84e48cea3c8a629b48154813f2f1dc27cd9cb9",
+  "official_final_admitted": 0,
+  "original_plan_sha256": "8dc8b4c40db26873a2a37d6114a0c283d3ace9e02ad9bc2ba4c00dfff121dab0",
+  "pre_action_invalid_count": 2,
+  "pre_action_invalid_receipt_sha256": {
+    "first": "f81587b138dbbd113259b51894dfe5f3f4aaa05124ec334a884bbdd15762130f",
+    "second": "3f40551aa1037d42f89797a79a5f970f2e9db6657b78b68717a8671ea9f45959"
+  },
+  "private_receipt_sha256": "a277aef5814cf31d62de52a85c63a99c31c92a78eb9ef35a6eb936fb7a5a1552",
+  "quarantine_receipt_sha256": "e238a1379472d63a489cb989e03fc62bcd576f91cd52479705a51fdedda118fd",
+  "quarantined_final_candidate_tasks": 4,
+  "quarantined_source_families": 1,
+  "remaining_original_final_candidates": 96,
+  "replacement_pending": 4,
+  "researcher_campaigns": 0,
+  "schema": "envloop-ppt-wdi-web-final-development-public-v1",
+  "source_equivalence": {
+    "embedded_workbook_bytes_equal": true,
+    "native_chart_cache_semantically_equal": true,
+    "native_chart_cache_values_checked": 13,
+    "slide_count": 7,
+    "slide_text_equal": true
+  },
+  "source_sha256": "3d938dfa18263cd08ffe3c478793ba89e0f04af734555ddd52320ff98382cd58",
+  "status": "quarantined_family_development_control_not_final_admission"
+}

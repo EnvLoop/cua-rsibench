@@ -1,0 +1,49 @@
+{
+  "added_paths": 0,
+  "api_calls": 0,
+  "archive_payload_bytes_available": false,
+  "changed_entries": 1,
+  "current_manifest_sha256": "0712cec5620c2891174e5cb7210e18f63f83f11b1f5021d6955686f17b942d04",
+  "current_rows": 100661,
+  "current_tree_sha256": "3a35d3ab643f6dd5e9e0f8bc488aa5a81fb740d57b4c17d7e5cd3cacb4ead9a1",
+  "differences": [
+    {
+      "baseline": [
+        "/usr/local/share/e2b/ssl-certs.tar",
+        "regular_file",
+        420,
+        0,
+        0,
+        [
+          522240,
+          "d8d08ce53f4fb98b1d501fb79a1809f6482bd1371b868a897ea1d55afb2d4ab4"
+        ]
+      ],
+      "current": [
+        "/usr/local/share/e2b/ssl-certs.tar",
+        "regular_file",
+        420,
+        0,
+        0,
+        [
+          522240,
+          "92ce293b421143471ef31b39064b8cb35c2e0ea7cb194f2f255bf87fa52dc28f"
+        ]
+      ],
+      "path": "/usr/local/share/e2b/ssl-certs.tar"
+    }
+  ],
+  "guest_reference_sha256": "1173ec245897bfc1d50919212c01736d67f128229231d57344e522e5a15ef911",
+  "kernel_counts_exclusions_equal": true,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_failed_v13_guest_exact_cause_recovered": false,
+  "original_manifest_sha256": "82d536d651f74d05a203afc284c1c8460fa62b2866c0c585e931ed433a80b6a1",
+  "original_rows": 100661,
+  "original_tree_sha256": "337e2d85f50731054ae8c23b6fd3e84383bd03a66cd74b20baf5d0c14d2223a0",
+  "removed_paths": 0,
+  "schema": "cua-native-neutral-v14-manifest-diff-public",
+  "status": "one_exact_archive_entry_changed",
+  "template_change_established": false,
+  "unchanged_rows": 100660
+}

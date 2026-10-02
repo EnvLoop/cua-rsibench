@@ -1,0 +1,17 @@
+{
+  "schema": "envloop-desktop-native-atspi-probe-v24-root",
+  "status": "actual_probe_unavailable_missing_atspi_namespace",
+  "native_result_sha256": "d5d7daa336b232e6df562d73d32aebc61c24e270024ede1eb194ccf09f374565",
+  "owned_cleanup_sha256": "99bf1e7497dc5d7a4463560059aaee842833c47dce3c27f80160e0b847f0a875",
+  "error_code": "Namespace Atspi not available",
+  "native_mutations": 0,
+  "model_calls": 0,
+  "provider_shape_attested": true,
+  "original_input_sha256": "dd6d0eaec56a726dfa8a0a6aee520ce3fe251dbd78996e4ce91b9278e173ab7f",
+  "native_calc_profile_attested": true,
+  "cleanup_kill_acknowledged": true,
+  "cleanup_sandbox_running": false,
+  "semantic_native_surface_qualified": false,
+  "native_task_qualification_credit": 0,
+  "official_final_admitted": 0
+}

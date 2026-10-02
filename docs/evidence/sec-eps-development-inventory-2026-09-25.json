@@ -1,0 +1,14 @@
+{
+  "schema": "sec-eps-public-development-inventory-v1",
+  "status": "four public mixed-unit cases; zero hidden or Excel-web admissions",
+  "structural_workflow": "reported EPS and diluted shares, shareholder cash returns, and synthetic repurchase scenario",
+  "issuer_families": 4,
+  "original_10k_accessions": 4,
+  "excerpt_sha256_by_ticker": {
+    "GOOGL": "bd31056d674ae135a38ef4da4db8d531747a7b773b288fa7f3b8e4acb815601c",
+    "NVDA": "a80795f4c2d6b5d9cecb45dcef6a468c61443596dcbc32f66f33a97a65b405b2",
+    "META": "e377f948f75a8c958c1dbe8fddf9f5bc4076af5c4e8fddeb541fd3d51845ac73",
+    "KO": "8491460c455d59dc8a0cac8489d6d43e5a6b1822d003bbf7995f407f779c1740"
+  },
+  "official_final_credit": 0
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "LOW",
+  "cik": 60667,
+  "entity_name": "LOWES COMPANIES INC",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000060667.json",
+  "proxy_raw_json_sha256": "7912551d61433f5e7e863ac602ebf24ee1484699e10aa556534f0055fff2ea7d",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/60667/000006066724000033/0000060667-24-000033-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/60667/000006066724000033/low-20240202.htm",
+  "filing_accession": "0000060667-24-000033",
+  "filing_filed": "2024-03-25",
+  "filing_period_end": "2024-02-02",
+  "filing_fiscal_year": 2023,
+  "facts": [
+    {
+      "id": "88a205badb3a0a2799a6",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-02-02",
+      "value": 41795000000,
+      "accession": "0000060667-24-000033",
+      "filed": "2024-03-25",
+      "form": "10-K",
+      "fy": 2023,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "416832a46ce5c4b7d038",
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "unit": "USD",
+      "start": "2023-02-04",
+      "end": "2024-02-02",
+      "value": 86377000000,
+      "accession": "0000060667-24-000033",
+      "filed": "2024-03-25",
+      "form": "10-K",
+      "fy": 2023,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

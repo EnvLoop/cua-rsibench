@@ -1,0 +1,14 @@
+{
+  "candidate_final_total": 100,
+  "controller_v5_sha256": "f5b90e5c2254131f1a21b50e07543255594b4dcfffa1b892e67322625c66f4ae",
+  "fresh_copy_positive_near_miss_reset_and_collateral_controls": true,
+  "independent_saved_pptx_scoring": true,
+  "individual_original_powerpoint_web_gui_controls_passed": 1,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "private_receipt_commitment_sha256": "94152cc81c3d20b5a5c1a8c394b1bab1eade6e96e5dbfb268325252d911e96ab",
+  "researcher_campaigns": 0,
+  "schema": "envloop-ppt-v5-final-gui-progress-public-v1",
+  "status": "development_gui_controls_passed_official_admission_pending",
+  "verifier_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9"
+}

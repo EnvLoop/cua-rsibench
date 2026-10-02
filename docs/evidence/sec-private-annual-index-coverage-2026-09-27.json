@@ -1,0 +1,29 @@
+{
+  "schema": "sec-private-annual-index-coverage-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "source-filing index availability only; no additional numeric facts, workbook cases or official Excel-web final admissions",
+  "total_final_source_issuer_families": 20,
+  "final_source_issuer_families_with_empty_slots": 19,
+  "still_empty_final_task_reservations": 72,
+  "untrusted_proxy_annual_accession_candidates_screened": 72,
+  "distinct_candidate_original_sec_10k_indexes_with_cik_accession_form_period_match": 72,
+  "candidate_index_identity_rejections_after_recovery": 0,
+  "nested_path_failure_recovered_using_official_sec_flat_index": 1,
+  "additional_task_specific_numeric_facts_checked": 0,
+  "additional_actor_reference_pairs_built": 0,
+  "offline_candidates_assigned_to_final_reservations": 28,
+  "unfilled_reservation_slots": {"train": 16, "selection": 16, "final": 72},
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "private_evidence_sha256": {
+    "annual_index_qualification_audit": "d8ba994fc00efff2699b9128836dae0307de2aba6d1602cca022b4ee70fe4f0d",
+    "candidate_source_planner": "965041546b8898dd95f5d11114cf36ebc0eb23e53465cdaeecb8c213e81635fe",
+    "original_sec_index_auditor": "9f57f5381f2f9df08ee1548ba55233287b405a5f93288320b0979d7fd5b8715f"
+  },
+  "limitations": [
+    "The local companyfacts snapshots supplied only untrusted filing-accession shortlists. The exact CIK, accession, 10-K form and period were separately checked in original SEC filing indexes for each of the 72 candidate accessions.",
+    "Original filing indexes establish source-file identity, not the authenticity of task-specific numeric facts. Zero new numeric facts were checked by this sweep.",
+    "No additional workbooks, hidden tasks or model attempts were admitted from these index checks. The 72 final slots remain empty until original filing numeric facts, novel task instances, OOXML oracle controls and per-ID Excel-web readback/reset pass.",
+    "The 16 train and 16 selection empty reservations were outside this final-source index sweep."
+  ]
+}

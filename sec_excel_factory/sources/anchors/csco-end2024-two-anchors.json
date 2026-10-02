@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "CSCO",
+  "cik": 858877,
+  "entity_name": "CISCO SYSTEMS, INC.",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000858877.json",
+  "proxy_raw_json_sha256": "f9f6cfb3c04bb8102552f121868831471a474165074ccc7c539f6f80f19d1b99",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/858877/000085887724000017/0000858877-24-000017-index.htm",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/858877/000085887724000017/csco-20240727.htm",
+  "filing_accession": "0000858877-24-000017",
+  "filing_filed": "2024-09-05",
+  "filing_period_end": "2024-07-27",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "e4cbdf5ef3106052ae00",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-07-27",
+      "value": 124413000000,
+      "accession": "0000858877-24-000017",
+      "filed": "2024-09-05",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "d9fef6d33e20f695a431",
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "unit": "USD",
+      "start": "2023-07-30",
+      "end": "2024-07-27",
+      "value": 53803000000,
+      "accession": "0000858877-24-000017",
+      "filed": "2024-09-05",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "evaluator_private_salt_sha256": "f5dc4d67bd91581c1623b7f2a19f6649f3fd31e3cd62d350fcd5ce2862006128",
+  "fair_scorer_calibration_failures": 0,
+  "final_candidate_count": 100,
+  "final_source_family_count": 25,
+  "freeze_date": "2026-09-27",
+  "gui_trios_independently_accepted": 100,
+  "known_near_miss_rejected_fair_scorer": 100,
+  "known_positive_passed_fair_scorer": 100,
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "private_detailed_audit_sha256": "4354e689707d4bd65af6d5b20ad22375ec7db934aecdb004f76aad33b19f941b",
+  "private_map_sha256": "c09eb0720d6a90770583a575284dc4ee90e48648336e2a3279ab3837ab1cae36",
+  "schema": "cua-native-wdi-fair-scorer-pre-result-freeze-v1",
+  "scope": "100 known GUI positive/negative calibration artifacts only. This scorer does not authorize any Qwen final run until the shared v0.6.4 action/observation, model, image, budget, and hidden-set pre-campaign gates also freeze.",
+  "scorer_bundle_sha256": "ab1a735bd00d28fb27df6f47cac6ff9a73d12403685344711d9be971d6fcf156",
+  "scorer_file_sha256": {
+    "formula_semantics.py": "9a942050cbf061f0373e9cd715b226f644d60947319fbbf82bc872893a727a6e",
+    "official_saved_verifier.py": "74815727ce0e3910714eddcec84c10f75b5b9f8286ded3634e8a79e6242a8cd8",
+    "target_text_semantics.py": "5decc7eb470b8b2a6534d22d3cf49c50004abfc5c74e60c21f0b494a912c742e",
+    "verify.py": "dc5295d479019b07bbbb8fddc9b648df9963e283959e4de56a41b1bb65a56baf"
+  },
+  "scorer_schema": "cua-native-wdi-saved-verifier-v2",
+  "status": "pre_result_scorer_candidate_frozen"
+}

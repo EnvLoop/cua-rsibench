@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-28",
+  "fresh_gui_controls_required": 100,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "ordered_task_identity_sha256": "7c92df91fdbaf4dfa316c81608c4301d788fb105c22bdca3b0cdf832c6808723",
+  "parent_cron_freeze_sha256": "f0096622c214cca4f3ce1e377fb93199ec98182bd5918de97181a40e9608a74c",
+  "plan_sha256": "1df41f027b5f284c7ff7ed162f42f075259960242a295e0a430bff1c8b479ae1",
+  "private_freeze_sha256": "27c7103e1c66d2954eeedf9a7c0f001dc32e751e22f0b0c33630a00499984147",
+  "runtime_fingerprint_sha256": "7f47aaa47abcb83a9874ff17f52b4fa6c44269b3d74c71127592774206aaa03f",
+  "schema": "envloop-magento-resumable-100-freeze-public-v2",
+  "status": "pre_result_gui_execution_protocol_frozen",
+  "study_wide_infrastructure_retry_cap": 20,
+  "whole_case_retry_cap_per_id": 1
+}

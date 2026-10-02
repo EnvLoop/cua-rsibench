@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1210 555" role="img" aria-label="Six-cell benchmark preparation, not model results">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="32" y="46" font-family="Arial,sans-serif" font-weight="700" font-size="26" fill="#10243A">Six-cell benchmark preparation</text>
+<text x="32" y="73" font-family="Arial,sans-serif" font-size="14" fill="#42576E">Dated aggregate evidence • 27 Sep 2026 • 100 proposed final tasks per cell</text>
+<rect x="285" y="95" width="18" height="12" fill="#CED8E4"/>
+<text x="310" y="106" font-family="Arial,sans-serif" font-size="13" fill="#42576E">Offline final candidates</text>
+<rect x="531" y="95" width="18" height="12" fill="#3B72B8"/>
+<text x="556" y="106" font-family="Arial,sans-serif" font-size="13" fill="#42576E">Development GUI controls</text>
+<text x="970" y="106" font-family="Arial,sans-serif" font-size="13" fill="#42576E">Official admitted</text>
+<line x1="284.0" y1="129" x2="284.0" y2="444" stroke="#E5EBF1" stroke-width="1"/>
+<text x="284.0" y="124" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#61758B">0</text>
+<line x1="449.0" y1="129" x2="449.0" y2="444" stroke="#E5EBF1" stroke-width="1"/>
+<text x="449.0" y="124" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#61758B">25</text>
+<line x1="614.0" y1="129" x2="614.0" y2="444" stroke="#E5EBF1" stroke-width="1"/>
+<text x="614.0" y="124" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#61758B">50</text>
+<line x1="779.0" y1="129" x2="779.0" y2="444" stroke="#E5EBF1" stroke-width="1"/>
+<text x="779.0" y="124" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#61758B">75</text>
+<line x1="944.0" y1="129" x2="944.0" y2="444" stroke="#E5EBF1" stroke-width="1"/>
+<text x="944.0" y="124" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#61758B">100</text>
+<text x="32" y="178" font-family="Arial,sans-serif" font-size="16" fill="#10243A">PowerPoint web</text>
+<rect x="284" y="159" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="159" width="660.0" height="26" rx="4" fill="#CED8E4"/>
+<text x="965" y="178" font-family="Arial,sans-serif" font-size="14" fill="#263D55">100 / 0</text>
+<text x="1118" y="178" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<text x="32" y="229" font-family="Arial,sans-serif" font-size="16" fill="#10243A">Excel web</text>
+<rect x="284" y="210" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="210" width="508.2" height="26" rx="4" fill="#CED8E4"/>
+<text x="965" y="229" font-family="Arial,sans-serif" font-size="14" fill="#263D55">77 / 0</text>
+<text x="1118" y="229" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<text x="32" y="280" font-family="Arial,sans-serif" font-size="16" fill="#10243A">LibreOffice desktop</text>
+<rect x="284" y="261" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="261" width="660.0" height="26" rx="4" fill="#CED8E4"/>
+<rect x="284" y="268" width="660.0" height="12" rx="3" fill="#3B72B8"/>
+<text x="965" y="280" font-family="Arial,sans-serif" font-size="14" fill="#263D55">100 / 100</text>
+<text x="1118" y="280" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<text x="32" y="331" font-family="Arial,sans-serif" font-size="16" fill="#10243A">Odoo Community</text>
+<rect x="284" y="312" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="312" width="660.0" height="26" rx="4" fill="#CED8E4"/>
+<rect x="284" y="319" width="660.0" height="12" rx="3" fill="#3B72B8"/>
+<text x="965" y="331" font-family="Arial,sans-serif" font-size="14" fill="#263D55">100 / 100</text>
+<text x="1118" y="331" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<text x="32" y="382" font-family="Arial,sans-serif" font-size="16" fill="#10243A">GitLab CE</text>
+<rect x="284" y="363" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="363" width="660.0" height="26" rx="4" fill="#CED8E4"/>
+<rect x="284" y="370" width="336.6" height="12" rx="3" fill="#3B72B8"/>
+<text x="965" y="382" font-family="Arial,sans-serif" font-size="14" fill="#263D55">100 / 51</text>
+<text x="1118" y="382" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<text x="32" y="433" font-family="Arial,sans-serif" font-size="16" fill="#10243A">Magento admin</text>
+<rect x="284" y="414" width="660" height="26" rx="4" fill="#F1F4F8"/>
+<rect x="284" y="414" width="660.0" height="26" rx="4" fill="#CED8E4"/>
+<rect x="284" y="421" width="165.0" height="12" rx="3" fill="#3B72B8"/>
+<text x="965" y="433" font-family="Arial,sans-serif" font-size="14" fill="#263D55">100 / 25</text>
+<text x="1118" y="433" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#B04B38">0</text>
+<line x1="32" y1="465" x2="1178" y2="465" stroke="#DCE5ED"/>
+<text x="32" y="492" font-family="Arial,sans-serif" font-size="13" fill="#42576E">Development controls differ by application and may include quarantined candidate families. They are not comparable success rates.</text>
+<text x="32" y="516" font-family="Arial,sans-serif" font-size="13" fill="#42576E">No cell has a ratified 100-task official denominator; no 24-campaign model result is represented here.</text>
+</svg>

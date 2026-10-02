@@ -1,0 +1,24 @@
+{
+  "schema": "envloop-odoo-hidden-boundary-public-v1",
+  "status": "source_entity_template_boundary_passed_before_hidden_gui_admission",
+  "candidate_counts": {
+    "train": 20,
+    "selection": 20,
+    "official_hidden": 100
+  },
+  "exposed_development_pools_compared": 14,
+  "evaluator_private_qa_pools_compared": 2,
+  "source_entity_instance_overlap_with_any_compared_pool": 0,
+  "legacy_filestore_manifests_compared": 2,
+  "causal_template_overlap_with_exposed_development": 0,
+  "causal_template_overlap_with_evaluator_private_qa": 4,
+  "qa_prompts_gold_and_sources_researcher_exposed": false,
+  "v06_split_validator_passed": true,
+  "three_worlds_bind_same_taskset_and_runtime": true,
+  "task_set_manifest_sha256": "6418ffb542c684053577927336874930214ae6050237bc18b7e7c522664c181b",
+  "boundary_auditor_sha256": "d0e82ff970b6604049d24a5b6ff1f268927b318270fb90c0d622155629efb0bf",
+  "private_boundary_audit_sha256": "8368d37b22515e9996571c195cdd4f567b141ece5eb6c5a04ac01f18911cc5a7",
+  "official_hidden_candidates": 100,
+  "official_final_tasks_admitted": 0,
+  "model_attempts": 0
+}

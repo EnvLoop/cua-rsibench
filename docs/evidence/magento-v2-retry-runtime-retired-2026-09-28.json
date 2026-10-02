@@ -1,0 +1,19 @@
+{
+  "all_disposable_pair_containers_absent": true,
+  "cleanup_result_chain_sha256": "254faac765cf228ad066dbf88e6312fa32d5518de5b340ecab4996b8bd59807a",
+  "completed_distinct_evaluator_controls": 14,
+  "exact_cleanup_step_receipts": 4,
+  "failed_attempts_same_fifteenth_task": 2,
+  "model_calls": 0,
+  "new_full100_source_freeze_required": true,
+  "official_final_admitted": 0,
+  "private_cleanup_intent_sha256": "59f2fa3ea084ad8874bebb353a942b090e3ba33cdbe1de26116557c2e6c1f32e",
+  "private_cleanup_receipt_sha256": "9e911972aa652482817c8a8219188cc235ed0a34837f6bf44250a4aa67f5b1d0",
+  "private_runtime_audit_sha256": "11802a51709a20e6abf16df2ef4810dcc2bff5ee6126fa4b05646e6a79f6257d",
+  "publisher_source_sha256": "3f0f18936fcd698c9e8e06514077639f79ba619e60ef816708a589a0f6d0e0cd",
+  "retired_disposable_containers": 2,
+  "schema": "envloop-magento-v2-retry-runtime-retired-public-v1",
+  "status": "exhausted_v2_control_run_retired_before_new_full100",
+  "stopped_journal_sha256": "f15de422dd41c6eb53483716096494cc5616f0572d9ebaeeb55ff5aa0f4e5030",
+  "third_same_id_retry_authorized": false
+}

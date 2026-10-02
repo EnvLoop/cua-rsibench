@@ -1,0 +1,13 @@
+{
+  "direct_file_controls_passed": 1,
+  "model_calls": 0,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "planned_specs": 80,
+  "private_smoke_receipt_sha256": "a5b90a513885ad6451ae1cce47e233946f03e839dbe580af1ceffd22025ad3a2",
+  "private_spec_plan_sha256": "f59fe91acf0f913c8bed60665319dd653da7074446c236190b6a2cb20d0626b3",
+  "remaining_specs_not_built": 79,
+  "schema": "envloop-ppt-wdi-calibration-rebase-one-spec-smoke-public-20260929-v1",
+  "source_boundary_private_manifest_sha256": "0dc7b18f3b4bd6019af683aa937f03b3f1add20c4cf0a3a2ad7f11d0080d1f44",
+  "status": "one_direct_file_control_passed_not_office_gui_or_model"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "envloop-odoo-crm-gui-autosave-qa-v1",
+  "status": "invalidated_development_harness_attempts",
+  "date": "2026-09-25",
+  "train_sweep_attempted_before_stop": 19,
+  "train_sweep_gui_qualified_before_stop": 15,
+  "train_crm_failed_due_to_uncommitted_salesperson_selection": 4,
+  "failed_case_recovery_cold_reset_exact": true,
+  "diagnosis": "The pinned CRM many2one control displayed the chosen salesperson before persisting it. The two-field train template required blur and saved-state readback. A selection CRM template could auto-save while its Save button disappeared.",
+  "repair": "Blur the salesperson control; allow CRM autosave or explicit Save only when a reload and independent database readback prove persistence.",
+  "repaired_train_crm_development_case_qualified": true,
+  "repaired_selection_crm_development_case_qualified": true,
+  "old_world_receipts_included_in_official_final": false,
+  "official_final_tasks_admitted": 0,
+  "model_attempts": 0
+}

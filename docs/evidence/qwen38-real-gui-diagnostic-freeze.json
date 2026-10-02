@@ -1,0 +1,17 @@
+{
+  "schema": "cua-qwen38-real-gui-diagnostic-freeze-v1",
+  "status": "frozen_before_diagnostic_paid_dispatch",
+  "plan_sha256": "cdd7998431924503d08a5dc3c57552a43d7263ba272daa6c443ad6b48f7c493e",
+  "prereg_sha256": "8011469aca87ff324c4e1e66b317c9e3ad8e9ff21dd7d9762f3c2fbc18daf9b2",
+  "student_model": "Qwen/Qwen3.8-27B",
+  "eligible_split": "train",
+  "task_disjoint_holdout": true,
+  "minimum_distinct_workflows": 3,
+  "optimizer_steps": 64,
+  "pricing_quote_is_dispatch_gate": false,
+  "diagnostic_only": true,
+  "selection_and_final_task_access": false,
+  "paid_diagnostic_calls_before_freeze": 0,
+  "official_researcher_campaigns_before_freeze": 0,
+  "official_final_model_attempts_before_freeze": 0
+}

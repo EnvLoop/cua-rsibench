@@ -1,3 +1,4 @@
 .env
 private/
+partition_workers/
 __pycache__/

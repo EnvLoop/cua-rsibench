@@ -1,0 +1,27 @@
+{
+  "schema": "sec-private-all-split-index-coverage-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "original SEC 10-K filing-index availability for every still-empty reservation; no additional numeric facts or tasks admitted by the index sweep",
+  "source_family_reservations_total": 28,
+  "source_families_with_still_empty_slots": 27,
+  "still_empty_slot_reservations": {"train": 16, "selection": 16, "final": 71},
+  "untrusted_proxy_annual_accession_candidates_screened": 103,
+  "distinct_candidate_original_sec_10k_indexes_with_cik_accession_form_period_match": 103,
+  "index_identity_rejections_after_recovery": 0,
+  "additional_task_specific_numeric_facts_checked_by_index_sweeps": 0,
+  "additional_actor_reference_pairs_built_by_index_sweeps": 0,
+  "offline_candidates_currently_assigned": {"train": 4, "selection": 4, "final": 29},
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "private_evidence_sha256": {
+    "all_empty_index_coverage_audit": "401a5bc59c725283bd08a4f9b8534db0d3b2902a1b6aff3b1aae3acee0247c40",
+    "all_split_candidate_source_planner": "e49e9e211bdf0a58c7d04f6ff93976f3d256533bc3cc827e4cab4fc94eb11c26",
+    "original_sec_index_coverage_auditor": "d8d98fd1de27eb83ce7e688acf57c8b5605e41e1ef45c3809df26482fb070fc5"
+  },
+  "limitations": [
+    "Companyfacts snapshots supplied only untrusted accession shortlists; each remaining candidate was separately checked against its original SEC filing index for CIK, accession, 10-K form and report period.",
+    "An index check does not authenticate task-specific numeric cells, a semantic task, an XLSX artifact, or model performance. This sweep added zero of those items.",
+    "The prior 72-final-index receipt was a point-in-time snapshot. One filing from that list has since passed independent numeric and offline-workbook controls, leaving 71 final slots alongside 16 train and 16 selection slots.",
+    "All 103 remaining slots require original-report numeric verification, source-filing-distinct and genuinely difficult task construction, independent OOXML controls and per-ID Microsoft Excel web save/download/readback/fresh-copy reset before admission."
+  ]
+}

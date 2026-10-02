@@ -1,0 +1,5 @@
+# Bounded Magento GUI infrastructure recovery outcome
+
+The [aggregate receipt](magento-original-negative-neutral-retry-2026-09-27.json) binds the [retained native CMS menu interruption](magento-original-negative-neutral-interruption-2026-09-27.md) to exactly one new full-task evaluator retry. The original failed journal and state/cleanup receipts remain immutable. The recovery journal points to that exact reconciled-journal hash and declares the published one-case recovery kind. No other retry from the same failed journal exists.
+
+Two entirely new application/search pairs were created under the same pinned candidate plan, original Magento source image, GUI controller and independent saved-state verifier. The fresh positive saved and scored **1**; the second clone proved material reset and a wrong-variant GUI mutation scored **0**. Both app/search pairs were identity-checked, mount-free and removed. The recovery succeeded as an evaluator **development control**; it does not turn the original timeout into a valid model score and does not erase it from the attempted-count ledger. Official final admission and hidden model calls remain zero.

@@ -1,0 +1,26 @@
+{
+  "schema": "excel-web-e2b-train-adapter-offline-v1",
+  "date": "2026-09-27",
+  "status": "train-only adapter tested offline; no original Excel web actor run",
+  "shared_action_boundary": "scale-action-output-v0.6.5",
+  "target_student": "Qwen/Qwen3.8-27B",
+  "fake_provider_acceptance_tests_passed": 10,
+  "actual_private_train_candidate_packages_validated_offline": 1,
+  "train_package_sha256": "6a41ab13b8c04af1600c18b3fcda485a458aa053f3afd6a5b5c98e56bb8ba005",
+  "actor_seed_sha256": "5587821ed1b82444a03eedcd75f74c0e67ddae8b47eaf1a27963e64b116e129e",
+  "train_actor_seed_bytes": 13685,
+  "live_e2b_connections": 0,
+  "live_tinker_model_calls": 0,
+  "excel_cloud_uploads": 0,
+  "excel_web_saved_downloads": 0,
+  "excel_web_original_software_admissions": 0,
+  "official_hidden_final_admissions": 0,
+  "public_release_contains_private_task_text_or_formulas": false,
+  "pending_live_gates": [
+    "Train-only Microsoft account scope isolated from sealed final items",
+    "Manual login in a bounded E2B desktop",
+    "Train actor seed uploaded and bound to the exact Excel cloud item",
+    "Saved original-format workbook downloaded through qualified GUI transport",
+    "Independent Excel saved-state readback and no-regression controls"
+  ]
+}

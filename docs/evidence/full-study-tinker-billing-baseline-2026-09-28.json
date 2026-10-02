@@ -1,0 +1,21 @@
+{
+  "available_balance_usd": null,
+  "cost_data_through_present": false,
+  "ending_before": "2026-09-27T21:00:00Z",
+  "estimated_cost_field_count": 0,
+  "event_count": 48,
+  "event_type_counts": {
+    "sampling_prefill": 14,
+    "sampling_sample": 13,
+    "storage": 21
+  },
+  "invoice_usd": null,
+  "private_receipt_sha256": "fdd80bd97046c84ae38975fa3e541d49d4a9e440f6b9819131432e93a04745e1",
+  "response_sha256": "ad55ce11d3586e4be76cde4b16d954269b33415e93273b7ca0b665ff58d58049",
+  "schema": "cua-full-study-tinker-billing-public-snapshot-v1",
+  "session_count": 13,
+  "starting_on": "2026-09-26T21:00:00Z",
+  "status": "read_only_usage_counts_not_invoice",
+  "tinker_sdk_version": "0.30.0",
+  "training_or_sampling_provider_calls": 0
+}

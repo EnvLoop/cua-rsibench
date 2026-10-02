@@ -1,0 +1,35 @@
+{
+  "schema": "sec-eps-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 4,
+  "distinct_issuer_families": 4,
+  "distinct_original_10k_accessions": 4,
+  "issuers": [
+    "GOOGL",
+    "KO",
+    "META",
+    "NVDA"
+  ],
+  "sheets_per_case": 8,
+  "formula_targets_per_case": 50,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 4,
+  "unsolved_seed_rejections": 4,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_units": [
+    "USD",
+    "shares",
+    "USD/shares"
+  ],
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "bcf806b984a00a90696644f147551e7e87fc25afcbd50530f453872ff54ba18e",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Reported EPS and simple net-income/share ratios need not match exactly.",
+    "Synthetic buyback price and spend fraction are not SEC guidance or market data.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

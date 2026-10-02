@@ -1,0 +1,60 @@
+{
+  "cells": [
+    {
+      "cell": "ppt",
+      "development_gui": 0,
+      "label": "PowerPoint web",
+      "official_admitted": 0,
+      "offline_final": 100
+    },
+    {
+      "cell": "excel",
+      "development_gui": 0,
+      "label": "Excel web",
+      "official_admitted": 0,
+      "offline_final": 77
+    },
+    {
+      "cell": "desktop",
+      "development_gui": 100,
+      "label": "LibreOffice desktop",
+      "official_admitted": 0,
+      "offline_final": 100
+    },
+    {
+      "cell": "odoo",
+      "development_gui": 100,
+      "label": "Odoo Community",
+      "official_admitted": 0,
+      "offline_final": 100
+    },
+    {
+      "cell": "gitlab",
+      "development_gui": 51,
+      "label": "GitLab CE",
+      "official_admitted": 0,
+      "offline_final": 100
+    },
+    {
+      "cell": "magento",
+      "development_gui": 25,
+      "label": "Magento admin",
+      "official_admitted": 0,
+      "offline_final": 100
+    }
+  ],
+  "date": "2026-09-27",
+  "development_controls_not_comparable": true,
+  "official_campaigns": 0,
+  "proposed_final_per_cell": 100,
+  "schema": "envloop-full-study-readiness-figure-data-v1",
+  "source_receipt_sha256": {
+    "desktop": "e0165cd881234c6d88d391b9f042fa63cd40e5983652ff336737213e2b36d667",
+    "excel": "8c4177adc8d0944a70080271ef62bc1086a1fa4a060719cb685fd5944f48ef4f",
+    "gitlab": "cf1eb4eb43da3aa8c9444c86c11b02d091e2bb363acb3c42937bf379c742c899",
+    "magento": "29989180ced1834da696494f29272cf8506685db7f45986bf156a968c2066f81",
+    "odoo": "4ba5d1c8a608a0ec4d60dd52314f7b23d0e083425335f633f6c596a262cf2b77",
+    "ppt": "bb7ba568814210118e852ac271933f33b9c44839892689dda1e04d76849e59e1"
+  },
+  "status": "methods_preparation_not_model_results"
+}

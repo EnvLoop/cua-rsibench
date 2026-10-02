@@ -1,0 +1,7 @@
+# Pre-result Odoo post-restart filestore audit amendment
+
+The original prospective Odoo v0.6.6 pilot auditor required its post-web-restart **entire** filestore manifest to equal the frozen checkpoint. The pinned reset implementation already proves full physical equality **before** restarting Odoo web. Web startup may regenerate cache files that are not business source attachments. Treating those cache files as a task regression would reject an exact database and source reset for an unrelated runtime effect.
+
+Before any new v0.6.6 Odoo GUI pilot or model attempt, the auditor was amended to require both the original full pre-restart physical equality receipt and byte equality of **every protected source attachment after web restart**. It still requires the restored SQL snapshot to equal the baseline and preserves the complete post-restart manifest as raw evidence. A changed or missing protected source file still fails. Synthetic tests cover a new runtime-cache entry (accepted) and a changed protected source file (rejected). This is an evaluator-boundary clarification, not a relaxation of task no-regression or an admission of a case.
+
+The amended source hash supersedes the earlier Odoo prospective plan's pilot-auditor binding. The [new source-bound aggregate](evidence/odoo-v066-prospective-gui-requalification-post-restart-2026-09-28.json) is the only plan designated for the first current-profile train GUI control. Historical 20/20/100 controls remain historical; fresh v0.6.6 controls, official final tasks, campaigns, and model outcomes all remain zero.

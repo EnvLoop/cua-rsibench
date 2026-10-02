@@ -1,0 +1,33 @@
+{
+  "controller_v4_sha256": "99fd7ee9dbb85690aa62b38948656e07930ec50c21cc5d3c3b7f4c8979d22271",
+  "independent_saved_pptx_verifier": true,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "preservation_by_role": {
+    "collateral": false,
+    "fresh_reset": true,
+    "near_miss": true,
+    "neutral": true,
+    "positive": true
+  },
+  "private_receipt_sha256": "152929787fbab491d2f4b9c505db831e9319431b20ac72cc91d549ec02c884bb",
+  "schema": "envloop-ppt-web-v4-training-controls-public-v1",
+  "score_by_role": {
+    "collateral": 0,
+    "fresh_reset": 0,
+    "near_miss": 0,
+    "neutral": 0,
+    "positive": 1
+  },
+  "source_to_office_baseline_semantics_preserved": true,
+  "status": "training_source_five_gui_roles_saved_pptx_verified",
+  "target_changes_by_role": {
+    "collateral": 0,
+    "fresh_reset": 0,
+    "near_miss": 3,
+    "neutral": 0,
+    "positive": 4
+  },
+  "two_downloads_byte_identical_per_role": 5,
+  "verifier_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9"
+}

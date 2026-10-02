@@ -6,3 +6,4 @@ outputs/
 .env
 work/
 /.venv
+/node_modules

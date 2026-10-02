@@ -1,0 +1,15 @@
+{
+  "schema": "sec-ppe-public-development-inventory-v1",
+  "status": "five public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "gross-to-net PPE carrying values, unexplained asset movement, and synthetic write-down/capex stress",
+  "issuer_families": 5,
+  "original_10k_accessions": 5,
+  "excerpt_sha256_by_ticker": {
+    "COST": "3ba257ea4b76cb8e04ad54293f3a00bfb624a7d1ba8db206e047c048cefc4fb8",
+    "NFLX": "ecaecc30ad0203dd5c7836d67844dd446dab8146b12207b030bea726ff3a2e77",
+    "PFE": "e602062e5a1cf617cc8f3609fa2a1c684bf579f4b076a6a0f2a0dde4fb4624bf",
+    "BA": "696e27d51ed5616c6936978f75d33beb1aad5313eeb7a8a470a788972ff48c5e",
+    "CAT": "d309130c36a99b302b9e33c8c7463c34b9a4f50d36ec8a0ae40488c473dc484a"
+  },
+  "official_final_credit": 0
+}

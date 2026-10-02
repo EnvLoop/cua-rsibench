@@ -1,0 +1,17 @@
+{
+  "controller_v2_sha256": "4e0a1f05ab3e2c8078610b4479d46b57ed7de0ce7853d9332e294daf2ad8500a",
+  "four_target_positive_preservation_pass": true,
+  "four_target_positive_score": 1,
+  "model_calls": 0,
+  "native_chart_and_workbook_preserved_after_freeze": true,
+  "official_final_admitted": 0,
+  "prior_private_receipt_sha256": "85331304ef8cb06049deb9ec336a814682a86dccb8558cfbcb7918eb03b00d63",
+  "private_receipt_sha256": "9ced564912c981ddea08eec52c15ff8fc435d827522e037690b4fd4868075763",
+  "schema": "envloop-ppt-web-stabilization-development-public-v2",
+  "second_baseline_preservation_pass": true,
+  "second_baseline_target_changes": 0,
+  "status": "raw_train_four_target_two_rounds_and_positive_verified",
+  "train_first_to_second_baseline_semantics_preserved": true,
+  "train_source_to_first_baseline_semantics_preserved": true,
+  "verifier_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9"
+}

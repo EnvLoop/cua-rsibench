@@ -1,0 +1,34 @@
+{
+  "candidate_counts": {
+    "final_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-28",
+  "desktop_runtime_bundle_sha256": "a9844afaf1eff259022eae01615e53a0983adddf858b8bfa1e1a6c0ecb21e714",
+  "desktop_worker_source_sha256": "d42405569bbb62e15e28e74b3d06320b3d9ba0946f065d031e23c4840c607748",
+  "fair_saved_ooxml_verifier_bundle_sha256": "ab1a735bd00d28fb27df6f47cac6ff9a73d12403685344711d9be971d6fcf156",
+  "native_action_adapter_sha256": "03ae9e2e84caed09a4c36738f6aed2bdd840b4250927ca264d01a302dffe09a3",
+  "new_e2b_sandbox_creates": 0,
+  "new_paid_teacher_calls": 0,
+  "official_final_admissions": 0,
+  "offline_fake_positive_train_episodes_by_application": {
+    "Calc": 1,
+    "Impress": 1,
+    "Writer": 1
+  },
+  "offline_public_source_fixture_inventory_sha256": "dc472a7313f4114c8eabb50856e5ef5f10e73ba2c80d2acc9d3dbf26c5ec414d",
+  "offline_regression_tests_passed": 89,
+  "offline_shared_collector_fake_desktop_episode_count": 1,
+  "private_selection_or_final_packages_opened": 0,
+  "private_train_app_package_readback_count": 3,
+  "raw_observation_and_predispatch_frame_pairs_per_synthetic_success": 2,
+  "real_train_episodes": 0,
+  "schema": "cua-native-wdi-v066-teacher-worker-offline-public-v1",
+  "scope": "Portable fake-provider tests use committed WDI Mexico train fixtures in a synthetic split manifest; separate read-only evaluator check validates 3 application train packages against the private candidate inventory. No model, E2B, selection, or final call.",
+  "selection_or_final_model_calls": 0,
+  "shared_teacher_adapter_source_sha256": "b5a6b434a03e1079a7db28982dc482527c0893aa809892d848daaa20cd0952fc",
+  "status": "offline_worker_only_not_ratified_or_live",
+  "two_distinct_e2b_lease_intents_per_synthetic_success": true
+}

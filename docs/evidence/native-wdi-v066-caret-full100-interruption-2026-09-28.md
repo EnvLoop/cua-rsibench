@@ -1,0 +1,7 @@
+# Desktop v0.6.6 fresh-control interruption — 2026-09-28
+
+The amended 100-task evaluator-only Desktop run stopped after its first two concurrent positive controls. Both sandboxes passed scoped guest-content attestation, began with no LibreOffice user profile, and opened their assigned documents. Both then failed a task-bound profile check before any actor GUI action, saved artifact, or model call. The receipt records `ValueError` but does not retain the first and second profile snapshots, so it cannot distinguish profile instability from a stable mismatch against the prior task baseline.
+
+Both sandbox IDs were acknowledged and distinct; `kill()` returned true for each, `is_running()` returned false, and an account-wide check found zero active sandboxes. The controller retained two intents and two failed receipts, marked 98 tasks unstarted, and refuses to resume from its partial root. The historical 22-intent evidence tree remains byte-identical. The combined conservative full-lease count is **24 intents / $4** against the existing $60 ceiling. This is a reservation estimate, not a provider invoice.
+
+The public train Impress smoke had passed before dispatch. The next diagnostic is one fresh, bounded **public train Calc** profile-only guest that retains raw profile-file manifests, registry bytes, canonical hashes, and capture timing. No acceptance-rule change or fresh 100-task rerun is authorized by this interruption receipt. Official admission and model results remain **zero**.

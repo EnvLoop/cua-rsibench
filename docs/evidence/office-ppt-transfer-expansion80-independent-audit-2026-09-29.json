@@ -1,0 +1,21 @@
+{
+  "four_target_workflows_reopened": 10,
+  "frozen_pilot_manifest_sha256": "34a584f51ee2254d726c3a37e106e18efeaf3a41b515a72766b57407876a6499",
+  "independent_auditor_source_sha256": "875dbdb82e75ba7cf9eeb1f0752079b1c115eec022bdccef89f306b907391342",
+  "model_calls": 0,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "package_layout_and_native_chart_controls_passed": 80,
+  "powerpoint_web_rendering_checked": false,
+  "private_manifest_sha256": "d53db3448e2bf8c4d03adbe30193f20a68b50849a3aa12a0bba5ce364745a75a",
+  "private_offline_receipt_sha256": "ee4f13f486f2f0f8657794cb4a5a02cd0c8666743ce4dc7c183190eab2325bd9",
+  "representative_pdf_pages": 70,
+  "representative_pdfs_reviewed": 10,
+  "saved_artifact_and_near_miss_controls_passed": 80,
+  "schema": "envloop-ppt-transfer-expansion80-independent-audit-v1",
+  "source_families_reopened": 8,
+  "status": "80_train_only_direct_file_controls_reopened_not_gui_admitted",
+  "train_only_task_packages_reopened": 80,
+  "visual_pdf_review_completed": true,
+  "visual_review_private_sha256": "4636db1dca63bdf9d5ddbf6ece449ef57a60cfd2a51eb79dd836f7a6a1356735"
+}

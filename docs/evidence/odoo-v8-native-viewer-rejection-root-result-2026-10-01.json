@@ -1,0 +1,17 @@
+{
+  "completed_applied_actions": 6,
+  "failure_sha256": "979ff8a9071dfae3d22009df25a35ea01227b9a4b2b84c0693a5a792abc4cc12",
+  "image_sha256": "74765bbcf37fd3f98682947f2d4155b020d606a9defa6ed5e05925dcc285919c",
+  "model_calls": 0,
+  "native_rejection": "target_not_current_and_safe",
+  "observed_and_predispatch_images_identical": true,
+  "official_final_admitted": 0,
+  "receipt_sha256": "cc364698051083dc0160dee32729dc58b350b837f1ba8e6d7822ac85d3255e2b",
+  "rejected_driver_result": "not_attempted",
+  "rejected_turn": 6,
+  "reset_exact": true,
+  "root_visual_review": "Readable PDF source with native FileViewer Close icon; semantic DIV role-button missing from observed target list; underlying account menu remains disabled and obscured.",
+  "schema": "envloop-odoo-v8-real-train-rejection-root-evidence-v1",
+  "services_restored": true,
+  "status": "actual_train_failed_preserved_no_qualification_credit"
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "sec-debt-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 5,
+  "distinct_issuer_families": 5,
+  "distinct_original_10k_accessions": 5,
+  "issuers": [
+    "COST",
+    "CRM",
+    "GOOGL",
+    "PFE",
+    "WMT"
+  ],
+  "sheets_per_case": 8,
+  "formula_targets_per_case": 33,
+  "unmarked_faults_per_case": 8,
+  "positive_reference_passes": 5,
+  "unsolved_seed_rejections": 5,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "086d92c4dafd0740d103bfb650a4cb92d4b1bd32120b96053fad16f010ede302",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "Tracked current and noncurrent long-term debt is not total corporate debt.",
+    "Synthetic refinancing rates and shares are not SEC guidance.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

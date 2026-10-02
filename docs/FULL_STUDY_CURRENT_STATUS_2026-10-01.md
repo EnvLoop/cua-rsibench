@@ -1,0 +1,43 @@
+# Full-study evidence status, 1 October 2026
+
+The publication-scale study is incomplete. Official result counts remain
+**0/600 admitted final tasks, 0/24 completed researcher campaigns and
+0/3,000 matched model outcomes**. Native control qualifications, source tests,
+partial batches and TRAIN pilots do not enter these denominators.
+
+| Stream | Latest verified evidence | Remaining work |
+|---|---|---|
+| Odoo Community | V12 full20 completed all saved-state/reset audits and independent source-frame visual reviews; its saved-only derived qualification is published. V12 full100 terminated after 33 completed cases because a real focused input was omitted from the capped control projection. Exact reset and service restoration passed. | V13 fresh TRAIN and full20 passed independent saved 0/1/0, source visual review and exact reset/service restoration. Full20 reopens 492 actual actions and 984 raw guard PNGs across all four task families. Ref2 full100 terminated after46 completed cases: the ordinary click at(800,1006) was correctly refused outside the1440-by1000 viewport. The reference-only V3 scrolling source leaves native57 unchanged; its fresh TRAIN and full20 passed independent native saved/reset/source review; the fresh full100 is live. Ref2 evidence does not qualify V3 reference dispatch. The V22 final execution counterpart remains required; V12 results provide zero V13 credit. |
+| GitLab CE | V13 TRAIN passed actual native controls and independent SQL/Git/reset/teardown auditing. The fresh V18 full100 control process terminated after two complete trios. The third task's repeated positive case failed its cold-reset check; its retained evidence is under independent review. | V6 effective-wait correction passed three actual cold boots,970 independently reopened raw files and original restoration. New V14 TRAIN passed independent1/0/1,15 raw native receipts and exact original restoration. Fresh V19 full100 is live. Two old V13 trios do not qualify V14 or admit final tasks. |
+| Magento admin | A native neutral control passed saved score 0, source-frame visual review and distinct clone reset. Later TRAIN attempts exposed navigation/readiness issues. The latest V5 attempt terminated with a native metadata-read timeout. | V3 replaces the nested six-second cutoff with one 30-second observation window inside the same 720-second actor clock; 36 root checks passed. The fresh V6 positive completed its GUI price save and exact reset but scored0 because the native full-product save changed protected nonprice fields. The uniform native queue-consumer and bulk-attribute source profile passed61 root checks; its first native TRAIN stopped before consumer launch on a queue primary-key read. The pinned2.4.6 schema correction passed18 targeted checks; a fresh corrected TRAIN is live. No verifier weakening or old-score relabeling is accepted. Full20/full100 and model-worker qualification remain pending. |
+| Native Desktop | The pinned prerequisite enabled actual AT-SPI. Current common V31 preparation passed bootstrap/source/window checks but refused a native point whose parent chain did not reach the owned window. Owned guest closure was verified. | The actual V33 diagnostic retained available native bus/object/parent facts: the point belongs to a different native frame identity, whose physical-window association is unknown. The refusal and owned closure were independently verified. V35 actual relations were empty; V36 actual forward child queries found the refused root pane via owned frame/panel/panel/root-pane indices0/1/0. Reverse-parent inconsistency is now evidenced. Guard integration and Calc/Writer/Impress qualification remain pending. |
+| PowerPoint web | The disposable qualification folder was verified empty. Native file upload preflight failed because local-file URL permission is disabled; no file was uploaded by that attempt. Concrete current teacher/selection/shared-base/final adapters are source-integrated. | Complete actual upload/save/download/delete/reset qualification under the owned single-account policy, then full20/full100. Permission remains pending; source tests do not qualify native execution. |
+| Excel web | Concrete current single-account adapters and independent artifact scoring source are integrated. | Complete actual native lifecycle and full20/full100 qualification. |
+
+The current actual Qwen3.8 Odoo public TRAIN pilot completed90 real sampling requests and90 applied clicks in366.28 actor seconds, then independently scored0 for an unchanged mismatched unit price. Owned lifecycle completed in425.16 seconds with exact reset and acknowledged actual provider close. It is development evidence, not a formal outcome or training gain.
+
+The preserved Qwen Desktop TRAIN pilot produced 22 completed responses/actions,
+a deadline-uncertain 23rd inference and saved score 0, with fresh reset and owned
+closure. It is a development result, not evidence of improvement. Actual billed
+tokens/dollars remain unknown where the provider did not return them.
+
+The remaining study work is fresh common-source qualification for all six cells,
+600 individual task admissions, 24 actual researcher/training/selection chains,
+all 3,000 final outcomes and an independent failure/cost audit. The final English
+paper, PDF, figures and release follow those results. The published development
+site and qualification artifacts are not the final benchmark publication.
+
+Evidence: [Current Odoo reference3 full20](evidence/odoo-v13-reference3-full20-root-result-2026-10-01.json),
+[Current GitLab V14 TRAIN](evidence/gitlab-v14-native-train-root-result-2026-10-01.json),
+[Desktop V36 forward edges](evidence/native-desktop-v36-forward-edges-root-result-2026-10-01.json),
+[Actual Qwen3.8 Odoo TRAIN pilot](evidence/odoo-v13-qwen38-public-train-root-result-2026-10-01.json),
+[GitLab V6 native effective wait](evidence/gitlab-v6-effective-wait-three-coldboots-root-result-2026-10-01.json),
+[Current Odoo V13 full20](evidence/odoo-v13-full20-visual-root-result-2026-10-01.json),
+[Current Odoo V13 TRAIN](evidence/odoo-v13-native-train-root-result-2026-10-01.json),
+[Desktop V33 native identity diagnostic](evidence/native-desktop-v33-window-identity-root-diagnostic-2026-10-01.json),
+[Odoo full20 independent visual qualification](evidence/odoo-full20-visual-derived-root-result-2026-10-01.json),
+[Odoo full20 saved-native audit](evidence/odoo-full20-native-reference-root-result-2026-10-01.json),
+[Magento neutral control](evidence/magento-native-v3-neutral-control-root-2026-10-01.json),
+[Desktop Qwen TRAIN pilot](evidence/desktop-v21-native-qwen-train-root-result-2026-10-01.json),
+[Odoo V13 source](ODOO_NATIVE_FOCUS_WITNESS_V13_2026-10-01.md),
+[Desktop identity diagnostic](native-desktop-hit-identity-diagnostic-v33.md).

@@ -1,0 +1,29 @@
+{
+  "cleanup_authorized": false,
+  "date": "2026-09-28",
+  "first_controls_retained": 14,
+  "frozen_v2_code_sha256s": {
+    "tools/audit_magento_cron_requalification_v1.py": "d96a86590f67bb41409eb1f2759f43198a738341c9fd42f372af709049b85673",
+    "tools/magento_resumable_100_v2.py": "24a5b2c9efb68557e09d3d413d2f75c95e130f2d1e1863b9fb1aac1bd580baa0",
+    "tools/sweep_magento_original_gui_controls_v1.py": "09285a06f0fb7f247c1fb83ca2505a67d8dad2cba34e209204ce2ffd2c89f471"
+  },
+  "frozen_v2_private_sha256": "27c7103e1c66d2954eeedf9a7c0f001dc32e751e22f0b0c33630a00499984147",
+  "independent_auditor_sha256": "b2033b0c854d610f6bcb1bce1ee9083a2cbe198476a6744862d082aa4740b401",
+  "modal_stop_private_sha256": "55e5b2016c3ed4c2725f9cebbcad7cb5fba8d184f05b4083f2e8babcd7f4d43b",
+  "modal_stop_public_sha256": "6834f762e445ea228f26dedc9f02de5820ac6553b9cd40525d6980d5577cdfb7",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_stopped_journal_sha256": "ae8ca0504a35531bb121a6bee61b4f32c3e432707635f9b5ead8f206825261cd",
+  "original_v2_class_did_not_match_stopped_stderr": true,
+  "post_stop_ui_observation_sha256s": {
+    "modal-ui-click-readonly-20260928": "163d2301faa685944ffc922f34279be5ea4008a73a2e793cb1fb75b6590292bb",
+    "modal-ui-readonly-20260928": "23e88285f71ce288c4af0d3d5cbe93c570f60d8f35721fb8af544457e66239f9"
+  },
+  "retry_authorized": false,
+  "schema": "envloop-magento-v2-modal-supplement-source-public-v1",
+  "scope_case_ordinal": 15,
+  "source_sha256": "92bd29e4e3ebfcb4ecd33d10a447fd69dd00de1f41ed454dddfc6ec937089ee4",
+  "status": "proposed_before_cleanup_retry_or_model_result",
+  "supplemental_classification": "supplemental_release_modal_pre_edit_timeout",
+  "v2_internal_compatibility_classification": "known_neutral_cms_menu_timeout_before_edit"
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "ADBE",
+  "cik": 796343,
+  "entity_name": "ADOBE INC.",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000796343.json",
+  "proxy_raw_json_sha256": "86a5689aa9aa7b0f9e95be21b48b0305376e014c8dbf3b8bb3b4b131f1b6a0c4",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634325000004/0000796343-25-000004-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634325000004/adbe-20241129.htm",
+  "filing_accession": "0000796343-25-000004",
+  "filing_filed": "2025-01-13",
+  "filing_period_end": "2024-11-29",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "1a95778fe28115011649",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-11-29",
+      "value": 30230000000,
+      "accession": "0000796343-25-000004",
+      "filed": "2025-01-13",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "4b0dc3d6bf6e2e4a5a08",
+      "concept": "Revenues",
+      "unit": "USD",
+      "start": "2023-12-02",
+      "end": "2024-11-29",
+      "value": 21505000000,
+      "accession": "0000796343-25-000004",
+      "filed": "2025-01-13",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

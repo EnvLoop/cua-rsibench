@@ -1,0 +1,19 @@
+{
+  "actual_control_count": 20,
+  "all_control_scores": [
+    0,
+    1,
+    0
+  ],
+  "formal_final_task_credit": 0,
+  "independent_source_review_sha256": "ebf103df2c0753edf688416f3d19215e89775b25862674402c2f13de0268e861",
+  "model_calls": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "old_control_credit": 0,
+  "qa_manifest_sha256": "b95929ec7de46ab3baac61c24f1c42d43a8d034c19a18bb24d77d60660411895",
+  "qualification_receipt_sha256": "f2f2874abeebaec544e236681fa7164067fb9a221cf14ea9848cea3290c0aede",
+  "reference_binding_sha256": "87f273749251874bfc856a5233f33653e89d68ae8ff262456645397716b6085d",
+  "saved_audits_independently_rederived": true,
+  "schema": "envloop-odoo14-actual-selection20-native-qualification-v1",
+  "source_and_packages_equivalent": true
+}

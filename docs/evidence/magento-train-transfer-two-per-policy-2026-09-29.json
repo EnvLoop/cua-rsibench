@@ -1,0 +1,27 @@
+{
+  "distinct_train_parent_families_per_policy": 2,
+  "gui_controls_passed": 0,
+  "model_results": 0,
+  "official_final_admitted": 0,
+  "original_train_count": 20,
+  "policy_counts": {
+    "multi-variant-freight-surcharge": 2,
+    "multi-variant-margin-floor": 2,
+    "multi-variant-parity-ladder": 2,
+    "multi-variant-stock-promotion": 2
+  },
+  "private_cases_sha256": "6f8755117f2c340f0cf9ae922d99e72f8a52c7b298ed56eafc35291cd70c2b49",
+  "protected_partition_source_and_entity_overlap": 0,
+  "schema": "envloop-magento-train-transfer-analogues-public-v1",
+  "source_binding": {
+    "aggregate_receipt_sha256": "b3506aba2f28f4f02fb1ac3b96bb61b4e16f16485d9e6becdd23d1d99ae4618e",
+    "original_factory_source_sha256": "c2acae52a27d653b71d2d2df317801f3f2bf1c42a87452225ef10818f94160ea",
+    "source_inventory_sha256": "742f505a16bdc9e478c2af2414455e50530ad824878c20254204314ccc5056cf",
+    "train_analogue_source_sha256": "eb61abfa25197e6e2d2f87dd1b34a35f54beea705ec726d93cb29828dd551a7e"
+  },
+  "status": "source_only_two_per_policy_staged_offline_no_gui_admission",
+  "supplemental_train_count": 8,
+  "target_skus_per_case": 5,
+  "untouched_same_parent_comparators_per_case_max": 2,
+  "untouched_same_parent_comparators_per_case_min": 1
+}

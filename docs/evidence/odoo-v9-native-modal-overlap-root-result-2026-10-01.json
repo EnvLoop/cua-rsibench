@@ -1,0 +1,35 @@
+{
+  "cause": "Visible FileViewer close was 54x46, but the obscured unsafe account menu behind it was 51x46; unscoped native target projection incorrectly let the background geometry compete.",
+  "completed_applied_actions": 6,
+  "coordinate_containing_native_target_bounds": [
+    [
+      0,
+      0,
+      1440,
+      1000
+    ],
+    [
+      1389,
+      0,
+      51,
+      46
+    ],
+    [
+      1386,
+      0,
+      54,
+      46
+    ]
+  ],
+  "failure_sha256": "f2876bc5f80c22ab78f97b22b8668874b9dceaef4872a7e6f8af80ceb5a96c37",
+  "model_calls": 0,
+  "native_rejection": "target_not_current_and_safe",
+  "official_final_admitted": 0,
+  "receipt_sha256": "294ac165b5dd1cbb28f6ee697e3340a49d6f77bc204e32b56104b6cb72da73f5",
+  "rejected_driver_result": "not_attempted",
+  "rejected_turn": 6,
+  "reset_exact": true,
+  "schema": "envloop-odoo-v9-native-dialog-overlap-root-evidence-v1",
+  "services_restored": true,
+  "status": "actual_train_failed_preserved_no_qualification_credit"
+}

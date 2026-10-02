@@ -1,0 +1,946 @@
+"""Read-only independent Odoo v0.6.6 selection/final GUI-control audit.
+
+Reopens raw evaluator-private screenshots/actions, SELECT-only SQL snapshots,
+physical source files, cold restores and worker leases. Derives positive and
+wrong-object negative results through the pure frozen verifier functions. It
+never calls Docker/browser/provider/model and never admits an official task.
+"""
+
+from __future__ import annotations
+
+from collections import Counter
+from datetime import datetime
+from io import BytesIO
+import json
+import os
+from pathlib import Path
+import re
+import stat
+from urllib.parse import urlsplit
+
+from PIL import Image, ImageChops
+
+from enterprise_fallback.odoo18 import v066_requalification_pilot as pilot
+from enterprise_fallback.odoo18.partition_factory import source_asset
+from tools import odoo_v066_scale_protocol_v1 as protocol
+from tools import odoo_v066_scale_controller_v1 as controller
+
+
+AUDIT_SCHEMA = "envloop-odoo-v066-scale-gui-control-audit-v1"
+CASE_AUDIT_SCHEMA = "envloop-odoo-v066-scale-case-independent-audit-v1"
+REFS = frozenset({
+    "pre_restore", "baseline_sql", "source_frame", "source_evidence",
+    "positive_reload_frame", "positive_sql", "positive_filestore",
+    "positive_store_paths", "negative_reload_frame", "negative_sql",
+    "negative_filestore", "negative_store_paths", "post_restore",
+    "restored_sql", "restored_filestore", "gui_trace",
+})
+GOLD_FILES = {"purchase": "development_gold.json",
+              "inventory": "replenishment_gold.json",
+              "sales": "sales_gold.json", "crm": "crm_gold.json"}
+
+
+class ScaleAuditError(ValueError):
+    pass
+
+
+def require(ok: bool, reason: str) -> None:
+    if not ok:
+        raise ScaleAuditError(reason)
+
+
+def _time(raw: object) -> datetime:
+    try:
+        value = datetime.fromisoformat(raw)
+    except (TypeError, ValueError):
+        raise ScaleAuditError("scale_audit_time_invalid") from None
+    require(value.tzinfo is not None, "scale_audit_time_invalid")
+    return value
+
+
+def _lease(events_path: Path, pid: int, start: datetime,
+           finish: datetime) -> bool:
+    protocol._private(events_path)
+    events = [json.loads(line) for line in events_path.read_text().splitlines()]
+    for index, event in enumerate(events):
+        if (event.get("operation") != controller.LEASE_OPERATION or
+                event.get("event") != "acquired" or event.get("pid") != pid or
+                _time(event.get("at_utc")) > start):
+            continue
+        release = next((later for later in events[index + 1:]
+                        if later.get("operation") == controller.LEASE_OPERATION and
+                        later.get("event") == "released" and
+                        later.get("pid") == pid), None)
+        if release is None or _time(release.get("at_utc")) < finish:
+            continue
+        if any(start <= _time(other.get("at_utc")) <= finish and
+               (other.get("pid") != pid or
+                other.get("operation") != controller.LEASE_OPERATION)
+               for other in events):
+            return False
+        return True
+    return False
+
+
+def _micro_alternate_independent(first: bytes, second: bytes) -> bool:
+    with Image.open(BytesIO(first)) as source, Image.open(BytesIO(second)) as sampled:
+        require(source.format == sampled.format == "PNG" and
+                source.mode == sampled.mode == "RGB",
+                "scale_guard_frame_mode_changed")
+        a, b = source.copy(), sampled.copy()
+    require(a.size == b.size == (1440, 1000),
+            "scale_guard_frame_geometry_changed")
+    box = ImageChops.difference(a, b).getbbox()
+    if box is None:
+        return False
+    changes = {}
+    for row in range(box[1], box[3]):
+        for col in range(box[0], box[2]):
+            old, new = a.getpixel((col, row)), b.getpixel((col, row))
+            if old == new:
+                continue
+            changes[(col, row)] = (old, new)
+            if len(changes) > 2:
+                return False
+    return set(changes) == {(41, 419), (132, 419)} and all(
+        pair in {((235, 237, 239), (235, 237, 240)),
+                 ((235, 237, 240), (235, 237, 239))}
+        for pair in changes.values())
+
+
+def _exact_return_chain(attempt: Path, trace: dict,
+                        *, require_pinned_profile: bool = False,
+                        family: str | None = None) -> None:
+    samples = trace.get("exact_return_guard_samples")
+    require(type(samples) is list and samples,
+            "scale_exact_return_guard_missing")
+    observed = {}
+    successful_frames = {}
+    for action in trace["actions"]:
+        _, raw = pilot._ref(attempt, action["frame"], image=True)
+        candidates = sorted((attempt / "actions").glob(
+            f"step-{action['step']:03d}*-intent.private.json"))
+        require(len(candidates) == 1,
+                "scale_exact_return_action_intent_missing")
+        intent = protocol.private_json(candidates[0])
+        frame_id_sha = protocol.digest(intent["frame_id"].encode())
+        key = (action["frame"]["sha256"], frame_id_sha)
+        observed[key] = raw
+        successful_frames[action["step"]] = key
+    for reference in trace["pre_intent_rejections"]:
+        rejection = pilot._artifact_json(attempt, reference)
+        frame = rejection["observed_frame_ref"]
+        _, raw = pilot._ref(attempt, frame, image=True)
+        observed[(frame["sha256"], rejection["frame_id_sha256"])] = raw
+    prior_step = -1
+    grouped = {}
+    for index, sample in enumerate(samples):
+        step, stage = sample.get("step"), sample.get("stage")
+        source_key = (sample.get("observed_frame_sha256"),
+                      sample.get("observed_frame_id_sha256"))
+        require(type(step) is int and step >= prior_step and
+                stage in ("parse", "dispatch") and
+                sample.get("sample") in range(
+                    7 if require_pinned_profile else 6) and
+                source_key in observed and
+                sample.get("classification") in (
+                    "exact_return", "one_recurring_micro_raster_alternate",
+                    "pinned_border_equivalence_accepted"),
+                "scale_exact_return_sample_order_or_class_invalid")
+        prior_step = step
+        ref = sample.get("sampled_frame_ref")
+        require(type(ref) is dict and
+                ref.get("path") == f"frames/guard-{index:04d}.png",
+                "scale_exact_return_sample_path_changed")
+        _, raw = pilot._ref(attempt, ref, image=True)
+        sampled_sha = protocol.digest(raw)
+        observed_sha = source_key[0]
+        group = grouped.setdefault((step, source_key, stage), [])
+        require(sample["sample"] == len(group) and
+                len(group) < (7 if require_pinned_profile else 6) and
+                (not group or group[-1][1] not in (
+                    "exact_return", "pinned_border_equivalence_accepted")),
+                "scale_exact_return_sample_bounded_sequence_invalid")
+        group.append((sampled_sha, sample["classification"]))
+        if sample["classification"] == "exact_return":
+            require(sampled_sha == observed_sha,
+                    "scale_exact_return_digest_not_exact")
+        else:
+            require(sampled_sha != observed_sha and
+                    _micro_alternate_independent(observed[source_key], raw),
+                    "scale_exact_return_alternate_not_micro")
+    alternatives_by_observation = {}
+    for (step, source_key, _stage), group in grouped.items():
+        alternatives_by_observation.setdefault((step, source_key), set()).update(
+            digest for digest, classification in group
+            if classification in (
+                "one_recurring_micro_raster_alternate",
+                "pinned_border_equivalence_accepted"))
+    require(all(len(alternatives) <= 1 for alternatives in
+                alternatives_by_observation.values()),
+            "scale_exact_return_third_frame_present")
+    if require_pinned_profile:
+        require(all(sample.get("classification") !=
+                    "pinned_border_equivalence_accepted" or
+                    (sample.get("stage") == "dispatch" and
+                     sample.get("step") in successful_frames and
+                     sample.get("observed_frame_sha256") ==
+                     successful_frames[sample["step"]][0] and
+                     sample.get("observed_frame_id_sha256") ==
+                     successful_frames[sample["step"]][1])
+                    for sample in samples),
+                "scale_pinned_accepted_orphan_guard_sample")
+    for action in trace["actions"]:
+        step = action["step"]
+        source_key = successful_frames[step]
+        successful_indices = [index for index, sample in enumerate(samples)
+                              if sample.get("step") == step and
+                              sample.get("observed_frame_sha256") ==
+                              source_key[0] and
+                              sample.get("observed_frame_id_sha256") ==
+                              source_key[1]]
+        parse = grouped.get((step, source_key, "parse"), [])
+        dispatch = grouped.get((step, source_key, "dispatch"), [])
+        require(successful_indices and
+                successful_indices == list(range(
+                    successful_indices[0], successful_indices[-1] + 1)) and
+                parse and dispatch and
+                parse[-1][1] == "exact_return" and
+                dispatch[-1][1] in (
+                    "exact_return", "pinned_border_equivalence_accepted") and
+                next(index for index, sample in enumerate(samples)
+                     if sample.get("step") == step and
+                     sample.get("observed_frame_id_sha256") == source_key[1] and
+                     sample.get("stage") == "parse" and
+                     sample.get("classification") == "exact_return") <
+                next(index for index, sample in enumerate(samples)
+                     if sample.get("step") == step and
+                     sample.get("observed_frame_id_sha256") == source_key[1] and
+                     sample.get("stage") == "dispatch" and
+                     sample.get("classification") in (
+                         "exact_return", "pinned_border_equivalence_accepted")),
+                "scale_action_not_guarded_by_exact_return")
+        if require_pinned_profile:
+            candidates = sorted((attempt / "actions").glob(
+                f"step-{step:03d}*-intent.private.json"))
+            intent = protocol.private_json(candidates[0])
+            visible_ref = intent.get("visible_text_ref")
+            require(type(visible_ref) is dict,
+                    "scale_model_visible_control_reference_missing")
+            _, visible_raw = pilot._ref(attempt, visible_ref)
+            try:
+                visible = json.loads(visible_raw)
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                raise ScaleAuditError(
+                    "scale_model_visible_controls_invalid_json") from None
+            controls = visible.get("controls")
+            contract = action.get("contract_receipt", {})
+            require(type(controls) is list and
+                    controls == intent.get("observation_controls") and
+                    visible.get("screenshot", {}).get("sha256") ==
+                    source_key[0] and
+                    len(controls) == contract.get("control_count") and
+                    contract.get("action_type") ==
+                    intent.get("normalized_action", {}).get("type") and
+                    contract.get("frame_id_sha256") == source_key[1],
+                    "scale_model_visible_controls_action_or_frame_unbound")
+            physical = action.get("contract_receipt", {}).get(
+                "physical_dispatch_guard")
+            require(type(physical) is dict and
+                    physical.get("profile") ==
+                    protocol.PINNED_BORDER_PROFILE and
+                    physical.get("observed_frame_sha256") == source_key[0] and
+                    physical.get("observed_frame_id_sha256") == source_key[1] and
+                    physical.get("observed_url") ==
+                    intent.get("observed_url") and
+                    physical.get("physical_url") ==
+                    intent.get("observed_url") and
+                    physical.get("target_point") ==
+                    intent.get("normalized_action", {}).get("target") and
+                    physical.get("physical_frame_ref") ==
+                    next(sample["sampled_frame_ref"] for sample in
+                         reversed(samples)
+                         if sample.get("step") == step and
+                         sample.get("stage") == "dispatch" and
+                         sample.get("observed_frame_id_sha256") == source_key[1]),
+                    "scale_physical_dispatch_receipt_unbound")
+            if dispatch[-1][1] == "exact_return":
+                require(physical.get("classification") ==
+                        "exact_physical_frame" and
+                        physical.get("target_control") is None and
+                        physical.get("pinned_pixel_coordinates") == [],
+                        "scale_exact_physical_receipt_changed")
+            else:
+                target = intent.get("normalized_action", {}).get("target")
+                control = physical.get("target_control")
+                observed_control = intent.get("observed_target_control")
+                bounds = control.get("bounds") if type(control) is dict else None
+                require(len(dispatch) == 7 and
+                        family == "purchase" and
+                        all(classification ==
+                            "one_recurring_micro_raster_alternate"
+                            for _, classification in dispatch[:-1]) and
+                        physical.get("classification") ==
+                        "pinned_border_equivalence_accepted" and
+                        physical.get("pinned_pixel_coordinates") ==
+                        [[41, 419], [132, 419]] and
+                        intent.get("normalized_action", {}).get("type") in
+                        ("click", "double_click", "type") and
+                        type(target) is dict and
+                        set(target) == {"x", "y"} and
+                        type(bounds) is list and len(bounds) == 4 and
+                        control.get("visible") is True and
+                        control.get("enabled") is True and
+                        type(control.get("ref")) is str and
+                        type(control.get("role")) is str and
+                        type(control.get("label")) is str and
+                        type(observed_control) is dict and
+                        all(control.get(key) == observed_control.get(key)
+                            for key in ("ref", "role", "label", "visible",
+                                        "enabled", "bounds",
+                                        "purchase_rfq_view")) and
+                        control.get("purchase_rfq_view") is True and
+                        re.fullmatch(r"/odoo/purchase/[0-9]+",
+                                     urlsplit(intent["observed_url"]).path)
+                        is not None and
+                        type(controls) is list and
+                        len([row for row in controls
+                             if type(row) is dict and
+                             row.get("ref") == control["ref"] and
+                             row.get("role") == control["role"] and
+                             row.get("label") == control["label"] and
+                             row.get("visible") is True and
+                             row.get("enabled") is True]) == 1 and
+                        all(type(value) in (int, float) for value in bounds) and
+                        bounds[0] <= target["x"] <= bounds[2] and
+                        bounds[1] <= target["y"] <= bounds[3] and
+                        all(not (bounds[0] - 8 <= x <= bounds[2] + 8 and
+                                 bounds[1] - 8 <= y <= bounds[3] + 8)
+                            for x, y in ((41, 419), (132, 419))),
+                        "scale_pinned_physical_dispatch_target_or_pixels_invalid")
+
+
+def _selection_retry_gate_independent(*, worker_private: Path,
+                                      plan: dict, batch_intent: dict,
+                                      private_plan_path: Path,
+                                      source_freeze_path: Path,
+                                      incident_public_path: Path,
+                                      old_run_dir: Path) -> None:
+    if plan.get("validator_amendment") == protocol.VALIDATOR_V066_AMENDMENT:
+        return _validator_retry_gate_independent(
+            worker_private=worker_private, plan=plan,
+            batch_intent=batch_intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=incident_public_path,
+            old_run_dir=old_run_dir)
+    if plan.get("physical_dispatch_profile") == protocol.PINNED_BORDER_PROFILE:
+        return _pinned_retry_gate_independent(
+            worker_private=worker_private, plan=plan,
+            batch_intent=batch_intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=incident_public_path,
+            old_run_dir=old_run_dir)
+    gate_path = (worker_private / "v066_scale_controls" /
+                 "selection-exact-return-retry-gate.private.json")
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_rows, old_tail, count = controller.read_journal(old_journal)
+    old_attempt = old_run_dir / "attempt-000"
+    require(gate.get("schema") ==
+            controller.SELECTION_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "old_failure_retained_current_baseline_exact_no_gui_replay" and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("selection_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == old_tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in old_rows] ==
+            ["case_started", "case_failed"] and
+            old_rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            old_rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") ==
+            protocol.digest((old_attempt / "failure.private.json").read_bytes())
+            == incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") ==
+            protocol.digest((old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("gui_trace_sha256") and
+            gate.get("old_step_three_intent_or_dispatch") is False and
+            not (old_attempt /
+                 "actions/step-003-intent.private.json").exists() and
+            not (old_attempt /
+                 "actions/step-003-result.private.json").exists() and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0 and
+            gate.get("model_attempts") == 0,
+            "scale_independent_selection_retry_gate_unbound")
+    sql_path = (worker_private / "v066_scale_controls" /
+                "selection-retry-current-sql.private.json")
+    files_path = (worker_private / "v066_scale_controls" /
+                  "selection-retry-current-filestore.private.json")
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) ==
+            protocol.private_json(worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_selection_retry_current_baseline_inexact")
+
+
+def _pinned_retry_gate_independent(*, worker_private: Path, plan: dict,
+                                   batch_intent: dict,
+                                   private_plan_path: Path,
+                                   source_freeze_path: Path,
+                                   incident_public_path: Path,
+                                   old_run_dir: Path) -> None:
+    root = worker_private / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-exact-return-01").resolve(),
+            "scale_independent_pinned_prior_run_invalid")
+    gate_path = root / "selection-pinned-border-retry-gate.private.json"
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_batch = old_run_dir / "batch-intent.private.json"
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_attempt = old_run_dir / "attempt-000"
+    rows, tail, count = controller.read_journal(old_journal)
+    require(gate.get("schema") == controller.PINNED_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "two_failed_attempts_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("physical_dispatch_profile") ==
+            protocol.PINNED_BORDER_PROFILE and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("second_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_batch_intent_sha256") ==
+            protocol.digest(old_batch.read_bytes()) ==
+            incident.get("batch_intent_sha256") and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()) ==
+            incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("private_gui_trace_sha256") and
+            gate.get("old_step_eight_intent_sha256") == protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes())
+            == incident.get("private_step_eight_intent_sha256") and
+            gate.get("old_step_eight_result_exists") is False and
+            not (old_attempt /
+                 "actions/step-008-result.private.json").exists() and
+            gate.get("prior_failed_control_count") == 2 and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0,
+            "scale_independent_pinned_retry_gate_unbound")
+    sql_path = root / "selection-pinned-border-current-sql.private.json"
+    files_path = root / "selection-pinned-border-current-filestore.private.json"
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) == protocol.private_json(
+                worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_pinned_retry_current_baseline_inexact")
+
+
+def _validator_retry_gate_independent(*, worker_private: Path, plan: dict,
+                                      batch_intent: dict,
+                                      private_plan_path: Path,
+                                      source_freeze_path: Path,
+                                      incident_public_path: Path,
+                                      old_run_dir: Path) -> None:
+    root = worker_private / "v066_scale_controls"
+    require(old_run_dir.resolve() ==
+            (root / "controls-20260929-pinned-border-01").resolve(),
+            "scale_independent_validator_prior_run_invalid")
+    gate_path = root / "selection-v066-validator-retry-gate.private.json"
+    gate = protocol.private_json(gate_path)
+    incident = protocol.public_json(incident_public_path)
+    old_batch = old_run_dir / "batch-intent.private.json"
+    old_journal = old_run_dir / "journal.private.jsonl"
+    old_attempt = old_run_dir / "attempt-000"
+    rows, tail, count = controller.read_journal(old_journal)
+    require(gate.get("schema") == controller.VALIDATOR_RETRY_GATE_SCHEMA and
+            gate.get("status") ==
+            "three_failed_attempts_retained_current_baseline_exact_no_gui_replay" and
+            gate.get("validator_amendment") ==
+            protocol.VALIDATOR_V066_AMENDMENT and
+            batch_intent.get("selection_retry_gate_sha256") ==
+            protocol.digest(gate_path.read_bytes()) and
+            gate.get("new_private_plan_sha256") ==
+            protocol.digest(private_plan_path.read_bytes()) and
+            gate.get("new_source_freeze_sha256") ==
+            protocol.digest(source_freeze_path.read_bytes()) and
+            gate.get("third_failure_public_sha256") ==
+            protocol.digest(incident_public_path.read_bytes()) and
+            gate.get("old_batch_intent_sha256") ==
+            protocol.digest(old_batch.read_bytes()) ==
+            incident.get("batch_intent_sha256") and
+            gate.get("old_journal_sha256") ==
+            protocol.digest(old_journal.read_bytes()) ==
+            incident.get("journal_sha256") and
+            gate.get("old_journal_tail_sha256") == tail ==
+            incident.get("journal_tail_sha256") and
+            count == 2 and [row.get("event") for row in rows] ==
+            ["case_started", "case_failed"] and
+            all(row.get("run_intent_sha256") ==
+                protocol.digest(old_batch.read_bytes()) for row in rows) and
+            rows[0].get("task_id") == plan["tasks"][0]["task_id"] and
+            rows[0].get("package_sha256") ==
+            plan["tasks"][0]["package_sha256"] and
+            gate.get("old_failure_sha256") == protocol.digest((
+                old_attempt / "failure.private.json").read_bytes()) ==
+            incident.get("private_failure_sha256") and
+            gate.get("old_gui_trace_sha256") == protocol.digest((
+                old_attempt / "gui_trace.json").read_bytes()) ==
+            incident.get("private_gui_trace_sha256") and
+            gate.get("old_step_eight_intent_sha256") == protocol.digest((
+                old_attempt / "actions/step-008-intent.private.json").read_bytes())
+            == incident.get("private_step_eight_intent_sha256") and
+            gate.get("old_step_eight_result_exists") is False and
+            not (old_attempt /
+                 "actions/step-008-result.private.json").exists() and
+            gate.get("prior_failed_control_count") == 3 and
+            gate.get("service_state_restored") is True and
+            gate.get("official_final_tasks_admitted") == 0,
+            "scale_independent_validator_retry_gate_unbound")
+    sql_path = root / "selection-v066-validator-current-sql.private.json"
+    files_path = root / "selection-v066-validator-current-filestore.private.json"
+    require(gate.get("current_sql_sha256") ==
+            protocol.digest(sql_path.read_bytes()) and
+            gate.get("current_filestore_sha256") ==
+            protocol.digest(files_path.read_bytes()) and
+            protocol.private_json(sql_path) == protocol.private_json(
+                worker_private / "baseline_snapshot.json") and
+            protocol.private_json(files_path) == protocol.private_json(
+                worker_private / "baseline-filestore-manifest.json"),
+            "scale_independent_validator_retry_current_baseline_inexact")
+
+
+def _action_chain(attempt: Path, trace: dict, row: dict,
+                  *, require_exact_return_guard: bool = False,
+                  require_pinned_profile: bool = False) -> tuple[int, int, int]:
+    actions = trace.get("actions")
+    rejections = trace.get("pre_intent_rejections")
+    require(trace.get("schema") == controller.TRACE_SCHEMA and
+            trace.get("task_binding_sha256") == row["task_binding_sha256"] and
+            trace.get("sft_examples_written") == 0 and
+            not (attempt / "sft_candidate.private.json").exists() and
+            type(actions) is list and 2 <= len(actions) <= 90 and
+            type(rejections) is list,
+            "scale_gui_trace_or_holdout_boundary_invalid")
+    positive = negative = 0
+    frame_hashes = set()
+    result_files = sorted((attempt / "actions").glob("*-result.private.json"))
+    require(len(result_files) == len(actions),
+            "scale_action_result_count_changed")
+    results = [protocol.private_json(path) for path in result_files]
+    for step, (action, result) in enumerate(zip(actions, results)):
+        require(action.get("step") == step and
+                action.get("phase") in ("positive", "negative") and
+                result.get("step") == step and
+                result.get("phase") == action["phase"] and
+                result.get("contract_receipt") == action.get("contract_receipt"),
+                "scale_action_trace_result_mismatch")
+        _, frame_raw = pilot._ref(attempt, action["frame"], image=True)
+        frame_sha = protocol.digest(frame_raw)
+        frame_hashes.add(frame_sha)
+        contract = action["contract_receipt"]
+        require(contract.get("action_profile") ==
+                "scale-action-profile-v0.6.6" and
+                contract.get("task_binding_sha256") == row["package_sha256"] and
+                contract.get("task_id_sha256") ==
+                protocol.digest(row["task_id"].encode()) and
+                contract.get("step") == step and
+                contract.get("screenshot", {}).get("sha256") == frame_sha and
+                contract.get("screenshot", {}).get("width") == 1440 and
+                contract.get("screenshot", {}).get("height") == 1000 and
+                contract.get("error_code") is None,
+                "scale_current_frame_contract_receipt_invalid")
+        intent_sha = result.get("intent_sha256")
+        candidates = sorted((attempt / "actions").glob(
+            f"step-{step:03d}*-intent.private.json"))
+        require(len(candidates) == 1 and
+                protocol.digest(candidates[0].read_bytes()) == intent_sha,
+                "scale_pre_dispatch_intent_missing_or_ambiguous")
+        intent = protocol.private_json(candidates[0])
+        require(intent.get("phase") == action["phase"] and
+                intent.get("step") == step and
+                intent.get("task_id") == row["task_id"] and
+                intent.get("task_binding_sha256") ==
+                row["package_sha256"] and
+                intent.get("frame_sha256") == frame_sha and
+                intent.get("normalized_action") == result.get("applied_action") and
+                intent.get("dispatch_state") ==
+                "intent_durable_before_gui_action",
+                "scale_normalized_action_not_bound_to_intent")
+        if require_pinned_profile:
+            controls = intent.get("observation_controls")
+            require(type(controls) is list and
+                    len(controls) == contract.get("control_count") and
+                    len({row.get("ref") for row in controls
+                         if type(row) is dict}) == len(controls) and
+                    all(type(row) is dict and
+                        set(row) == {"ref", "role", "label", "visible", "enabled"}
+                        for row in controls),
+                    "scale_observed_control_table_missing_or_changed")
+        if action["phase"] == "positive":
+            require(negative == 0, "scale_action_phase_order_invalid")
+            positive += 1
+        else:
+            negative += 1
+    for reference in rejections:
+        rejected = pilot._artifact_json(attempt, reference)
+        require(rejected.get("schema") ==
+                "envloop-odoo-v066-pre-intent-frame-rejection-v1" and
+                rejected.get("error_code") == "stale_frame" and
+                rejected.get("pre_dispatch_intent_created") is False and
+                rejected.get("gui_action_dispatched") is False,
+                "scale_pre_intent_rejection_invalid")
+        pilot._ref(attempt, rejected["observed_frame_ref"], image=True)
+        pilot._ref(attempt, rejected["assistant_action_ref"])
+    if require_exact_return_guard:
+        _exact_return_chain(
+            attempt, trace, require_pinned_profile=require_pinned_profile,
+            family=row.get("family"))
+    require(positive > 0 and negative > 0,
+            "scale_positive_or_negative_gui_phase_missing")
+    return positive, negative, len(rejections)
+
+
+def audit_case(*, plan: dict, row: dict, attempt: Path,
+               worker_private: Path) -> dict:
+    attempt = Path(attempt)
+    protocol._private(attempt, directory=True)
+    raw_path = attempt / "attempt.private.json"
+    receipt = protocol.private_json(raw_path)
+    require(receipt.get("schema") == protocol.CASE_SCHEMA and
+            receipt.get("status") == controller.CASE_STATUS and
+            receipt.get("split") == plan["split"] and
+            receipt.get("family") == row["family"] and
+            receipt.get("task_id") == row["task_id"] and
+            receipt.get("package_sha256") == row["package_sha256"] and
+            receipt.get("task_binding_sha256") ==
+            row["task_binding_sha256"] and
+            receipt.get("source_freeze_sha256") ==
+            plan["source_freeze_sha256"] and
+            receipt.get("plan_sha256") == protocol.digest(protocol.canonical(plan)) and
+            receipt.get("ratification_sha256") == protocol.RATIFICATION_SHA and
+            receipt.get("official_final_tasks_admitted") == 0 and
+            receipt.get("model_attempts") == 0 and
+            receipt.get("service_state_restored_receipt") is True and
+            type(receipt.get("worker_pid")) is int and
+            type(receipt.get("refs")) is dict and
+            set(receipt["refs"]) == REFS,
+            "scale_case_receipt_identity_or_refs_invalid")
+    start, finish = _time(receipt.get("started_at_utc")), _time(
+        receipt.get("finished_at_utc"))
+    stamps = receipt.get("stage_timestamps")
+    require(type(stamps) is dict and set(stamps) == set(controller.STAGES),
+            "scale_case_stage_times_missing")
+    ordered = [_time(stamps[key]) for key in controller.STAGES]
+    require(start <= ordered[0] and
+            all(left <= right for left, right in zip(ordered, ordered[1:])) and
+            ordered[-1] <= finish and
+            receipt.get("lease_operation") == controller.LEASE_OPERATION and
+            _lease(worker_private / "worker-lease-events.jsonl",
+                   receipt["worker_pid"], start, finish),
+            "scale_case_worker_lease_or_phase_order_invalid")
+    refs = receipt["refs"]
+    artifacts = {}
+    for name, ref in refs.items():
+        if name.endswith("frame"):
+            pilot._ref(attempt, ref, image=True)
+        else:
+            artifacts[name] = pilot._artifact_json(attempt, ref)
+    trace = artifacts["gui_trace"]
+    positive_actions, negative_actions, rejected = _action_chain(
+        attempt, trace, row,
+        require_exact_return_guard=(plan.get("frame_guard_amendment") ==
+                                    "exact-frame-return-2026-09-28"),
+        require_pinned_profile=(plan.get("physical_dispatch_profile") ==
+                                protocol.PINNED_BORDER_PROFILE))
+    require(refs["source_frame"]["sha256"] in {
+        action["frame"]["sha256"] for action in trace["actions"]},
+        "scale_source_not_in_native_gui_trace")
+    source = artifacts["source_evidence"]
+    require(source.get("schema") ==
+            "envloop-odoo-v066-native-source-presentation-v1" and
+            source.get("task_id") == row["task_id"] and
+            source.get("source_asset_sha256") == row["source_asset_sha256"] and
+            source.get("source_label") == row["source_label"] and
+            source.get("source_frame_sha256") == refs["source_frame"]["sha256"] and
+            source.get("source_opened_via_v066_gui_actions") is True,
+            "scale_source_gui_presentation_unbound")
+    checkpoint = plan["checkpoint"]
+    for name in ("pre_restore", "post_restore"):
+        reset = artifacts[name]
+        require(reset.get("status") == "restored" and
+                reset.get("business_snapshot_equal") is True and
+                reset.get("physical_filestore_equal_before_web_restart") is True and
+                reset.get("db_sha256") == checkpoint["db_sha256"] and
+                reset.get("filestore_sha256") == checkpoint["filestore_sha256"],
+                "scale_case_full_physical_reset_invalid")
+    baseline_path = worker_private / "baseline_snapshot.json"
+    baseline = protocol.private_json(baseline_path)
+    frozen_path = worker_private / "baseline-filestore-manifest.json"
+    frozen = protocol.private_json(frozen_path)
+    require(protocol.digest(baseline_path.read_bytes()) ==
+            checkpoint["baseline_snapshot_sha256"] and
+            protocol.digest(frozen_path.read_bytes()) ==
+            checkpoint["baseline_filestore_manifest_sha256"] and
+            artifacts["baseline_sql"] == baseline and
+            artifacts["restored_sql"] == baseline,
+            "scale_case_baseline_or_restored_sql_changed")
+    world = protocol.private_json(worker_private / "partition_cases.json")
+    cases = [case for family in protocol.FAMILIES
+             for case in world["cases"][family]
+             if case["id"] == row["task_id"]]
+    require(len(cases) == 1 and cases[0]["family"] == row["family"] and
+            protocol.digest(source_asset(cases[0], world)) ==
+            row["source_asset_sha256"],
+            "scale_case_world_source_changed")
+    gold = protocol.private_json(worker_private / GOLD_FILES[row["family"]])
+    require(row["task_id"] in gold, "scale_case_gold_missing")
+    target = gold[row["task_id"]]
+    protected_count = 3 * protocol.SPLITS[plan["split"]][2] + 1
+    require(len({item["checksum"] for item in baseline["attachments"]}) ==
+            protected_count,
+            "scale_case_protected_attachment_count_changed")
+    source_paths = {str(item["id"]):
+                    f"{item['checksum'][:2]}/{item['checksum']}"
+                    for item in baseline["attachments"]}
+    baseline_score = pilot._pure_score(
+        row["family"], row["task_id"], target,
+        baseline, baseline, frozen, frozen, source_paths)
+    positive = pilot._pure_score(
+        row["family"], row["task_id"], target,
+        baseline, artifacts["positive_sql"], frozen,
+        artifacts["positive_filestore"],
+        artifacts["positive_store_paths"])
+    negative = pilot._pure_score(
+        row["family"], row["task_id"], target,
+        baseline, artifacts["negative_sql"], frozen,
+        artifacts["negative_filestore"],
+        artifacts["negative_store_paths"])
+    from enterprise_fallback.odoo18.sweep_partition import NEGATIVE_CODES
+    from enterprise_fallback.odoo18.verify import protected_source_file_differences
+    require(baseline_score["reward"] == 0.0 and
+            positive["reward"] == 1.0 and
+            positive["difference_codes"] == [] and
+            negative["reward"] == 0.0 and
+            negative["difference_codes"] ==
+            [NEGATIVE_CODES[row["family"]]] and
+            positive["protected_source_files_checked"] == protected_count and
+            negative["protected_source_files_checked"] == protected_count and
+            protected_source_file_differences(
+                baseline, frozen, artifacts["restored_filestore"]) == [] and
+            artifacts["positive_sql"] != baseline and
+            artifacts["negative_sql"] != artifacts["positive_sql"],
+            "scale_case_independent_saved_state_or_negative_invalid")
+    return {
+        "schema": CASE_AUDIT_SCHEMA,
+        "status": "current_profile_raw_gui_semantics_verified_source_visual_review_pending",
+        "split": plan["split"],
+        "family": row["family"],
+        "task_id": row["task_id"],
+        "package_sha256": row["package_sha256"],
+        "private_attempt_sha256": protocol.digest(raw_path.read_bytes()),
+        "positive_gui_actions": positive_actions,
+        "negative_gui_actions": negative_actions,
+        "pre_intent_rejections": rejected,
+        "independent_baseline_reward": baseline_score["reward"],
+        "independent_positive_reward": positive["reward"],
+        "independent_wrong_object_reward": negative["reward"],
+        "protected_source_files_checked": protected_count,
+        "full_pre_web_filestore_reset_exact": True,
+        "protected_post_web_source_bytes_equal": True,
+        "source_visual_review_pending": True,
+        "official_final_tasks_admitted": 0,
+        "model_attempts": 0,
+    }
+
+
+def audit_batch(*, split: str, worker_dir: Path, private_plan_path: Path,
+                public_plan_path: Path, source_freeze_path: Path,
+                run_dir: Path, adoption_path: Path | None = None,
+                old_private_plan_path: Path | None = None,
+                old_source_freeze_path: Path | None = None,
+                incident_public_path: Path | None = None) -> tuple[dict, dict]:
+    plan = protocol.validate_split_plan(
+        split=split, private_path=private_plan_path,
+        public_path=public_plan_path,
+        source_freeze_path=source_freeze_path)
+    worker = Path(worker_dir).resolve()
+    private = protocol._worker_split(worker, split)
+    run_dir = Path(run_dir)
+    protocol._private(run_dir, directory=True)
+    intent = protocol.private_json(run_dir / "batch-intent.private.json")
+    require(intent.get("schema") == protocol.BATCH_SCHEMA and
+            intent.get("split") == split and
+            intent.get("expected_case_count") == plan["task_count"],
+            "scale_batch_intent_unbound")
+    if split == "selection" and plan.get("frame_guard_amendment") == \
+            protocol.EXACT_RETURN_AMENDMENT:
+        validator_fixed = (plan.get("validator_amendment") ==
+                           protocol.VALIDATOR_V066_AMENDMENT)
+        pinned = (plan.get("physical_dispatch_profile") ==
+                  protocol.PINNED_BORDER_PROFILE)
+        _selection_retry_gate_independent(
+            worker_private=private, plan=plan, batch_intent=intent,
+            private_plan_path=private_plan_path,
+            source_freeze_path=source_freeze_path,
+            incident_public_path=(protocol.ROOT / "docs/evidence" /
+                ("odoo-v066-selection-third-validator-mismatch-2026-09-29.json"
+                 if validator_fixed else
+                 "odoo-v066-selection-second-post-intent-stale-2026-09-29.json"
+                 if pinned else
+                 "odoo-v066-selection-first-exact-frame-flicker-incident-2026-09-28.json")),
+            old_run_dir=(private / "v066_scale_controls" /
+                         ("controls-20260929-pinned-border-01"
+                          if validator_fixed else
+                          "controls-20260929-exact-return-01" if pinned else
+                          "controls-20260928-v1")))
+    old_plan = None
+    current_binding = (intent.get("private_plan_sha256") ==
+                       protocol.digest(private_plan_path.read_bytes()) and
+                       intent.get("source_freeze_sha256") ==
+                       protocol.digest(source_freeze_path.read_bytes()))
+    if not current_binding:
+        adoption, old_plan = controller._old_plan_adoption(
+            adoption_path=adoption_path,
+            old_private_plan_path=old_private_plan_path,
+            old_source_freeze_path=old_source_freeze_path,
+            incident_public_path=incident_public_path,
+            current_plan=plan,
+            current_source_freeze_path=source_freeze_path)
+        require(intent.get("private_plan_sha256") ==
+                adoption["old_private_plan_sha256"] and
+                intent.get("source_freeze_sha256") ==
+                adoption["old_source_freeze_sha256"],
+                "scale_batch_intent_old_source_not_adopted")
+    completed = controller.next_case_index(run_dir, plan)
+    journal_rows, _, _ = controller.read_journal(
+        run_dir / "journal.private.jsonl")
+    reclassified = {event["ordinal"] for event in journal_rows
+                    if event.get("event") ==
+                    "case_reclassified_after_lease_release"}
+    if reclassified:
+        controller.verify_reclassified_current_baseline(run_dir, private)
+    rows = []
+    for ordinal in range(completed):
+        selected = old_plan if ordinal in reclassified else plan
+        require(selected is not None,
+                "scale_reclassified_case_old_plan_missing")
+        rows.append(audit_case(
+            plan=selected, row=selected["tasks"][ordinal],
+            attempt=run_dir / f"attempt-{ordinal:03d}",
+            worker_private=private))
+    counts = Counter(row["family"] for row in rows)
+    raw_report = {
+        "schema": AUDIT_SCHEMA,
+        "status": ("all_raw_split_controls_semantically_verified"
+                   if completed == plan["task_count"] else
+                   "raw_split_controls_partial"),
+        "split": split,
+        "source_freeze_sha256": plan["source_freeze_sha256"],
+        "private_plan_sha256": protocol.digest(private_plan_path.read_bytes()),
+        "batch_intent_sha256": protocol.digest(
+            (run_dir / "batch-intent.private.json").read_bytes()),
+        "journal_sha256": protocol.digest(
+            (run_dir / "journal.private.jsonl").read_bytes())
+            if (run_dir / "journal.private.jsonl").is_file() else None,
+        "completed_independently_verified_cases": completed,
+        "expected_case_count": plan["task_count"],
+        "verified_family_counts": dict(counts),
+        "per_id": rows,
+        "source_visual_reviews_pending": completed,
+        "reclassified_without_gui_replay_count": len(reclassified),
+        "official_final_tasks_admitted": 0,
+        "model_attempts": 0,
+    }
+    public = {
+        "schema": "envloop-odoo-v066-scale-gui-control-audit-public-v1",
+        "status": raw_report["status"],
+        "split": split,
+        "source_freeze_sha256": plan["source_freeze_sha256"],
+        "private_audit_sha256": protocol.digest(protocol.canonical(raw_report)),
+        "completed_independently_verified_cases": completed,
+        "expected_case_count": plan["task_count"],
+        "verified_family_counts": dict(counts),
+        "source_visual_reviews_pending": completed,
+        "reclassified_without_gui_replay_count": len(reclassified),
+        "official_final_tasks_admitted": 0,
+        "model_attempts": 0,
+    }
+    return raw_report, public
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--split", choices=tuple(protocol.SPLITS), required=True)
+    parser.add_argument("--worker-dir", type=Path, required=True)
+    parser.add_argument("--private-plan", type=Path, required=True)
+    parser.add_argument("--public-plan", type=Path, required=True)
+    parser.add_argument("--source-freeze", type=Path, required=True)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--adoption-private", type=Path)
+    parser.add_argument("--old-private-plan", type=Path)
+    parser.add_argument("--old-source-freeze", type=Path)
+    parser.add_argument("--incident-public", type=Path)
+    parser.add_argument("--private-out", type=Path, required=True)
+    parser.add_argument("--public-out", type=Path, required=True)
+    args = parser.parse_args()
+    try:
+        private, public = audit_batch(
+            split=args.split, worker_dir=args.worker_dir,
+            private_plan_path=args.private_plan,
+            public_plan_path=args.public_plan,
+            source_freeze_path=args.source_freeze,
+            run_dir=args.run_dir,
+            adoption_path=args.adoption_private,
+            old_private_plan_path=args.old_private_plan,
+            old_source_freeze_path=args.old_source_freeze,
+            incident_public_path=args.incident_public)
+        protocol.write_new(args.private_out, private=True, value=private)
+        protocol.write_new(args.public_out, private=False, value=public)
+    except Exception as error:
+        print(json.dumps({"schema": AUDIT_SCHEMA,
+                          "status": "raw_control_audit_refused",
+                          "error_type": type(error).__name__,
+                          "official_final_tasks_admitted": 0,
+                          "model_attempts": 0}, sort_keys=True))
+        raise SystemExit(2) from None
+    print(json.dumps(public, sort_keys=True))

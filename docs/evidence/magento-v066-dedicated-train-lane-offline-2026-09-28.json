@@ -1,0 +1,69 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "actual_docker_calls": 0,
+  "actual_model_calls": 0,
+  "adapter_sha256": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+  "cell_id": "magento-admin",
+  "checked_date": "2026-09-28",
+  "clone_pairs": [
+    {
+      "app_name": "envloop-magento-original-v066-teacher-app-a",
+      "control_loopback_port": 7821,
+      "http_loopback_port": 7820,
+      "search_name": "envloop-magento-v066-teacher-search-a"
+    },
+    {
+      "app_name": "envloop-magento-original-v066-teacher-app-b",
+      "control_loopback_port": 7823,
+      "http_loopback_port": 7822,
+      "search_name": "envloop-magento-v066-teacher-search-b"
+    }
+  ],
+  "cron_disabled_before_supervisor_in_command_plan": true,
+  "dedicated_network": "envloop-magento-v066-teacher-network",
+  "evaluator_names_ports_network_disjoint_in_source": true,
+  "fake_process_and_playwright_lifecycle_tests_passed": 9,
+  "fake_teacher_worker_tests_passed": 9,
+  "frozen_v2_evaluator_source_checks": {
+    "tools/audit_magento_cron_requalification_v1.py": {
+      "same_as_base_9ce18a0": true,
+      "sha256": "d96a86590f67bb41409eb1f2759f43198a738341c9fd42f372af709049b85673"
+    },
+    "tools/magento_resumable_100_v2.py": {
+      "same_as_base_9ce18a0": true,
+      "sha256": "24a5b2c9efb68557e09d3d413d2f75c95e130f2d1e1863b9fb1aac1bd580baa0"
+    },
+    "tools/sweep_magento_original_gui_controls_v1.py": {
+      "same_as_base_9ce18a0": true,
+      "sha256": "09285a06f0fb7f247c1fb83ca2505a67d8dad2cba34e209204ce2ffd2c89f471"
+    }
+  },
+  "independent_train_positive_negative_reset_smoke_completed": false,
+  "launcher_source_sha256": "e0f69e87c1f9197ca4ee4564dc6d74b04a9d28d84159e0e4c1952568781a4242",
+  "live_teacher_execution_enabled": false,
+  "official_final_admissions": 0,
+  "official_training_episodes": 0,
+  "pinned_native_search_image_sha256": "sha256:2c257b68f361872e13bdd476cba152e232a314ec61b0eedfc1f71b628ba39432",
+  "pinned_original_app_image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "provider_invoice_usd": null,
+  "qualified_private_lane_receipt_exists": false,
+  "schema": "envloop-magento-v066-dedicated-train-lane-offline-v1",
+  "status": "launcher_implemented_fake_process_only_independent_live_smoke_missing",
+  "verifier_sha256": "bb2ca77c90f403713ef0d2ffb1f7a8f0bd1fe4e21fe5c06e10f1669b56ecdd1b",
+  "worker_runtime_bundle_sha256": "d607a27b795a870457ca1d312a8ab653cb477553676d01f0b4f1e501c62e2ee4",
+  "worker_runtime_source_sha256s": {
+    "magento_catalog_factory/plan.py": "c2acae52a27d653b71d2d2df317801f3f2bf1c42a87452225ef10818f94160ea",
+    "magento_catalog_factory/seed.py": "6bca87ef9aeaf8aac74d0e284b91167ae885a516eb12a093d935e153d986afa5",
+    "magento_catalog_factory/verify.py": "bb2ca77c90f403713ef0d2ffb1f7a8f0bd1fe4e21fe5c06e10f1669b56ecdd1b",
+    "tools/magento_cron_runtime_contract_v1.py": "36e1e76059370055be3f6cc9e50fbecb640d0d19061d4f99da6e813979c8b73b",
+    "tools/magento_dedicated_train_lane_v066.py": "e0f69e87c1f9197ca4ee4564dc6d74b04a9d28d84159e0e4c1952568781a4242",
+    "tools/magento_teacher_episode_worker_v066.py": "43968d014c4aa29e5105771a4c1df1e6afbddedafecfd23c38fe30882c32ed5c",
+    "tools/magento_v066_train_adapter.py": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+    "tools/qualify_magento_original_catalog_v1.py": "573fa5b29f7d9e6d991734ddc05a14f1e8046313ae17e3942c5f4b17a231cdd8",
+    "tools/reconcile_magento_unseeded_search_drift_v1.py": "9eef732a9f9508daa91cb3c0d68236ec0b7606c145c1cf7c253eb73a076dc955",
+    "tools/run_magento_model_pilot_v06.py": "25f32928ff11e7ebdeb426be943680ddc8e05fa72f1caea3117a18a67bdebeeb",
+    "tools/run_magento_model_pilot_v063.py": "c2869f0cc1455045b51bc4ada78089ff82b7d9bd0dcec9c128bab3f1120b3520",
+    "tools/start_magento_native_sidecar_clone_v1.py": "0c48169358bcfdaaafa777ceb19b783dd41d835982653852e0b249e2fdc551c2",
+    "tools/sweep_magento_original_gui_controls_v1.py": "09285a06f0fb7f247c1fb83ca2505a67d8dad2cba34e209204ce2ffd2c89f471"
+  }
+}

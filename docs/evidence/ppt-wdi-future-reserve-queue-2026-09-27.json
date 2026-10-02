@@ -1,0 +1,17 @@
+{
+  "country_identities_public": false,
+  "current_plan_sha256": "71b263d9d5c899cde24b2835b3de64a98421bf2af811965001f54cc7d3b6e4ea",
+  "declared_after_quarantined_source_families": 7,
+  "every_rejected_source_retained": true,
+  "future_source_complete_observation_screen_required": true,
+  "if_cap_exceeded": "fail_cell_and_re_register_study_before_model_results",
+  "maximum_additional_family_replacements": 3,
+  "maximum_total_quarantined_source_families": 10,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "ordered_future_country_count": 10,
+  "private_queue_sha256": "35ea4f56e669b1f3c66c76de0ef59c1e43987fdc5e6228ba6537ce916471c798",
+  "schema": "envloop-ppt-future-reserve-queue-public-v1",
+  "seventh_quarantine_receipt_sha256": "5a68fb3e70bf4315d002f2ab3e97ce93a98db5f6190b674188c0766309f28594",
+  "status": "pre_result_queue_and_attrition_cap_frozen"
+}

@@ -1,0 +1,13 @@
+{
+  "actor_or_runner_modified": false,
+  "as_of_date": "2026-09-29",
+  "frozen_v6_source_freeze_sha256": "c3ec2e588a4c432990658a3dd75db33cae885c5ddcdb9f63221b8aed9b2387ca",
+  "model_attempts": 0,
+  "official_final_tasks_admitted": 0,
+  "schema": "envloop-odoo-v066-two-frame-v6a-independent-audit-source-freeze",
+  "source_sha256s": {
+    "tests/test_odoo_v066_two_frame_dispatch_v6a.py": "fc43ae7e2c40a043fc6b57b89440fc4e73e77a73c2881e7bd7645c338875606f",
+    "tools/audit_odoo_v066_two_frame_dispatch_v6a.py": "06f662e60ba1b36376808130f0f5911c94fbf11d498e6412815261e01da1c974"
+  },
+  "status": "additive_read_only_audit_before_v6_raw_control_promotion"
+}

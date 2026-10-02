@@ -1,0 +1,3 @@
+Open the supplied Mexico document in the native LibreOffice GUI. Use only screenshots, mouse, and keyboard; save the original file in place. Do not change the authentic WDI observations, source citation, other findings, non-target objects, or unrelated files. No terminal, filesystem API, or office API is available to the actor.
+In Review, repair B4 through B4 as 2024-vs-2023 percentage growth using the indicated GDP, GDP-per-capita, and population columns on WDI facts. Keep formulas, not pasted constants, and respect the percentage units shown.
+Source: World Bank, World Development Indicators, API snapshot 2026-09-25, 2019–2024; CC BY 4.0. Derived calculations are EnvLoop's, not World Bank conclusions.

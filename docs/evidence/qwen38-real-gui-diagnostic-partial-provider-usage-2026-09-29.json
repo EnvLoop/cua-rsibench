@@ -1,0 +1,56 @@
+{
+  "exact_metadata_matched_training_event_count": 2,
+  "final_provider_billed_token_totals": null,
+  "frozen_training_sdk_version": "0.30.0",
+  "legacy_sdk_0300_response_sha256": "bfec36420ec3bad223294adfe306f08a032aae52adae07060f3b27720b362709",
+  "local_observed_sample_output_tokens": 295,
+  "local_rendered_sampling_prompt_tokens": 26368,
+  "local_scheduled_training_tokens": 212895,
+  "matched_provider_estimated_cost_field_count": 2,
+  "matched_sampling_prefill_event_count": 0,
+  "matched_sampling_sample_event_count": 0,
+  "matched_training_tokens_in_returned_usage_events": 63213,
+  "model": "Qwen/Qwen3.8-27B",
+  "nominal_subtotal_for_matched_training_events_usd": "0.259362939",
+  "notes": [
+    "The hourly provider response is attributed by exact purpose, plan-prefix run ID, split and model in session metadata; it has no per-operation billing identifiers.",
+    "SDK 0.30.4 returned gross estimated cost for the two matched training events; it is not an invoice or final run cost. SDK 0.30.0 had dropped those response fields.",
+    "The current UTC day has no invoice-reconciliation completeness watermark; sampling rows were absent, and the difference between scheduled and returned training tokens does not establish complete billing.",
+    "A checkpoint event lacked matching session metadata and is excluded from the attributed subtotal."
+  ],
+  "official_docs": {
+    "billing_usage": "https://tinker-docs.thinkingmachines.ai/tinker/api-reference/restclient/#get_billing_usage",
+    "model_pricing": "https://tinker-docs.thinkingmachines.ai/tinker/models/"
+  },
+  "official_researcher_campaign": false,
+  "organization_event_count_in_window": 3,
+  "organization_session_count_in_window": 1,
+  "plan_sha256": "cdd7998431924503d08a5dc3c57552a43d7263ba272daa6c443ad6b48f7c493e",
+  "pricing_source_sha256": "1521db910e08c3f2cc052e9c4f831cdc7b9fbca74ca2d4d2f07c1b544530dcef",
+  "private_attribution_sha256": "b5039152d1aa353ea5b1f536199456c270fada37ed1ea60e2dd05e35b3cbfeeb",
+  "private_provider_receipt_sha256": "8123b762ea6385293a59dcf07452bfa0a99e4c18459777942ef4fc0d282f24ac",
+  "private_provider_response_sha256": "fe63ea0781403af6fbb53acbf21e615db01ff9f849a5d92731a44d228d036139",
+  "provider_estimated_gross_cost_for_returned_matched_training_events_usd": "0.259362939",
+  "provider_estimated_total_run_cost_usd": null,
+  "provider_invoice_usd": null,
+  "provider_usage_completeness_watermark": null,
+  "provider_window_utc": {
+    "ending_before": "2026-09-28T18:00:00Z",
+    "starting_on": "2026-09-28T14:00:00Z"
+  },
+  "published_training_rate_usd_per_million_tokens": "4.103",
+  "read_only_billing_api_calls": 2,
+  "read_only_query_sdk_version": "0.30.4",
+  "run_journal_sha256": "1bac0e4ca9c63e5b6aaac259f11be70bb338c25c1a5fb41d37932c1d94b5b517",
+  "run_journal_snapshot": {
+    "automatic_replay_authorized": false,
+    "completed_operations": 154,
+    "open_intents_after_interruption": 0,
+    "provider_intents": 154,
+    "uncertain_operations": 0
+  },
+  "schema": "cua-qwen38-real-gui-diagnostic-partial-provider-usage-v1",
+  "status": "partial_provider_training_usage_attributed_invoice_unknown",
+  "training_or_sampling_provider_calls_for_reconciliation": 0,
+  "unattributed_checkpoint_event_count": 1
+}

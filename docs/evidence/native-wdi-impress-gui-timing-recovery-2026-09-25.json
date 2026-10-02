@@ -1,0 +1,20 @@
+{
+  "archive_ledger_sha256": "f9353bb7538edb95ce4ee4b183d40cf9f9b5d8b9fefcdb1355bbf5f343f60628",
+  "checked_date": "2026-09-25",
+  "corrected_retry_run_receipt_sha256": "bb0fde4fa9785557e4d061ed9a06d468b004cf6e45bf4ad28fa29195518caf70",
+  "fresh_corrected_gui_result": "positive_accepted_near_miss_rejected_cold_reset_verified",
+  "fresh_positive_near_miss_reset_receipt_sha256": {
+    "cold-reset": "2d06f4787169d141fce542568b8c5a9baab4a49fb8dd67a66f4a7481961da3df",
+    "near-miss": "717b2de4fc05c4c6a16265e8e250fd04efe90e4c224aed89ca4c937e4157188a",
+    "positive": "98543466193aaf18fbb93da1e6687cc0c30bfb4c359acd0ca457fbb09b722efa"
+  },
+  "interpretation": "A two-second slide transition wait is consistent with recovery of the first-target click. The original partial attempt is retained; no student/model outcome was involved.",
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "old_known_positive_gui_result": "first_target_unchanged_other_two_correct; independently_rejected",
+  "opaque_task_ref": "f351b7641749b991f365e6e51074dc8ee37a8ebd1b3870d48ae532d52f7243ca",
+  "original_partial_positive_receipt_sha256": "531f66ff4ce17ba0866ba7d2da929317493e1017129a6be1e05813f2787c5764",
+  "original_partial_saved_artifact_sha256": "c355b0b3d48bfba3bfc2c22d0b29edc7c7e4d2c60f63c7adcd82db2470488684",
+  "patched_sweeper_sha256": "de36fe29bdd38a9fc37cacda95ce521aaa735ca19efaf24d3081aeb0576363b8",
+  "schema": "cua-native-impress-gui-calibration-repair-public-v1"
+}

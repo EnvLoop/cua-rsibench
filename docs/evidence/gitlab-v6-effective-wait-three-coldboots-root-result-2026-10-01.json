@@ -1,0 +1,18 @@
+{
+  "actual_effective_wait_seconds": 60,
+  "actual_successful_nginx_logger_calls": 3,
+  "all_owned_cycle_and_parent_resources_removed": true,
+  "formal_campaign_credit": 0,
+  "formal_final_outcome_credit": 0,
+  "formal_task_credit": 0,
+  "independent_private_audit_sha256": "9bc1402d39dd4cfed441fb27f5d4e9327a40ef6ad1d4fbda4109eafac45c5c35",
+  "model_calls": 0,
+  "native_result_sha256": "025ae4ee3285f8052d08129df051c066ac50cacf45035bc6bd43af77120fa516",
+  "neutral_cycles_verified": 3,
+  "new_task_dispatch_authorized_by_neutral_proof_alone": false,
+  "old_neutral_credit": 0,
+  "original_identity_sql_git_source_seed_and_services_restored": true,
+  "raw_files_independently_reopened": 970,
+  "schema": "envloop-public-gitlab-v6-native-effective-wait-root-v1",
+  "status": "saved_three_neutral_v6_effective_wait_native_cycles_independently_replayed"
+}

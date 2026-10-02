@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+<defs><style>text{font-family:Helvetica,Arial,sans-serif;fill:#173448}.title{font-size:30px;font-weight:700}.label{font-size:18px;font-weight:700}.body{font-size:15px}.small{font-size:13px;fill:#496579}.card{fill:#fff;stroke:#c3d3dc;stroke-width:1.5}.arrow{fill:none;stroke:#438b99;stroke-width:2.5;marker-end:url(#arrow)}</style><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#438b99" stroke-width="1.5"/></marker></defs>
+<rect width="1200" height="700" fill="#f3f7f9"/>
+<text x="44" y="53" class="title">EnvLoop: execution infrastructure without training</text>
+<text x="44" y="81" class="body">Portable controller, original software resources, independent saved-state verification</text>
+<rect x="44" y="124" width="303" height="272" rx="12" class="card"/>
+<text x="65" y="157" class="label">Hash-checked source bundle</text>
+<text x="65" y="190" class="body">Adapters + task generators</text><text x="65" y="221" class="body">Trusted verifiers + report tools</text><text x="65" y="252" class="body">Pinned runtime dependencies</text><text x="65" y="283" class="body">Public development fixtures</text><text x="65" y="326" class="small">Private tasks, answers and account state</text><text x="65" y="347" class="small">are supplied separately at runtime.</text>
+<rect x="394" y="124" width="329" height="272" rx="12" class="card"/>
+<text x="415" y="157" class="label">Non-Tinker controller image</text><text x="415" y="191" class="body">Chromium / Docker / Compose</text><text x="415" y="222" class="body">E2B / Harbor / artifact libraries</text><text x="415" y="253" class="body">Current source bindings + CLI checks</text><text x="415" y="284" class="body">Network-isolated build smoke</text><text x="415" y="327" class="small">No training service or model request</text><text x="415" y="348" class="small">is required to build this controller.</text>
+<path d="M347 244L386 244" class="arrow"/>
+<rect x="769" y="124" width="387" height="272" rx="12" class="card"/>
+<text x="790" y="157" class="label">Owned original-software resources</text><text x="790" y="191" class="body">Excel web + PowerPoint web</text><text x="790" y="222" class="body">LibreOffice desktop in E2B</text><text x="790" y="253" class="body">Odoo Community + GitLab CE</text><text x="790" y="284" class="body">Magento + native search / queue</text><text x="790" y="327" class="small">Every action still needs current identity,</text><text x="790" y="348" class="small">target, scope, lease and guard evidence.</text>
+<path d="M723 244L761 244" class="arrow"/>
+<rect x="394" y="452" width="762" height="164" rx="12" class="card"/>
+<text x="415" y="486" class="label">Independent qualification path</text><text x="415" y="520" class="body">Reset baseline  →  genuine positive / wrong-object control  →  saved artifact, SQL or Git readback</text><text x="415" y="551" class="body">Exact reset and owned cleanup  →  source-bound qualification evidence</text><text x="415" y="586" class="small">A build test, a scripted control and a model outcome remain separate evidence tiers.</text>
+<path d="M961 396L961 444" class="arrow"/>
+<rect x="44" y="452" width="303" height="164" rx="12" fill="#e7edf2" stroke="#c3d3dc"/>
+<text x="65" y="486" class="label">Training boundary</text><text x="65" y="520" class="body">Tinker training and sampling</text><text x="65" y="549" class="body">resume as a separate phase.</text><text x="65" y="586" class="small">No training-gain result is claimed here.</text>
+<text x="44" y="662" class="small">Full-study gates are preserved: 600 admitted identities · 24 researcher chains · 3,000 matched outcomes.</text>
+</svg>

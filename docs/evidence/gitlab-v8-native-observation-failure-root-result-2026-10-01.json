@@ -1,0 +1,22 @@
+{
+  "applied_actions": 0,
+  "cold_reset_generations_reopened": [
+    0,
+    1
+  ],
+  "failure": "Unrelated native control disappeared during eager observation handle lookup; locator waited30 seconds and stopped before first GUI input.",
+  "failure_sha256": "8b24ff97199726fe462ef64220742bd63c7531e4d835ca09937e34a5ff43c069",
+  "immutable_seed_exact": true,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_git_raw_files_reopened": 198,
+  "original_healthy": true,
+  "original_identity_restored": true,
+  "original_sql_business_restored": true,
+  "owned_parent_absent": true,
+  "protected_metadata_exact": true,
+  "result_inferred": false,
+  "schema": "envloop-gitlab-v8-real-train-failure-root-audit-v1",
+  "status": "terminal_native_train_failure_preserved_no_task_credit",
+  "terminal_sha256": "b40f931bcd3e58cec8e7cdd3509b2f026569c7c8059746798353e04d02f65b07"
+}

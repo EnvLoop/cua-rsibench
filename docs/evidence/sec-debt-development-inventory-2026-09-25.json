@@ -1,0 +1,15 @@
+{
+  "schema": "sec-debt-public-development-inventory-v1",
+  "status": "five public development cases, zero hidden or Excel-web admissions",
+  "structural_workflow": "current versus noncurrent reported long-term debt, cash capacity, and synthetic refinance stress",
+  "issuer_families": 5,
+  "original_10k_accessions": 5,
+  "excerpt_sha256_by_ticker": {
+    "PFE": "be43a5e64af1161f0a5f950ebd8930187bfd58374447550a78e82d7c4eb300bd",
+    "COST": "ca959d0629c28951f402ab8b1e79dff8bed97dee63974efddd104d0084b51666",
+    "WMT": "6ebd519239135de0ebefbf4fdc9cd2f88a88e2eefec16f94037d5d31afa59ad2",
+    "GOOGL": "73ee1e582bef122fa097d24a8109cf4321fa9bcf62f9a34e6a86e755b3e1e650",
+    "CRM": "09498e319c8d336a4e2ff308bc3d9a8cc14864711691f431c441e02027ef4698"
+  },
+  "official_final_credit": 0
+}

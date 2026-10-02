@@ -1,0 +1,53 @@
+{
+  "schema": "sec-cashquality-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "five public original-filing source excerpts; zero hidden or GUI admission",
+  "issuers": 5,
+  "original_accessions": 5,
+  "total_fact_rows": 90,
+  "source_units": [
+    "USD"
+  ],
+  "sources": [
+    {
+      "ticker": "META",
+      "cik": 1326801,
+      "accession": "0001326801-25-000017",
+      "records": 18,
+      "raw_json_sha256": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
+      "excerpt_sha256": "1e20c02474cf38a0f414e9f63f0b70c288369cf60e135e3e79ca1c830fcde15f"
+    },
+    {
+      "ticker": "CRM",
+      "cik": 1108524,
+      "accession": "0001108524-24-000005",
+      "records": 18,
+      "raw_json_sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "excerpt_sha256": "a2f2008dcf9954fc0215872eeb9c91e630ac4534f85c6128cbc2b80c95bec5cd"
+    },
+    {
+      "ticker": "COST",
+      "cik": 909832,
+      "accession": "0000909832-24-000049",
+      "records": 18,
+      "raw_json_sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f",
+      "excerpt_sha256": "6255078337315cb4787767623481610f81318a7a937b5f0dc31b2759cd533dde"
+    },
+    {
+      "ticker": "KO",
+      "cik": 21344,
+      "accession": "0000021344-25-000011",
+      "records": 18,
+      "raw_json_sha256": "53d363a9aa3071406cda9857654358f4dca42e174a1defb8cc1ce9ad2a4c9e40",
+      "excerpt_sha256": "7c21a4e496297fcabed92077723d889044cd0e3beabd6e6c708b3e9fe4b75218"
+    },
+    {
+      "ticker": "NFLX",
+      "cik": 1065280,
+      "accession": "0001065280-25-000044",
+      "records": 18,
+      "raw_json_sha256": "00f3449073d90dfa3aec4e384de24b70d92d897f90c67d6bca61f23e33d38634",
+      "excerpt_sha256": "cb74bb14b13f7a0653ef3b82eb6ae4fa4450754c16ec9cc74d1322fcddcd32a0"
+    }
+  ]
+}

@@ -69,10 +69,22 @@ def _configuration(root: Path, reference: object, *, role: str,
                        f'{role}: settings required')
     needed = ({'renderer', 'image_processor', 'temperature', 'max_output_tokens'}
               if role == 'student' else
-              {'reasoning_effort', 'temperature', 'max_output_tokens'})
+              {'reasoning_effort', 'reasoning_mode', 'max_output_tokens'})
     cell_final.require(needed <= set(settings) and
                        all(settings[key] is not None for key in needed),
                        f'{role}: required inference settings missing')
+    cell_final.positive_integer(settings['max_output_tokens'],
+                                f'{role}: max_output_tokens', 100_000)
+    if role != 'student':
+        from .agentrouter import REASONING_EFFORTS, REASONING_MODES
+        cell_final.require(settings['reasoning_effort'] in REASONING_EFFORTS and
+                           settings['reasoning_mode'] in REASONING_MODES and
+                           ('temperature' not in settings or settings['temperature'] is None),
+                           f'{role}: unsupported reasoning or temperature setting')
+    else:
+        cell_final.require(cell_final.amount(settings['temperature'],
+                                               'student temperature') <= 2,
+                           'student temperature exceeds bound')
     asset_names = {'prompt', 'harness', 'tool_grammar', 'decoding', 'provider_route'}
     if role == 'student':
         asset_names.add('training')
@@ -214,7 +226,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     seen_official_ids: set[str] = set()
     output_cells = []
     final_slot_upper_bound = Decimal(0)
-    shared_base_upper_bound = Decimal(0)
+    shared_base_final_upper_bound = Decimal(0)
+    shared_base_selection_upper_bound = Decimal(0)
     unique_final_executions = 0
     for raw in cells:
         cell = cell_final.exact(raw, {'cell_id', 'analysis_families', 'base_manifest',
@@ -269,7 +282,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                                    slot['cost_maximum'] <= campaign_all_in,
                                    f'{cell_id}/{researcher_id}: campaign all-in cap exceeded')
             else:
-                shared_base_upper_bound += slot['cost_maximum']
+                shared_base_final_upper_bound += slot['cost_maximum']
+                shared_base_selection_upper_bound += slot['cost_maximum']
         execution_owners: dict[str, str] = {}
         reuse = {}
         for researcher_id in ('shared-base', *RESEARCHERS):
@@ -288,6 +302,7 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             'analysis_family_count': len(set(family_by_task.values())),
             'qualification_sha256': base['qualification_sha256'],
             'matched_bindings': base['matched_bindings'],
+            'base_selection_cost_upper_bound_usd': str(base['cost_maximum']),
             'unique_checkpoint_count': len(execution_owners),
             'execution_evidence_owner_by_slot': reuse,
             'base': base['plan'],
@@ -296,6 +311,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     cell_final.require(seen == set(CELLS) and len(seen_official_ids) == 600,
                        'six declared cells or 600 unique identities not covered')
     campaign_reservation = campaign_all_in * len(CELLS) * len(RESEARCHERS)
+    shared_base_upper_bound = (shared_base_final_upper_bound +
+                               shared_base_selection_upper_bound)
     study_upper_bound = shared_base_upper_bound + campaign_reservation
     cell_final.require(study_upper_bound <= global_ceiling and study_upper_bound <= available,
                        'matrix all-in upper bound exceeds declared ceiling or available balance')
@@ -313,6 +330,10 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                        pre_plan['study_id'] == manifest['study_id'] and
                        protocol['budget'] == manifest['budget'] and
                        pre_plan['configuration_bindings'] == frozen_configs and
+                       pre_plan['declared_shared_base_final_cost_upper_bound_usd'] ==
+                       str(shared_base_final_upper_bound) and
+                       pre_plan['declared_shared_base_selection_cost_upper_bound_usd'] ==
+                       str(shared_base_selection_upper_bound) and
                        pre_plan['declared_shared_base_cost_upper_bound_usd'] == str(shared_base_upper_bound) and
                        pre_plan['declared_campaign_reservation_usd'] == str(campaign_reservation) and
                        pre_plan['declared_all_in_cost_upper_bound_usd'] == str(study_upper_bound),
@@ -328,7 +349,9 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             prior['official_identities_sha256'] == cell['official_identities_sha256'] and
             prior['matched_bindings'] == cell['matched_bindings'] and
             prior['sampling'] == base['sampling'] and
-            prior['execution'] == base['execution'],
+            prior['execution'] == base['execution'] and
+            prior['base_selection_cost_upper_bound_usd'] ==
+            cell['base_selection_cost_upper_bound_usd'],
             f"{cell['cell_id']}: final matrix drifted from pre-campaign cell")
     return {
         'schema': PLAN_SCHEMA, 'study_id': manifest['study_id'],
@@ -357,6 +380,10 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'nominal_tinker_cap_all_campaigns_usd': str(
             TINKER_USD_PER_CAMPAIGN * len(CELLS) * len(RESEARCHERS)),
         'declared_final_slot_cost_upper_bound_usd': str(final_slot_upper_bound),
+        'declared_shared_base_final_cost_upper_bound_usd':
+            str(shared_base_final_upper_bound),
+        'declared_shared_base_selection_cost_upper_bound_usd':
+            str(shared_base_selection_upper_bound),
         'declared_shared_base_cost_upper_bound_usd': str(shared_base_upper_bound),
         'declared_campaign_reservation_usd': str(campaign_reservation),
         'declared_all_in_cost_upper_bound_usd': str(study_upper_bound),

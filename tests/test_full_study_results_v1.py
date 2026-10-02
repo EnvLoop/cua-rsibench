@@ -154,7 +154,7 @@ class FullStudyResultAuditTests(unittest.TestCase):
             'storage_application_usd_cap_per_campaign': '5',
             'e2b_sandbox_hours_cap_per_campaign': '20',
             'per_campaign_all_in_ceiling_usd': '750',
-            'declared_all_in_cost_upper_bound_usd': '18600',
+            'declared_all_in_cost_upper_bound_usd': '19200',
             'matched_non_tinker_campaign_caps': {
                 'researcher_calls_per_campaign': 1000,
                 'teacher_rollout_tokens_per_campaign': 1000000,
@@ -289,6 +289,97 @@ class FullStudyResultAuditTests(unittest.TestCase):
         finally:
             freeze_path.write_bytes(old_freeze)
             usage_path.write_bytes(old_usage)
+
+    def test_nine_decimal_microcharge_reconciles_without_rounding(self):
+        changed = copy.deepcopy(self.index)
+        cell_id = matrix.CELLS[0]
+        owner = 'astra'
+        execution = next(row for row in changed['final_executions']
+                         if (row['cell_id'], row['owner_slot']) == (cell_id, owner))
+        campaign = next(row for row in changed['campaigns']
+                        if (row['cell_id'], row['researcher_id']) == (cell_id, owner))
+        execution_path = self.root / execution['receipt']['path']
+        usage_path = self.root / campaign['usage']['path']
+        old_execution, old_usage = execution_path.read_bytes(), usage_path.read_bytes()
+        try:
+            receipt = json.loads(old_execution)
+            receipt['cost_usd'] = '3.000000007'
+            execution_path.write_bytes(cell_final.json_bytes(receipt))
+            execution['receipt']['sha256'] = cell_final.digest(execution_path.read_bytes())
+            usage = json.loads(old_usage)
+            usage['selected_final_usd'] = '3.000000007'
+            usage['all_in_usd'] = '17.000000007'
+            usage_path.write_bytes(cell_final.json_bytes(usage))
+            campaign['usage']['sha256'] = cell_final.digest(usage_path.read_bytes())
+            audited = results.audit(self.plan, changed, self.root,
+                                    plan_sha256=self.plan_sha,
+                                    bootstrap_replicates=100)
+            self.assertEqual(audited['reported_campaign_cost_subtotal_usd'],
+                             '408.000000007')
+            self.assertEqual(audited['reported_all_in_cost_subtotal_usd'],
+                             '420.000000007')
+            self.assertFalse(audited['provider_invoice_complete'])
+        finally:
+            execution_path.write_bytes(old_execution)
+            usage_path.write_bytes(old_usage)
+
+    def test_nine_decimal_cap_overrun_is_not_rounded_down(self):
+        changed = copy.deepcopy(self.index)
+        execution = next(row for row in changed['final_executions']
+                         if row['owner_slot'] == 'shared-base')
+        path = self.root / execution['receipt']['path']
+        old = path.read_bytes()
+        try:
+            receipt = json.loads(old)
+            receipt['cost_usd'] = '100.000000001'
+            path.write_bytes(cell_final.json_bytes(receipt))
+            execution['receipt']['sha256'] = cell_final.digest(path.read_bytes())
+            with self.assertRaisesRegex(ValueError,
+                                        'final execution cost cap exceeded'):
+                results.audit(self.plan, changed, self.root,
+                              plan_sha256=self.plan_sha,
+                              bootstrap_replicates=100)
+        finally:
+            path.write_bytes(old)
+
+    def test_provider_invoice_null_is_distinct_from_exact_billed_total(self):
+        campaign = self.index['campaigns'][0]
+        freeze = results._reference_json(self.root, campaign['selection_freeze'],
+                                          'fixture freeze')
+        nominal = results._reference_json(self.root, campaign['usage'],
+                                           'fixture usage')
+        billed = copy.deepcopy(nominal)
+        billed['cost_basis'] = 'provider_billed'
+        with self.assertRaisesRegex(ValueError, 'invoice availability'):
+            results._usage(billed, cell_id=campaign['cell_id'],
+                           researcher_id=campaign['researcher_id'],
+                           plan=self.plan, freeze=freeze)
+        billed['provider_invoice_usd'] = '17.000000000'
+        results._usage(billed, cell_id=campaign['cell_id'],
+                       researcher_id=campaign['researcher_id'],
+                       plan=self.plan, freeze=freeze)
+        billed['provider_invoice_usd'] = '17.000000001'
+        with self.assertRaisesRegex(ValueError, 'invoice availability'):
+            results._usage(billed, cell_id=campaign['cell_id'],
+                           researcher_id=campaign['researcher_id'],
+                           plan=self.plan, freeze=freeze)
+        nominal['provider_invoice_usd'] = '0'
+        with self.assertRaisesRegex(ValueError, 'invoice availability'):
+            results._usage(nominal, cell_id=campaign['cell_id'],
+                           researcher_id=campaign['researcher_id'],
+                           plan=self.plan, freeze=freeze)
+        nominal['provider_invoice_usd'] = None
+        nominal['tinker_nominal_usd'] = '500.000000001'
+        nominal['all_in_usd'] = '507.000000001'
+        with self.assertRaisesRegex(ValueError,
+                                    'tinker_nominal_usd cap exceeded'):
+            results._usage(nominal, cell_id=campaign['cell_id'],
+                           researcher_id=campaign['researcher_id'],
+                           plan=self.plan, freeze=freeze)
+        with self.assertRaisesRegex(ValueError, 'at most nine decimals'):
+            results.actual_usd('0.0000000001', 'microcharge')
+        self.assertEqual(str(results.actual_usd('0.0000007', 'microcharge')),
+                         '7E-7')
 
 
 if __name__ == '__main__':

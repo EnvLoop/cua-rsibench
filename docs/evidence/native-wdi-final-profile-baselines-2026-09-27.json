@@ -1,0 +1,33 @@
+{
+  "actual_billed_usd": null,
+  "application_counts": {
+    "Calc": 50,
+    "Impress": 25,
+    "Writer": 25
+  },
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "checked_date": "2026-09-27",
+  "cleanup_reconciliation_sha256": "724ebe33eb3aa851ea3a689d70ebfc4633437af17c5271b88331157e77e6e9f2",
+  "direct_baseline_count": 99,
+  "distinct_accepted_sandbox_count": 100,
+  "final_candidate_count": 100,
+  "held_out_source_family_count": 25,
+  "historical_status_counts": {
+    "profile_baseline_failed": 2,
+    "profile_baseline_observed": 1,
+    "profile_baseline_passed": 99
+  },
+  "lease_reconciled_baseline_count": 1,
+  "native_lane_cap_usd": "40",
+  "native_lane_full_server_lease_reserve_usd": "38.66111111111111111111111111",
+  "official_full_study_desktop_admissions": 0,
+  "official_full_study_desktop_model_results": 0,
+  "private_profile_manifest_sha256": "fc17c8858170dc4ff7e473e64bb1399445adecc21854073f9021de41ec0f63e9",
+  "provider_active_probe_sha256": "6fa76df24e063cf562acf9e6d15b26ab3b69683527d7f4d3bb7265233f5667f8",
+  "provider_running_sandboxes_at_final_check": 0,
+  "runtime_manifest_sha256": "bcabfbdc7d02e4700d3d28a0c7b98ecf95fbf96d4d0d913e1f80a90fb55b0b0c",
+  "schema": "cua-native-wdi-final-profile-baseline-public-v1",
+  "scope": "Evaluator-only neutral GUI opens of the 100 hidden final native Office inputs; no model action, oracle inspection, or official final result.",
+  "task_bound_profile_baselines_qualified": 100,
+  "total_historical_profile_attempt_receipts": 102
+}

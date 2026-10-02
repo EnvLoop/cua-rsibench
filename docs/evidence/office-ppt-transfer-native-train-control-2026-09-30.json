@@ -1,0 +1,60 @@
+{
+  "initial_failed_attempts_retained": 2,
+  "model_calls": 0,
+  "native_control_roles_checked": 5,
+  "native_train_control_candidates_passed": 1,
+  "official_final_admissions": 0,
+  "package_guard_sha256": "9b9ebfda51ebf5edc8f8364629daee8f5a7975b029b07957f60de19772d95113",
+  "private_auditor_sha256": "4b64e0c354c1fabdfbb9f7088d2f31baebcddc65406f1bcef61c078a2c92497f",
+  "private_saved_audit_sha256": "dc7f46e508ea54ddc437fa19cc3d4c705acf32eefc5e74984b672f7a6a6b5129",
+  "private_visual_review_sha256": "d447a94727f1d86c594cccea9d78e7e6074fa70938d0657e1f81d3d8d52e5fa3",
+  "registered_native_train_admissions": 0,
+  "restoration_intermediates_retained": 3,
+  "roles": {
+    "collateral": {
+      "artifact_sha256": "692c946e3781f07c0538ef4bda28a4450b66c2a8ba3d80e59a05966290c90e56",
+      "correct_target_count": 4,
+      "preservation_pass": false,
+      "score": 0.0,
+      "unexpected_part_count": 1
+    },
+    "fresh_reset": {
+      "artifact_sha256": "01ca2451ca7bee171bc5a7caa1ce3cc6a714ab2d40d3abda47dbefc010232280",
+      "correct_target_count": 0,
+      "preservation_pass": true,
+      "score": 0.0,
+      "unexpected_part_count": 0
+    },
+    "near_miss": {
+      "artifact_sha256": "c0d4aafee245dc3498cf283419e07c3bfaf4e51ed2ad64da343be09377422143",
+      "correct_target_count": 3,
+      "preservation_pass": true,
+      "score": 0.0,
+      "unexpected_part_count": 0
+    },
+    "positive": {
+      "artifact_sha256": "94fab3833f43f54664d46331264b0d2ea9f5e46889b4d2f95a2ac59872addf7c",
+      "correct_target_count": 4,
+      "preservation_pass": true,
+      "score": 1.0,
+      "unexpected_part_count": 0
+    },
+    "same_file_restored": {
+      "artifact_sha256": "6bde736d7f47019c625f92a5fe92a2986d87f0a0a961877cb09096c46c724789",
+      "correct_target_count": 0,
+      "preservation_pass": true,
+      "score": 0.0,
+      "unexpected_part_count": 0
+    }
+  },
+  "schema": "envloop.office_ppt_transfer_native_train_control.public.v1",
+  "scope": "TRAIN-only manual native GUI control candidate",
+  "scorer_changed": false,
+  "scorer_sha256": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9",
+  "selection_admissions": 0,
+  "slides_individually_reviewed": 7,
+  "source_commit": "64d8411644e7e08d017752eb8976b640d2b4045a",
+  "source_equivalent_artifacts_checked": 5,
+  "targets_per_task": 4,
+  "tasks_checked": 1
+}

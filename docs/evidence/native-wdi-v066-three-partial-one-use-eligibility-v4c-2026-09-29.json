@@ -1,0 +1,25 @@
+{
+  "additional_full_lease_intents_if_separately_authorized": 9,
+  "eligibility_source_sha256": "67847cefa195f0cebe990f9814f1ddebbd209d5af98803c011065f23eb84ea81",
+  "eligible_partial_logical_task_count": 3,
+  "historical_attempts_retained_and_charged": true,
+  "independent_saved_state_and_reset_audit_required": true,
+  "maximum_new_full_trios_per_eligible_id": 1,
+  "new_e2b_creates": 0,
+  "new_stopped_v3_partial_task_count": 1,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "original_quarantined_task_count": 2,
+  "private_eligibility_sha256": "1719c4db771e067a617d88e8291b6e80e9e689a8faa9267c37bbac1fb052e454",
+  "projected_all_root_full_lease_intents_if_all_89_and_three_retried": 331,
+  "projected_reserved_usd_upper_if_separately_authorized": "55.16666666666666666666666667",
+  "required_fresh_attempts_per_trio": [
+    "positive",
+    "near-miss",
+    "cold-reset"
+  ],
+  "same_id_retry_dispatch_authorized": false,
+  "schema": "cua-native-wdi-v066-three-partial-retry-eligibility-public-v4",
+  "separate_sidecar_root_and_source_freeze_required": true,
+  "status": "one_use_full_trio_eligibility_no_dispatch_authority"
+}

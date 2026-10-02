@@ -1,0 +1,66 @@
+{
+  "applied_gui_action_types": [
+    "click",
+    "click"
+  ],
+  "applied_target_kinds": [
+    "coordinate",
+    "coordinate"
+  ],
+  "checked_date": "2026-09-27",
+  "completed_multimodal_samples": 2,
+  "failure_class": null,
+  "independent_train_reward_after_model": 0.0,
+  "live_action_alias_reply_count": 0,
+  "model": "Qwen/Qwen3.8-27B",
+  "official_full_study_final_admissions": 0,
+  "official_hidden_task_used": false,
+  "official_model_result_count": 0,
+  "post_model_full_database_filestore_reset_exact": true,
+  "pre_model_full_database_filestore_reset_exact": true,
+  "private_receipt_sha256": "e7764b63cd1889143ccd0f09326229b2cc78bf907c000d85874773dcd097d974",
+  "private_sampler_journal_sha256": "4441bc07b68b68d05860499b7beeaf7d69bda9678c9ef084d981d8626ade9f45",
+  "provider_billed_usd": null,
+  "rejected_model_action_codes": [],
+  "rendered_usage_not_billing": [
+    {
+      "basis": "rendered multimodal length and returned sample length; not billing",
+      "image_tokens": 1395,
+      "input_tokens": 4861,
+      "output_tokens": 25,
+      "prompt_cache_hit_tokens": 0,
+      "provider_billed_tokens": null
+    },
+    {
+      "basis": "rendered multimodal length and returned sample length; not billing",
+      "image_tokens": 1395,
+      "input_tokens": 4278,
+      "output_tokens": 26,
+      "prompt_cache_hit_tokens": 0,
+      "provider_billed_tokens": null
+    }
+  ],
+  "renderer_identity": {
+    "image_processor": "Qwen2VLImageProcessorPil",
+    "model": "Qwen/Qwen3.8-27B",
+    "processor_config_sha256": "f30d048e3fda7839c8b3e0e9b8559e5f4581ce7d4f9b15ccd893b9bf5c6ac45b",
+    "renderer": "qwen3_5_disable_thinking",
+    "tokenizer_vocabulary_sha256": "420ab4b96193b4325156f56cd7c3876a8a0d46f515fe4f711a7a6bf5553bf8fa"
+  },
+  "run_status": "action_budget_reached",
+  "sampling_binding_sha256": "54f90ef3186e760ee9c85f1943f1e2c17dbaa9356f5d16729865ebcff78e87fb",
+  "schema": "envloop-odoo-qwen-v065-native-train-public-v1",
+  "scope": "One original Odoo Community 18 train-only native GUI model smoke, not a hidden-final score or researcher campaign.",
+  "source_binding_sha256s": {
+    "odoo_native_adapter_sha256": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+    "selected_v065_sha256": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+    "shared_full_action_validator_sha256": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+    "shared_minimal_v062_sha256": "6e140ea2f8e7dab9bba74d689860d33c8e821fa050bd216610e28c0cc7862d5d",
+    "shared_minimal_v064_sha256": "3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70",
+    "train_runner_sha256": "5964aab60b72b64d20cd4586abfa945560278ed51fd649c0f22b0d20128fcf2d"
+  },
+  "tinker_session_closed": true,
+  "train_package_sha256": "103928c593e401ee905680c294dc9212c80f9d7d269f78e720d37484ff7ae9ef",
+  "train_task_set_manifest_sha256": "a6ec71150f365eea6edb4d327fc4b7485531885774cc1578128a52018bc77083",
+  "train_world_sha256": "0756518b932df816c88d805037d1d38805213969ad7bb5bd549abebcba5435dc"
+}

@@ -1,0 +1,14 @@
+{
+  "actor_task_sha256": "29ed2e7052acdf4bc4dd52db4d4491172f3c9f0154a24d8a1e1a2be08f3d6012",
+  "input_sha256": "8edcfd3fdbe099830596642c765413a709ae99acaf2dae3970aa307a1369f228",
+  "instance_group": "wdi-native-mex-calc-growth",
+  "oracle_sha256": "977da1f290f8727913dfe244842a9cc55805b9af829831298f8e56659677afb0",
+  "package_sha256": "40f8ca27ba65a3e4ada241a316fd7eeed28b7b37019bb0f6d70bf2991171e467",
+  "source_groups": [
+    "wdi-country:MEX"
+  ],
+  "split": "train",
+  "task_id": "wdi-native-mex-calc-growth",
+  "template_group": "train:calc-growth",
+  "workflow": "calc-growth"
+}

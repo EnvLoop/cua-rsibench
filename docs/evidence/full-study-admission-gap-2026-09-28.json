@@ -1,0 +1,68 @@
+{
+  "cell_rows": [
+    {
+      "cell": "ppt",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 0,
+      "label": "PowerPoint web",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    },
+    {
+      "cell": "excel",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 0,
+      "label": "Excel web",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    },
+    {
+      "cell": "desktop",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 100,
+      "label": "LibreOffice desktop",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    },
+    {
+      "cell": "odoo",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 100,
+      "label": "Odoo Community",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    },
+    {
+      "cell": "gitlab",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 81,
+      "label": "GitLab CE",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    },
+    {
+      "cell": "magento",
+      "fresh_v066_final_gui_trios": 0,
+      "historical_development_gui_controls": 35,
+      "label": "Magento admin",
+      "official_final_admissions": 0,
+      "offline_final_candidates": 100
+    }
+  ],
+  "date": "2026-09-28",
+  "fresh_v066_final_gui_trio_total": 0,
+  "historical_development_gui_total": 316,
+  "official_final_admission_total": 0,
+  "offline_candidate_total": 600,
+  "researcher_campaigns_completed": 0,
+  "schema": "envloop-full-study-admission-gap-figure-v1",
+  "scope": "methods_progress_not_model_results",
+  "source_receipt_sha256": {
+    "docs/evidence/full-study-readiness-offline-complete-2026-09-27.json": "9dbb9710fe5401c5f82c59645e8ccaeabc38493a1e59475d762510dc2aecdc9a",
+    "docs/evidence/gitlab-scoped-gui-progress-85-2026-09-27.json": "8e928d810d0c17b9fe98be95c9d579db16494d9f82cba5f76203b2204b6491c5",
+    "docs/evidence/magento-original-cellwide-index-drift-stop-2026-09-27.json": "d871ed9c9e8bda2bad19a1907320c08dae892048883611340be635c40b5bcf21",
+    "docs/evidence/native-wdi-v065-final-admission-preflight-2026-09-27.json": "2eef7ba653a008937784c3184267e446e758525bef6ad30f7673c2eab4e1f623",
+    "docs/evidence/odoo-official-hidden-100-gui-audit-2026-09-25.json": "63824cf042c8244750fff2254bd40ab80ab5b50cf8a54b6dfd5561ada82d5903"
+  },
+  "warning": "Historical evaluator GUI controls use different action and runtime versions; these bars are not comparable agent success rates or current-profile admission proofs."
+}

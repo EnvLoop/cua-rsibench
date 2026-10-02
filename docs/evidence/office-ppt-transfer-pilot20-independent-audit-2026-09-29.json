@@ -1,0 +1,16 @@
+{
+  "four_target_workflows_reopened": 10,
+  "independent_auditor_source_sha256": "d1cc1c7ebbb229b34134fb205a55034de7add9f6be27c7952081aa9b436e99e3",
+  "model_calls": 0,
+  "office_web_gui_admitted": 0,
+  "official_final_admitted": 0,
+  "package_layout_and_native_chart_controls_passed": 20,
+  "private_manifest_sha256": "34a584f51ee2254d726c3a37e106e18efeaf3a41b515a72766b57407876a6499",
+  "private_offline_receipt_sha256": "0b1662ea8bb71505316fb0b4b1e8f1f79d95144c232e0f01a34c178d07855142",
+  "saved_artifact_and_near_miss_controls_passed": 20,
+  "schema": "envloop-ppt-transfer-pilot20-independent-audit-v1",
+  "source_families_reopened": 2,
+  "status": "20_train_only_direct_file_controls_reopened_not_gui_admitted",
+  "train_only_task_packages_reopened": 20,
+  "visual_pdf_review_completed": false
+}

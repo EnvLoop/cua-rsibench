@@ -261,6 +261,19 @@ def _strict_json(raw: str | dict) -> dict:
     if type(raw) is not str or len(raw.encode('utf-8', errors='ignore')) > 65536:
         raise ContractError('invalid_action_json')
 
+    # A single whole-response Markdown fence is presentation syntax, not an
+    # action. Normalize it identically for base and selected checkpoints before
+    # applying the unchanged strict JSON/schema/current-frame validators.
+    stripped = raw.strip()
+    if stripped.startswith('```'):
+        lines = stripped.splitlines()
+        if (len(lines) < 3 or lines[0] not in ('```', '```json')
+                or lines[-1] != '```'):
+            raise ContractError('invalid_action_json')
+        raw = '\n'.join(lines[1:-1])
+        if not raw.strip():
+            raise ContractError('invalid_action_json')
+
     def unique_pairs(pairs):
         value = {}
         for key, item in pairs:

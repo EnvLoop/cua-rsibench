@@ -12,13 +12,15 @@ import hashlib
 import io
 import json
 import math
+import os
 import random
 import xmlrpc.client
 from datetime import date, timedelta
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[1]
+CODE_DIR = Path(__file__).resolve().parent
+HERE = Path(os.environ.get("ENVLOOP_ODOO_WORKER_DIR", CODE_DIR)).resolve()
+REPO = CODE_DIR.parents[1]
 PRIVATE = HERE / "private"
 SOURCE = REPO / "sec_excel_factory/sources/retail_excerpt.json"
 BASE_URL = "http://127.0.0.1:8078"

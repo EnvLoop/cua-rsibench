@@ -1,0 +1,22 @@
+{
+  "actor_actions": 0,
+  "actual_guest_fact_mode": 384,
+  "fact_bytes": 7330,
+  "fact_records": 12,
+  "model_calls": 0,
+  "native_owned_window_identity_found_in_parent_chain": false,
+  "native_qualification_passed": false,
+  "native_result_sha256": "376e65448719a7696d18515dc43cfd5fee93b7082397e3176d20fc13563d37c8",
+  "official_task_credit": 0,
+  "original_ancestry_refusal_preserved": true,
+  "owned_cleanup_receipt_sha256": "8cdbd88753d983c8a8c963661f26affa081fc87c8fd09c82ffb3731b499d2295",
+  "owned_guest_closure_verified": true,
+  "physical_window_association": "unknown",
+  "private_fact_journal_sha256": "482ef94451e9212be7d361524a39fa9ab0353a349ab6774d5b974ef03293c2c6",
+  "proxy_identity_mismatch": false,
+  "same_pid_not_used_as_ownership": true,
+  "schema": "envloop-public-native-desktop-v33-root-diagnostic-v1",
+  "source_files_checked": 38,
+  "source_files_matching_current_main": 38,
+  "status": "different_native_frame_identity_observed_ownership_unresolved"
+}

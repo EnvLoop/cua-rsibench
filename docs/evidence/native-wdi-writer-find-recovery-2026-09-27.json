@@ -1,0 +1,26 @@
+{
+  "checked_date": "2026-09-27",
+  "classification": "evaluator_native_GUI_focus_failures_not_model_failures",
+  "fresh_near_miss_receipt_sha256": "83a089ad475ba5e7739d584a1ed235522c0b9c065e55840c5e72dbe4dbf78178",
+  "fresh_near_miss_result": "exactly_one_target_error_no_collateral_change",
+  "fresh_retry_run_receipt_sha256": "884a2a20bd7c1bed4206f1261b932ed3242bc3c0d0e979f76b2b09d815a4a9cf",
+  "note": "Two prior Ctrl+F/Ctrl+H GUI scripts altered non-target content and remain independently rejected; each was archived before one fresh guarded per-statement Find-and-Replace control completed the GUI gate.",
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "opaque_task_ref": "04fe7782b4fce5014dc9fc0bcfb98de5f9288e5c6361902a8867e37a07455ac2",
+  "preserved_failed_near_miss_count": 2,
+  "preserved_failures": [
+    {
+      "archive_ledger_sha256": "1b808e73673fbf792272329debc2b61192e3c4b0a9a71ce3428199fa7eeee476",
+      "failed_receipt_sha256": "ba9f037e368a9cf8f6da8b70c735d5813c1ed826c27f4daa6e128542e7579893",
+      "failed_saved_docx_sha256": "5035f35fbf96c31db664b5f7b82fb28a056b6c18e5c16b899a9f29697e26017b"
+    },
+    {
+      "archive_ledger_sha256": "e5a9d70e3a6072a3ec1970a5744f91e03ed2c7389910d8cb69180f2fbb3a90e8",
+      "failed_receipt_sha256": "b28b16f9461b1aad9e8b79cdd2f8c9a1e29eae1775792baa28a18a914963481e",
+      "failed_saved_docx_sha256": "c5cf649e773726667d73c161d6403fe3a4a31ab8b8da6b92e01618c2f102f87a"
+    }
+  ],
+  "schema": "cua-native-writer-find-focus-public-recovery-v1",
+  "separate_health_probe_sha256": "34673db877e0643d43765ad5eff53d3f0fb0a969e95f41f30c26aef216578c20"
+}

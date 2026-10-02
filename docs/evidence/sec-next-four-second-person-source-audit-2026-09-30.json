@@ -1,0 +1,29 @@
+{
+  "author_review_sha256": "657fb74cb1cef2e0130d570b319dcf7d1a054257fd8c8aa48a78506adf531d77",
+  "bank_annual_average_facts_untagged_table_only": true,
+  "bank_graphs": 2,
+  "bank_same_accession_companyfacts_checks": 20,
+  "disclosed_dash_fields": 1,
+  "distinct_issuers": 4,
+  "excel_web_gui_controls": 0,
+  "fields_with_numeric_values": 58,
+  "fiscal_years_checked": [
+    2024,
+    2025
+  ],
+  "mismatches": 32,
+  "model_calls": 0,
+  "not_separately_reported_fields": 6,
+  "numeric_and_presence_fields_compared": 64,
+  "official_final_admissions": 0,
+  "pension_dimensioned_facts_not_claimed_companyfacts_verified": true,
+  "pension_graphs": 2,
+  "pension_unreported_separate_from_filed_zero": true,
+  "private_independent_audit_sha256": "8528276bd54254a30d3e820c2c9f36a7933ec7445d6f989a04752c74a006784d",
+  "raw_source_bundles_reopened": 4,
+  "schema": "envloop.sec_excel_train_next_four_second_person.public.v1",
+  "scope_dimension_metadata_mismatches": 32,
+  "sign_and_scope_conventions_checked": true,
+  "source_plan_sha256": "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa",
+  "status": "source_values_match_scope_metadata_correction_required"
+}

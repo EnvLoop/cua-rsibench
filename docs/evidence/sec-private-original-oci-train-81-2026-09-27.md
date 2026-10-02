@@ -1,0 +1,11 @@
+# Original-filing OCI train calibration case
+
+The [aggregate receipt](sec-private-original-oci-train-81-2026-09-27.json) extends the [80-case checkpoint](sec-private-original-r-fragment-interest-final-80-2026-09-27.md) by one evaluator-private **train** candidate from a distinct original SEC 10-K for an already reserved train issuer. It uses a previously pinned direct-original source control manifest; no new SEC request was made during the current rate-limit cooldown.
+
+The case checks **12 selected numeric facts** and five supporting original disclosures. Both years’ accumulated-OCI changes reconcile to their filed flow values, profit plus OCI reconciles to comprehensive income, and total assets less liabilities reconciles to total equity. The workbook keeps the issuer’s exact “Accumulated income” label and records that this filing has no separate noncontrolling-interest line. Synthetic OCI stress is labeled separately from filing facts.
+
+The ten-sheet actor/reference pair passes **57** independent saved-OOXML formula targets. The unrepaired actor fails, all **nine** unmarked defects are individually detected, and two source/scenario counterfactual profiles, hardcoded-target and unauthorized-source-edit negatives, old train-case regression, and visual sheet review pass.
+
+The integrated offline screen now covers **81 unique original filing accessions**, **28 issuer families**, **15 private workflow graphs including 12 final types**, **1,191 checked task-specific numeric facts**, **5,710 formula targets**, and **729 individually detected faults**. The 20/20/100 ledger has **8 train, 7 selection and 66 final offline candidates**. **59 reservations remain empty**: 12 train, 13 selection and 34 final. Source and semantic split isolation and the five-case-per-issuer cap pass.
+
+These remain offline candidates. Structural qualification is **0**, and official hidden-final Microsoft Excel for the web admission is **0/100**. Every final ID still requires its own saved/downloaded Excel-web readback and fresh-copy reset. Public SHA-256 commitments bind evaluator-private source and workbook evidence without disclosing hidden issuer identities, filings, tasks, or gold. The source method uses [SEC EDGAR original filings](https://www.sec.gov/edgar/search/); the SEC does not endorse this benchmark.

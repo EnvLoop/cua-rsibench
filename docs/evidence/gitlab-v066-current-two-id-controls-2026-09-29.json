@@ -1,0 +1,17 @@
+{
+  "all_100_controls_independently_validated": false,
+  "completed_task_count": 2,
+  "historical_first_attempt_failures_retained": 6,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "pending_intent": false,
+  "plan_sha256": "f0f97459075fd2a166e39947e9ba61b8f4a474d2cd4e21e69a966db93c2c3f53",
+  "private_audit_sha256": "1859a743af1e11ee8dbcfc400823d25912c624d67682b2e139a460ffcbc16080",
+  "remaining_task_count": 98,
+  "researcher_campaigns": 0,
+  "schema": "envloop-gitlab-v066-control-audit-public-v1",
+  "source_bundle_sha256": "7cde198b8b48da8b3f1433cd54671913914a79ee7143415e727e1a6c9394a9cb",
+  "status": "source_bound_evaluator_controls_only_not_official_admission",
+  "terminal_failure": false,
+  "v06_unissued_proof_material_source_bound_to_raw_receipts": false
+}

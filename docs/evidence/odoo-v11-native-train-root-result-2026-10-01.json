@@ -1,0 +1,29 @@
+{
+  "actual_applied_control_actions": 20,
+  "final_controls_completed": 0,
+  "full_guard_images_reopened": 40,
+  "full_pre_web_filestore_reset_exact": true,
+  "model_calls": 0,
+  "native_adapter_binding_sha256": "e61e594f59b08efd05a97f0c37e7509ae85df3387ceaa1ca7722c08f8dc1e4fb",
+  "native_surface_policy_sha256": "c0bea1934c9021442c1ab6e196ef89d23abc1cf022db4ab3a0219b9735894181",
+  "native_worker_binding_sha256": "02beb8d7341ea1ccaee38c05eedaf94dc2615c1020d74a80205bf05a39f08ac3",
+  "official_final_admitted": 0,
+  "official_final_outcomes_completed": 0,
+  "official_researcher_campaigns_completed": 0,
+  "original_services_restored": true,
+  "protected_source_files_checked": 16,
+  "saved_scores": [
+    0.0,
+    1.0,
+    0.0
+  ],
+  "schema": "envloop-odoo-v11-native-train-root-result-v1",
+  "selection_controls_completed": 0,
+  "source_asset_sha256": "94a5b246e1d0906266dcf9fa2b85407144d671856ada1b6ec354b7ec4683e480",
+  "source_frame_sha256": "74765bbcf37fd3f98682947f2d4155b020d606a9defa6ed5e05925dcc285919c",
+  "source_matches_deterministic_train_package": true,
+  "source_review_sha256": "9bf4047281ed9cbab50b0d36352d5fcff2ef0d76d56045b743674aa1ed1a7116",
+  "source_visual_review_verified": true,
+  "status": "fresh_train_control_independently_replayed_and_visually_reviewed",
+  "train_control_sha256": "6f5b83755d06cc1e5a68ee57bd444a4af76adbe9e82a9605a91a26bbcc499242"
+}

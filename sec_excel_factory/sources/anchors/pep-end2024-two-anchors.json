@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "PEP",
+  "cik": 77476,
+  "entity_name": "PepsiCo, Inc.",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000077476.json",
+  "proxy_raw_json_sha256": "7694c322779ef273d15b3791729e5f2d261ce6ed1839be8ff014a33f537375be",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/77476/000007747625000007/0000077476-25-000007-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/77476/000007747625000007/pep-20241228.htm",
+  "filing_accession": "0000077476-25-000007",
+  "filing_filed": "2025-02-04",
+  "filing_period_end": "2024-12-28",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "178c0e5a97f1d88dacbf",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-12-28",
+      "value": 99467000000,
+      "accession": "0000077476-25-000007",
+      "filed": "2025-02-04",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "b14d726f8a9c3bb53bda",
+      "concept": "Revenues",
+      "unit": "USD",
+      "start": "2023-12-31",
+      "end": "2024-12-28",
+      "value": 91854000000,
+      "accession": "0000077476-25-000007",
+      "filed": "2025-02-04",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

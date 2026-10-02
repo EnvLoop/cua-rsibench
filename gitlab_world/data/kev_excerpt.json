@@ -1,0 +1,1683 @@
+{
+  "license": "CC0-1.0; no CISA/DHS logo or endorsement",
+  "records": [
+    {
+      "cveID": "CVE-2013-1331",
+      "cwes": [
+        "CWE-119"
+      ],
+      "dateAdded": "2022-06-08",
+      "dueDate": "2022-06-22",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Office",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Microsoft Office contains a buffer overflow vulnerability that allows remote attackers to execute code via crafted PNG data in an Office document.",
+      "vendorProject": "Microsoft",
+      "vulnerabilityName": "Microsoft Office Buffer Overflow Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-3519",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2023-07-19",
+      "dueDate": "2023-08-09",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "NetScaler ADC and NetScaler Gateway",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Citrix NetScaler ADC and NetScaler Gateway contains a code injection vulnerability that allows for unauthenticated remote code execution.",
+      "vendorProject": "Citrix",
+      "vulnerabilityName": "Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-39197",
+      "cwes": [
+        "CWE-20",
+        "CWE-79"
+      ],
+      "dateAdded": "2023-03-30",
+      "dueDate": "2023-04-20",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Cobalt Strike",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Fortra Cobalt Strike contains a cross-site scripting (XSS) vulnerability in Teamserver that would allow an attacker to set a malformed username in the Beacon configuration, allowing them to execute code remotely.",
+      "vendorProject": "Fortra",
+      "vulnerabilityName": "Fortra Cobalt Strike Teamserver Cross-Site Scripting (XSS) Vulnerability"
+    },
+    {
+      "cveID": "CVE-2017-12149",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2021-12-10",
+      "dueDate": "2022-06-10",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "JBoss Application Server",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The JBoss Application Server, shipped with Red Hat Enterprise Application Platform 5.2, allows an attacker to execute arbitrary code via crafted serialized data.",
+      "vendorProject": "Red Hat",
+      "vulnerabilityName": "Red Hat JBoss Application Server Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-27103",
+      "cwes": [
+        "CWE-918"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "FTA",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Accellion FTA contains a server-side request forgery (SSRF) vulnerability exploited via a crafted POST request to wmProgressstat.html.",
+      "vendorProject": "Accellion",
+      "vulnerabilityName": "Accellion FTA Server-Side Request Forgery (SSRF) Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-0193",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2021-12-10",
+      "dueDate": "2022-06-10",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Solr",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The optional Apache Solr module DataImportHandler contains a code injection vulnerability.",
+      "vendorProject": "Apache",
+      "vulnerabilityName": "Apache Solr DataImportHandler Code Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-30563",
+      "cwes": [
+        "CWE-122",
+        "CWE-843"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Chromium V8",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Google Chromium V8 Engine contains a type confusion vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+      "vendorProject": "Google",
+      "vulnerabilityName": "Google Chromium V8 Type Confusion Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-37055",
+      "cwes": [
+        "CWE-120"
+      ],
+      "dateAdded": "2025-12-08",
+      "dueDate": "2025-12-29",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Routers",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "D-Link Routers contains a buffer overflow vulnerability that has a high impact on confidentiality, integrity, and availability. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+      "vendorProject": "D-Link",
+      "vulnerabilityName": "D-Link Routers Buffer Overflow Vulnerability"
+    },
+    {
+      "cveID": "CVE-2017-16651",
+      "cwes": [
+        "CWE-552"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Roundcube Webmail",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Roundcube Webmail contains a file disclosure vulnerability caused by insufficient input validation in conjunction with file-based attachment plugins, which are used by default.",
+      "vendorProject": "Roundcube",
+      "vulnerabilityName": "Roundcube Webmail File Disclosure Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-20821",
+      "cwes": [
+        "CWE-923"
+      ],
+      "dateAdded": "2022-05-23",
+      "dueDate": "2022-06-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "IOS XR",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Cisco IOS XR software health check opens TCP port 6379 by default on activation. An attacker can connect to the Redis instance on the open port and allow access to the Redis instance that is running within the NOSi container.",
+      "vendorProject": "Cisco",
+      "vulnerabilityName": "Cisco IOS XR Open Port Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-21975",
+      "cwes": [
+        "CWE-918"
+      ],
+      "dateAdded": "2022-01-18",
+      "dueDate": "2022-02-01",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "vRealize Operations Manager API",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Server Side Request Forgery (SSRF) in vRealize Operations Manager API prior to 8.4 may allow a malicious actor with network access to the vRealize Operations Manager API to perform a SSRF attack to steal administrative credentials.",
+      "vendorProject": "VMware",
+      "vulnerabilityName": "VMware Server Side Request Forgery in vRealize Operations Manager API"
+    },
+    {
+      "cveID": "CVE-2023-37450",
+      "cwes": [],
+      "dateAdded": "2023-07-13",
+      "dueDate": "2023-08-03",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Products",
+      "requiredAction": "Apply updates per vendor instructions or discontinue use of the product if updates are unavailable.",
+      "shortDescription": "Apple iOS, iPadOS, macOS, and Safari WebKit contain an unspecified vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+      "vendorProject": "Apple",
+      "vulnerabilityName": "Apple Multiple Products WebKit Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-30154",
+      "cwes": [
+        "CWE-506"
+      ],
+      "dateAdded": "2025-03-24",
+      "dueDate": "2025-04-14",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "action-setup GitHub Action",
+      "requiredAction": "Apply mitigations as set forth in the CISA instructions linked below. Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "reviewdog action-setup GitHub Action contains an embedded malicious code vulnerability that dumps exposed secrets to Github Actions Workflow Logs.",
+      "vendorProject": "reviewdog",
+      "vulnerabilityName": "reviewdog/action-setup GitHub Action Embedded Malicious Code Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-32433",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2025-06-09",
+      "dueDate": "2025-06-30",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Erlang/OTP",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Erlang Erlang/OTP SSH server contains a missing authentication for critical function vulnerability. This could allow an attacker to execute arbitrary commands without valid credentials, potentially leading to unauthenticated remote code execution (RCE). By exploiting a flaw in how SSH protocol messages are handled, a malicious actor could gain unauthorized access to affected systems. This vulnerability could affect various products that implement Erlang/OTP SSH server, including—but not limited to—Cisco, NetApp, and SUSE.",
+      "vendorProject": "Erlang",
+      "vulnerabilityName": "Erlang Erlang/OTP SSH Server Missing Authentication for Critical Function Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-25372",
+      "cwes": [
+        "CWE-787"
+      ],
+      "dateAdded": "2023-06-29",
+      "dueDate": "2023-07-20",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Mobile Devices",
+      "requiredAction": "Apply updates per vendor instructions or discontinue use of the product if updates are unavailable",
+      "shortDescription": "Samsung mobile devices contain an improper boundary check vulnerability within DSP driver that allows for out-of-bounds memory access.",
+      "vendorProject": "Samsung",
+      "vulnerabilityName": "Samsung Mobile Devices Improper Boundary Check Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-9377",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2025-09-03",
+      "dueDate": "2025-09-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Routers",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "TP-Link Archer C7(EU) and TL-WR841N/ND(MS) contain an OS command injection vulnerability that exists in the Parental Control page. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+      "vendorProject": "TP-Link",
+      "vulnerabilityName": "TP-Link Archer C7(EU) and TL-WR841N/ND(MS) OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-12271",
+      "cwes": [
+        "CWE-89"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "SFOS",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Sophos Firewall operating system (SFOS) firmware contains a SQL injection vulnerability when configured with either the administration (HTTPS) service or the User Portal is exposed on the WAN zone. Successful exploitation may cause remote code execution to exfiltrate usernames and hashed passwords for the local device admin(s), portal admins, and user accounts used for remote access (but not external Active Directory or LDAP passwords).",
+      "vendorProject": "Sophos",
+      "vulnerabilityName": "Sophos SFOS SQL Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-14933",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2024-12-18",
+      "dueDate": "2025-01-08",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "NVRmini Devices",
+      "requiredAction": "The impacted product is end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue utilization of the product.",
+      "shortDescription": "NUUO NVRmini devices contain an OS command injection vulnerability. This vulnerability allows remote command execution via shell metacharacters in the uploaddir parameter for a writeuploaddir command.",
+      "vendorProject": "NUUO",
+      "vulnerabilityName": "NUUO NVRmini Devices OS Command Injection Vulnerability "
+    },
+    {
+      "cveID": "CVE-2021-33044",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2024-08-21",
+      "dueDate": "2024-09-11",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "IP Camera Firmware",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Dahua IP cameras and related products contain an authentication bypass vulnerability when the NetKeyboard type argument is specified by the client during authentication.",
+      "vendorProject": "Dahua",
+      "vulnerabilityName": "Dahua IP Camera Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-42999",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2025-05-15",
+      "dueDate": "2025-06-05",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "NetWeaver",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "SAP NetWeaver Visual Composer Metadata Uploader contains a deserialization vulnerability that allows a privileged attacker to compromise the confidentiality, integrity, and availability of the host system by deserializing untrusted or malicious content.",
+      "vendorProject": "SAP",
+      "vulnerabilityName": "SAP NetWeaver Deserialization Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-11708",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2022-05-23",
+      "dueDate": "2022-06-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Firefox and Thunderbird",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Mozilla Firefox and Thunderbird contain a sandbox escape vulnerability that could result in remote code execution.",
+      "vendorProject": "Mozilla",
+      "vulnerabilityName": "Mozilla Firefox and Thunderbird Sandbox Escape Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-21587",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2023-02-02",
+      "dueDate": "2023-02-23",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "E-Business Suite",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Oracle E-Business Suite contains an unspecified vulnerability that allows an unauthenticated attacker with network access via HTTP to compromise Oracle Web Applications Desktop Integrator.",
+      "vendorProject": "Oracle",
+      "vulnerabilityName": "Oracle E-Business Suite Unspecified Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-29824",
+      "cwes": [
+        "CWE-89"
+      ],
+      "dateAdded": "2024-10-02",
+      "dueDate": "2024-10-23",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Endpoint Manager (EPM)",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Ivanti Endpoint Manager (EPM) contains a SQL injection vulnerability in Core server that allows an unauthenticated attacker within the same network to execute arbitrary code. ",
+      "vendorProject": "Ivanti",
+      "vulnerabilityName": "Ivanti Endpoint Manager (EPM) SQL Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-10068",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Xperience",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Kentico contains a failure to validate security headers. This deserialization can led to unauthenticated remote code execution.",
+      "vendorProject": "Kentico",
+      "vulnerabilityName": "Kentico Xperience Deserialization of Untrusted Data Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-36742",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Apex One, Apex One as a Service, and Worry-Free Business Security",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Trend Micro Apex One, Apex One as a Service, and Worry-Free Business Security contain an improper input validation vulnerability that allows for privilege escalation.",
+      "vendorProject": "Trend Micro",
+      "vulnerabilityName": "Trend Micro Multiple Products Improper Input Validation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2012-1823",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "PHP",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "sapi/cgi/cgi_main.c in PHP, when configured as a CGI script, does not properly handle query strings, which allows remote attackers to execute arbitrary code.",
+      "vendorProject": "PHP",
+      "vulnerabilityName": "PHP-CGI Query String Parameter Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-37415",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2021-12-01",
+      "dueDate": "2021-12-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "ManageEngine ServiceDesk Plus (SDP)",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Zoho ManageEngine ServiceDesk Plus before 11302 is vulnerable to authentication bypass that allows a few REST-API URLs without authentication",
+      "vendorProject": "Zoho",
+      "vulnerabilityName": "Zoho ManageEngine ServiceDesk Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2015-1187",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Devices",
+      "requiredAction": "The impacted product is end-of-life and should be disconnected if still in use.",
+      "shortDescription": "The ping tool in multiple D-Link and TRENDnet devices allow remote attackers to perform remote code execution.",
+      "vendorProject": "D-Link and TRENDnet",
+      "vulnerabilityName": "D-Link and TRENDnet Multiple Devices Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2014-7169",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2022-01-28",
+      "dueDate": "2022-07-28",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Bourne-Again Shell (Bash)",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "GNU Bash through 4.3 processes trailing strings after function definitions in the values of environment variables, which allows remote attackers to execute code. This CVE correctly remediates the vulnerability in CVE-2014-6271.",
+      "vendorProject": "GNU",
+      "vulnerabilityName": "GNU Bourne-Again Shell (Bash) Arbitrary Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-54236",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2025-10-24",
+      "dueDate": "2025-11-14",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Commerce and Magento",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Adobe Commerce and Magento Open Source contain an improper input validation vulnerability that could allow an attacker to take over customer accounts through the Commerce REST API.",
+      "vendorProject": "Adobe",
+      "vulnerabilityName": "Adobe Commerce and Magento Improper Input Validation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2016-3714",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2024-09-09",
+      "dueDate": "2024-09-30",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "ImageMagick",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "ImageMagick contains an improper input validation vulnerability that affects the EPHEMERAL, HTTPS, MVG, MSL, TEXT, SHOW, WIN, and PLT coders. This allows a remote attacker to execute arbitrary code via shell metacharacters in a crafted image.",
+      "vendorProject": "ImageMagick",
+      "vulnerabilityName": "ImageMagick Improper Input Validation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-40407",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2024-12-18",
+      "dueDate": "2025-01-08",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "RLC-410W IP Camera",
+      "requiredAction": "The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization if a current mitigation is unavailable.",
+      "shortDescription": "Reolink RLC-410W IP cameras contain an authenticated OS command injection vulnerability in the device network settings functionality.",
+      "vendorProject": "Reolink",
+      "vulnerabilityName": "Reolink RLC-410W IP Camera OS Command Injection Vulnerability "
+    },
+    {
+      "cveID": "CVE-2023-48365",
+      "cwes": [
+        "CWE-444"
+      ],
+      "dateAdded": "2025-01-13",
+      "dueDate": "2025-02-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Sense",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Qlik Sense contains an HTTP tunneling vulnerability that allows an attacker to escalate privileges and execute HTTP requests on the backend server hosting the software.",
+      "vendorProject": "Qlik",
+      "vulnerabilityName": "Qlik Sense HTTP Tunneling Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-11652",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Salt",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "SaltStack Salt contains a path traversal vulnerability in the salt-master process ClearFuncs which allows directory access to authenticated users. Salt users who follow fundamental internet security guidelines and best practices are not affected by this vulnerability.",
+      "vendorProject": "SaltStack",
+      "vulnerabilityName": "SaltStack Salt Path Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-27038",
+      "cwes": [
+        "CWE-416"
+      ],
+      "dateAdded": "2025-06-03",
+      "dueDate": "2025-06-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Chipsets",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Multiple Qualcomm chipsets contain a use-after-free vulnerability. This vulnerability allows for memory corruption while rendering graphics using Adreno GPU drivers in Chrome.",
+      "vendorProject": "Qualcomm",
+      "vulnerabilityName": "Qualcomm Multiple Chipsets Use-After-Free Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-8876",
+      "cwes": [],
+      "dateAdded": "2025-08-13",
+      "dueDate": "2025-08-20",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "N-Central",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "N-able N-Central contains a command injection vulnerability via improper sanitization of user input.",
+      "vendorProject": "N-able",
+      "vulnerabilityName": "N-able N-Central Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2017-17562",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2021-12-10",
+      "dueDate": "2022-06-10",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "GoAhead",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Embedthis GoAhead before 3.6.5 allows remote code execution if CGI is enabled and a CGI program is dynamically linked.",
+      "vendorProject": "Embedthis",
+      "vulnerabilityName": "Embedthis GoAhead Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-0012",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2024-11-18",
+      "dueDate": "2024-12-09",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "PAN-OS",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable. Additionally, management interface for affected devices should not be exposed to untrusted networks, including the internet.",
+      "shortDescription": "Palo Alto Networks PAN-OS contains an authentication bypass vulnerability in the web-based management interface for several PAN-OS products, including firewalls and VPN concentrators.",
+      "vendorProject": "Palo Alto Networks",
+      "vulnerabilityName": "Palo Alto Networks PAN-OS Management Interface Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-49897",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2023-12-21",
+      "dueDate": "2024-01-11",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "AE1021, AE1021PE",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "FXC AE1021 and AE1021PE contain an OS command injection vulnerability that allows authenticated users to execute commands via a network.",
+      "vendorProject": "FXC",
+      "vulnerabilityName": "FXC AE1021, AE1021PE OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-6789",
+      "cwes": [
+        "CWE-119"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Exim",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Exim contains a buffer overflow vulnerability in the base64d function part of the SMTP listener that may allow for remote code execution.",
+      "vendorProject": "Exim",
+      "vulnerabilityName": "Exim Buffer Overflow Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-50302",
+      "cwes": [
+        "CWE-908"
+      ],
+      "dateAdded": "2025-03-04",
+      "dueDate": "2025-03-25",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Kernel",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "The Linux kernel contains a use of uninitialized resource vulnerability that allows an attacker to leak kernel memory via a specially crafted HID report.",
+      "vendorProject": "Linux",
+      "vulnerabilityName": "Linux Kernel Use of Uninitialized Resource Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-23006",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2025-01-24",
+      "dueDate": "2025-02-14",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "SMA1000 Appliances",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "SonicWall SMA1000 Appliance Management Console (AMC) and Central Management Console (CMC) contain a deserialization of untrusted data vulnerability, which can enable a remote, unauthenticated attacker to execute arbitrary OS commands.",
+      "vendorProject": "SonicWall",
+      "vulnerabilityName": "SonicWall SMA1000 Appliances Deserialization Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-45519",
+      "cwes": [
+        "CWE-284"
+      ],
+      "dateAdded": "2024-10-03",
+      "dueDate": "2024-10-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Zimbra Collaboration Suite (ZCS)",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Synacor Zimbra Collaboration Suite (ZCS) contains an unspecified vulnerability in the postjournal service that may allow an unauthenticated user to execute commands.",
+      "vendorProject": "Synacor",
+      "vulnerabilityName": "Synacor Zimbra Collaboration Suite (ZCS) Command Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-28799",
+      "cwes": [
+        "CWE-285"
+      ],
+      "dateAdded": "2022-03-31",
+      "dueDate": "2022-04-21",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Network Attached Storage (NAS)",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "QNAP NAS running HBS 3 contains an improper authorization vulnerability which can allow remote attackers to log in to a device.",
+      "vendorProject": "QNAP",
+      "vulnerabilityName": "QNAP NAS Improper Authorization Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-32315",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2023-08-24",
+      "dueDate": "2023-09-14",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Openfire",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Ignite Realtime Openfire contains a path traversal vulnerability that allows an unauthenticated attacker to access restricted pages in the Openfire Admin Console reserved for administrative users.",
+      "vendorProject": "Ignite Realtime",
+      "vulnerabilityName": "Ignite Realtime Openfire Path Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-14733",
+      "cwes": [
+        "CWE-787"
+      ],
+      "dateAdded": "2025-12-19",
+      "dueDate": "2025-12-26",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Firebox",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "WatchGuard Fireware OS iked process contains an out of bounds write vulnerability in the OS iked process. This vulnerability may allow a remote unauthenticated attacker to execute arbitrary code and affects both the mobile user VPN with IKEv2 and the branch office VPN using IKEv2 when configured with a dynamic gateway peer.",
+      "vendorProject": "WatchGuard",
+      "vulnerabilityName": "WatchGuard Firebox Out of Bounds Write Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-47827",
+      "cwes": [
+        "CWE-324"
+      ],
+      "dateAdded": "2025-10-14",
+      "dueDate": "2025-11-04",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "IGEL OS",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "IGEL OS contains a use of a key past its expiration date vulnerability that allows for Secure Boot bypass. The igel-flash-driver module improperly verifies a cryptographic signature. Ultimately, a crafted root filesystem can be mounted from an unverified SquashFS image.",
+      "vendorProject": "IGEL",
+      "vulnerabilityName": "IGEL OS Use of a Key Past its Expiration Date Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-1003030",
+      "cwes": [],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Matrix Project Plugin",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Jenkins Matrix Project plugin contains a vulnerability which can allow users to escape the sandbox, opening opportunity to perform remote code execution.",
+      "vendorProject": "Jenkins",
+      "vulnerabilityName": "Jenkins Matrix Project Plugin Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-10758",
+      "cwes": [],
+      "dateAdded": "2021-12-10",
+      "dueDate": "2022-06-10",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "mongo-express",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "mongo-express before 0.54.0 is vulnerable to Remote Code Execution via endpoints that uses the `toBSON` method.",
+      "vendorProject": "MongoDB",
+      "vulnerabilityName": "MongoDB mongo-express Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-7028",
+      "cwes": [
+        "CWE-284"
+      ],
+      "dateAdded": "2024-05-01",
+      "dueDate": "2024-05-22",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "GitLab CE/EE",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "GitLab Community and Enterprise Editions contain an improper access control vulnerability. This allows an attacker to trigger password reset emails to be sent to an unverified email address to ultimately facilitate an account takeover.",
+      "vendorProject": "GitLab",
+      "vulnerabilityName": "GitLab Community and Enterprise Editions Improper Access Control Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-19410",
+      "cwes": [],
+      "dateAdded": "2025-02-04",
+      "dueDate": "2025-02-25",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "PRTG Network Monitor",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Paessler PRTG Network Monitor contains a local file inclusion vulnerability that allows a remote, unauthenticated attacker to create users with read-write privileges (including administrator).",
+      "vendorProject": "Paessler",
+      "vulnerabilityName": "Paessler PRTG Network Monitor Local File Inclusion Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-14847",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2021-12-01",
+      "dueDate": "2022-06-01",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "RouterOS",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "MikroTik RouterOS through 6.42 allows unauthenticated remote attackers to read arbitrary files and remote authenticated attackers to write arbitrary files due to a directory traversal vulnerability in the WinBox interface.",
+      "vendorProject": "MikroTik",
+      "vulnerabilityName": "MikroTik Router OS Directory Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2017-11357",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2023-01-26",
+      "dueDate": "2023-02-16",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "User Interface (UI) for ASP.NET AJAX",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Telerik UI for ASP.NET AJAX contains an insecure direct object reference vulnerability in RadAsyncUpload that can result in file uploads in a limited location and/or remote code execution.",
+      "vendorProject": "Telerik",
+      "vulnerabilityName": "Telerik UI for ASP.NET AJAX Insecure Direct Object Reference Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-21551",
+      "cwes": [
+        "CWE-782"
+      ],
+      "dateAdded": "2022-03-31",
+      "dueDate": "2022-04-21",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "dbutil Driver",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Dell dbutil driver contains an insufficient access control vulnerability which may lead to escalation of privileges, denial-of-service (DoS), or information disclosure.",
+      "vendorProject": "Dell",
+      "vulnerabilityName": "Dell dbutil Driver Insufficient Access Control Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-35674",
+      "cwes": [],
+      "dateAdded": "2023-09-13",
+      "dueDate": "2023-10-04",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Framework",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Android Framework contains an unspecified vulnerability that allows for privilege escalation.",
+      "vendorProject": "Android",
+      "vulnerabilityName": "Android Framework Privilege Escalation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-54085",
+      "cwes": [
+        "CWE-290"
+      ],
+      "dateAdded": "2025-06-25",
+      "dueDate": "2025-07-16",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "MegaRAC SPx",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "AMI MegaRAC SPx contains an authentication bypass by spoofing vulnerability in the Redfish Host Interface. A successful exploitation of this vulnerability may lead to a loss of confidentiality, integrity, and/or availability.",
+      "vendorProject": "AMI",
+      "vulnerabilityName": "AMI MegaRAC SPx Authentication Bypass by Spoofing Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-28995",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2024-07-17",
+      "dueDate": "2024-08-07",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Serv-U",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "SolarWinds Serv-U contains a path traversal vulnerability that allows an attacker access to read sensitive files on the host machine.",
+      "vendorProject": "SolarWinds",
+      "vulnerabilityName": "SolarWinds Serv-U Path Traversal Vulnerability "
+    },
+    {
+      "cveID": "CVE-2021-27877",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2023-04-07",
+      "dueDate": "2023-04-28",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Backup Exec Agent",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Veritas Backup Exec (BE) Agent contains an improper authentication vulnerability that could allow an attacker unauthorized access to the BE Agent via SHA authentication scheme.",
+      "vendorProject": "Veritas",
+      "vulnerabilityName": "Veritas Backup Exec Agent Improper Authentication Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-23131",
+      "cwes": [
+        "CWE-290"
+      ],
+      "dateAdded": "2022-02-22",
+      "dueDate": "2022-03-08",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Frontend",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Unsafe client-side session storage leading to authentication bypass/instance takeover via Zabbix Frontend with configured SAML.",
+      "vendorProject": "Zabbix",
+      "vulnerabilityName": "Zabbix Frontend Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-36193",
+      "cwes": [
+        "CWE-22",
+        "CWE-59"
+      ],
+      "dateAdded": "2022-08-25",
+      "dueDate": "2022-09-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Archive_Tar",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "PEAR Archive_Tar Tar.php allows write operations with directory traversal due to inadequate checking of symbolic links. PEAR stands for PHP Extension and Application Repository and it is an open-source framework and distribution system for reusable PHP components with known usage in third-party products such as Drupal Core and Red Hat Linux.",
+      "vendorProject": "PEAR",
+      "vulnerabilityName": "PEAR Archive_Tar Improper Link Resolution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-13379",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "FortiOS",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Fortinet FortiOS SSL VPN web portal contains a path traversal vulnerability that may allow an unauthenticated attacker to download FortiOS system files through specially crafted HTTP resource requests.",
+      "vendorProject": "Fortinet",
+      "vulnerabilityName": "Fortinet FortiOS SSL VPN Path Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-23874",
+      "cwes": [
+        "CWE-284"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "McAfee Total Protection (MTP)",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "McAfee Total Protection (MTP) contains an improper privilege management vulnerability that allows a local user to gain elevated privileges and execute code, bypassing MTP self-defense.",
+      "vendorProject": "McAfee",
+      "vulnerabilityName": "McAfee Total Protection (MTP) Improper Privilege Management Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-55182",
+      "cwes": [],
+      "dateAdded": "2025-12-05",
+      "dueDate": "2025-12-12",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "React Server Components",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Meta React Server Components contains a remote code execution vulnerability that could allow unauthenticated remote code execution by exploiting a flaw in how React decodes payloads sent to React Server Function endpoints. Please note CVE-2025-66478 has been rejected, but it is associated with CVE-2025- 55182.",
+      "vendorProject": "Meta",
+      "vulnerabilityName": "Meta React Server Components Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-27562",
+      "cwes": [
+        "CWE-787"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Trusted Firmware",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Arm Trusted Firmware contains an out-of-bounds write vulnerability allowing the non-secure (NS) world to trigger a system halt, overwrite secure data, or print out secure data when calling secure functions under the non-secure processing environment (NSPE) handler mode. This vulnerability affects Yealink Device Management servers.",
+      "vendorProject": "Arm",
+      "vulnerabilityName": "Arm Trusted Firmware Out-of-Bounds Write Vulnerability"
+    },
+    {
+      "cveID": "CVE-2016-7836",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2025-10-14",
+      "dueDate": "2025-11-04",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Client View",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "SKYSEA Client View contains an improper authentication vulnerability that allows remote code execution via a flaw in processing authentication on the TCP connection with the management console program.",
+      "vendorProject": "SKYSEA",
+      "vulnerabilityName": "SKYSEA Client View Improper Authentication Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-25298",
+      "cwes": [
+        "CWE-78",
+        "CWE-138"
+      ],
+      "dateAdded": "2022-01-18",
+      "dueDate": "2022-02-01",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Nagios XI",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Nagios XI contains a vulnerability which can lead to OS command injection on the Nagios XI server.",
+      "vendorProject": "Nagios",
+      "vulnerabilityName": "Nagios XI OS Command Injection"
+    },
+    {
+      "cveID": "CVE-2022-36537",
+      "cwes": [
+        "CWE-441"
+      ],
+      "dateAdded": "2023-02-27",
+      "dueDate": "2023-03-20",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "AuUploader",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "ZK Framework AuUploader servlets contain an unspecified vulnerability that could allow an attacker to retrieve the content of a file located in the web context. The ZK Framework is an open-source Java framework. This vulnerability can impact multiple products, including but not limited to ConnectWise R1Soft Server Backup Manager.",
+      "vendorProject": "ZK Framework",
+      "vulnerabilityName": "ZK Framework AuUploader Unspecified Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-39891",
+      "cwes": [
+        "CWE-203"
+      ],
+      "dateAdded": "2024-07-23",
+      "dueDate": "2024-08-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Authy",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Twilio Authy contains an information disclosure vulnerability in its API that allows an unauthenticated endpoint to accept a request containing a phone number and respond with information about whether the phone number was registered with Authy.",
+      "vendorProject": "Twilio",
+      "vulnerabilityName": "Twilio Authy Information Disclosure Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-52163",
+      "cwes": [
+        "CWE-862"
+      ],
+      "dateAdded": "2025-12-22",
+      "dueDate": "2026-01-12",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "DS-2105 Pro",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Digiever DS-2105 Pro contains a missing authorization vulnerability which could allow for command injection via time_tzsetup.cgi.",
+      "vendorProject": "Digiever",
+      "vulnerabilityName": "Digiever DS-2105 Pro Missing Authorization Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-13671",
+      "cwes": [
+        "CWE-434"
+      ],
+      "dateAdded": "2022-01-18",
+      "dueDate": "2022-07-18",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Drupal core",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Improper sanitization in the extension file names is present in Drupal core.",
+      "vendorProject": "Drupal",
+      "vulnerabilityName": "Drupal core Un-restricted Upload of File"
+    },
+    {
+      "cveID": "CVE-2023-2868",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2023-05-26",
+      "dueDate": "2023-06-16",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Email Security Gateway (ESG) Appliance",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Barracuda Email Security Gateway (ESG) appliance contains an improper input validation vulnerability of a user-supplied .tar file, leading to remote command injection.",
+      "vendorProject": "Barracuda Networks",
+      "vulnerabilityName": "Barracuda Networks ESG Appliance Improper Input Validation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-4879",
+      "cwes": [
+        "CWE-1287"
+      ],
+      "dateAdded": "2024-07-29",
+      "dueDate": "2024-08-19",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Utah, Vancouver, and Washington DC Now Platform",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "ServiceNow Utah, Vancouver, and Washington DC Now Platform releases contain a jelly template injection vulnerability in UI macros. An unauthenticated user could exploit this vulnerability to execute code remotely. ",
+      "vendorProject": "ServiceNow",
+      "vulnerabilityName": "ServiceNow Improper Input Validation Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-1709",
+      "cwes": [
+        "CWE-288"
+      ],
+      "dateAdded": "2024-02-22",
+      "dueDate": "2024-02-29",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "ScreenConnect",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "ConnectWise ScreenConnect contains an authentication bypass vulnerability that allows an attacker with network access to the management interface to create a new, administrator-level account on affected devices.",
+      "vendorProject": "ConnectWise",
+      "vulnerabilityName": "ConnectWise ScreenConnect Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-6670",
+      "cwes": [
+        "CWE-89"
+      ],
+      "dateAdded": "2024-09-16",
+      "dueDate": "2024-10-07",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "WhatsUp Gold",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Progress WhatsUp Gold contains a SQL injection vulnerability that allows an unauthenticated attacker to retrieve the user's encrypted password if the application is configured with only a single user.",
+      "vendorProject": "Progress",
+      "vulnerabilityName": "Progress WhatsUp Gold SQL Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-28461",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2024-11-25",
+      "dueDate": "2024-12-16",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "AG/vxAG ArrayOS",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Array Networks AG and vxAG ArrayOS contain a missing authentication for critical function vulnerability that allows an attacker to read local files and execute code on the SSL VPN gateway.",
+      "vendorProject": "Array Networks ",
+      "vulnerabilityName": "Array Networks AG and vxAG ArrayOS Missing Authentication for Critical Function Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-26085",
+      "cwes": [
+        "CWE-425"
+      ],
+      "dateAdded": "2022-03-28",
+      "dueDate": "2022-04-18",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Confluence Server",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Affected versions of Atlassian Confluence Server allow remote attackers to view restricted resources via a pre-authorization arbitrary file read vulnerability in the /s/ endpoint.",
+      "vendorProject": "Atlassian",
+      "vulnerabilityName": "Atlassian Confluence Server Pre-Authorization Arbitrary File Read Vulnerability"
+    },
+    {
+      "cveID": "CVE-2016-6277",
+      "cwes": [
+        "CWE-352"
+      ],
+      "dateAdded": "2022-03-07",
+      "dueDate": "2022-09-07",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Routers",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "NETGEAR confirmed multiple routers allow unauthenticated web pages to pass form input directly to the command-line interface, permitting remote code execution.",
+      "vendorProject": "NETGEAR",
+      "vulnerabilityName": "NETGEAR Multiple Routers Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2016-8562",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2022-03-03",
+      "dueDate": "2022-03-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "SIMATIC CP",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "An improper privilege management vulnerability exists within the Siemens SIMATIC Communication Processor (CP) that allows a privileged attacker to remotely cause a denial of service.",
+      "vendorProject": "Siemens",
+      "vulnerabilityName": "Siemens SIMATIC CP 1543-1 Improper Privilege Management Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-30525",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2022-05-16",
+      "dueDate": "2022-06-06",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Firewalls",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "A command injection vulnerability in the CGI program of some Zyxel firewall versions could allow an attacker to modify specific files and then execute some OS commands on a vulnerable device.",
+      "vendorProject": "Zyxel",
+      "vulnerabilityName": "Zyxel Multiple Firewalls OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-26143",
+      "cwes": [
+        "CWE-306",
+        "CWE-406"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "MiCollab, MiVoice Business Express",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "A vulnerability has been identified in MiCollab and MiVoice Business Express that may allow a malicious actor to gain unauthorized access to sensitive information and services, cause performance degradations or a denial of service condition on the affected system.",
+      "vendorProject": "Mitel",
+      "vulnerabilityName": "MiCollab, MiVoice Business Express Access Control Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-7841",
+      "cwes": [
+        "CWE-89"
+      ],
+      "dateAdded": "2022-04-15",
+      "dueDate": "2022-05-06",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "U.motion Builder",
+      "requiredAction": "The impacted product is end-of-life and should be disconnected if still in use.",
+      "shortDescription": "A SQL Injection vulnerability exists in U.motion Builder software which could cause unwanted code execution when an improper set of characters is entered.",
+      "vendorProject": "Schneider Electric",
+      "vulnerabilityName": "Schneider Electric U.motion Builder SQL Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-0411",
+      "cwes": [
+        "CWE-693"
+      ],
+      "dateAdded": "2025-02-06",
+      "dueDate": "2025-02-27",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "7-Zip",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "7-Zip contains a protection mechanism failure vulnerability that allows remote attackers to bypass the Mark-of-the-Web security feature to execute arbitrary code in the context of the current user.",
+      "vendorProject": "7-Zip",
+      "vulnerabilityName": "7-Zip Mark of the Web Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-50623",
+      "cwes": [
+        "CWE-434"
+      ],
+      "dateAdded": "2024-12-13",
+      "dueDate": "2025-01-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Multiple Products",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Cleo Harmony, VLTrader, and LexiCom, which are managed file transfer products, contain an unrestricted file upload and download vulnerability that can lead to remote code execution with elevated privileges.",
+      "vendorProject": "Cleo",
+      "vulnerabilityName": "Cleo Multiple Products Unrestricted File Upload Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-23209",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2025-02-20",
+      "dueDate": "2025-03-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Craft CMS",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Craft CMS contains a code injection vulnerability caused by improper validation of the database backup path, ultimately enabling remote code execution.",
+      "vendorProject": "Craft CMS",
+      "vulnerabilityName": "Craft CMS Code Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-26828",
+      "cwes": [
+        "CWE-434"
+      ],
+      "dateAdded": "2025-12-03",
+      "dueDate": "2025-12-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "ScadaBR",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "OpenPLC ScadaBR contains an unrestricted upload of file with dangerous type vulnerability that allows remote authenticated users to upload and execute arbitrary JSP files via view_edit.shtm.",
+      "vendorProject": "OpenPLC",
+      "vulnerabilityName": "OpenPLC ScadaBR Unrestricted Upload of File with Dangerous Type Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-11023",
+      "cwes": [
+        "CWE-79"
+      ],
+      "dateAdded": "2025-01-23",
+      "dueDate": "2025-02-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "JQuery",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "JQuery contains a persistent cross-site scripting (XSS) vulnerability. When passing maliciously formed, untrusted input enclosed in HTML tags, JQuery's DOM manipulators can execute untrusted code in the context of the user's browser.",
+      "vendorProject": "JQuery",
+      "vulnerabilityName": "JQuery Cross-Site Scripting (XSS) Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-57819",
+      "cwes": [
+        "CWE-89",
+        "CWE-288"
+      ],
+      "dateAdded": "2025-08-29",
+      "dueDate": "2025-09-19",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "FreePBX",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Sangoma FreePBX contains an authentication bypass vulnerability due to insufficiently sanitized user-supplied data allows unauthenticated access to FreePBX Administrator leading to arbitrary database manipulation and remote code execution.",
+      "vendorProject": "Sangoma",
+      "vulnerabilityName": "Sangoma FreePBX Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-26501",
+      "cwes": [
+        "CWE-306"
+      ],
+      "dateAdded": "2022-12-13",
+      "dueDate": "2023-01-03",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Backup & Replication",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The Veeam Distribution Service in the Backup & Replication application allows unauthenticated users to access internal API functions. A remote attacker can send input to the internal API which may lead to uploading and executing of malicious code.",
+      "vendorProject": "Veeam",
+      "vulnerabilityName": "Veeam Backup & Replication Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2015-7755",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2025-10-02",
+      "dueDate": "2025-10-23",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "ScreenOS",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Juniper ScreenOS contains an improper authentication vulnerability that could allow unauthorized remote administrative access to the device.",
+      "vendorProject": "Juniper",
+      "vulnerabilityName": "Juniper ScreenOS Improper Authentication Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-30116",
+      "cwes": [
+        "CWE-522"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Virtual System/Server Administrator (VSA)",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Kaseya Virtual System/Server Administrator (VSA) contains an information disclosure vulnerability allowing an attacker to obtain the sessionId that can be used to execute further attacks against the system.",
+      "vendorProject": "Kaseya",
+      "vulnerabilityName": "Kaseya Virtual System/Server Administrator (VSA) Information Disclosure Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-4040",
+      "cwes": [
+        "CWE-1336"
+      ],
+      "dateAdded": "2024-04-24",
+      "dueDate": "2024-05-01",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "CrushFTP",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "CrushFTP contains an unspecified sandbox escape vulnerability that allows a remote attacker to escape the CrushFTP virtual file system (VFS).",
+      "vendorProject": "CrushFTP",
+      "vulnerabilityName": "CrushFTP VFS Sandbox Escape Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-0543",
+      "cwes": [
+        "CWE-862"
+      ],
+      "dateAdded": "2022-03-28",
+      "dueDate": "2022-04-18",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Debian-specific Redis Servers",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Redis is prone to a (Debian-specific) Lua sandbox escape, which could result in remote code execution.",
+      "vendorProject": "Redis",
+      "vulnerabilityName": "Debian-specific Redis Server Lua Sandbox Escape Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-24816",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2024-06-26",
+      "dueDate": "2024-07-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "JAI-EXT",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "OSGeo GeoServer JAI-EXT contains a code injection vulnerability that, when programs use jt-jiffle and allow Jiffle script to be provided via network request, could allow remote code execution.",
+      "vendorProject": "OSGeo",
+      "vulnerabilityName": "OSGeo GeoServer JAI-EXT Code Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-19320",
+      "cwes": [],
+      "dateAdded": "2022-10-24",
+      "dueDate": "2022-11-14",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Multiple Products",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The GDrv low-level driver in GIGABYTE App Center, AORUS Graphics Engine, XTREME Gaming Engine, and OC GURU II exposes ring0 memcpy-like functionality that could allow a local attacker to take complete control of the affected system.",
+      "vendorProject": "GIGABYTE",
+      "vulnerabilityName": "GIGABYTE Multiple Products Unspecified Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-43208",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2024-05-20",
+      "dueDate": "2024-06-10",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Mirth Connect",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "NextGen Healthcare Mirth Connect contains a deserialization of untrusted data vulnerability that allows for unauthenticated remote code execution via a specially crafted request.",
+      "vendorProject": "NextGen Healthcare",
+      "vulnerabilityName": "NextGen Healthcare Mirth Connect Deserialization of Untrusted Data Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-8218",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2022-03-07",
+      "dueDate": "2022-09-07",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Pulse Connect Secure",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "A code injection vulnerability exists in Pulse Connect Secure that allows an attacker to crafted a URI to perform an arbitrary code execution via the admin web interface.",
+      "vendorProject": "Pulse Secure",
+      "vulnerabilityName": "Pulse Connect Secure Code Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-20123",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2024-09-03",
+      "dueDate": "2024-09-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "VigorConnect",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Draytek VigorConnect contains a path traversal vulnerability in the DownloadFileServlet endpoint. An unauthenticated attacker could leverage this vulnerability to download arbitrary files from the underlying operating system with root privileges. ",
+      "vendorProject": "DrayTek",
+      "vulnerabilityName": "Draytek VigorConnect Path Traversal Vulnerability "
+    },
+    {
+      "cveID": "CVE-2023-44487",
+      "cwes": [
+        "CWE-400"
+      ],
+      "dateAdded": "2023-10-10",
+      "dueDate": "2023-10-31",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "HTTP/2",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "HTTP/2 contains a rapid reset vulnerability that allows for a distributed denial-of-service attack (DDoS).",
+      "vendorProject": "IETF",
+      "vulnerabilityName": "HTTP/2 Rapid Reset Attack Vulnerability"
+    },
+    {
+      "cveID": "CVE-2016-0752",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Ruby on Rails",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Directory traversal vulnerability in Action View in Ruby on Rails allows remote attackers to read arbitrary files.",
+      "vendorProject": "Rails",
+      "vulnerabilityName": "Ruby on Rails Directory Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-43939",
+      "cwes": [
+        "CWE-647"
+      ],
+      "dateAdded": "2025-03-03",
+      "dueDate": "2025-03-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Pentaho Business Analytics (BA) Server",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Hitachi Vantara Pentaho BA Server contains a use of non-canonical URL paths for authorization decisions vulnerability that enables an attacker to bypass authorization.",
+      "vendorProject": "Hitachi Vantara",
+      "vulnerabilityName": "Hitachi Vantara Pentaho BA Server Authorization Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-3929",
+      "cwes": [
+        "CWE-79"
+      ],
+      "dateAdded": "2022-04-15",
+      "dueDate": "2022-05-06",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Products",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Multiple Crestron products are vulnerable to command injection via the file_transfer.cgi HTTP endpoint. A remote, unauthenticated attacker can use this vulnerability to execute operating system commands as root.",
+      "vendorProject": "Crestron",
+      "vulnerabilityName": "Crestron Multiple Products Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-22963",
+      "cwes": [
+        "CWE-94"
+      ],
+      "dateAdded": "2022-08-25",
+      "dueDate": "2022-09-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Spring Cloud",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "When using routing functionality in VMware Tanzu's Spring Cloud Function, it is possible for a user to provide a specially crafted SpEL as a routing-expression that may result in remote code execution and access to local resources.",
+      "vendorProject": "VMware Tanzu",
+      "vulnerabilityName": "VMware Tanzu Spring Cloud Function Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-2533",
+      "cwes": [
+        "CWE-352"
+      ],
+      "dateAdded": "2025-07-28",
+      "dueDate": "2025-08-18",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "NG/MF",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "PaperCut NG/MF contains a cross-site request forgery (CSRF) vulnerability, which, under specific conditions, could potentially enable an attacker to alter security settings or execute arbitrary code. ",
+      "vendorProject": "PaperCut",
+      "vulnerabilityName": "PaperCut NG/MF Cross-Site Request Forgery (CSRF) Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-58136",
+      "cwes": [
+        "CWE-424"
+      ],
+      "dateAdded": "2025-05-02",
+      "dueDate": "2025-05-23",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Yii",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Yii Framework contains an improper protection of alternate path vulnerability that may allow a remote attacker to execute arbitrary code. This vulnerability could affect other products that implement Yii, including—but not limited to—Craft CMS, as represented by CVE-2025-32432.",
+      "vendorProject": "Yiiframework",
+      "vulnerabilityName": "Yiiframework Yii Improper Protection of Alternate Path Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-11120",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2025-05-07",
+      "dueDate": "2025-05-28",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Multiple Devices",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Multiple GeoVision devices contain an OS command injection vulnerability that allows a remote, unauthenticated attacker to inject and execute arbitrary system commands. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+      "vendorProject": "GeoVision",
+      "vulnerabilityName": "GeoVision Devices OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-8816",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2021-12-10",
+      "dueDate": "2022-06-10",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "AdminLTE",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Pi-hole Web v4.3.2 (aka AdminLTE) allows Remote Code Execution by privileged dashboard users via a crafted DHCP static lease.",
+      "vendorProject": "Pi-hole",
+      "vulnerabilityName": "Pi-Hole AdminLTE Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-44207",
+      "cwes": [
+        "CWE-798"
+      ],
+      "dateAdded": "2024-12-23",
+      "dueDate": "2025-01-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "USAHERDS",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable. Please contact the product developer for support and vulnerability mitigation.",
+      "shortDescription": "Acclaim Systems USAHERDS contains a hard-coded credentials vulnerability that could allow an attacker to achieve remote code execution on the system that runs the application. The MachineKey must be obtained via a separate vulnerability or other channel.",
+      "vendorProject": "Acclaim Systems",
+      "vulnerabilityName": "Acclaim Systems USAHERDS Use of Hard-Coded Credentials Vulnerability "
+    },
+    {
+      "cveID": "CVE-2024-11182",
+      "cwes": [
+        "CWE-79"
+      ],
+      "dateAdded": "2025-05-19",
+      "dueDate": "2025-06-09",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Email Server",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "MDaemon Email Server contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to load arbitrary JavaScript code via an HTML e-mail message.",
+      "vendorProject": "MDaemon",
+      "vulnerabilityName": "MDaemon Email Server Cross-Site Scripting (XSS) Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-47812",
+      "cwes": [
+        "CWE-158"
+      ],
+      "dateAdded": "2025-07-14",
+      "dueDate": "2025-08-04",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Wing FTP Server",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "Wing FTP Server contains an improper neutralization of null byte or NUL character vulnerability that can allow injection of arbitrary Lua code into user session files. This can be used to execute arbitrary system commands with the privileges of the FTP service (root or SYSTEM by default).",
+      "vendorProject": "Wing FTP Server",
+      "vulnerabilityName": "Wing FTP Server Improper Neutralization of Null Byte or NUL Character Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-11738",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2022-05-03",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Snap Creek Duplicator Plugin",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "WordPress Snap Creek Duplicator plugin contains a file download vulnerability when an administrator creates a new copy of their site that allows an attacker to download the generated files from their Wordpress dashboard. This vulnerability affects Duplicator and Dulplicator Pro.",
+      "vendorProject": "WordPress",
+      "vulnerabilityName": "WordPress Snap Creek Duplicator Plugin File Download Vulnerability"
+    },
+    {
+      "cveID": "CVE-2015-1427",
+      "cwes": [
+        "CWE-284"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Elasticsearch",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The Groovy scripting engine in Elasticsearch allows remote attackers to bypass the sandbox protection mechanism and execute arbitrary shell commands.",
+      "vendorProject": "Elastic",
+      "vulnerabilityName": "Elasticsearch Groovy Scripting Engine Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2019-15107",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Webmin",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "An issue was discovered in Webmin. The parameter old in password_change.cgi contains a command injection vulnerability.",
+      "vendorProject": "Webmin",
+      "vulnerabilityName": "Webmin Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2020-11899",
+      "cwes": [
+        "CWE-125"
+      ],
+      "dateAdded": "2022-03-03",
+      "dueDate": "2022-03-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "IPv6",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The Treck TCP/IP stack contains an IPv6 out-of-bounds read vulnerability.",
+      "vendorProject": "Treck TCP/IP stack",
+      "vulnerabilityName": "Treck TCP/IP stack Out-of-Bounds Read Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-20090",
+      "cwes": [
+        "CWE-22"
+      ],
+      "dateAdded": "2021-11-03",
+      "dueDate": "2021-11-17",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Buffalo Firmware",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "Arcadyan Buffalo firmware contains a path traversal vulnerability that could allow unauthenticated, remote attackers to bypass authentication and access sensitive information. This vulnerability affects multiple routers across several different vendors.",
+      "vendorProject": "Arcadyan",
+      "vulnerabilityName": "Arcadyan Buffalo Firmware Path Traversal Vulnerability"
+    },
+    {
+      "cveID": "CVE-2022-47986",
+      "cwes": [
+        "CWE-502"
+      ],
+      "dateAdded": "2023-02-21",
+      "dueDate": "2023-03-14",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "Aspera Faspex",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "IBM Aspera Faspex could allow a remote attacker to execute code on the system, caused by a YAML deserialization flaw.",
+      "vendorProject": "IBM",
+      "vulnerabilityName": "IBM Aspera Faspex Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-8956",
+      "cwes": [
+        "CWE-287"
+      ],
+      "dateAdded": "2024-11-04",
+      "dueDate": "2024-11-25",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "PT30X-SDI/NDI Cameras",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "PTZOptics PT30X-SDI/NDI cameras contain an insecure direct object reference (IDOR) vulnerability that allows a remote, attacker to bypass authentication for the /cgi-bin/param.cgi CGI script. If combined with CVE-2024-8957, this can lead to remote code execution as root.",
+      "vendorProject": "PTZOptics",
+      "vulnerabilityName": "PTZOptics PT30X-SDI/NDI Cameras Authentication Bypass Vulnerability"
+    },
+    {
+      "cveID": "CVE-2021-22991",
+      "cwes": [
+        "CWE-119"
+      ],
+      "dateAdded": "2022-01-18",
+      "dueDate": "2022-02-01",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "BIG-IP Traffic Management Microkernel",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "The Traffic Management Microkernel of BIG-IP ASM Risk Engine has a buffer overflow vulnerability, leading to a bypassing of URL-based access controls.",
+      "vendorProject": "F5",
+      "vulnerabilityName": "F5 BIG-IP Traffic Management Microkernel Buffer Overflow"
+    },
+    {
+      "cveID": "CVE-2007-3010",
+      "cwes": [
+        "CWE-20"
+      ],
+      "dateAdded": "2022-04-15",
+      "dueDate": "2022-05-06",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "OmniPCX Enterprise",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "masterCGI in the Unified Maintenance Tool in Alcatel OmniPCX Enterprise Communication Server allows remote attackers to execute arbitrary commands.",
+      "vendorProject": "Alcatel",
+      "vulnerabilityName": "Alcatel OmniPCX Enterprise Remote Code Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-39717",
+      "cwes": [
+        "CWE-434"
+      ],
+      "dateAdded": "2024-08-23",
+      "dueDate": "2024-09-13",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Director",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "The Versa Director GUI contains an unrestricted upload of file with dangerous type vulnerability that allows administrators with Provider-Data-Center-Admin or Provider-Data-Center-System-Admin privileges to customize the user interface. The “Change Favicon” (Favorite Icon) enables the upload of a .png file, which can be exploited to upload a malicious file with a .png extension disguised as an image.",
+      "vendorProject": "Versa",
+      "vulnerabilityName": "Versa Director Dangerous File Type Upload Vulnerability"
+    },
+    {
+      "cveID": "CVE-2024-51567",
+      "cwes": [
+        "CWE-276"
+      ],
+      "dateAdded": "2024-11-07",
+      "dueDate": "2024-11-28",
+      "knownRansomwareCampaignUse": "Known",
+      "product": "CyberPanel",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "CyberPanel contains an incorrect default permissions vulnerability that allows a remote, unauthenticated attacker to execute commands as root.",
+      "vendorProject": "CyberPersons",
+      "vulnerabilityName": "CyberPanel Incorrect Default Permissions Vulnerability"
+    }
+  ],
+  "schema": "envloop-gitlab-kev-source-v1",
+  "selection_rule": "Rows dated no later than 2025-12-31; SHA-256 ranking of envloop-gitlab-kev-v1:CVE ID; first 120 distinct case-folded vendors with nonempty product and short description.",
+  "source_catalog_version": "2026.09.24",
+  "source_commit": "203fa4633af39c6944608e30984996f04ccc4541",
+  "source_date_released": "2026-09-24T19:00:55.0481Z",
+  "source_file": "known_exploited_vulnerabilities.json",
+  "source_full_file_sha256": "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1",
+  "source_repository": "https://github.com/cisagov/kev-data"
+}

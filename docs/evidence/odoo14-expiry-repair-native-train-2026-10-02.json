@@ -1,0 +1,19 @@
+{
+  "actual_train_control_sha256": "2f050cd6a40621c072c8f0282837680e6d3fc722956a572998dfb5ef341bfbfc",
+  "actual_train_negative_positive_wrong_object_scores": [
+    0,
+    1,
+    0
+  ],
+  "formal_large_study_credit": 0,
+  "full_selection20_native_control_status": "in_progress",
+  "independent_source_visual_review_sha256": "a55e7f35b8db1398a40dbc2cc9b5fa97d0623f19d101312279e5817d35a46ee9",
+  "model_calls": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "observation_and_envelope_expiry_bounded": true,
+  "old_native13_control_credit": 0,
+  "reference_binding_sha256": "87f273749251874bfc856a5233f33653e89d68ae8ff262456645397716b6085d",
+  "schema": "envloop-odoo14-expiry-repair-native-preflight-v1",
+  "training_optimizer_steps_completed": 0,
+  "uniform_actor_seconds": 720
+}

@@ -1,0 +1,7 @@
+# PowerPoint split structure and difficulty shape
+
+The [aggregate audit](ppt-wdi-split-difficulty-shape-2026-09-27.json) checks the current evaluator-private 20/20/100 offline PowerPoint plan. The train, selection and final splits have 5, 5 and 25 disjoint WDI source families, respectively; no task or instance identity crosses splits. Each source family contributes four final candidates. Ten causal workflow types contribute ten final candidates each, and every final task requires four target fields on distinct slides. The authored train tasks require one target field each, while selection tasks require three. This is a verifiable increase in cross-slide edit dependencies, **not** a measured human or model difficulty ranking.
+
+The transfer claim is deliberately narrow. Four causal workflow types occur in both train and final, and eight occur in both selection and final. Two final workflow types are absent from selection. The benchmark therefore tests performance on new source families and fuller multi-field tasks, while explicitly reporting workflow overlap. Split-prefixed task-template identifiers do not by themselves establish unseen-workflow generalization.
+
+The audit publishes only counts and a manifest commitment. It releases no final source identity, task text, answer or native deck. Original-software PowerPoint GUI qualification is separate; active-pool final admissions and hidden model calls remain zero.

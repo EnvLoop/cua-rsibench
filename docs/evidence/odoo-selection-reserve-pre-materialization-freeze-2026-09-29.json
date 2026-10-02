@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2026-09-29",
+  "blueprint_order_sha256": "9f961abd7633af95dec799ada9987dc8f862076e680f2fe0def165e630e8705f",
+  "generator_sha256": "e98fe0bca34588571ba1a1883e9f03f951d323bd0161dd1b4733e30c4ea3f232",
+  "gui_controls": 0,
+  "hidden_gold_read": false,
+  "input_sha256": {
+    "retirement_audit": "7286adcc368604df0cf87db7032affd26cdf1d516910e945cc6645d73562fb55",
+    "selection_world": "ef1972d2e8c738afe68a62c9b3e3db6b8fe856db4f893db2930b1b289eb65afa",
+    "task_manifest": "a6ec71150f365eea6edb4d327fc4b7485531885774cc1578128a52018bc77083",
+    "train_world": "0756518b932df816c88d805037d1d38805213969ad7bb5bd549abebcba5435dc"
+  },
+  "model_attempts": 0,
+  "official_final_admissions": 0,
+  "retired_id_order_sha256": "6595cf8af19c51c2c1020ce282baae38dc97b1c4ac2441c84cef647eb8c2e0bf",
+  "rule": {
+    "allocation": "retired_purchase_ordinal_1_to_5_maps_to_blueprint_ordinal_1_to_5",
+    "redraw_after_failure": false,
+    "selection_denominator": 20,
+    "slots": 5,
+    "source_documents_per_case": 1,
+    "target_edits_per_case": 2,
+    "wrong_object_per_case": 1
+  },
+  "schema": "envloop-odoo-selection-reserve-v1-pre-materialization-public-freeze",
+  "seed_sha256": "aebacdd91fe6b229849c9f7737fbfe283c8118132699ebb96e13be84f75ee8c2",
+  "selection_admissions": 0,
+  "status": "prospective_frozen_before_real_seed_materialization"
+}

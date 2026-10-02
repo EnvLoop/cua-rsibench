@@ -1,0 +1,22 @@
+{
+  "actual_nonblank_running_service_count": 0,
+  "compose_running_services_stdout_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+  "compose_stdout_line_count": 1,
+  "gui_replay_performed": false,
+  "inferred_controller_error_code": "scale_selection_retry_services_not_cold",
+  "live_sql_or_filestore_preflight_completed": false,
+  "model_attempts": 0,
+  "new_run_directory_created": false,
+  "official_final_tasks_admitted": 0,
+  "old_controller_source_sha256": "91b996aa1a9641de1353e482d604fdfca248c2e6e4a369e6af352e475bef1357",
+  "old_failed_attempt_preserved": true,
+  "old_private_selection_plan_sha256": "48a37b37041ba513aca90c5658f7d003b53eb261fe937289291d34c014fbf827",
+  "old_selection_failure_public_sha256": "91985f9a3e9b964224b26e465b10512b5160ede92984a93e27b88b270e817891",
+  "old_source_freeze_sha256": "4c2729791c5adc4aaa817029afbd518e30514f8a66cbe64dcb31e0cd2e58d931",
+  "old_unfiltered_running_service_set_size": 1,
+  "original_worker_db_web_exited_zero": true,
+  "reported_cli_failure_type": "ScaleControlError",
+  "retry_gate_file_created": false,
+  "schema": "envloop-odoo-v066-selection-blank-compose-preflight-incident-v1",
+  "status": "read_only_source_bound_diagnosis_before_docker_start"
+}

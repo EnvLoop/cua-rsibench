@@ -1,0 +1,65 @@
+{
+  "license": "CC0-1.0; no CISA/DHS logo or endorsement",
+  "records": [
+    {
+      "cveID": "CVE-2024-12686",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2025-01-13",
+      "dueDate": "2025-02-03",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Privileged Remote Access (PRA) and Remote Support (RS)",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) contain an OS command injection vulnerability that can be exploited by an attacker with existing administrative privileges to upload a malicious file. Successful exploitation of this vulnerability can allow a remote attacker to execute underlying operating system commands within the context of the site user.",
+      "vendorProject": "BeyondTrust",
+      "vulnerabilityName": "BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2018-14839",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2022-03-25",
+      "dueDate": "2022-04-15",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "N1A1 NAS",
+      "requiredAction": "Apply updates per vendor instructions.",
+      "shortDescription": "LG N1A1 NAS 3718.510 is affected by a remote code execution vulnerability.",
+      "vendorProject": "LG",
+      "vulnerabilityName": "LG N1A1 NAS Remote Command Execution Vulnerability"
+    },
+    {
+      "cveID": "CVE-2025-48703",
+      "cwes": [
+        "CWE-78"
+      ],
+      "dateAdded": "2025-11-04",
+      "dueDate": "2025-11-25",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Control Web Panel",
+      "requiredAction": "Apply mitigations per vendor instructions, follow applicable BOD 22-01 guidance for cloud services, or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "CWP Control Web Panel (formerly CentOS Web Panel) contains an OS command Injection vulnerability that allows unauthenticated remote code execution via shell metacharacters in the t_total parameter in a filemanager changePerm request. A valid non-root username must be known.",
+      "vendorProject": "CWP",
+      "vulnerabilityName": "CWP Control Web Panel OS Command Injection Vulnerability"
+    },
+    {
+      "cveID": "CVE-2023-45727",
+      "cwes": [
+        "CWE-611"
+      ],
+      "dateAdded": "2024-12-03",
+      "dueDate": "2024-12-24",
+      "knownRansomwareCampaignUse": "Unknown",
+      "product": "Proself",
+      "requiredAction": "Apply mitigations per vendor instructions or discontinue use of the product if mitigations are unavailable.",
+      "shortDescription": "North Grid Proself Enterprise/Standard, Gateway, and Mail Sanitize contain an improper restriction of XML External Entity (XXE) reference vulnerability, which could allow a remote, unauthenticated attacker to conduct an XXE attack.",
+      "vendorProject": "North Grid",
+      "vulnerabilityName": "North Grid Proself Improper Restriction of XML External Entity (XXE) Reference Vulnerability"
+    }
+  ],
+  "schema": "envloop-gitlab-kev-reserve-source-v1",
+  "selection_rule": "Same SHA-256 CVE ranking as primary excerpt; first four distinct vendors not in the 120-record primary excerpt.",
+  "source_commit": "203fa4633af39c6944608e30984996f04ccc4541",
+  "source_full_file_sha256": "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1"
+}

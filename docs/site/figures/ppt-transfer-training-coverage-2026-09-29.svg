@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="700" viewBox="0 0 1260 700" role="img" aria-labelledby="title desc">
+<title id="title">PowerPoint training-transfer source coverage</title>
+<desc id="desc">Ten four-target workflows each have two pilot and six additional source-disjoint training cases. All eighty pass offline controls. Office web and model outcomes remain unmeasured.</desc>
+<rect width="1260" height="700" fill="#f5f8fb"/>
+<rect x="24" y="20" width="1212" height="660" rx="20" fill="#fff" stroke="#d7e1eb"/>
+<text x="52" y="73" font-family="Arial,sans-serif" font-size="29" font-weight="700" fill="#123349">PowerPoint training-transfer coverage</text>
+<text x="52" y="107" font-family="Arial,sans-serif" font-size="16" fill="#50687c">Real WDI observations · 4 edits per task · 7-slide editable decks</text>
+<rect x="969" y="53" width="230" height="42" rx="21" fill="#e4f5ec"/>
+<text x="1084" y="80" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#166446">80 / 80 offline QA</text>
+<text x="52" y="158" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1" fill="#647c90">WORKFLOW</text>
+<text x="474" y="158" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1" fill="#647c90">TRAIN-ONLY SOURCE FAMILIES</text>
+<rect x="42" y="169" width="1172" height="38" rx="6" fill="#f6f9fc"/>
+<text x="52" y="194" font-family="Arial,sans-serif" font-size="15" fill="#244359">Nominal output growth</text>
+<rect x="474" y="175" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="175" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="175" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="194" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<text x="52" y="234" font-family="Arial,sans-serif" font-size="15" fill="#244359">Per-capita growth</text>
+<rect x="474" y="215" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="215" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="215" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="234" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<rect x="42" y="249" width="1172" height="38" rx="6" fill="#f6f9fc"/>
+<text x="52" y="274" font-family="Arial,sans-serif" font-size="15" fill="#244359">Inflation acceleration</text>
+<rect x="474" y="255" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="255" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="255" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="274" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<text x="52" y="314" font-family="Arial,sans-serif" font-size="15" fill="#244359">Labor-rate change</text>
+<rect x="474" y="295" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="295" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="295" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="314" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<rect x="42" y="329" width="1172" height="38" rx="6" fill="#f6f9fc"/>
+<text x="52" y="354" font-family="Arial,sans-serif" font-size="15" fill="#244359">Population growth</text>
+<rect x="474" y="335" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="335" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="335" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="354" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<text x="52" y="394" font-family="Arial,sans-serif" font-size="15" fill="#244359">Output/person divergence</text>
+<rect x="474" y="375" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="375" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="375" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="394" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<rect x="42" y="409" width="1172" height="38" rx="6" fill="#f6f9fc"/>
+<text x="52" y="434" font-family="Arial,sans-serif" font-size="15" fill="#244359">Price–labor spread</text>
+<rect x="474" y="415" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="415" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="415" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="434" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<text x="52" y="474" font-family="Arial,sans-serif" font-size="15" fill="#244359">Dual-threshold review</text>
+<rect x="474" y="455" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="455" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="455" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="474" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<rect x="42" y="489" width="1172" height="38" rx="6" fill="#f6f9fc"/>
+<text x="52" y="514" font-family="Arial,sans-serif" font-size="15" fill="#244359">Source-year reconciliation</text>
+<rect x="474" y="495" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="495" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="495" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="514" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<text x="52" y="554" font-family="Arial,sans-serif" font-size="15" fill="#244359">Chart-caption reconciliation</text>
+<rect x="474" y="535" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="556" y="535" width="66" height="27" rx="6" fill="#4e7eaa"/>
+<rect x="638" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="720" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="802" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="884" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="966" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<rect x="1048" y="535" width="66" height="27" rx="6" fill="#24887e"/>
+<text x="1190" y="554" text-anchor="end" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#23445f">8</text>
+<rect x="474" y="603" width="20" height="16" rx="3" fill="#4e7eaa"/>
+<text x="504" y="617" font-family="Arial,sans-serif" font-size="14" fill="#476176">Pilot source families (2)</text>
+<rect x="750" y="603" width="20" height="16" rx="3" fill="#24887e"/>
+<text x="780" y="617" font-family="Arial,sans-serif" font-size="14" fill="#476176">New source families (6)</text>
+<line x1="52" y1="638" x2="1204" y2="638" stroke="#dce5ed"/>
+<text x="52" y="662" font-family="Arial,sans-serif" font-size="14" fill="#526b7e">Office-web saves: 0 · Model runs: 0 · Official final credit: 0</text>
+</svg>

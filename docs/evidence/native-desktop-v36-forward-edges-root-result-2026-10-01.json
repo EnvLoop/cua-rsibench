@@ -1,0 +1,30 @@
+{
+  "actor_actions": 0,
+  "edges_retained": 17,
+  "exact_forward_child_indices": [
+    0,
+    1,
+    0
+  ],
+  "exact_forward_roles": [
+    "frame",
+    "panel",
+    "panel",
+    "root pane"
+  ],
+  "fact_journal_bytes": 19278,
+  "fact_journal_sha256": "fa6f787ac50a717141b7c42ff9cbe83a5a6cee53451a2ceb9d9ff9a9370dec2a",
+  "formal_task_credit": 0,
+  "model_calls": 0,
+  "native_ownership_or_actor_qualification_granted": false,
+  "native_sources_independently_checked": 44,
+  "nodes_retained": 18,
+  "owned_cleanup_sha256": "de31029b3c0e18a0cf4a40fe02ce6a42b1d5b62b7906a910d6783a79504e0efa",
+  "owned_guest_closure_verified": true,
+  "private_result_sha256": "ba64bfd05388111564e8de1ad730ba0dbc997c49c8a087abcf86e6eda6c3fd1a",
+  "reverse_parent_refusal_preserved": true,
+  "same_pid_or_box_not_used_as_association": true,
+  "schema": "envloop-public-desktop-v36-forward-edge-root-result-v1",
+  "status": "refused_hit_root_pane_reachable_by_actual_owned_window_children",
+  "whole_tree_completeness_claimed": false
+}

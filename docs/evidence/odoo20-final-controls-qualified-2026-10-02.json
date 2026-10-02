@@ -1,0 +1,19 @@
+{
+  "actual_control_count": 20,
+  "all_independent_control_scores": [
+    0,
+    1,
+    0
+  ],
+  "descriptor_sha256": "8a76c59a6255b71d94cc5cf0070f790769f1c883b221c0e021efd9441823f1dc",
+  "final_model_evaluation_outcomes": 0,
+  "formal_large_study_credit": 0,
+  "frozen_task_roster_unchanged": true,
+  "independent_source_visual_review_count": 20,
+  "model_calls": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "original_world_count": 100,
+  "reference_binding_sha256": "87f273749251874bfc856a5233f33653e89d68ae8ff262456645397716b6085d",
+  "saved_audit_sha256": "0bb4ac172d770b5963c169c34f6b9a554300a8ef30edbcdf8b8a48a3ace0d844",
+  "schema": "envloop-odoo20-final-native-controls-qualified-v2"
+}

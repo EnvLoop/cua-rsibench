@@ -1,0 +1,40 @@
+{
+  "cloud_item_url_sha256": {
+    "baseline": "67f4dbab1e08ea6a545816f5648d0184672defdb71f1750b48392b2cd939a3f3",
+    "fresh_reset": "f96ba3af5b0f9e3661aa4139215a81edb39871d42361619f71c6701537df35ba",
+    "near_miss": "4d3135dc7d4c39b556a1b4fbade835b0e3abf290386f39d3db6b586290321752",
+    "positive": "d0a96c37e8b0b03781d9d7d699289767ab6033176cdaf7e256ff7bf2ed3e1704"
+  },
+  "fresh_equivalence": {
+    "embedded_workbook_bytes_equal": true,
+    "native_chart_cache_semantically_equal": true,
+    "native_chart_cache_values_checked": 13,
+    "slide_count": 7,
+    "slide_text_equal": true
+  },
+  "fresh_reset_saved_score": 0.0,
+  "independent_cloud_items": 4,
+  "model_calls": 0,
+  "near_miss_saved_score": 0.0,
+  "normalized_baseline_sha256": "4c83bfe73c3fc73c473285f1fd547f30049d03baf511ee640b5548ccd27cdfd2",
+  "official_final_tasks_admitted": 0,
+  "original_source_sha256": "5493c8f37c46a52a4571354de859561ebd630f86142452c12175298b3a7a5996",
+  "positive_saved_score": 1.0,
+  "preservation_passed": true,
+  "private_receipt_sha256": "5f51646a85216a74e37dc690847ed3d8838b8d868033471ae37fddcc0ae977fb",
+  "researcher_campaigns": 0,
+  "saved_download_sha256": {
+    "fresh_reset": "fdb92dcff9d6a2dfbe746bc4a3a857bfa99b7e171bb425d5db8721d1dbe2a5e2",
+    "near_miss": "2a7676c3f578b030e21de99e36fd4cd44ecfa1730319925f2571b64167683838",
+    "positive": "20df67a506cd89d00b059f2456db67cdf4cfdf20bd4b2b5f6a0558be59bed716"
+  },
+  "schema": "envloop-ppt-wdi-web-train-triad-public-v1",
+  "source_equivalence": {
+    "embedded_workbook_bytes_equal": true,
+    "native_chart_cache_semantically_equal": true,
+    "native_chart_cache_values_checked": 13,
+    "slide_count": 7,
+    "slide_text_equal": true
+  },
+  "status": "one_train_source_gui_triad_not_final_admission"
+}

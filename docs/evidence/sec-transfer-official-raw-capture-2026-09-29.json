@@ -1,0 +1,26 @@
+{
+  "admitted_train_analogues": 0,
+  "authored_training_workbooks": 0,
+  "companyfacts_accession_form_match_count": 4,
+  "created_utc": "2026-09-28T19:24:36.528159+00:00",
+  "derived_debt_total_arithmetic_checks": 4,
+  "independent_semantic_fact_reviews": 0,
+  "index_identity_form_match_count": 4,
+  "numeric_literal_missing_count": 0,
+  "official_final_admissions": 0,
+  "period_numeric_literal_checks": 62,
+  "private_manifest_salted_commitment": "b08da28273c30ccebdf8f761646ec16e0c9d172109af25c66108326fd416688a",
+  "private_pilot_salted_commitment": "50ce4b44aec96ae32c996b4b360c354b0fb59889cc8dd39b217ffcb28bdd25e4",
+  "schema": "envloop-sec-transfer-official-raw-capture-public-v1",
+  "source_candidates": 4,
+  "source_docs": {
+    "api": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+    "fair_access": "https://www.sec.gov/about/privacy-information",
+    "filings": "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data"
+  },
+  "source_method": "official SEC HTTPS with verified TLS and declared User-Agent; <=1 SEC request/s",
+  "status": "four_official_sec_10k_sources_captured_semantic_review_pending",
+  "verified_companyfacts_json_count": 4,
+  "verified_original_10k_html_count": 4,
+  "verified_sec_index_html_count": 4
+}

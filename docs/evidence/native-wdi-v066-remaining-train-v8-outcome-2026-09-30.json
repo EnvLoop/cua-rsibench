@@ -1,0 +1,35 @@
+{
+  "automatic_restarts": 0,
+  "combined_distinct_guests": 6,
+  "combined_full_lease_intents_charged": 6,
+  "combined_original_byte_resets": 3,
+  "independent_root_postrun_audit": true,
+  "material_oscillation_proven": false,
+  "new_full_lease_intents_charged": 3,
+  "new_original_byte_resets": 2,
+  "no_action_probe_classifications": [
+    "caret_only_probe_material_oscillation_inconclusive"
+  ],
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "old_run_sha256": "84673c00d2ac7b9d2d7e7542b98c9b1821ff8c56a4cd1f36b00bef7a1d4910a6",
+  "original_v7_planned_ordinals_completed": [
+    3,
+    4,
+    5
+  ],
+  "original_v7_terminal_status": "stopped_for_reconciliation",
+  "private_permit_sha256": "4d0ce9ce4e0944c99fd5d75265f8b04416f67bdeb8174f92c67a9fb72c7dfee4",
+  "provider_active_after": 0,
+  "retained_raw_files_verified": 51,
+  "run_sha256": "85b4db4271c29f9b888cd21be92909dde6d3fac1f877df25cbcfb7f0b163b7d6",
+  "same_intent_replay_authorized": false,
+  "saved_wrong_target_score_zero": 1,
+  "schema": "cua-native-wdi-v066-post-enter-remaining-audit-public-v8",
+  "separate_visual_modal_adjudications": 1,
+  "source_freeze_sha256": "20a06bcf4ae3c5ba1751bb6625573c192c9f88af6a2d8928f7c653b5aac439ca",
+  "status": "remaining_train_resets_audited_material_oscillation_inconclusive",
+  "supervisor_exit_code": 0,
+  "supervisor_terminal_sha256": "a28f3e97a0271c6dcd8dd23c4023e97ac97a5542f7fc5183ab2dedb7a0061362",
+  "unresolved_writes": 0
+}

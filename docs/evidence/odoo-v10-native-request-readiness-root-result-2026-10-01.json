@@ -1,0 +1,20 @@
+{
+  "all_document_complete": true,
+  "all_explicit_busy_empty": true,
+  "all_lease_checks_active": true,
+  "applied_actions": 0,
+  "failure_code": "guard_native_loading_timeout_no_replay",
+  "failure_sha256": "7eb1189f70ea0b4d4065d79c53794d7c42f8e890b21b2df2de67c5310d6b1a8b",
+  "last_generic_request_quiet_seconds": 6.9988679579983,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "pending_request_types": [
+    "xhr"
+  ],
+  "readiness_samples": 24,
+  "request_purpose_or_completion_inferred": false,
+  "reset_exact": true,
+  "schema": "envloop-odoo-v10-real-native-readiness-failure-root-evidence-v1",
+  "services_restored": true,
+  "status": "actual_train_failed_before_observation_preserved"
+}

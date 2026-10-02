@@ -1,0 +1,5 @@
+# GitLab v7 interrupted TRAIN child: separate terminal reconciliation
+
+The [independent interruption audit](gitlab-v066-v7-interruption-audit-2026-09-30.md) was replayed in the original evaluator checkout and matched its public receipt exactly. Root then executed the separately reviewed terminal-only reconciliation tool under the unchanged diagnostic lock. It wrote one owner-only private receipt, SHA-256 `44c254227d2e2213b8a5c6b9aec2306f83aa6eff39723199b6e0e6906707b1c8`, and performed no task, GUI, provider or Docker mutation.
+
+A subsequent [read-only audit](gitlab-v066-v7-interruption-reconciled-2026-09-30.json) reopened that receipt and the original source, intent, child, nine owner-only PNGs, twelve Docker log/State files, persisted 1/0/1 scores, three exact resets, and live frozen baseline. The separate receipt records the child evidence as terminal and prohibits replay. The original supervisor result and original public outcome remain absent; their exit status, watchdog outcome and original process-group receipt remain unknown. No original result was reconstructed, no supervisor success is claimed, and official final admissions remain zero.

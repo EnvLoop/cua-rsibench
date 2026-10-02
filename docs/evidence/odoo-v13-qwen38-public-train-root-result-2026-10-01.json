@@ -1,0 +1,40 @@
+{
+  "action_types": {
+    "click": 90
+  },
+  "actor_elapsed_seconds": 366.27928899999824,
+  "actor_max_actions": 90,
+  "actor_seconds_limit": 720,
+  "actual_applied_native_actions": 90,
+  "actual_provider_close_call_returned": true,
+  "completed_real_provider_samples": 90,
+  "evidence_boundary": "One public TRAIN development pilot. This does not estimate benchmark performance or training improvement.",
+  "formal_campaign_credit": 0,
+  "formal_final_outcome_credit": 0,
+  "formal_task_credit": 0,
+  "independently_reopened_model_source_reset_and_readiness": true,
+  "model": "Qwen/Qwen3.8-27B",
+  "native_actions_after_deadline": 0,
+  "native_binding_sha256": "56b3e77c254c5dd38d6bbaebf4661d3d71a7d053de44c942e055f0adf89842f4",
+  "native_rejections": 0,
+  "observed_trajectory": "After opening the supplier PDF, the base student repeatedly opened and closed the same attachment and did not edit the mismatched unit price. All90 actions were clicks.",
+  "owned_lifecycle_seconds": 425.15897695798776,
+  "owned_lifecycle_seconds_limit": 1200,
+  "pilot_source_binding_sha256": "dc17abf10a3ea215aba9d63513d83e249f838041c3aa953297d55cac6b92be54",
+  "post_reset_exact": true,
+  "pre_reset_exact": true,
+  "private_result_sha256": "6b42b35c315742d9f3d14f8a281c219892494bb7632585e047464a95e76c22df",
+  "provider_billed_tokens": null,
+  "provider_billed_usd": null,
+  "provider_close_status": "acknowledged",
+  "sampling_kind": "base",
+  "schema": "envloop-public-odoo-v13-qwen38-train-pilot-v1",
+  "score": 0,
+  "status": "actual_public_train_saved_scored_reset_and_provider_closed",
+  "task_id": "ELPO-TRN-0001",
+  "termination": "task_action_budget",
+  "trained_model": false,
+  "verifier_difference_codes": [
+    "target_unit_price_mismatch"
+  ]
+}

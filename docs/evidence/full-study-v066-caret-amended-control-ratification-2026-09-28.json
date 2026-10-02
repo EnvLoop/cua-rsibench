@@ -1,0 +1,29 @@
+{
+  "amendment_public_sha256": "d48c9aa3f1a55f563c0ab04f68fca4c486fe466770e2c4c424cdda1e70cdf16d",
+  "cell_adapter_sha256s": {
+    "desktop-native": "628f3f5383f265ecb781386d0a7ac5ab335d56238f9dec5c375f73c7baefb480",
+    "excel-web": "dd81109c64802a188085a092a4e999a6d136f69af634d7602e0ff05a23e50966",
+    "gitlab": "f0c88a17a85a5e6dc96bb39202c77c65d7e64cebdd487e2bda63520463fb2599",
+    "magento-admin": "cc736ca923bed8c97335389fe5c2323b39ef57314c0d2367dbd89a61033c6c8a",
+    "odoo-community": "bec076a3d8baff1e763734b774582ff5f5ae5d3a56225dadf68bfdb3702e34d6",
+    "powerpoint-web": "fc39b0853b7ad01d825feec97c6e393c0efb61e7810931d9ae9c97d80ea4d9c8"
+  },
+  "common_source_sha256s": {
+    "full_action_extension_v066": "68569a1ed06984985600d367975d3e5c1e6935ec9571b24e3d3ba637174dc24b",
+    "full_action_validator_v06": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+    "minimal_output_v065_dependency": "6c72edf41ea3aa0e3454cae7b487e4a693b91630019d9dda85cd01e7d98a0a28",
+    "minimal_output_v066": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+    "qwen_vision_proxy": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2"
+  },
+  "full_study_pre_campaign_witness_published": false,
+  "official_final_model_results": 0,
+  "private_ratification_sha256": "49f6a047313c4b1c30fbe357677dbf33cb692614d7e273fe57b088e435c46359",
+  "qualified_final_tasks": 0,
+  "researcher_campaigns": 0,
+  "schema": "cua-six-cell-v066-caret-code-only-ratification-public-v1",
+  "shared_action_bundle_sha256": "60f1fc50990118da44c11df3d54b05e0ddf709464401308d9d8c9fa61cd43041",
+  "six_cell_live_smokes_complete": false,
+  "static_ledger_sha256": "f1a7c220cbe6208294cc07059ea2991aa73d651ae875020a7eeda7909f7211a2",
+  "status": "new_source_bytes_frozen_for_evaluator_controls_only",
+  "supersedes_old_private_ratification_sha256": "30a0f3501b8e5ae5bace62aa68adea59c176778906349fb8b0a3a7b33845caa2"
+}

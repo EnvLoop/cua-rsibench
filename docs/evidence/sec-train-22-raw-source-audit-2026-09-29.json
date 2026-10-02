@@ -1,0 +1,14 @@
+{
+  "capture_receipt_sha256": "95653019192e7d9c2a7f4af7f4446b2f00a953f6e40be2d03a30e5567394b8d8",
+  "distinct_new_issuers_outside_frozen_140_and_prior_four": 22,
+  "excel_web_train_admissions": 0,
+  "incorporated_or_supporting_filing_documents_reopened": 3,
+  "official_final_admissions": 0,
+  "original_sec_submissions_index_10k_companyfacts_and_support_reopened": 91,
+  "raw_source_bytes_rehashed": 218186933,
+  "saved_ooxml_train_controls": 0,
+  "schema": "envloop.sec_excel_train_22_raw_independent_audit.public.v1",
+  "semantic_fact_reviews": 0,
+  "source_bundles_reopened": 22,
+  "status": "independent_raw_source_replay_passed"
+}

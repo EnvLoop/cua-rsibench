@@ -1,0 +1,45 @@
+{
+  "models": [
+    {
+      "benchmark_task_sent": false,
+      "http_status": 200,
+      "input_tokens": 4124,
+      "model": "gpt-6-astra",
+      "output_tokens": 5,
+      "request_sha256": "1a39a3846d517877a32c3ada472ceb99ad7ef756807feddd3a27d2b5e65bf501",
+      "response_model": "gpt-6-astra",
+      "response_sha256": "3c50268cdcd4fe9ee594ca4ff740afc3676a8e6a8117efa00e1e5b16f05b29c5",
+      "response_status": "completed",
+      "total_tokens": 4129
+    },
+    {
+      "benchmark_task_sent": false,
+      "http_status": 200,
+      "input_tokens": 4390,
+      "model": "gpt-5.6-sol",
+      "output_tokens": 5,
+      "request_sha256": "3951b1034353f596f9e2f64cce7095539e4252f286457933c064c9033a18c422",
+      "response_model": "gpt-5.6-sol",
+      "response_sha256": "7583effd97bd0fe9ab7577c8725bcface010487e75d60c17f8a66d5675f7265c",
+      "response_status": "completed",
+      "total_tokens": 4395
+    },
+    {
+      "benchmark_task_sent": false,
+      "http_status": 200,
+      "input_tokens": 4390,
+      "model": "gpt-6-luna",
+      "output_tokens": 5,
+      "request_sha256": "ba7e7aba522c5f55d43246b87527d99ac7fc737640fb76d15c8d400dbf2bf094",
+      "response_model": "gpt-6-luna",
+      "response_sha256": "6b793d983a6d6ee66eb8081eb6b40ba62459e77a922e9ee5bfc60f1b4a8ae601",
+      "response_status": "completed",
+      "total_tokens": 4395
+    }
+  ],
+  "official_final_tasks_observed": 0,
+  "prior_sol_receipt": "full-study-researcher-route-live-preflight-2026-09-27.json",
+  "researcher_campaigns_started": 0,
+  "schema": "envloop-researcher-model-live-smokes-v1",
+  "verified_utc": "2026-09-27T13:21:33Z"
+}

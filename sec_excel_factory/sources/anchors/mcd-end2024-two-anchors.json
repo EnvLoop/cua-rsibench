@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "MCD",
+  "cik": 63908,
+  "entity_name": "McDONALD\u2019S CORPORATION",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000063908.json",
+  "proxy_raw_json_sha256": "0394e814d75510be107679b026e2df6e5d02d4f2029166911aa4924f9556681f",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/63908/000006390825000012/0000063908-25-000012-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/63908/000006390825000012/mcd-20241231.htm",
+  "filing_accession": "0000063908-25-000012",
+  "filing_filed": "2025-02-25",
+  "filing_period_end": "2024-12-31",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "4fed88314ee14adf7eff",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-12-31",
+      "value": 55182000000,
+      "accession": "0000063908-25-000012",
+      "filed": "2025-02-25",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "0233532e710fccd44e6e",
+      "concept": "Revenues",
+      "unit": "USD",
+      "start": "2024-01-01",
+      "end": "2024-12-31",
+      "value": 25920000000,
+      "accession": "0000063908-25-000012",
+      "filed": "2025-02-25",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

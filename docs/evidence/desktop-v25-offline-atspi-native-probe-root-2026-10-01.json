@@ -1,0 +1,19 @@
+{
+  "cleanup_result_sha256": "dff779efcbeb4f4ce63bcba605c131ba0eff96d805bcb13352adf910fab74e80",
+  "desktop_count": 1,
+  "existing_native_libraries_replaced": false,
+  "kill_acknowledged": true,
+  "model_calls": 0,
+  "namespace_available": true,
+  "namespace_result_sha256": "79bf0e488e8eda0df6e20c5c317307f49820f9bdb26c6b7134e8df0d1b81eae1",
+  "native_result_sha256": "a85d5f35c6f1ecce1f7c00ca1cf68001b0183603f93779218008acbc62dd1de7",
+  "native_tree_focus_targets_qualified": false,
+  "official_final_admitted": 0,
+  "sandbox_running": false,
+  "schema": "envloop-desktop-offline-atspi-native-probe-v25-root",
+  "status": "namespace_fixed_actual_native_tree_unbounded",
+  "supplemental_content_epoch_sha256": "25dcde43d47376c302514b0d6f302bbbd88d1ed86cfdeaa93d6fdd07709e793f",
+  "task_files_modified": false,
+  "typelib_bytes": 54164,
+  "typelib_sha256": "210580f698add0a1607ee01e177d93d3b6bdb0fdcfc908e8c1b5c7ebbb503b62"
+}

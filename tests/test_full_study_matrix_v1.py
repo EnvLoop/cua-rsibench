@@ -61,7 +61,8 @@ class FullStudyMatrixTests(unittest.TestCase):
                      'temperature': '0', 'max_output_tokens': 512}
                     if role == 'student' else
                     {'reasoning_effort': 'max',
-                     'temperature': '0', 'max_output_tokens': 4096})
+                     'reasoning_mode': 'standard',
+                     'max_output_tokens': 4096})
         path = directory / 'config.json'
         path.write_bytes(cell_final.json_bytes({
             'schema': 'cua-model-configuration-v1',
@@ -241,9 +242,11 @@ class FullStudyMatrixTests(unittest.TestCase):
         plan = json.loads((out / 'campaign-plan.json').read_text())
         self.assertEqual((result['campaign_count'],
                           result['distinct_official_task_identities']), (24, 600))
-        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_final_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_selection_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '1200')
         self.assertEqual(plan['declared_campaign_reservation_usd'], '18000')
-        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '18600')
+        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '19200')
         self.assertEqual(len(plan['campaign_intents']), 24)
         self.assertTrue(all(row['selected_checkpoint_known'] is False and
                             row['provider_dispatch_enabled'] is False
@@ -328,9 +331,11 @@ class FullStudyMatrixTests(unittest.TestCase):
         self.assertEqual(result['planned_unique_checkpoint_task_executions'], 3000)
         self.assertTrue(all(cell['unique_checkpoint_count'] == 5 for cell in plan['cells']))
         self.assertEqual(plan['declared_final_slot_cost_upper_bound_usd'], '3000')
-        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_final_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_selection_cost_upper_bound_usd'], '600')
+        self.assertEqual(plan['declared_shared_base_cost_upper_bound_usd'], '1200')
         self.assertEqual(plan['declared_campaign_reservation_usd'], '18000')
-        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '18600')
+        self.assertEqual(plan['declared_all_in_cost_upper_bound_usd'], '19200')
         self.assertEqual(len(plan['configuration_bindings']['researchers']), 4)
         self.assertIn('training', plan['configuration_bindings']['student']['asset_sha256'])
         self.assertEqual(plan['researcher_inference_usd_cap_per_campaign'], '100')
@@ -416,6 +421,18 @@ class FullStudyMatrixTests(unittest.TestCase):
             ref['sha256'] = sha(path.read_bytes())
             with self.assertRaisesRegex(ValueError, 'configured model or role changed'):
                 matrix.prepare(self.write_matrix(bad), self.root / 'bad-model-config')
+        finally:
+            path.write_bytes(original)
+        bad = copy.deepcopy(self.matrix)
+        ref = bad['configurations']['researchers']['astra']
+        try:
+            value = json.loads(original)
+            value['settings']['temperature'] = '0'
+            path.write_bytes(cell_final.json_bytes(value))
+            ref['sha256'] = sha(path.read_bytes())
+            with self.assertRaisesRegex(ValueError,
+                                        'unsupported reasoning or temperature'):
+                matrix.prepare(self.write_matrix(bad), self.root / 'bad-reasoning-temperature')
         finally:
             path.write_bytes(original)
         asset_path = path.parent / 'prompt.txt'

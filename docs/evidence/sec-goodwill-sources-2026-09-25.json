@@ -1,0 +1,37 @@
+{
+  "schema": "sec-goodwill-source-expansion-v1",
+  "date": "2026-09-25",
+  "status": "three public original-filing source excerpts; zero hidden or GUI admission",
+  "issuers": 3,
+  "original_accessions": 3,
+  "total_fact_rows": 41,
+  "source_units": [
+    "USD"
+  ],
+  "sources": [
+    {
+      "ticker": "PFE",
+      "cik": 78003,
+      "accession": "0000078003-25-000054",
+      "records": 13,
+      "raw_json_sha256": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
+      "excerpt_sha256": "fac49a39745723eac9e62410f923e8ec0ec5bd3d15da9b546d53812b31fe716d"
+    },
+    {
+      "ticker": "NVDA",
+      "cik": 1045810,
+      "accession": "0001045810-24-000029",
+      "records": 13,
+      "raw_json_sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff",
+      "excerpt_sha256": "5a2f35235f62c3c01a1603505391e484e075415175ef7338ce2a488aa6040910"
+    },
+    {
+      "ticker": "META",
+      "cik": 1326801,
+      "accession": "0001326801-25-000017",
+      "records": 15,
+      "raw_json_sha256": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
+      "excerpt_sha256": "6c6d3131e6555214987c564fb59afe83a790ba040b87defa5f1b6359824ecc1c"
+    }
+  ]
+}

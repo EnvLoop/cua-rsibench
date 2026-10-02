@@ -1,0 +1,23 @@
+{
+  "controller_sha256": {
+    "core_v1": "51f65a1d18bb3f92b3bc7d38b27bacb221b767de0fcc33a7cdf0b94bbe3fda59",
+    "neutral_v2": "4e0a1f05ab3e2c8078610b4479d46b57ed7de0ce7853d9332e294daf2ad8500a",
+    "pre_task_open": "58c63f75f695293acfc32b4987a5b18896322310dcafb95001891bc1230adbb7",
+    "verifier": "2aef4513690984e965f59f7bb994aa3ba3ef3fbd342da566a10d0fb7a5e8fcc9"
+  },
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "private_receipt_sha256": "85331304ef8cb06049deb9ec336a814682a86dccb8558cfbcb7918eb03b00d63",
+  "quarantined_first_stage_chart_failures": 2,
+  "quarantined_source_families_excluded": 2,
+  "quarantined_stabilized_chart_positive_score": 1,
+  "schema": "envloop-ppt-web-stabilization-development-public-v1",
+  "status": "pre_result_evaluator_and_train_only_no_final_admissions",
+  "train_first_to_second_stage_semantics_preserved": true,
+  "train_four_target_neutral_saved_state_preserved": true,
+  "train_four_target_positive_preservation_pass": true,
+  "train_four_target_positive_score": 1,
+  "train_partial_score": 0,
+  "train_partial_target_changes": 1,
+  "train_source_to_first_stage_semantics_preserved": true
+}

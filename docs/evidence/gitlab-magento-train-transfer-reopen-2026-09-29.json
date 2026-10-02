@@ -1,0 +1,25 @@
+{
+  "auditor_source_sha256": "b1cee3a8f8cdc2ca236a10f2db44b4fab921ae536bc3bc67c65225f29bbb8ed8",
+  "gitlab_train_analogues": 10,
+  "gitlab_workflow_counts": {
+    "approved_merge_request_merge": 2,
+    "ci_and_runbook_reconciliation": 2,
+    "cross_record_issue_triage": 2,
+    "least_privilege_access_handoff": 2,
+    "release_milestone_coordination": 2
+  },
+  "gui_controls_passed": 0,
+  "magento_policy_counts": {
+    "multi-variant-freight-surcharge": 2,
+    "multi-variant-margin-floor": 2,
+    "multi-variant-parity-ladder": 2,
+    "multi-variant-stock-promotion": 2
+  },
+  "magento_target_skus_per_case": 5,
+  "magento_train_analogues": 8,
+  "model_results": 0,
+  "official_final_admitted": 0,
+  "protected_source_entity_overlap": 0,
+  "schema": "envloop-gitlab-magento-train-transfer-reopen-audit-v1",
+  "status": "source_only_private_reopen_passed_no_gui_or_model_result"
+}

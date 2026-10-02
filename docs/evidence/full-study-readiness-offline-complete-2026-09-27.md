@@ -1,0 +1,7 @@
+# Six-cell offline inventory complete; original-software admission pending
+
+The [updated SVG](../site/figures/full-study-readiness-offline-complete-2026-09-27.svg) and [source-bound chart data](full-study-readiness-offline-complete-2026-09-27.json) use the completed original-SEC Excel checkpoint together with the dated PowerPoint, desktop, Odoo, GitLab and Magento aggregate receipts. **Every cell now has 100 constructed offline final-candidate identities.** This is 600 candidate identities, not a ratified hidden-exam denominator or a model result.
+
+The blue development-control bars show application-specific evaluator work: active-pool PowerPoint 0, Excel web 0, LibreOffice desktop 100, Odoo Community 100, GitLab CE 61 and Magento admin 25 at the bound receipt revisions. These controls differ in software, reset scope and failure history; GitLab's pass count may include candidates later excluded with a source family. They must not be read as comparable agent success rates. The prior one-case PowerPoint pass was quarantined with its family and is intentionally absent from the active bar.
+
+All six official-admission counts remain **zero**. No common six-cell source-rights/runtime/Qwen/budget freeze has been ratified; no 24 researcher campaigns or matched 3,000 slot-task evaluations have run. The figure is an English methods-progress artifact. Its source hashes and [generator](../../tools/build_full_study_readiness_figure_v1.py) allow a reviewer to reproduce this dated snapshot without revealing hidden task identities or gold.

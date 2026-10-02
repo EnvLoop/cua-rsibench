@@ -1,0 +1,9 @@
+# GitLab native target resolution v9
+
+The real V8 TRAIN qualifier stopped before its first action while eagerly resolving an unrelated observed control that native GitLab rerendering had removed. The original 30-second locator timeout and complete cleanup evidence remain preserved. No task or provider result is inferred.
+
+The additive V9 observation retains the full native metadata and current control references without resolving every element. Dispatch resolves only target/from/to references actually requested, using a nonwaiting unique native handle lookup. It retains native connection, reference and document identity before the unchanged shared decision, intent and driver. Missing, duplicate or disconnected references cause a truthful current-target rejection with consumed nonce and no input; no action is guessed, retargeted or automatically replayed. The full original observation and predispatch images, real account/project/lease and target safety remain authoritative. Semantic role options are included in current native controls.
+
+The same class and source closure applies to teacher, reference controls, Qwen base and all four checkpoints. The declared actor budget is 90 actions and 720 seconds. Teacher actor timing begins after the exact initial reset, matching student actor timing; lifecycle/readback/provider shutdown time remains separately measured. Final aggregate clock accounting still requires the declared full-study counterpart and is not called qualified by this source change. Old V8 source, intent and failure remain immutable.
+
+Fresh metadata preparation, exact TRAIN phase review, independent 1/0/1 saved-state plus reset/source audit, then full20/100 controls and six-cell ratification remain mandatory. The V5 three-coldboot runtime proof is a lifecycle prerequisite, not task qualification. No model/provider call is made by source preparation or tests.

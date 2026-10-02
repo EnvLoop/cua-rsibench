@@ -1,0 +1,46 @@
+{
+  "actual_provider_billed_usd": null,
+  "applied_gui_actions_total": 43,
+  "attempt_count": 5,
+  "checked_date": "2026-09-27",
+  "complete_train_positive_with_raw_predispatch_frames": 0,
+  "conservative_full_lease_reserve_added_usd": "0.8333333333333333333333333333",
+  "distinct_sandbox_count": 5,
+  "failure_error_type_counts": {
+    "PhysicalFrameDrift": 2,
+    "ReadError": 1
+  },
+  "guest_content_attested_count": 5,
+  "native_development_lane_cap_usd": "40",
+  "native_development_lane_reserved_usd_after": "39.99444444444444444444444444",
+  "official_full_study_desktop_admissions": 0,
+  "official_hidden_final_model_attempts": 0,
+  "private_receipt_sha256s": [
+    "cc73cc7a7e1938d039c4e30da2684fd8d62a91e3d45e1da068ba58af609b97db",
+    "89221a387ff56a5ad314d3410593d030c48a9a604036be7290a64cbfc06677f8",
+    "69c0ebd544ecdb9b017ea9594f39bfdcc369365699bc1f408ed0706b2dd2a03a",
+    "e755c97683ed66a4c35edf580e0f88a639771b6b98d9a374db65280cba115deb",
+    "8e24eafb645f57b98cf649f319a4256d962af40e1cdeb7fcc55b40c046f23e8d"
+  ],
+  "raw_predispatch_frames_retained_on_later_failed_attempts": 16,
+  "saved_train_positive_artifacts_reverified": 2,
+  "schema": "cua-native-wdi-v066-train-primitive-live-public-v1",
+  "scope": "Five evaluator-scripted E2B smokes on one public Impress train fixture; no Tinker/model or hidden final task.",
+  "status_counts": {
+    "train_primitive_smoke_failed": 3,
+    "train_primitive_smoke_passed": 2
+  },
+  "successful_chord_smoke_applied_gui_actions": 16,
+  "successful_chord_smoke_attempt_index": 3,
+  "successful_chord_smoke_current_frame_predispatch_checks": 16,
+  "successful_chord_smoke_focused_insert_applied": 1,
+  "successful_chord_smoke_native_double_click_applied": 1,
+  "successful_chord_smoke_new_explicit_key_chords_applied": 4,
+  "successful_chord_smoke_raw_predispatch_frames_retained": false,
+  "successful_train_runner_sha256": "340d61e39341bf9311316abb97c2d7edb825f79f753b960cafe22aa1b3a69afe",
+  "terminated_sandbox_count": 5,
+  "v066_full_action_validator_sha256": "68569a1ed06984985600d367975d3e5c1e6935ec9571b24e3d3ba637174dc24b",
+  "v066_live_final_gui_trios": 0,
+  "v066_model_output_adapter_sha256": "27ac924609eafec82bdb3767ab591bc2b2cf36b610771602ff97dcc60fc830ff",
+  "v066_native_adapter_sha256": "03ae9e2e84caed09a4c36738f6aed2bdd840b4250927ca264d01a302dffe09a3"
+}

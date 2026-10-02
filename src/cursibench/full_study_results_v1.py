@@ -10,7 +10,7 @@ trace; application-specific readback remains an independent audit obligation.
 from __future__ import annotations
 
 from collections import Counter
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import json
 from pathlib import Path
 
@@ -32,6 +32,23 @@ COUNT_FIELDS = (
     'teacher_rollout_calls', 'e2b_peak_concurrency', 'candidate_submissions',
     'selection_evaluations',
 )
+
+
+def actual_usd(value: object, label: str) -> Decimal:
+    """Exact provider/nominal usage, separate from six-decimal frozen caps.
+
+    The paid-dispatch ledger already records nine decimal places. Never use a
+    float or silently quantize a small charge when reconciling that ledger.
+    """
+    _require(type(value) is str, f'{label}: decimal string required')
+    try:
+        amount = Decimal(value)
+    except InvalidOperation:
+        raise ValueError(f'{label}: invalid decimal') from None
+    _require(amount.is_finite() and amount >= 0 and
+             -amount.as_tuple().exponent <= 9,
+             f'{label}: nonnegative USD with at most nine decimals required')
+    return amount
 
 
 def _require(condition: bool, message: str) -> None:
@@ -108,13 +125,19 @@ def _usage(receipt: object, *, cell_id: str, researcher_id: str,
              receipt['researcher_id'] == researcher_id and
              receipt['cost_basis'] in ('provider_billed', 'published_rate_nominal'),
              'campaign usage identity or cost basis invalid')
-    if receipt['provider_invoice_usd'] is not None:
-        cell_final.amount(receipt['provider_invoice_usd'], 'provider_invoice_usd')
-    # Keep the invoice null distinct from the positive, bounded nominal fields.
-    amounts = {name: cell_final.amount(receipt[name], name) for name in USAGE_FIELDS}
-    total = cell_final.amount(receipt['all_in_usd'], 'all_in_usd')
+    invoice = (None if receipt['provider_invoice_usd'] is None else
+               actual_usd(receipt['provider_invoice_usd'], 'provider_invoice_usd'))
+    # The invoice is an exact observed total or explicitly unavailable; it is
+    # not inferred from published rates or fabricated as numeric zero.
+    amounts = {name: actual_usd(receipt[name], name) for name in USAGE_FIELDS}
+    total = actual_usd(receipt['all_in_usd'], 'all_in_usd')
     _require(total == sum(amounts.values(), Decimal(0)),
              'campaign all-in subtotal does not equal its components')
+    _require((receipt['cost_basis'] == 'provider_billed' and
+              invoice is not None and invoice == total) or
+             (receipt['cost_basis'] == 'published_rate_nominal' and
+              invoice is None),
+             'campaign invoice availability or subtotal differs from cost basis')
     caps = {
         'tinker_nominal_usd': plan['tinker_usd_cap_per_campaign'],
         'researcher_inference_usd': plan['researcher_inference_usd_cap_per_campaign'],
@@ -173,7 +196,7 @@ def _execution(receipt: object, *, cell_id: str, owner: str,
              after_time < receipt['started_at'] <= receipt['finished_at'] and
              receipt['cost_basis'] in ('provider_billed', 'published_rate_nominal'),
              f'{cell_id}/{owner}: final execution identity or timing invalid')
-    cell_final.amount(receipt['cost_usd'], 'final execution cost')
+    actual_usd(receipt['cost_usd'], 'final execution cost')
     rows = receipt['tasks']
     _require(isinstance(rows, list) and len(rows) == 100,
              f'{cell_id}/{owner}: exactly 100 task results required')
@@ -277,7 +300,7 @@ def audit(plan: object, index: object, root: Path, *,
                                         f'{cell_id}/{researcher_id} usage'),
                        cell_id=cell_id, researcher_id=researcher_id,
                        plan=plan, freeze=freeze)
-        reported_campaign_cost += cell_final.amount(usage['all_in_usd'], 'all_in_usd')
+        reported_campaign_cost += actual_usd(usage['all_in_usd'], 'all_in_usd')
         campaigns[key] = {'freeze': freeze, 'usage': usage}
     _require(set(campaigns) == {(cell, researcher) for cell in matrix.CELLS
                                 for researcher in matrix.RESEARCHERS},
@@ -309,17 +332,17 @@ def audit(plan: object, index: object, root: Path, *,
             _reference_json(root, raw['receipt'], f'{cell_id}/{owner} final execution'),
             cell_id=cell_id, owner=owner, checkpoint=checkpoint,
             packages=packages, after_time=last_freeze)
-        _require(cell_final.amount(record['cost_usd'], 'final execution cost') <=
+        _require(actual_usd(record['cost_usd'], 'final execution cost') <=
                  cell_final.amount(slot_plan['declared_all_in_cost_upper_bound_usd'],
                                    'slot final cost upper bound'),
                  f'{cell_id}/{owner}: final execution cost cap exceeded')
         invalid_counts.update(invalid)
         if owner == 'shared-base':
-            shared_base_cost += cell_final.amount(record['cost_usd'], 'base cost')
+            shared_base_cost += actual_usd(record['cost_usd'], 'base cost')
         else:
             declared = campaigns[(cell_id, owner)]['usage']['selected_final_usd']
-            _require(cell_final.amount(declared, 'selected_final_usd') ==
-                     cell_final.amount(record['cost_usd'], 'selected final cost'),
+            _require(actual_usd(declared, 'selected_final_usd') ==
+                     actual_usd(record['cost_usd'], 'selected final cost'),
                      f'{cell_id}/{owner}: selected final cost disagrees with campaign')
         executions[key] = record
     _require(set(executions) == expected_owners,
@@ -333,7 +356,7 @@ def audit(plan: object, index: object, root: Path, *,
             owner = reuse[researcher_id]
             selected_scores = executions[(cell_id, owner)]['scores']
             if owner != researcher_id:
-                _require(cell_final.amount(campaigns[(cell_id, researcher_id)]['usage'][
+                _require(actual_usd(campaigns[(cell_id, researcher_id)]['usage'][
                     'selected_final_usd'], 'selected_final_usd') == 0,
                     f'{cell_id}/{researcher_id}: reused execution charged twice')
             summary = stats.paired_summary(

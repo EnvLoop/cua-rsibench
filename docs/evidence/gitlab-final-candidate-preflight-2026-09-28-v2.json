@@ -1,0 +1,32 @@
+{
+  "admission_blockers": [
+    "per_task_v06_reset_and_verifier_proofs_not_issued",
+    "per_task_gui_controller_source_at_execution_not_bound",
+    "v066_live_student_observation_and_sampling_not_qualified",
+    "complete_cell_runtime_hidden_set_and_cost_freeze_absent",
+    "six_cell_pre_campaign_witness_absent"
+  ],
+  "all_raw_case_receipts_snapshots_and_named_screens_rehashed": true,
+  "analysis_families_sha256": "2cd91b436781aa3913ed881f756c961a7880c499da918266da6e21e629d2b403",
+  "application": "GitLab CE 18.5.0-ce.0",
+  "auditor_source_sha256": "d14b9ab4b7b7c2fbd8a51d328e0afad528e446b7bb6516cd7dc258bfef6dc345",
+  "cell_id": "gitlab",
+  "current_cold_reset_receipts": 300,
+  "current_gui_positive_negative_positive_trios": 100,
+  "failure_ledger_head_sha256": "b962e355722cfbb82c75221436ed6b439b2662454914ac9cc90cfd9c71240e11",
+  "final_source_families": 20,
+  "index_sha256": "2db41b63d906954c18a57edb6125843469fb698b66aa0c9afbbea8557b6bd728",
+  "official_final_admitted": 0,
+  "official_model_outcomes": 0,
+  "private_per_task_ledger_sha256": "5d9c8d9ceb18630760c4a48ef44c1bfa4d3c6ee4edadce2650256322aba6d0c0",
+  "provisional_final_candidates": 100,
+  "real_advisory_source": "CISA KEV CC0; internal operations are synthetic",
+  "researcher_campaigns": 0,
+  "retained_first_attempt_failures": 6,
+  "schema": "envloop-gitlab-final-candidate-preflight-public-v1",
+  "selection_candidates": 20,
+  "status": "100_individual_evaluator_gui_controls_verified_not_admitted",
+  "tasks_per_source_family": 5,
+  "train_candidates": 20,
+  "v066_code_only_ratification_sha256": "30a0f3501b8e5ae5bace62aa68adea59c176778906349fb8b0a3a7b33845caa2"
+}

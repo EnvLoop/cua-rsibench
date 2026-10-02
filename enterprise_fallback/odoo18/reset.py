@@ -18,6 +18,7 @@ from pathlib import Path
 
 from factory import HERE, PRIVATE, local_config
 from verify import snapshot
+from worker_lease import exclusive_worker_operation
 
 ODOO_IMAGE = "odoo@sha256:478065867b945579649373aa4cca3b56f7b74daf0522e5fdf85e7d1262e11d39"
 FILESTORE_SCAN = (
@@ -73,6 +74,11 @@ def wait_web(timeout_s: int = 90) -> None:
 
 
 def checkpoint() -> dict:
+    with exclusive_worker_operation("checkpoint"):
+        return _checkpoint_unlocked()
+
+
+def _checkpoint_unlocked() -> dict:
     PRIVATE.mkdir(exist_ok=True)
     db_dump = PRIVATE / "baseline.pgcustom"
     fs_dump = PRIVATE / "baseline-filestore.tgz"
@@ -111,6 +117,11 @@ def checkpoint() -> dict:
 
 
 def restore() -> dict:
+    with exclusive_worker_operation("restore"):
+        return _restore_unlocked()
+
+
+def _restore_unlocked() -> dict:
     db_dump = PRIVATE / "baseline.pgcustom"
     fs_dump = PRIVATE / "baseline-filestore.tgz"
     receipt = json.loads((PRIVATE / "checkpoint_receipt.json").read_text())

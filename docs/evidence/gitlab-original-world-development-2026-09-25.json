@@ -1,0 +1,103 @@
+{
+  "cell": "gitlab",
+  "date": "2026-09-25",
+  "evaluator_owned_sweep": {
+    "candidate_families": {
+      "approved_merge_request_merge": 20,
+      "ci_and_runbook_reconciliation": 20,
+      "cross_record_issue_triage": 20,
+      "least_privilege_access_handoff": 20,
+      "release_milestone_coordination": 20
+    },
+    "candidate_final_total": 100,
+    "complete_100_per_id_gui_admission": false,
+    "development_gui_trio_passed": 1,
+    "generated_final_and_reserve_candidates": 105,
+    "implemented_gui_families": [
+      "cross_record_issue_triage"
+    ],
+    "no_model_scores": true,
+    "official_final_admitted": 0,
+    "quarantined_final_candidate_ids": 5,
+    "quarantined_source_families": 1,
+    "refill_complete_as_inventory_only": true,
+    "reserve_replacement_candidate_ids": 5,
+    "retained_prior_failed_attempts": 1,
+    "schema": "envloop-gitlab-development-sweep-summary-v1",
+    "source_excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+    "statuses": {
+      "development_gui_trio_passed": 1,
+      "not_attempted": 99
+    },
+    "still_unexposed_final_candidates": 100,
+    "unexposed_100_candidate_inventory_intact": true
+  },
+  "full_researcher_campaigns_executed": 0,
+  "gui_development_control": {
+    "cold_resets": 3,
+    "fresh_browser_attempts": 3,
+    "model_calls": 0,
+    "positive_negative_positive_scores": [
+      1.0,
+      0.0,
+      1.0
+    ],
+    "source_families": 1,
+    "source_family_quarantined_before_refill": true
+  },
+  "independent_oracle": {
+    "all_31_projects_monitored_for_no_regression": true,
+    "postgresql_and_git_readback": true,
+    "target_workflow_families_specified": 5
+  },
+  "limitations": [
+    "Only the composite issue triage GUI driver is implemented; other four final families remain unattempted by the sweeper.",
+    "The development trio used administrator login and DOM-located actions; the eventual model requires scoped operator credentials and a frozen screenshot/action contract.",
+    "The saved CI configuration is not evidence of a functioning runner or passing pipeline.",
+    "Candidate difficulty and model discrimination are unmeasured; no 100-task final set is admitted or sealed."
+  ],
+  "official_final_task_identities_admitted": 0,
+  "runtime": {
+    "application": "GitLab CE 18.5.0-ce.0",
+    "copy_on_write_cold_container_reset": true,
+    "frozen_world_resumed_after_demo_restore": true,
+    "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
+    "isolated_loopback_instance": true,
+    "post_reserve_business_sha256": "0b46f02098932c6a0c2d63bddbd8f38a5d828de6c8f6302ff0bbabd445a42344",
+    "pre_existing_demo_identity_preserved_and_restored_healthy": true
+  },
+  "schema": "envloop-gitlab-original-world-development-public-v1",
+  "source": {
+    "WebArena_task_ids_or_scores_transferred": false,
+    "original_task_source": "EnvLoop authored",
+    "real_fact_source": {
+      "commit": "203fa4633af39c6944608e30984996f04ccc4541",
+      "excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+      "full_file_sha256": "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1",
+      "license": "CC0-1.0; no CISA/DHS logo or endorsement",
+      "repository": "https://github.com/cisagov/kev-data"
+    },
+    "reserve_excerpt_sha256": "dfd9c995f9e1db3f086144c9272a100734ffde79508037b5c86720cfa3f43bc6",
+    "synthetic_internal_operations": true
+  },
+  "world": {
+    "direct_acl_memberships": 93,
+    "issues": 186,
+    "labels": 217,
+    "merge_requests": 62,
+    "official_final_admitted": 0,
+    "original_final_candidates": 100,
+    "projects": 31,
+    "quarantined_final_candidate_ids": 5,
+    "quarantined_source_families": 1,
+    "refill_complete_as_inventory_only": true,
+    "reserve_candidates": 5,
+    "reserve_replacement_candidate_ids": 5,
+    "selection_candidates": 20,
+    "source_advisories": 124,
+    "still_unexposed_final_candidates": 100,
+    "train_candidates": 20,
+    "unexposed_100_candidate_inventory_intact": true,
+    "users": 124
+  }
+}

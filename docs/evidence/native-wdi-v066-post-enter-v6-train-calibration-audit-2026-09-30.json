@@ -1,0 +1,15 @@
+{
+  "calc_cold_reset_original_bytes_verified": true,
+  "distinct_sandbox_guests": 3,
+  "full_lease_intents_charged": 3,
+  "official_final_admissions": 0,
+  "positive_saved_workflows": 2,
+  "post_enter_raw_frames": 10,
+  "post_enter_windows": 2,
+  "private_sample_ledger_sha256": "b887d4654dc13a49fd60d89e74c339f32b4a22a1ecff0a99c2ee4f49690f7ffd",
+  "provider_active_after": 0,
+  "same_intent_replay_authorized": false,
+  "schema": "cua-native-wdi-v066-post-enter-train-calibration-audit-public-v1",
+  "source_scope": "public_train_only",
+  "status": "three_public_train_guests_saved_state_and_reset_audited"
+}

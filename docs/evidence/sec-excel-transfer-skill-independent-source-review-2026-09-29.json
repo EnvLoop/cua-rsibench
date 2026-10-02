@@ -1,0 +1,42 @@
+{
+  "admission": {
+    "model_calls_by_this_review": 0,
+    "official_excel_web_final_tasks": 0,
+    "train_analogues_materialized_by_this_review": 0
+  },
+  "coverage": {
+    "connected_acyclic_skill_dags_with_at_least_three_edges_on_longest_path": 13,
+    "historical_snapshot_builders_excluded": 8,
+    "original_generator_module_paths_sha256_bound": 37,
+    "private_final_skill_graph_cards": 13,
+    "private_registry_offline_final_reservations": 100,
+    "semantic_source_reviews_passed": 13,
+    "source_declared_nine_fault_guards": 37
+  },
+  "date_utc": "2026-09-29",
+  "detached_signature_sha256": "4d0865c0c503676e4d598a4ff84fdb57625a33dcd5b47f1aed2da4f238b70058",
+  "interpretation": "The source-level cards can constrain future train-only analogue specifications. They do not establish case validity, GUI solvability, or model improvement.",
+  "not_reviewed": [
+    "final workbooks or per-ID gold",
+    "per-ID generator-to-workbook artifact replay",
+    "train analogue construction",
+    "Microsoft Excel for the web save/download/reset",
+    "provider or model results"
+  ],
+  "private_cards_salted_commitment_sha256": "53fdbff90fcbfb1878169319957d8b1b030204567b8b902cde0bf8beb7697d32",
+  "private_review_sha256": "44027f008e7672da883e907215fba75a0a94662080f5f0d259fe78c4e3def579",
+  "reviewed_evidence": [
+    "private graph-reservation registry metadata",
+    "original generator module source bytes",
+    "causal skill atoms and dependency edges",
+    "minimum target-edit depth"
+  ],
+  "schema": "envloop-sec-excel-transfer-skill-independent-review-public-v1",
+  "signature_identity_boundary": "The audit key was generated locally by the independent review agent; the detached signature protects the bound review bytes but is not an externally certified human identity.",
+  "signature_namespace": "envloop-sec-excel-transfer",
+  "signature_verified_locally": true,
+  "signer_identity": "envloop-excel-independent-review",
+  "signer_key_fingerprint": "SHA256:0jq9FnYYvEaMy+5JXUkAYJB2Olr/i2z/IoI2aSCyEKo",
+  "signer_public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDlQC+RgMejB7uUOCi+OddweZxs036HUNgz/Tf2UEHau",
+  "status": "source_bound_review_passed"
+}

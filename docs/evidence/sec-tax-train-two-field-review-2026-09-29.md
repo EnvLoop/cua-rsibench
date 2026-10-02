@@ -1,0 +1,11 @@
+# Two TRAIN-only uncertain-tax-position source reviews
+
+Two source-captured SEC 10-K packages received an evaluator-private, field-level semantic review for possible Excel TRAIN analogues. This is a source review only. It does not admit an Excel task, establish Office-web execution, or count toward any final evaluation set.
+
+The review tool verifies the captured file hashes, matches each source to its private source plan, locates the filed rollforward table, resolves inline-XBRL contexts, cross-checks every selected field against same-accession SEC Company Facts, and recomputes two annual gross-position bridges. Both bridges reconcile with zero discrepancy. Each package also has a separately disclosed accrued interest-and-penalties balance, which the review keeps outside the gross-position bridge.
+
+The disclosed component sets differ. One source separately reports a statute-of-limitations lapse; the other does not. Neither source separately reports translation or an “other” bridge row. Those absent categories are recorded as **not separately reported**, never as filed or structural zeros. One source reports interest expense separately, whereas the other reports a combined interest-and-penalties amount that is a net benefit in the current year. The latter source places the detailed table in a filing exhibit while its inline-XBRL context definitions are in the primary 10-K document.
+
+The private receipt holds issuer identities, accession numbers, original-file hashes, field tags and context references, periods, signed values, exact source locations, and the arithmetic checks. It remains outside the public repository. Future workbook construction must preserve the reported-versus-authored boundary and independently test formula, counterfactual, reset, and saved-file behavior before any task admission.
+
+Reproduce the source review with `python -m pip install -e '.[sec_source_review]'`, then run `tools/review_sec_uncertain_tax_sources.py` with `--private-plan`, `--raw-root`, and `--output-private`. The script emits a mode-0600 private JSON receipt and fails on source drift, missing fields, period conflicts, SEC Company Facts mismatches, or bridge arithmetic mismatch.

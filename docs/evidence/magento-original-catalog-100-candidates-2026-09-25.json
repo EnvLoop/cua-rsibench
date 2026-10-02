@@ -1,0 +1,39 @@
+{
+  "application": "Magento Open Source 2.4.6 administration",
+  "checked_date": "2026-09-25",
+  "final_source_family_count": 100,
+  "final_template_counts": {
+    "multi-variant-freight-surcharge": 25,
+    "multi-variant-margin-floor": 25,
+    "multi-variant-parity-ladder": 25,
+    "multi-variant-stock-promotion": 25
+  },
+  "image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "model_results": 0,
+  "official_final_tasks_admitted": 0,
+  "private_candidate_plan_sha256": "1df41f027b5f284c7ff7ed162f42f075259960242a295e0a430bff1c8b479ae1",
+  "private_gold_or_account_data_published": false,
+  "private_master_seed_sha256": "120b44fdb5e636622667351d117de20c55e4ba04a6775970a87531f9097fdd29",
+  "private_source_inventory_sha256": "742f505a16bdc9e478c2af2414455e50530ad824878c20254204314ccc5056cf",
+  "schema": "envloop-magento-original-catalog-candidates-public-v1",
+  "selection_template_groups": [
+    "two-variant-quoted-reprice"
+  ],
+  "source_inventory": {
+    "configurable_parent_count": 147,
+    "eligible_parent_count": 145,
+    "quarantined_train_development_parent_count": 1,
+    "ten_variant_final_capacity": 115
+  },
+  "source_type": "Magento Luma sample catalog plus EnvLoop-authored synthetic supplier quotes",
+  "split_counts": {
+    "official_candidate": 100,
+    "selection": 20,
+    "train": 20
+  },
+  "status": "offline_candidate_factory_not_runtime_admitted",
+  "task_packages_gui_calibrated": 0,
+  "train_template_groups": [
+    "single-visible-direct-reprice"
+  ]
+}

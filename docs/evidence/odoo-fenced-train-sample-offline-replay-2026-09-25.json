@@ -1,0 +1,15 @@
+{
+  "current_frame_validation_executed": false,
+  "gui_action_dispatched": false,
+  "historical_action_status": "rejected_not_dispatched",
+  "historical_error_code": "invalid_action_json",
+  "historical_train_sample_text_sha256": "d62b7437de9c4d9a2c43968627de48ea86d7ccd64392dd8dce42bed11aae0ac3",
+  "new_shared_parser_sha256": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+  "new_transport_json_parse_passed": true,
+  "official_hidden_task_used": false,
+  "official_task_scores_added": 0,
+  "parsed_action_type": "click",
+  "parsed_target_kind": "current_frame_control_ref",
+  "provider_calls_added": 0,
+  "schema": "envloop-odoo-fenced-train-sample-offline-replay-v1"
+}

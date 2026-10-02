@@ -1,0 +1,86 @@
+{
+  "applied_gui_action_types": [
+    "click",
+    "click"
+  ],
+  "checked_date": "2026-09-27",
+  "completed_multimodal_samples": 2,
+  "development_verifier_passed": false,
+  "e2b_full_lease_reserve_usd_for_smoke": "0.1666666666666666666666666667",
+  "e2b_lane_cap_usd": "40",
+  "e2b_lane_full_lease_reserve_usd_after_smoke": "32.76111111111111111111111111",
+  "historical_applied_gui_actions": 7,
+  "historical_attempt_status_counts": {
+    "action_budget_reached": 4,
+    "model_output_or_frame_rejected": 1
+  },
+  "historical_completed_multimodal_samples": 10,
+  "historical_nonfinal_attempt_count": 5,
+  "historical_private_receipt_sha256s": [
+    "f5246068aa7714f57178b5a71bfece366060c671ef21e47ca4600acbc92dfe40",
+    "ac37bced2b7dc9397fe1d494763bb22cdfd29047af883190f5f53677dd8a0059",
+    "03b71daf6c89a9e4242fbe93bb933f8d183d0f6c40ba4f74e06c5f7d73445094",
+    "80a7b10918bf0106f0825fac3caa29a924a76ccacd3287b3310d47f2d9194055",
+    "8b9a9b58f1ee916d78c0a1ab92b44a32a916133842264a4e38097957b8daa6fc"
+  ],
+  "historical_rejected_action_code_counts": {
+    "invalid_action": 1,
+    "stale_frame": 2
+  },
+  "native_adapter_source_sha256": "7c77327336161c9b918a7bce1f83c530bc1f64521ae74113abfbcea498afad12",
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "private_frame_screenshots_retained": 2,
+  "private_receipt_sha256": "8b9a9b58f1ee916d78c0a1ab92b44a32a916133842264a4e38097957b8daa6fc",
+  "provider_billed_usd": null,
+  "provider_envd_version": "0.9.0",
+  "provider_resource_shape": {
+    "memory_mb": 8192,
+    "vcpu": 8
+  },
+  "provider_template_id": "k0wmnzir0zuzye6dndlw",
+  "rejected_action_codes": [],
+  "rendered_usage_not_billing": [
+    {
+      "basis": "rendered multimodal length and returned sample length; not billing",
+      "image_tokens": 1000,
+      "input_tokens": 1552,
+      "output_tokens": 25,
+      "prompt_cache_hit_tokens": 0,
+      "provider_billed_tokens": null
+    },
+    {
+      "basis": "rendered multimodal length and returned sample length; not billing",
+      "image_tokens": 1000,
+      "input_tokens": 1570,
+      "output_tokens": 25,
+      "prompt_cache_hit_tokens": 0,
+      "provider_billed_tokens": null
+    }
+  ],
+  "renderer_identity": {
+    "image_processor": "Qwen2VLImageProcessorPil",
+    "model": "Qwen/Qwen3.8-27B",
+    "processor_config_sha256": "f30d048e3fda7839c8b3e0e9b8559e5f4581ce7d4f9b15ccd893b9bf5c6ac45b",
+    "renderer": "qwen3_5_disable_thinking",
+    "tokenizer_vocabulary_sha256": "420ab4b96193b4325156f56cd7c3876a8a0d46f515fe4f711a7a6bf5553bf8fa"
+  },
+  "runner_source_sha256": "efb021c0bf37feb16ee4bb4b9f461f094e353f6f5e98a88bd73c7e43f1baccf2",
+  "runner_status": "action_budget_reached",
+  "sample_errors": [],
+  "sampling_binding_sha256": "1fd727032f44e9c3e248b8994301906d34fa85eb1ce4f97d549fce4cf4dcd58e",
+  "sandbox_terminated": true,
+  "saved_artifact_changed": false,
+  "schema": "cua-native-wdi-qwen-v064-nonfinal-smoke-public-v1",
+  "scope": "Latest of 5 train/selection-only development boundary smokes; no final-candidate model exposure or official full-study outcome.",
+  "screenshot_size": {
+    "height": 800,
+    "pixels": 1024000,
+    "width": 1280
+  },
+  "shared_action_parser_sha256": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+  "shared_v064_adapter_sha256": "3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70",
+  "shared_vision_proxy_sha256": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2",
+  "split": "train",
+  "tinker_session_closed": true
+}

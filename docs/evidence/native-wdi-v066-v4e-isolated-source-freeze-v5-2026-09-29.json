@@ -1,0 +1,28 @@
+{
+  "automatic_clone_retry_authorized": false,
+  "candidate_inventory_sha256": "0e1f1800fa8a3a647a4215296afac020affd844b8e5f735aa27d02ef29592ac0",
+  "dispatch_authorized": false,
+  "historical_complete_trios": 8,
+  "historical_partial_logical_ids": 4,
+  "official_final_admissions": 0,
+  "official_final_model_attempts": 0,
+  "private_freeze_sha256": "0579b45383814f1b57af7773616b47434e235ff66a0807bcebc04c01dabca6b2",
+  "projected_five_root_full_lease_intents": 323,
+  "projected_five_root_reserved_usd_upper": "53.83333333333333333333333333",
+  "retained_four_root_full_lease_intents": 56,
+  "same_intent_replay_authorized": false,
+  "schema": "cua-native-wdi-v066-five-root-freeze-public-v4e",
+  "sorted_final_roster_sha256": "240bf7547d8aa36c0f4488cc48b1235dec20902655397c673c05878f072c9e23",
+  "source_sha256s": {
+    "native_desktop_factory/qwen_v066_adapter_v4_strict.py": "8565ef15784b1de9d20f79b08d0d17ac4e108f3e2c7e5a0e0dbe42e4e142b29b",
+    "native_desktop_factory/v066_day_rollover_controller_v4e.py": "95f1730a919f81c419b14cad0aca472ceb9a43282a91141d69553058855a877c",
+    "native_desktop_factory/v066_day_rollover_durable_child_v4e.py": "9bc9441c7f5ba40d16470d0835a51e226c73a3b90ab90726545bbf6e3a3b0648",
+    "native_desktop_factory/v066_day_rollover_durable_output_v4d.py": "2c3a3497c6ae75d59033dc4c80c552d1df66c0d21c46e95894d206f93c193f9a",
+    "native_desktop_factory/v066_day_rollover_five_root_v4e.py": "ff213f4b4221232cfa31b01028c401d5d3824877e90b9011d89efb7ea93546f1",
+    "native_desktop_factory/v066_day_rollover_independent_audit_v4e.py": "e198e9c3afffce900e54af88d1ebb3b81c485adbe753232b7d635b24705d6626"
+  },
+  "status": "source_frozen_pending_independent_dispatch_review",
+  "untouched_task_count": 88,
+  "v4d_main_freeze_sha256": "d1e2d7639bc20772a4922777d4cf0f2ec0f3f9f624d0b360a16270fa360885d3",
+  "v4d_main_public_sha256": "f06958825c1d2b5283a4e3ba33c14ee6fcb20e896055d66f31c4dd5f064b6485"
+}

@@ -1,0 +1,22 @@
+{
+  "all_formula_specs": {
+    "Review!B4": "=('WDI facts'!B9/'WDI facts'!B8-1)*100",
+    "Review!B5": "=('WDI facts'!C9/'WDI facts'!C8-1)*100",
+    "Review!B6": "=('WDI facts'!E9/'WDI facts'!E8-1)*100"
+  },
+  "country_iso3": "MEX",
+  "edits": 1,
+  "input_sha256": "8edcfd3fdbe099830596642c765413a709ae99acaf2dae3970aa307a1369f228",
+  "schema": "cua-native-wdi-oracle-v1",
+  "source_sha256": "cad6aafbd856ebb78f3f50106ab1b5b38ac369a2da251e2442268e296fde6d9f",
+  "split": "train",
+  "targets": {
+    "Review!B4": {
+      "expected_value": 2.0106305905178035,
+      "formula": "=('WDI facts'!B9/'WDI facts'!B8-1)*100"
+    }
+  },
+  "task_id": "wdi-native-mex-calc-growth",
+  "variant": 1,
+  "workflow": "calc-growth"
+}

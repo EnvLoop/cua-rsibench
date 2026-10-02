@@ -1,0 +1,18 @@
+{
+  "actual_effective_wait60_and_neutral3_verified": true,
+  "formal_task_credit": 0,
+  "full_git_sql_saved_state_and_cold_reset_independently_reopened": true,
+  "independent_native_dispatch_receipts": 15,
+  "independent_saved_scores": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "model_calls": 0,
+  "native_train_result_sha256": "0402bc51e727bb7fa97474351af7449037e5919a8a1f15f652cc6272f20491ac",
+  "new_full100_pending": true,
+  "old_source_epoch_credit": 0,
+  "schema": "envloop-public-gitlab-v14-native-train-root-result-v1",
+  "status": "actual_train_1_0_1_uniform_runtime_and_native_safety",
+  "whole_source_binding_sha256": "e9806accbbe7fee6ee0e74400bde0a177912d84a119d0aa5b2ab7cc6b8d76598"
+}

@@ -1,0 +1,20 @@
+{
+  "archive_ledger_sha256": "8f8b731d22a8d981d15c8c9ef683fb82db2cc9e57fea44d9aff9a915c62fa119",
+  "checked_date": "2026-09-25",
+  "corrected_retry_run_receipt_sha256": "578ef6e7ea72348aebaa12ea9b15a77f169f64f75b76f326cf36399ae8de628e",
+  "fresh_corrected_gui_result": "positive_accepted_near_miss_rejected_cold_reset_verified",
+  "fresh_positive_near_miss_reset_receipt_sha256": {
+    "cold-reset": "bd3db9858f9cea83882183aa0ac4db35daf7902819668c6c2a76846c2c730ed9",
+    "near-miss": "491f28f47e6fd27b3d2c81ca87de6c005b443ead0838695a0d6e0a19409f6d8e",
+    "positive": "c7299d56b5ec920cd56c096b3d2844cd9a526a139752c1f3e92bd11f478f5788"
+  },
+  "interpretation": "A one-second wait after each Name Box Enter is consistent with restoring formula entry focus. The original failed attempt remains archived and no model outcome was involved.",
+  "official_full_study_admitted_final_count": 0,
+  "official_model_result_count": 0,
+  "old_known_positive_gui_result": "name_box_invalid_reference_modal; three target formulas untouched; independently rejected",
+  "opaque_task_ref": "8b8d65c8becba5f582b83575e8d292df7974c7dc6ad2b3a7347c5df91ad640c9",
+  "original_failed_positive_receipt_sha256": "bb08ddc13fd571d01a0e88231d4de6ce96261af6d2542b37249cf120203d1de7",
+  "original_partial_saved_artifact_sha256": "3fb6bc7c97b2b01c014682a22250f4e6a347c86c8386391aa36a44e32b2b7090",
+  "patched_sweeper_sha256": "8a1f2da07588a5676bcbb8d40885bedd0e0bae55252ff9df8551fb009d867cdc",
+  "schema": "cua-native-calc-focus-recovery-public-v1"
+}

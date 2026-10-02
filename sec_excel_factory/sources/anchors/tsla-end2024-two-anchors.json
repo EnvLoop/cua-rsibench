@@ -1,0 +1,45 @@
+{
+  "schema": "sec-two-officially-crosschecked-anchors-v1",
+  "status": "two_source_facts_manually_checked_against_non_proxy_sec_view; other_companyfacts_rows_not_admitted",
+  "ticker": "TSLA",
+  "cik": 1318605,
+  "entity_name": "Tesla, Inc.",
+  "companyfacts_source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001318605.json",
+  "proxy_raw_json_sha256": "d0c2b9288d027a6d735039a6fe874a348b65a7fdbc6c133130666c777c885204",
+  "official_index_url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025003063/0001628280-25-003063-index.html",
+  "official_value_view_url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828025003063/tsla-20241231.htm",
+  "filing_accession": "0001628280-25-003063",
+  "filing_filed": "2025-01-30",
+  "filing_period_end": "2024-12-31",
+  "filing_fiscal_year": 2024,
+  "facts": [
+    {
+      "id": "ae2cad07a49633485ff7",
+      "concept": "Assets",
+      "unit": "USD",
+      "start": "",
+      "end": "2024-12-31",
+      "value": 122070000000,
+      "accession": "0001628280-25-003063",
+      "filed": "2025-01-30",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    },
+    {
+      "id": "42cf9ba2400820643a15",
+      "concept": "RevenueFromContractWithCustomerExcludingAssessedTax",
+      "unit": "USD",
+      "start": "2024-01-01",
+      "end": "2024-12-31",
+      "value": 97690000000,
+      "accession": "0001628280-25-003063",
+      "filed": "2025-01-30",
+      "form": "10-K",
+      "fy": 2024,
+      "fp": "FY",
+      "frame": ""
+    }
+  ]
+}

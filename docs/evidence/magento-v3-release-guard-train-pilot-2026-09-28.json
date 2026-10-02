@@ -1,0 +1,21 @@
+{
+  "all_four_pre_edit_states_exact": true,
+  "fresh_reset_passed": true,
+  "gui_views": 4,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "original_magento_source_commit": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "parent_cron_freeze_sha256": "f0096622c214cca4f3ce1e377fb93199ec98182bd5918de97181a40e9608a74c",
+  "positive_saved_state_passed": true,
+  "private_pilot_sha256": "de5a2ee6468da8c5a284bc15f801da93b244b47d4f5a587c1c4cc58be078f7da",
+  "release_obstruction_observed_in_train": true,
+  "runtime_receipt_sha256": "89675510b28990777b4d69538cd4e35c87ca69ef0a4c996835070b7cab047a65",
+  "schema": "envloop-magento-v3-release-guard-train-pilot-public-v1",
+  "source_sha256s": {
+    "tools/magento_v3_guard_train_pilot.py": "619d994c2c051017ab231b188ed0e0fead2f9d9272cbd08617b91679340f9df0",
+    "tools/qualify_magento_original_catalog_v3.py": "5dc6558b4eb741cf68363682c97440a2017951dc80e8f0c8e9fc08102b735741",
+    "tools/sweep_magento_original_gui_controls_v3.py": "44afab866c8e49b918aae522832dd75c4e59f57e52124a74a4e3c5cdbe493770"
+  },
+  "status": "train_only_live_original_gui_guard_qualified_for_v3_freeze",
+  "wrong_variant_rejected": true
+}

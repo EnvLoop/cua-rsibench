@@ -55,7 +55,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
     seen_official_ids: set[str] = set()
     output_cells = []
     campaign_intents = []
-    shared_base_upper = Decimal(0)
+    shared_base_final_upper = Decimal(0)
+    shared_base_selection_upper = Decimal(0)
     for raw in cells:
         cell = cell_final.exact(raw, {'cell_id', 'analysis_families',
                                       'base_manifest'}, 'pre-campaign cell')
@@ -88,7 +89,11 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             limits['storage_application_usd'] +
             base['cost_maximum'] <= limits['campaign_all_in'],
             f'{cell_id}: campaign cap omits selected final-evaluation reservation')
-        shared_base_upper += base['cost_maximum']
+        # The complete 100-task base-final maximum is a conservative,
+        # separately reserved ceiling for this cell's 20-task base selection.
+        # Its one-time cost is outside all four researcher campaign caps.
+        shared_base_final_upper += base['cost_maximum']
+        shared_base_selection_upper += base['cost_maximum']
         train_sha = cell_final.digest(cell_final.json_bytes(base['train']))
         selection_sha = cell_final.digest(cell_final.json_bytes(base['selection']))
         official_sha = cell_final.digest(cell_final.json_bytes(base['official']))
@@ -109,6 +114,7 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
             'sampling': base['sampling'],
             'execution': base['execution'],
             'selected_final_cost_upper_bound_usd': str(base['cost_maximum']),
+            'base_selection_cost_upper_bound_usd': str(base['cost_maximum']),
         })
         for researcher_id, researcher_model in matrix.RESEARCHERS.items():
             campaign = {
@@ -147,6 +153,8 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
                        len(seen_official_ids) == 600,
                        'six declared cells or 600 unique official identities missing')
     campaign_reservation = limits['campaign_all_in'] * len(campaign_intents)
+    shared_base_upper = (shared_base_final_upper +
+                         shared_base_selection_upper)
     study_upper = shared_base_upper + campaign_reservation
     cell_final.require(study_upper <= limits['global_ceiling'] and
                        study_upper <= limits['available'],
@@ -164,6 +172,10 @@ def build(manifest: object, root: Path, manifest_sha256: str) -> dict:
         'campaign_count': len(campaign_intents),
         'distinct_official_task_identities': len(seen_official_ids),
         'selection_task_identities_per_cell': matrix.SELECTION_PER_CELL,
+        'declared_shared_base_final_cost_upper_bound_usd':
+            str(shared_base_final_upper),
+        'declared_shared_base_selection_cost_upper_bound_usd':
+            str(shared_base_selection_upper),
         'declared_shared_base_cost_upper_bound_usd': str(shared_base_upper),
         'declared_campaign_reservation_usd': str(campaign_reservation),
         'declared_all_in_cost_upper_bound_usd': str(study_upper),

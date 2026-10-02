@@ -1,0 +1,20 @@
+{
+  "action_profile": "scale-action-profile-v0.6.6",
+  "automatic_replay_after_uncertain_call": false,
+  "batch_size": 2,
+  "full_study_ratified_training_profile_claim": false,
+  "hyperparameter_reference_sha256": "8011469aca87ff324c4e1e66b317c9e3ad8e9ff21dd7d9762f3c2fbc18daf9b2",
+  "learning_rate": "0.0001",
+  "lora_rank": 8,
+  "max_scheduled_tokens": 4194304,
+  "max_supervised_tokens": 32768,
+  "minimum_distinct_training_tasks": 4,
+  "minimum_distinct_workflows": 4,
+  "model": "Qwen/Qwen3.8-27B",
+  "optimizer_steps": 64,
+  "provider_invoice_required_for_cost_claim": true,
+  "sample_max_tokens": 512,
+  "sampling_temperature": 0,
+  "schema": "envloop-odoo20-qwen-sft-training-v1",
+  "seed": 23
+}

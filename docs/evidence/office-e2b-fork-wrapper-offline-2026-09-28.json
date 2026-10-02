@@ -1,0 +1,16 @@
+{
+  "schema": "envloop-office-e2b-wrapper-offline-probe-v1",
+  "sdk_version": "2.51.0",
+  "desktop_version": "2.2.0",
+  "source_sha256": {
+    "e2b_sync_sandbox": "e4c996f2e93a1d3f5e0bfaacdb319ab4855fd80f97c78a60453d970c4c5f2a93",
+    "e2b_desktop_sandbox": "e31ce9348d862c48bcaf7428a251d5e4c986685d54a2c86529dc54cdee1e66af"
+  },
+  "mocked_fork_invocations": 1,
+  "child_is_desktop_subclass": true,
+  "child_has_display_wrapper": false,
+  "child_has_vnc_wrapper": false,
+  "provider_requests": 0,
+  "live_gui_or_acl_verified": false,
+  "official_final_admitted": 0
+}

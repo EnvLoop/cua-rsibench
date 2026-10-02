@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-01",
+  "document_owner_cid_not_used_as_signed_in_principal": true,
+  "exact_passive_email_observation_claimed": false,
+  "existing_account_used": true,
+  "fixes": [
+    "folder_toolbar_double_document_download_after_genuine_saved_status",
+    "native_parent_card_count_and_exact_child_inventory",
+    "requested_target_geometry_and_context_only_resolution",
+    "safe_application_keyboard_separate_from_editable_typing",
+    "signed_in_ui_email_witness_and_passive_folder_editor_label_continuity"
+  ],
+  "frozen_v2_sources_modified": false,
+  "native_actions_by_source_task": 0,
+  "native_lifecycle_qualified": false,
+  "official_model_results": 0,
+  "provider_calls_by_source_task": 0,
+  "schema": "office-native-surface-v3-source-verification",
+  "status": "source_only_pending_root_native_review",
+  "verification": {
+    "actual_saved_private_folder_editor_profile_projection_passed": true,
+    "frozen_v2_regression_tests_passed": 8,
+    "new_actual_method_tests_passed": 9,
+    "test_surfaces_synthetic": true
+  }
+}

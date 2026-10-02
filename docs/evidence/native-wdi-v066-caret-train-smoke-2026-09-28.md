@@ -1,0 +1,7 @@
+# Amended Desktop v0.6.6 train GUI smoke — 2026-09-28
+
+One paid E2B Desktop sandbox ran the evaluator script on a public **train** Impress package. All 18 GUI actions completed. A fresh guest-content check and neutral LibreOffice profile check passed; the actor-saved PPTX was read back and passed an independent saved-artifact verifier. The sandbox was killed, `is_running()` returned false, and an account-wide read-only check found zero active sandboxes afterward.
+
+An independent host audit reopened the receipt, every action's observation and predispatch PNGs, 11 recorded drift pairs, and the saved PPTX. The 61 private files were hashed and made owner-read-only. Intermediate screenshots taken inside the bounded caret probe are not individually retained; dispatch still required the final predispatch application crop to exactly equal the observed crop. This train result does not establish a full 100-task GUI pass.
+
+The one 600-second lease was reserved before create under a dated **$41 diagnostic cap**, raising that development lane's conservative full-lease accounting from $39.99444444444444444444444444 to $40.16111111111111111111111111. This is a planning estimate, not a provider invoice. It is separate from the proposed $60 final-control lane. The adjacent JSON contains only aggregate counts and source/evidence hashes. No model or hidden final task was run; official admissions and model results remain zero.

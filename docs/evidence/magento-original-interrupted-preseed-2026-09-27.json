@@ -1,0 +1,18 @@
+{
+  "app_container_id_sha256": "8c35b2e2e6abf0a21ec33da0954b370a58a3a8124e05657ab64b8254a451dff2",
+  "app_image_sha256": "sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+  "app_mount_count": 0,
+  "benchmark_quote_pages": 0,
+  "date": "2026-09-27",
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "ordinal": 32,
+  "original_journal_sha256": "8902576f0857fa1698c36ca8ac089eb9083a7245c356cbac6777a3dcfb2fe715",
+  "private_audit_sha256": "cf2f2956bc429d6f4e431f8022ffd98a99eed6faa373bb1b6d9cc1d0465e5d63",
+  "schema": "envloop-magento-interrupted-preseed-public-v1",
+  "search_container_id_sha256": "06244886f3839d4dc742ac82f7c446bd971f47029d61c00389897f17c6915568",
+  "search_image_sha256": "sha256:2c257b68f361872e13bdd476cba152e232a314ec61b0eedfc1f71b628ba39432",
+  "search_mount_count": 0,
+  "status": "preseed_orchestration_interruption_audited_pending_cleanup",
+  "task_seeded": false
+}

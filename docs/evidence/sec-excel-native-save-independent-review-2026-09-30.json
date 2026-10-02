@@ -1,0 +1,27 @@
+{
+  "adversarial_controls_rejected": 55,
+  "audited_evidence_sha256": "a3c2e078f6654ffbf52e3085b72e9d2ecc46f1bfba0a0d1c952380dc361aedd5",
+  "equivalent_save_controls_passed": 4,
+  "excel_web_admissions": 0,
+  "final_runs": 0,
+  "fresh_reset_semantic_cells_preserved": 169,
+  "general_selection_final_verifier_authorized": false,
+  "historical_strict_failures_preserved": true,
+  "independent_review": [
+    "Reviewed exact TRAIN source and raw/native-baseline byte bindings.",
+    "Reviewed namespace-aware package comparison and limited native-save metadata normalization.",
+    "Reviewed independent target arithmetic, counterfactual dependencies, all formula-cache checks and non-target preservation.",
+    "Replayed the complete adversarial audit in both isolated and main checkouts; both produced the committed evidence bytes."
+  ],
+  "main_import_commit": "94a22cd",
+  "model_calls": 0,
+  "native_recalculation_provenance_verified": false,
+  "official_final_admissions": 0,
+  "raw_to_native_visual_qualification_complete": false,
+  "reviewed_commit": "74bd221",
+  "saved_positive_controls_passed": 2,
+  "schema": "envloop.sec_excel.native_save.independent_source_review.public.v1",
+  "selection_runs": 0,
+  "status": "one_TRAIN_proposal_source_review_and_main_replay_passed",
+  "unit_test_module_tests_passed": 10
+}

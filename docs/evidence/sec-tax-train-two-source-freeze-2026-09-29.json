@@ -1,0 +1,11 @@
+{
+  "schema": "envloop.sec_tax_train_two_source_public_freeze.v1",
+  "status": "two_exact_semantic_reviews_frozen_for_train_only_offline_build",
+  "source_plan_sha256": "d975e9a31259b6a5bf5474b3b2b57b140fc55a5da03e3357bf2cca78de3e13aa",
+  "semantic_review_sha256": "0a016835fbd0eafec32361beaff0ef8486eb55efa1fa12c617eef91bcc6f455e",
+  "reviewed_card_sha256": "31603abdb060b93481dce5be4578c6099ea491ea9300b3922b88ffb902788e1f",
+  "original_140_split_sha256": "3459c1e2fbc4a02dbece31379849c28d52d12bf17b3d188a709590c1ee7df937",
+  "case_count": 2,
+  "annual_rollforwards_checked": 4,
+  "scope": "TRAIN-only source review. Offline workbook and GUI controls are separate evidence; no final admission or model result."
+}

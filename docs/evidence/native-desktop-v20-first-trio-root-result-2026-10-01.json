@@ -1,0 +1,59 @@
+{
+  "actual_provider_billed_usd": null,
+  "completed_fresh_final_trios": 0,
+  "completed_fresh_selection_trios": 1,
+  "historical_control_credit": 0,
+  "model_calls": 0,
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "package_sha256": "606932473e7eb551927b15a3f469e241674757024565a95ec94a2b2b85608fcd",
+  "receipts": [
+    {
+      "actor_elapsed_seconds": 245.73152187501546,
+      "applied_gui_actions": 25,
+      "attempt": "positive",
+      "fresh_guest_attested": true,
+      "is_running_after_kill": false,
+      "kill_returned": true,
+      "passive_full_frame_samples": 42,
+      "post_enter_windows": 4,
+      "receipt_sha256": "d908d837bfdea2908933fea753dcae4cb0b810d3c483e5ee1933edee5c793755",
+      "saved_verifier_passed": true,
+      "status": "control_passed"
+    },
+    {
+      "actor_elapsed_seconds": 272.85718445901875,
+      "applied_gui_actions": 25,
+      "attempt": "near-miss",
+      "fresh_guest_attested": true,
+      "is_running_after_kill": false,
+      "kill_returned": true,
+      "passive_full_frame_samples": 42,
+      "post_enter_windows": 4,
+      "receipt_sha256": "125489d21b968abac15b3e2fb2e9a998013a3b696dd27dd14018f1929aac8544",
+      "saved_verifier_passed": false,
+      "status": "control_passed"
+    },
+    {
+      "actor_elapsed_seconds": null,
+      "applied_gui_actions": 0,
+      "attempt": "cold-reset",
+      "fresh_guest_attested": true,
+      "is_running_after_kill": false,
+      "kill_returned": true,
+      "passive_full_frame_samples": 0,
+      "post_enter_windows": 0,
+      "receipt_sha256": "00c5dff108233c464d84038a49fbd006051101c700f912eb5d75a5c39d4f5c24",
+      "saved_verifier_passed": null,
+      "status": "cold_reset_observed"
+    }
+  ],
+  "required_final_trios": 100,
+  "required_selection_trios": 20,
+  "root_independent_audit_sha256": "98354aa2138b214d7556b2d41fd84de59e68b8e7982282fd800e7ea7f2f65a8c",
+  "schema": "envloop-desktop-v20-first-native-trio-root-result-v1",
+  "source_freeze_sha256": "326facf6051d2c104ec7a28c17904a0556505b67087eec34fa5996a0753f96fa",
+  "split": "selection",
+  "status": "new_original_gui_saved_trio_independently_verified",
+  "task_id": "wdi-native-v2-egy-calc-growth"
+}

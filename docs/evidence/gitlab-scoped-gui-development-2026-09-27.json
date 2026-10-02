@@ -1,0 +1,174 @@
+{
+  "analysis_family_binding": {
+    "analysis_manifest_sha256": "2cd91b436781aa3913ed881f756c961a7880c499da918266da6e21e629d2b403",
+    "candidate_family_mapping_pinned_before_any_official_outcome": true,
+    "clean_final_task_count": 100,
+    "official_final_admitted": 0,
+    "project_source_family_count": 20,
+    "schema": "envloop-gitlab-analysis-family-public-v1",
+    "tasks_per_project_source_family": 5
+  },
+  "application": {
+    "all_project_and_group_business_state_monitored": true,
+    "group_members": 6,
+    "image_sha256": "sha256:f7e992491db0c80a9a3f066c2c26e69b444307b5a8834e1bdde7929c4a74e97e",
+    "issues": 186,
+    "merge_requests": 62,
+    "name": "GitLab CE",
+    "non_admin_partition_operators": 3,
+    "pre_existing_demo_restored_healthy_same_identity": true,
+    "private_groups": 3,
+    "project_direct_members": 93,
+    "projects": 31,
+    "v3_cold_baseline_sha256": "b05ac85517098e1143d6c177eb18329f9861db1674e8db326d26e26f138940d1",
+    "version": "18.5.0-ce.0"
+  },
+  "candidate_inventory": {
+    "exposed_quarantined": 5,
+    "original_final": 100,
+    "reserve": 5,
+    "selection": 20,
+    "train": 20,
+    "unexposed_final_after_refill": 100,
+    "unexposed_final_source_families": 20
+  },
+  "cell": "gitlab",
+  "date": "2026-09-27",
+  "development_gui_controls": {
+    "approved_merge_request_merge": {
+      "cold_resets": 3,
+      "model_calls": 0,
+      "positive_negative_positive": [
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "ci_and_runbook_reconciliation": {
+      "cold_resets": 3,
+      "model_calls": 0,
+      "positive_negative_positive": [
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "least_privilege_access_handoff": {
+      "cold_resets": 3,
+      "model_calls": 0,
+      "positive_negative_positive": [
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "release_milestone_coordination": {
+      "cold_resets": 3,
+      "model_calls": 0,
+      "positive_negative_positive": [
+        1.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "evaluator_private_bounded_sweep": {
+    "attempted_source_family_count": 5,
+    "candidate_families": {
+      "approved_merge_request_merge": 20,
+      "ci_and_runbook_reconciliation": 20,
+      "cross_record_issue_triage": 20,
+      "least_privilege_access_handoff": 20,
+      "release_milestone_coordination": 20
+    },
+    "candidate_final_total": 100,
+    "complete_100_per_id_gui_admission": false,
+    "development_gui_trio_passed": 5,
+    "failed_source_family_count": 0,
+    "generated_final_and_reserve_candidates": 105,
+    "implemented_gui_families": [
+      "approved_merge_request_merge",
+      "ci_and_runbook_reconciliation",
+      "cross_record_issue_triage",
+      "least_privilege_access_handoff",
+      "release_milestone_coordination"
+    ],
+    "individually_attempted_ids": 5,
+    "no_model_scores": true,
+    "official_final_admitted": 0,
+    "passed_source_family_count": 5,
+    "quarantined_final_candidate_ids": 5,
+    "quarantined_source_families": 1,
+    "refill_complete_as_inventory_only": true,
+    "reserve_replacement_candidate_ids": 5,
+    "retained_prior_failed_attempts": 0,
+    "schema": "envloop-gitlab-development-sweep-summary-v1",
+    "source_excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+    "statuses": {
+      "development_gui_trio_passed": 5,
+      "not_attempted": 95
+    },
+    "still_unexposed_final_candidates": 100,
+    "unexposed_100_candidate_inventory_intact": true
+  },
+  "limitations": [
+    "The bounded per-ID GUI sweep is not 100 individual admissions.",
+    "Deterministic DOM-located qualification controls are separate from a paid Qwen screenshot-only rollout; no model result is reported.",
+    "The CI task verifies saved Git configuration and runbook blobs, not execution by a registered CI runner.",
+    "The final task identity/gold and preregistered campaign manifest are not yet frozen."
+  ],
+  "official_final_admitted": 0,
+  "partition_acl": {
+    "cross_partition_gui_denials": 6,
+    "own_project_gui_successes": 3,
+    "root_administrator_is_not_actor": true
+  },
+  "researcher_campaigns_executed": 0,
+  "retained_driver_failure_receipts": 1,
+  "retained_failed_completed_development_trios": 2,
+  "retained_legacy_partial_unscored_failures": {
+    "native_gui_screenshots_retained_private": 5,
+    "partial_unscored_driver_failure_count": 2,
+    "promoted_to_official_results": false,
+    "schema": "envloop-gitlab-legacy-failure-public-count-v1"
+  },
+  "schema": "envloop-gitlab-scoped-gui-development-public-v1",
+  "shared_gui_sft_split_gate": {
+    "accepted_training_episodes": 0,
+    "cell_adapter": "gitlab_project",
+    "clean_final_candidate_count": 100,
+    "final_manifest_sha256": "c01dcc7d9d6e9fe78cf3d1f713f7e01b448303a5974d48ba5b9b846b1353a6f1",
+    "official_final_admitted": 0,
+    "provisional_not_frozen": true,
+    "schema": "envloop-gitlab-gui-sft-split-public-v1",
+    "selection_count": 20,
+    "selection_final_task_template_entity_disjoint": true,
+    "selection_manifest_sha256": "46bc9575a2ca614476f6fd184434e02f8de0be0856b3975509e28337285b27ff",
+    "shared_split_schema": "gui-sft-split-manifest-v2",
+    "study_cell": "gitlab",
+    "train_source_disjoint_from_selection_and_final": true
+  },
+  "shared_qwen_actor": {
+    "action_contract": "scale-computer-use-v0.6",
+    "model_calls": 0,
+    "output_contract": "scale-action-output-v0.6.4",
+    "read_only_native_gui_smoke": true,
+    "source_sha256": {
+      "gui_sft_episode_v2.py": "1bfe13ed6be14949b15031945afabff1b9aa5fcd8bc7ba4e50e837cd3a8aff1b",
+      "scale_action_contract.py": "8be932baaee4841c6015a432e99bad141c1c2986174c8aeb5448f6bf62df600a",
+      "scale_action_output_v064.py": "3a53dee508ec1f5edf8fe1f7000c69e90d00774c8444c21703acc5157cec3d70",
+      "scale_vision_proxy.py": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2"
+    },
+    "stale_frame_rejected": true,
+    "student": "Qwen/Qwen3.8-27B"
+  },
+  "source": {
+    "WebArena_identity_or_score_transferred": false,
+    "internal_operations_are_synthetic": true,
+    "primary_excerpt_sha256": "28217d51a35a1faf8887b8af20578d516d37aad66b4a75682ae193412ed049e2",
+    "real_advisory_source": "CISA KEV CC0 1.0",
+    "reserve_excerpt_sha256": "dfd9c995f9e1db3f086144c9272a100734ffde79508037b5c86720cfa3f43bc6",
+    "source_commit": "203fa4633af39c6944608e30984996f04ccc4541",
+    "source_full_file_sha256": "39099ffcf82c3f183fa6f7326900a6d82731517b2edb5cecde06dee6e04289d1"
+  }
+}

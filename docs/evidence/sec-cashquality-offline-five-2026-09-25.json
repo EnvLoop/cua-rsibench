@@ -1,0 +1,32 @@
+{
+  "schema": "sec-cashquality-offline-audit-v1",
+  "date": "2026-09-25",
+  "status": "public development workflow only; zero hidden or Excel-web admission",
+  "workflows": 1,
+  "cases": 5,
+  "distinct_issuer_families": 5,
+  "distinct_original_10k_accessions": 5,
+  "issuers": [
+    "COST",
+    "CRM",
+    "KO",
+    "META",
+    "NFLX"
+  ],
+  "sheets_per_case": 9,
+  "formula_targets_per_case": 48,
+  "unmarked_faults_per_case": 9,
+  "positive_reference_passes": 5,
+  "unsolved_seed_rejections": 5,
+  "every_fault_detected_in_isolation_under_baseline_or_two_replays": true,
+  "source_raw_status": "exact prior direct-SEC companyfacts SHA-256 per issuer",
+  "semantic_artifact_commitment_sha256": "b6c587322bf43f0ec3779badeb752adee3d369a6c3305236d2070925a0b8a6a1",
+  "official_final_admission": 0,
+  "model_scored_final": 0,
+  "limits": [
+    "The unexplained cash-flow bridge residual is not one reported cash-flow adjustment.",
+    "Free cash flow and coverage are calculated metrics, not SEC filing line items.",
+    "Synthetic capex and working-capital cash stress is not an SEC forecast.",
+    "No Microsoft Excel for the web save/download/readback or reset on these cases."
+  ]
+}

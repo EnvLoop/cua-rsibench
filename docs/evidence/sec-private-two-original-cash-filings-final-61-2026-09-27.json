@@ -1,0 +1,67 @@
+{
+  "schema": "sec-private-two-original-cash-filings-final-61-aggregate-v1",
+  "date": "2026-09-27",
+  "status": "two additional original SEC 10-K filing-distinct offline final candidates; zero official Excel-web hidden-final admission",
+  "additional_original_sec_10k_accessions_independently_verified": 2,
+  "additional_new_issuer_families": 0,
+  "additional_selected_original_numeric_facts": 24,
+  "additional_separate_cash_scope_numeric_controls": 12,
+  "additional_original_cash_driver_bridges": 4,
+  "additional_cash_scope_component_bridges": 4,
+  "additional_opening_to_closing_bridges": 2,
+  "cross_filing_shared_comparative_selected_values_agree": true,
+  "additional_offline_actor_reference_pairs": 2,
+  "additional_checked_formula_targets": 132,
+  "additional_individually_detected_faults": 18,
+  "additional_positive_references_passed": 2,
+  "additional_unrepaired_actors_rejected": 2,
+  "source_and_scenario_counterfactual_profiles_per_case": 2,
+  "hardcoded_target_and_collateral_original_fact_edit_controls_rejected": true,
+  "cumulative_private_issuer_families_disjoint_from_public_development": 28,
+  "cumulative_offline_actor_reference_pairs": 61,
+  "cumulative_original_numeric_facts_checked": 924,
+  "cumulative_private_semantic_workflow_graphs": 14,
+  "cumulative_final_semantic_workflow_graphs": 11,
+  "cumulative_checked_formula_targets": 4437,
+  "cumulative_individually_detected_faults": 549,
+  "private_split_reservations": {
+    "train": 20,
+    "selection": 20,
+    "final": 100
+  },
+  "offline_candidates": {
+    "train": 7,
+    "selection": 7,
+    "final": 47
+  },
+  "empty_reservations": {
+    "train": 13,
+    "selection": 13,
+    "final": 53
+  },
+  "maximum_offline_cases_per_issuer": 5,
+  "structurally_qualified_private_split_tasks": 0,
+  "microsoft_excel_web_official_hidden_final_admissions": 0,
+  "pre_result_reservation_amendment": "Two empty final slots of one previously reserved issuer were allocated to distinct original 10-Ks before model outcomes; the issuer now reaches the five-case cap.",
+  "private_evidence_sha256": {
+    "original_filing_numeric_controls": "f9a43db939baee612e2cd7d0f807266c9fa3b7afdb39f75d20a789f785ee25f5",
+    "original_filing_control_generator": "90163fb3aaf0ea9e2ec67a1744ade6ca36bc43c1631450d8ed59126f2eb77e3e",
+    "source_acceptance_and_scope_bridges": "5f99ea3286a6861b852cd9fb3cead23f7da538c4068295261a5673a86a396938",
+    "first_verified_source_excerpt": "fa0013ed0656badfd6432e24c082c986ddd3aeb8586851d0a825b2d2dfbeabe5",
+    "second_verified_source_excerpt": "0b7f6b47b97c94d35de3a04fd401d68fc788e849004f510f67edb4b12c28db6d",
+    "case_manifest": "b977672bd61bc54d1abedb15697ceaa63264dc2874ae89f16ac0151941e936ad",
+    "offline_ooxml_audit": "7d066912808adb5d0f5c7f516b56f995c8af4be378ce3dae39803578430639c1",
+    "private_workbook_builder": "c5924b990cea5d1a8897830391d48c24c6e6b8688247c470aa12825a732d250f",
+    "independent_ooxml_verifier": "84fb7dc1439104f29c401e60aafbbb22e58970a923667dea0a622469855e47c8",
+    "private_split_slot_reservations": "753ae0fa038a13e487d0bfcdd48913c1c9691da395773eee4fde7b0479ff60e6",
+    "integrated_offline_audit": "f74a61ce4d7440172b11aed6ffff12e5f2028bd4fa8ccfacc2d206feb32aa812",
+    "integrated_auditor": "78d60d4d1ac8e2fe131c0264c75bdb3d638b205e63c24970218a1c5bd938ef66",
+    "private_slot_allocator": "e6bc01e597a1e271591814faaada774d291343accc35589a795c43f21c7afc11"
+  },
+  "limitations": [
+    "The shared comparative year was checked within each original accession; the older as-filed comparative reclassification is preserved rather than replaced with an unrelated source year.",
+    "Cash-scope components were used as separate corroborating controls, not as extra task-fact or final-case counts.",
+    "Saved-OOXML positive/negative/counterfactual checks do not qualify an Excel-web final task without per-ID GUI save, downloaded artifact readback, and fresh-copy reset.",
+    "The remaining 79 reservations are empty, including 53 of 100 final slots; source identity alone is not task admission."
+  ]
+}

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 690" role="img" aria-label="Six-cell benchmark admission progress">
+<rect width="1120" height="690" fill="#f8f9f6"/>
+<text x="55" y="64" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#17363d">From candidate inventory to admitted exam</text>
+<text x="55" y="94" font-family="Arial,sans-serif" font-size="16" fill="#53686e">28 September 2026 · six original-software cells · methods progress</text>
+<rect x="55" y="119" width="1010" height="74" rx="10" fill="#e9f0ed"/>
+<text x="76" y="149" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#17363d">600 offline candidates</text>
+<text x="76" y="176" font-family="Arial,sans-serif" font-size="15" fill="#53686e">316 historical evaluator GUI controls · 0 current v0.6.6 final trios · 0 official admissions · 0/24 researcher campaigns</text>
+<line x1="331.0" y1="225" x2="331.0" y2="578" stroke="#d8dfdc" stroke-width="1"/>
+<text x="331.0" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#718188">0</text>
+<line x1="493.5" y1="225" x2="493.5" y2="578" stroke="#d8dfdc" stroke-width="1"/>
+<text x="493.5" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#718188">25</text>
+<line x1="656.0" y1="225" x2="656.0" y2="578" stroke="#d8dfdc" stroke-width="1"/>
+<text x="656.0" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#718188">50</text>
+<line x1="818.5" y1="225" x2="818.5" y2="578" stroke="#d8dfdc" stroke-width="1"/>
+<text x="818.5" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#718188">75</text>
+<line x1="981.0" y1="225" x2="981.0" y2="578" stroke="#d8dfdc" stroke-width="1"/>
+<text x="981.0" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#718188">100</text>
+<text x="55" y="270" font-family="Arial,sans-serif" font-size="17" fill="#17363d">PowerPoint web</text>
+<rect x="331" y="250" width="650" height="28" rx="5" fill="#dce3df"/>
+<text x="1004" y="270" font-family="Arial,sans-serif" font-size="16" fill="#17363d">0/100</text>
+<text x="55" y="324" font-family="Arial,sans-serif" font-size="17" fill="#17363d">Excel web</text>
+<rect x="331" y="304" width="650" height="28" rx="5" fill="#dce3df"/>
+<text x="1004" y="324" font-family="Arial,sans-serif" font-size="16" fill="#17363d">0/100</text>
+<text x="55" y="378" font-family="Arial,sans-serif" font-size="17" fill="#17363d">LibreOffice desktop</text>
+<rect x="331" y="358" width="650" height="28" rx="5" fill="#dce3df"/>
+<rect x="331" y="358" width="650.0" height="28" rx="5" fill="#307a87"/>
+<text x="1004" y="378" font-family="Arial,sans-serif" font-size="16" fill="#17363d">100/100</text>
+<text x="55" y="432" font-family="Arial,sans-serif" font-size="17" fill="#17363d">Odoo Community</text>
+<rect x="331" y="412" width="650" height="28" rx="5" fill="#dce3df"/>
+<rect x="331" y="412" width="650.0" height="28" rx="5" fill="#307a87"/>
+<text x="1004" y="432" font-family="Arial,sans-serif" font-size="16" fill="#17363d">100/100</text>
+<text x="55" y="486" font-family="Arial,sans-serif" font-size="17" fill="#17363d">GitLab CE</text>
+<rect x="331" y="466" width="650" height="28" rx="5" fill="#dce3df"/>
+<rect x="331" y="466" width="526.5" height="28" rx="5" fill="#307a87"/>
+<text x="1004" y="486" font-family="Arial,sans-serif" font-size="16" fill="#17363d">81/100</text>
+<text x="55" y="540" font-family="Arial,sans-serif" font-size="17" fill="#17363d">Magento admin</text>
+<rect x="331" y="520" width="650" height="28" rx="5" fill="#dce3df"/>
+<rect x="331" y="520" width="227.5" height="28" rx="5" fill="#307a87"/>
+<text x="1004" y="540" font-family="Arial,sans-serif" font-size="16" fill="#17363d">35/100</text>
+<rect x="55" y="600" width="16" height="16" rx="2" fill="#dce3df"/>
+<text x="79" y="613" font-family="Arial,sans-serif" font-size="13" fill="#53686e">Constructed offline candidate</text>
+<rect x="358" y="600" width="16" height="16" rx="2" fill="#307a87"/>
+<text x="382" y="613" font-family="Arial,sans-serif" font-size="13" fill="#53686e">Historical evaluator GUI control</text>
+<text x="55" y="643" font-family="Arial,sans-serif" font-size="13" fill="#8a5a2b">Heterogeneous development controls; no bar is a model score or a v0.6.6 admission proof.</text>
+<text x="55" y="668" font-family="Arial,sans-serif" font-size="12" fill="#718188">Source hashes and dated counts: docs/evidence/full-study-admission-gap-2026-09-28.json</text>
+</svg>

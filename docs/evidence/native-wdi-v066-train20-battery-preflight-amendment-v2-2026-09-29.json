@@ -1,0 +1,22 @@
+{
+  "assignment_unchanged": true,
+  "explicit_battery_flag_required": true,
+  "holdout_candidate_count": 5,
+  "host_power_telemetry_retained": true,
+  "new_plan_public_sha256": "3c1234d955a884abb2d685a121b8d3d44704d928bbfd19ebdbb7ea86d59f65af",
+  "official_final_admissions": 0,
+  "official_model_results": 0,
+  "paid_train_e2b_creates": 0,
+  "prior_offline_amendment_sha256": "1e5865a91cd9f1b0b1a3c1847c6c309cee0cfae9f60defe4ae82d890aa893ee3",
+  "provider_active_zero_gate_retained": true,
+  "raw_guest_calendar_independently_reopened_for_train_sources": true,
+  "schema": "cua-native-wdi-v066-train20-battery-preflight-amendment-public-v2",
+  "sft_candidate_count": 15,
+  "source_sha256s": {
+    "native_desktop_factory/v066_train20_audit.py": "55394b31ee64ef1b0427a655472bfd7ae90b29c4083b4923aad28cb0a67738b9",
+    "native_desktop_factory/v066_train20_plan.py": "014f41ae56ed44dd8c3ffae04bb8fc32c4b519884e735d29a784c58381452db5",
+    "native_desktop_factory/v066_train20_worker.py": "3f85541cb0f754b71fbd1c8b3dbbdbfbf40be6fef035a2b751adad39193f141f"
+  },
+  "status": "offline_pre_result_train_only_source_rebased_before_paid_create",
+  "tinker_calls": 0
+}

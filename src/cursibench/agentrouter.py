@@ -19,6 +19,8 @@ RESEARCHER_MODELS = {
 }
 MODEL_CHOICES = tuple(RESEARCHER_MODELS.values())
 RESEARCHER_CHOICES = tuple(RESEARCHER_MODELS) + MODEL_CHOICES
+REASONING_EFFORTS = frozenset({'low', 'medium', 'high', 'xhigh', 'max'})
+REASONING_MODES = frozenset({'standard', 'pro'})
 
 
 def resolve_researcher_model(name):
@@ -34,17 +36,31 @@ class ProviderFailure(RuntimeError):
         self.receipt = receipt
 
 
-def response_receipt(prompt, model='gpt-6-astra', max_output_tokens=900, timeout=60):
+def response_receipt(prompt, model='gpt-6-astra', max_output_tokens=900, timeout=60,
+                     *, reasoning_effort='low', reasoning_mode='standard'):
     if model not in MODEL_CHOICES:
         raise ValueError('model outside registered choices')
+    if reasoning_effort not in REASONING_EFFORTS or reasoning_mode not in REASONING_MODES:
+        raise ValueError('unsupported frozen reasoning configuration')
+    if type(max_output_tokens) is not int or not 1 <= max_output_tokens <= 100_000:
+        raise ValueError('invalid output token cap')
+    if type(timeout) not in (int, float) or not 0 < timeout <= 3600:
+        raise ValueError('invalid provider timeout')
     key = os.environ.get('OPENAI_API_KEY')
     if not key:
         raise RuntimeError('OPENAI_API_KEY is not set')
     base = os.environ.get('OPENAI_BASE_URL', 'https://sub2api.agentrouterhub.com').rstrip('/')
     endpoint = base + ('/responses' if base.endswith('/v1') else '/v1/responses')
-    payload = {'model': model, 'input': prompt, 'max_output_tokens': max_output_tokens, 'store': False, 'reasoning': {'effort':'low'}}
+    reasoning = {'effort': reasoning_effort}
+    if reasoning_mode == 'pro':
+        reasoning['mode'] = 'pro'
+    payload = {'model': model, 'input': prompt, 'max_output_tokens': max_output_tokens,
+               'store': False, 'reasoning': reasoning}
     started = time.monotonic()
-    receipt = {'requested_model': model, 'max_output_tokens': max_output_tokens,
+    receipt = {'requested_model': model,
+               'requested_reasoning_effort': reasoning_effort,
+               'requested_reasoning_mode': reasoning_mode,
+               'max_output_tokens': max_output_tokens,
                'input_bytes': len(prompt.encode()), 'cost_usd': None, 'usage': None}
     try:
         body=post_json(endpoint,payload,{

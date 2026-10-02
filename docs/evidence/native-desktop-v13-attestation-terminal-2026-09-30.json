@@ -1,0 +1,23 @@
+{
+  "applied_gui_actions": 0,
+  "exact_differing_field_known": false,
+  "guest_reference_sha256": "1173ec245897bfc1d50919212c01736d67f128229231d57344e522e5a15ef911",
+  "model_calls": 0,
+  "new_provider_calls_by_audit": 0,
+  "official_final_admissions": 0,
+  "provider_shape_matches_prior_verified_guest": true,
+  "raw_guest_manifest_retained": false,
+  "raw_probe_stderr_retained": false,
+  "raw_probe_stdout_retained": false,
+  "receipt_sha256": "226ea1005ad1796a4be03d2280c61426af2a8b6e0b48e687ae2abf2f01025bfc",
+  "recorded_error_type": "ValueError",
+  "recorded_kill_returned": true,
+  "recorded_running_after_kill": false,
+  "same_intent_replay_authorized": false,
+  "schema": "cua-native-desktop-v13-attestation-terminal-public",
+  "source_freeze_sha256": "55bc5feed7ac1eaf89f9066b3c2bb61344b266fdb3ca4be574f8615c24f126a2",
+  "status": "guest_attestation_failed_raw_probe_output_unavailable",
+  "storage_reserved_bytes": 0,
+  "storage_rows": 0,
+  "stored_frames": 0
+}

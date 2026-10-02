@@ -1,0 +1,52 @@
+{
+  "schema": "envloop-odoo-native-model-boundary-live-smoke-v1",
+  "status": "passed",
+  "application": "original_odoo_community_18",
+  "partition": "train_only",
+  "model_calls": 0,
+  "validated_gui_actions": 3,
+  "validated_action_types": [
+    "type",
+    "key",
+    "click"
+  ],
+  "actual_software_record_visible": true,
+  "screenshot_observed": true,
+  "visible_controls_observed": true,
+  "independent_business_reward_remained_unsolved": true,
+  "final_full_database_filestore_reset_exact": true,
+  "host_only_evaluator_state_in_model_observation": false,
+  "common_model_binding": {
+    "schema": "envloop-odoo-native-model-boundary-v1",
+    "version": "odoo-native-browser-v1",
+    "student_model": "Qwen/Qwen3.8-27B",
+    "renderer": "qwen3_5_disable_thinking",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "max_actions": 90,
+    "wall_seconds": 720,
+    "observation_modalities": [
+      "screenshot",
+      "visible_control_labels"
+    ],
+    "actor_actions": [
+      "click",
+      "type",
+      "key",
+      "scroll",
+      "drag",
+      "wait",
+      "finish"
+    ],
+    "no_actor_shell_sql_application_rpc_or_arbitrary_url": true,
+    "bindings_sha256": {
+      "odoo_native_adapter": "9b499b4d73e3908ce025fe76d5938084f6a8d9bd76642e0fd6412f0ba3da4fba",
+      "shared_action_contract": "6954f1fc8c8cc64d3aef4cca8c647d115f39412b469a0cc707a2eeb2a3e8a2f6",
+      "qwen_vision_proxy": "1c8c8ddeaf7f9439f037606092f60219168b9ed1d3f0d4fc64288eef8e0b5ae2"
+    },
+    "binding_sha256": "57ce5a82a7cba12e6729170b9f134d14b40d04f063c3d38ac7345261f383d015"
+  },
+  "official_hidden_task_used": false
+}
