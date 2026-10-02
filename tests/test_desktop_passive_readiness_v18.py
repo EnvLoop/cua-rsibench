@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from native_desktop_factory import pre_observation_readiness_v12 as old
 from native_desktop_factory import pre_observation_readiness_v18 as ready
+from native_desktop_factory import save_readiness_v20 as adopted
 from native_desktop_factory import selection_control_readiness_epoch_v18 as epoch
 from native_desktop_factory import selection_control_readiness_worker_v18 as worker
 from native_desktop_factory import selection_control_bounded_epoch_v17 as v17
@@ -77,7 +78,7 @@ class ReadinessTests(unittest.TestCase):
                 self.assertEqual(ready.dispatch(guest.proxy, {'type': 'click', 'target': {'x': 52, 'y': 170}}), 'click')
                 self.assertIs(ready._owner(guest.recorder), ready._owner(guest.proxy))
                 original = ready.passive_samples; moments = iter(timeline())
-                with patch.object(ready, 'passive_samples', lambda sb, **kwargs: original(sb,
+                with patch.object(adopted, 'passive_samples', lambda sb, **kwargs: original(sb,
                           clock=lambda: next(moments), sleep=lambda _: None, **kwargs)):
                     observation = guest.observe(identity={'task_id': 'fixture', 'package_sha256': 'a' * 64},
                         instruction='Public synthetic readiness test.', step=1, previous={'status': 'applied', 'code': 'ok'})
@@ -88,9 +89,9 @@ class ReadinessTests(unittest.TestCase):
                 action = strict.parse_current_action('{"type":"key","key":"Escape"}', observation, native)
                 self.assertEqual(action['type'], 'key')
         proposal = integration.proposal()
-        self.assertIs(model.readiness, ready)
-        self.assertEqual(proposal['passive_readiness_recipe'], epoch.READINESS_RECIPE)
-        self.assertEqual(proposal['passive_readiness_source_sha256'], digest(Path(ready.__file__).read_bytes()))
+        self.assertIs(model.readiness, adopted)
+        self.assertEqual(proposal['passive_readiness_recipe'], adopted.RECIPE)
+        self.assertEqual(proposal['passive_readiness_source_sha256'], digest(Path(adopted.__file__).read_bytes()))
         self.assertEqual((proposal['max_actor_actions'], proposal['max_actor_wall_seconds'], proposal['lease_seconds_each']), (90, 720, 1200))
 
     def test_v18_context_binds_inherited_control_functions_and_restores_v12(self):

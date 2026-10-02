@@ -10,7 +10,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-import build_qwen_dispatch_gate_offline_v1 as evidence  # noqa: E402
+import build_qwen_dispatch_gate_offline_v2 as evidence  # noqa: E402
 
 
 class DispatchGateEvidenceTests(unittest.TestCase):
@@ -28,6 +28,14 @@ class DispatchGateEvidenceTests(unittest.TestCase):
         receipt["real_researcher_campaigns"] = 1
         with self.assertRaises(evidence.EvidenceError):
             evidence.audit_receipt(receipt)
+
+    def test_previous_receipt_is_preserved_as_historical_evidence(self):
+        from hashlib import sha256
+        current=json.loads(evidence.OUTPUT.read_bytes())
+        historical=current['historical_receipt']
+        self.assertEqual(sha256((ROOT/historical['path']).read_bytes()).hexdigest(),historical['sha256'])
+        self.assertFalse(current['historical_receipt_replaced'])
+        self.assertFalse(current['historical_native_qualification_promoted'])
         receipt = evidence.expected_receipt(focused_test_count=44)
         first = evidence.SOURCE_PATHS[0]
         receipt["source_sha256s"][first] = "0" * 64

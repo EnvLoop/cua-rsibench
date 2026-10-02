@@ -1,0 +1,47 @@
+{
+  "benchmark_score": null,
+  "builder_sha256": "6ad51d2018a7c162e0bc9dcdf91bb24d0e350f3e0da31f01c282d8a24460bd82",
+  "current_builder_sha256": "f5ad5948ba2729bd7cc8193fcc11c1f94626ab7d1937d623e97c2a2501973e42",
+  "focused_fake_provider_tests_passed": 44,
+  "focused_test_modules": [
+    "tests.test_full_study_qwen_runtime_gate_v1",
+    "tests.test_full_study_campaign_dispatch_v1",
+    "tests.test_full_study_shared_base_selection_v1",
+    "tests.test_full_study_shared_base_execution_v1"
+  ],
+  "historical_native_qualification_promoted": false,
+  "historical_receipt": {
+    "path": "docs/evidence/qwen38-dispatch-gate-offline-2026-09-28.json",
+    "sha256": "ed608dbe84d567fe9b67b4f6576e6b633a34ecd6abf14ac5ea4ef198c6eaf4dc"
+  },
+  "historical_receipt_replaced": false,
+  "official_final_model_outcomes": 0,
+  "official_final_task_admissions": 0,
+  "provider_credentials_supplied_to_tests": false,
+  "public_toy_runtime_evidence": {
+    "path": "docs/evidence/tinker-qwen38-vision-clean-runtime-2026-09-28.json",
+    "sha256": "62d456c06035ec80f6996b962dd950276fef14a050cf96322f011d067b2015a1"
+  },
+  "python_socket_connections_permitted_during_tests": false,
+  "real_provider_calls_by_builder": 0,
+  "real_researcher_campaigns": 0,
+  "schema": "cua-qwen38-dispatch-gate-offline-evidence-v2",
+  "source_sha256s": {
+    "runtime/qwen38-vision/requirements.lock": "dd346431882f8a4ca075a47c8f066c88c3d463858dfa26c132f649ddd2f1524f",
+    "runtime/qwen38-vision/runtime-spec.json": "4aa4c9c0145f707783ea58f2ef2c250ca793c80b2d4de09d07d900ca348ee7e6",
+    "src/cursibench/full_study_campaign_dispatch_v1.py": "8fdc69762549a6171f0b298974f673b88266e22c1840805f38344909b5104339",
+    "src/cursibench/full_study_qwen_runtime_gate_v1.py": "160b66c0c17734d4753562f47a06c9b45699e29e9432d73f9bd4d62a61874c74",
+    "src/cursibench/full_study_shared_base_execution_v1.py": "0e4a4e1fa8c93c38bb356c6eb248ac7e3afbe96204a5e97c494171b80d3911a1",
+    "src/cursibench/full_study_shared_base_selection_v1.py": "621631e9bf3393a1a8cc2576c493189bc9448cd646ebd926ebf324a0d78cf460",
+    "tools/verify_qwen38_training_runtime_v1.py": "e90273f4cca19e98dae02bbdb498867daed810b9020d42874690dd0f22241cb7"
+  },
+  "status": "source_bound_fake_provider_pre_dispatch_tests_passed",
+  "test_source_sha256s": {
+    "tests/shared_base_selection_fixture.py": "103d4c79ea4ef422f7467e47599a0548671225e8a619b13c0dba3e42521acf4f",
+    "tests/test_full_study_campaign_dispatch_v1.py": "0bbd5d0d476bbf55b204a79ae6576e91690f06af729ea1e5591354e0833f9a6a",
+    "tests/test_full_study_qwen_runtime_gate_v1.py": "9d538f80f05d70c03c62d85257d948ada4dcc81b14a6124562122df4e26a3ff2",
+    "tests/test_full_study_shared_base_execution_v1.py": "faf07795f56935be1ee61fd621d4bc194c119109229dea66d87abe8ef3b234ba",
+    "tests/test_full_study_shared_base_selection_v1.py": "9fe238c342635038cba1ab077ea72523ae9f00885b6c9e9b74de9c991987a2fa",
+    "tests/test_qwen_dispatch_gate_offline_evidence_v1.py": "7c8ece18cfd185ff079ee845f45e8c6aaf876cdb68d25c1ad55724eed419ddc3"
+  }
+}

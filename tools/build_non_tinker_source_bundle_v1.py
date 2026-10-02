@@ -41,7 +41,7 @@ def allowed(name):
         return False
     if path.name == '.DS_Store': return False
     return (path.parts[0] in SOURCE_ROOTS or name in EXTRA_FILES
-            or name.startswith(DEPLOY_ROOT+'/'))
+            or name.startswith(DEPLOY_ROOT+'/') or path.parts[0] in ('tests','docs'))
 
 
 def checked_file(root, name):
@@ -60,7 +60,8 @@ def checked_file(root, name):
 
 def source_names(root, extra=()):
     names = subprocess.check_output(['git','ls-files','-z'],cwd=root).decode().split('\0')
-    names = {name for name in names if name and allowed(name)}
+    names = {name for name in names if name and allowed(name)
+             and PurePosixPath(name).parts[0] not in ('tests','docs')}
     for name in extra:
         if not allowed(name): raise ValueError('unapproved_additional_bundle_file')
         names.add(name)
@@ -69,6 +70,28 @@ def source_names(root, extra=()):
         if (Path(root)/name).is_file(): names.add(name)
     for path in (Path(root)/DEPLOY_ROOT).rglob('*'):
         if path.is_file(): names.add(path.relative_to(root).as_posix())
+    # Current source bindings explicitly hash some test/protocol files. Preserve
+    # that closure rather than omitting them or copying all historical reports.
+    pending=list(names);seen=set()
+    while pending:
+        name=pending.pop()
+        if name in seen:continue
+        seen.add(name)
+        if not name.endswith('.py'):continue
+        raw=checked_file(root,name)
+        references=re.findall(rb'(?:tests|docs)/[A-Za-z0-9_./-]+\.(?:py|md|json)',raw)
+        for reference in references:
+            relative=reference.decode()
+            if allowed(relative) and (Path(root)/relative).is_file() and relative not in names:
+                names.add(relative);pending.append(relative)
+        if name.endswith('.py'):
+            # Keep regular package identity. A namespace package would change
+            # recursive runtime source bindings even with identical leaf files.
+            for parent in PurePosixPath(name).parents:
+                if str(parent)=='.':continue
+                relative=(parent/'__init__.py').as_posix()
+                if allowed(relative) and (Path(root)/relative).is_file() and relative not in names:
+                    names.add(relative);pending.append(relative)
     return sorted(names)
 
 

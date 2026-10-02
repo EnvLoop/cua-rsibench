@@ -62,5 +62,28 @@ class BundleTests(unittest.TestCase):
             self.assertFalse(value['training_provider_required_for_build'])
             self.assertFalse(value['benchmark_model_results_claimed'])
 
+    def test_recursive_explicit_source_binding_dependencies_are_preserved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)/'source';root.mkdir();files=self.fixture(root)
+            dependencies={
+                'src/cursibench/epoch.py':b"FILES=('tests/test_epoch.py', 'docs/runtime-contract.md')\n",
+                'tests/test_epoch.py':b"PARENT='tests/test_parent.py'\n",
+                'tests/test_parent.py':b'# Bound parent test\n',
+                'tests/__init__.py':b'# Keep the regular package identity\n',
+                'docs/runtime-contract.md':b'# Bound runtime contract\n',
+                'docs/unrelated.md':b'# Not in the runtime closure\n',
+            }
+            for name,raw in dependencies.items():
+                p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw)
+            tracked=tuple(files)+tuple(dependencies)
+            with patch.object(bundle.subprocess,'check_output',return_value=('\0'.join(tracked)+'\0').encode()):
+                out=Path(tmp)/'context';bundle.stage(root,out)
+            self.assertTrue((out/'tests/test_parent.py').is_file())
+            self.assertTrue((out/'tests/__init__.py').is_file())
+            self.assertTrue((out/'docs/runtime-contract.md').is_file())
+            self.assertFalse((out/'docs/unrelated.md').exists())
+            (out/'tests/test_parent.py').write_text('changed dependency')
+            with self.assertRaisesRegex(ValueError,'member_changed'):bundle.verify(out)
+
 
 if __name__=='__main__':unittest.main()
