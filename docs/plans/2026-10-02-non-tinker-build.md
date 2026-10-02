@@ -1,7 +1,5 @@
 # Non-Tinker Benchmark Build Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
-
 **Goal:** Build and verify the six real-software benchmark components and their distribution path while training is unavailable.
 
 **Architecture:** Preserve each frozen actor, task and verifier epoch. Repair environment execution in scoped additive implementations when required, and keep qualification distinct from model results. A portable source-layout runner packages the application adapters, generators, independent verifiers and report tooling without secrets, private task state or an active training provider.
