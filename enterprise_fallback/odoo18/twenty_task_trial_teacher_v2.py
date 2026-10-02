@@ -7,6 +7,7 @@ _impl = load_source(
     'enterprise_fallback.odoo18._twenty_task_trial_teacher_v2',
     '8f65162fecd11dc66678d1e469d0a8cc7845d39bbf729a88844ec6bd687164a5',
     (('native_surface_workers_v13', 'native_surface_workers_v14', 1),
+     ("'reasoning_effort':'high'", "'reasoning_effort':'medium'", 1),
      ("'image_detail':'high'}", "'image_detail':'high','response_format':'json_object'}", 1)))
 _impl.TEACHER_SYSTEM_PROMPT += (
     '\nThis native browser runs on macOS. For select-all inside a focused editor, '
