@@ -1,0 +1,46 @@
+name: Non-Tinker runtime build
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'deployment/non-tinker-runner/**'
+      - 'tools/build_non_tinker_source_bundle_v1.py'
+      - 'tools/non_tinker_runner_smoke_v1.py'
+      - '.github/workflows/non-tinker-runtime.yml'
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify distribution boundary
+        run: python -m unittest tests.test_non_tinker_source_bundle_v1 -v
+      - name: Stage explicit source and archive
+        run: python tools/build_non_tinker_source_bundle_v1.py stage --out work/non-tinker-ci/context --archive work/non-tinker-ci/EnvLoop-Non-Tinker-Source.tar.gz
+      - name: Build runner
+        run: docker build --progress=plain -f work/non-tinker-ci/context/deployment/non-tinker-runner/Dockerfile -t envloop/non-tinker-runner:ci work/non-tinker-ci/context
+      - name: Verify actual container without network or provider keys
+        run: docker run --rm --network none envloop/non-tinker-runner:ci | tee work/non-tinker-ci/container-smoke.json
+      - name: Authenticate container registry
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: Publish code-only runtime
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/cua-rsibench-runner"
+          docker tag envloop/non-tinker-runner:ci "$image:$GITHUB_SHA"
+          docker push "$image:$GITHUB_SHA"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: non-tinker-source-and-smoke
+          path: |
+            work/non-tinker-ci/EnvLoop-Non-Tinker-Source.tar.gz
+            work/non-tinker-ci/context/non-tinker-source-manifest.json
+            work/non-tinker-ci/container-smoke.json

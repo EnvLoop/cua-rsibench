@@ -1,0 +1,12 @@
+.git
+.env*
+**/.env*
+**/*.private*
+**/private/**
+**/__pycache__/**
+**/.DS_Store
+work
+outputs
+artifacts
+.venv
+node_modules
