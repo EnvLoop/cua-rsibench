@@ -15,6 +15,8 @@ The [2 October execution record](docs/evidence/odoo20-pilot-progress-2026-10-02.
 
 The [infrastructure recovery amendment](docs/ODOO20_INFRASTRUCTURE_RECOVERY_2026-10-02.md) preserves the three completed cases, excludes the incomplete attempt without a score, and specifies reviewed continuation after billing access is restored. It retains the native actor, independent scorer, exact reset and original task limits.
 
+The [2 October full-study status](docs/FULL_STUDY_CURRENT_STATUS_2026-10-02.md) records server-side checkpoint readback, two independently qualified current GitLab control trios, and corrections to earlier live-worker labels. These are development and qualification evidence; official study result counts remain zero.
+
 ## v0.6 real-software qualification note
 
 The [English qualification PDF](docs/qualification-v06/EnvLoop-Computer-Use-Qualification-Report.pdf), [interactive six-application explorer](https://envloop.github.io/cua-rsibench/qualification-v06/), and [source-hashed evidence data](docs/evidence/v0.6-qualification-report-data.json) document the next benchmark's environment and verifier work. This is a **separate methods release**, not a new full-scale score: the planned Qwen3.8-27B study has zero completed researcher campaigns, zero official final task instances, and no application with 100 admitted tasks. Human GUI controls, one-task model pilots, published source inventories, and provisional splits are labeled separately. The v0.5 Qwen3.5-4B Kanboard results below remain unchanged.
