@@ -1,0 +1,75 @@
+{
+  "all_six_release_assets_anonymous_download_verified": true,
+  "ci_architecture": "amd64",
+  "ci_archive_matches_local_and_public": true,
+  "ci_conclusion": "success",
+  "ci_smoke_sha256": "2485a56f292d697febfe525bf03d7f6c34ed767e006fe8d1e8a6b036eca306e2",
+  "ci_url": "https://github.com/EnvLoop/cua-rsibench/actions/runs/37019535131",
+  "complete_empirical_benchmark": false,
+  "completed_researcher_chains": 0,
+  "current_source_bindings": {
+    "desktop": {
+      "native_qualification_passed": false,
+      "observation_policy_sha256": "a7da63257bd8f1e8be34a16d032f992b4542d39ecff02499421bad9703b4cf21",
+      "schema": "cua-native-guarded-observation-runtime-source-v46",
+      "source_files": 76,
+      "source_manifest_sha256": "1d71eed934f52038984cffdb6df80336aa0f6eea1a5fc94a55a0746742985ee9"
+    },
+    "gitlab": {
+      "binding_sha256": "e9806accbbe7fee6ee0e74400bde0a177912d84a119d0aa5b2ab7cc6b8d76598"
+    },
+    "magento": {
+      "binding_sha256": "3796a86891553f2dae6092a9a8e548356467d6a312352a1768f5d7de9597b23a",
+      "control_entrypoint": "magento_catalog_factory.native_reference_qualification_v7",
+      "old_principal_epoch_qualification_credit": 0,
+      "principal_epoch": "v2",
+      "reference_binding_sha256": "de1169cd65013950f7d6b4d3cdd02c64e208288446f08c0378eeb72259f0966d",
+      "schema": "magento-native-five-slot-source-binding-v10",
+      "worker_entrypoint": "magento_catalog_factory.native_surface_workers_v10"
+    },
+    "odoo": {
+      "binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c"
+    },
+    "office": {
+      "schema": "office-current-rich-counterpart-registration-v5",
+      "source_files": 53
+    }
+  },
+  "date": "2026-10-02",
+  "desktop_active_window_failure_cause": "unknown",
+  "desktop_actual_applied_actions": 5,
+  "desktop_distinct_reset_completed": false,
+  "desktop_owned_guest_stopped": true,
+  "desktop_saved_bytes_equal_baseline": true,
+  "desktop_saved_verifier_passed": false,
+  "desktop_terminal_exit_zero_is_not_control_success": true,
+  "desktop_terminal_sha256": "7ef9acbd6a03ead36e8e293d5096aee37018a16b565825cb604e09fb5a024ad5",
+  "desktop_worker_process_absent": true,
+  "focused_checks_passed": 77,
+  "magento_current_train_trio_scores": [
+    0,
+    1,
+    0
+  ],
+  "magento_queue_reset_cleanup_audited": true,
+  "matched_full_study_outcomes": 0,
+  "merged_pr_url": "https://github.com/EnvLoop/cua-rsibench/pull/10",
+  "model_api_calls_by_build": 0,
+  "office_current_native_upload_passed": false,
+  "official_final_admissions": 0,
+  "pdf_pages_visually_checked": 3,
+  "pdf_sha256": "8090fac0ba0acc105ee008952b45b2765372b32295f42c128c14f068cfb97c41",
+  "registry_anonymous_pull_verified": false,
+  "registry_image": "ghcr.io/envloop/cua-rsibench-runner:44b69412e0ff05fd563da456dc4962a7dcf9ec08",
+  "registry_public_visibility_blocker": "Public setting disabled by organization administrators",
+  "registry_push_verified": true,
+  "release_url": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.4-controller-build",
+  "schema": "envloop-final-non-training-controller-publication-v1",
+  "source_archive_sha256": "5e178a426361436170f973a6979b2a08b81eaa12c1c9569318d1dd1fffc67598",
+  "source_commit": "44b69412e0ff05fd563da456dc4962a7dcf9ec08",
+  "source_files_verified": 1644,
+  "source_manifest_sha256": "fb9e930a0ce67c19ea57f569446570ea11c8e3b0841e98046726e1dac90f6b7c",
+  "source_pdf_cjk_matches": 0,
+  "tinker_api_calls_by_build": 0,
+  "tinker_installed": false
+}
