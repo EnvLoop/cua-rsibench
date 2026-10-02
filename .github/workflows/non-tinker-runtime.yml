@@ -3,11 +3,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'deployment/non-tinker-runner/**'
-      - 'tools/build_non_tinker_source_bundle_v1.py'
-      - 'tools/non_tinker_runner_smoke_v1.py'
-      - '.github/workflows/non-tinker-runtime.yml'
 permissions:
   contents: read
   packages: write

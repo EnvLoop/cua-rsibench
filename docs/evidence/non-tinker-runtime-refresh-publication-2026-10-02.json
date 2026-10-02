@@ -1,0 +1,71 @@
+{
+  "ci_architecture": "amd64",
+  "ci_conclusion": "success",
+  "ci_smoke_sha256": "c3fd75ef204754911e69afb9fe471db0ec47a02ac4cdb943678a279af3b07335",
+  "ci_source_archive_matches_local": true,
+  "ci_source_files_verified": 1638,
+  "ci_url": "https://github.com/EnvLoop/cua-rsibench/actions/runs/37011712281",
+  "completed_researcher_chains": 0,
+  "current_source_bindings": {
+    "desktop": {
+      "native_qualification_passed": false,
+      "schema": "cua-native-editor-capability-runtime-source-v44",
+      "source_files": 70,
+      "source_manifest_sha256": "59df1f4b94f707310d7e903734ef0d94904bbcd28e7fd8249b9c3fa5966c06f2"
+    },
+    "gitlab": {
+      "binding_sha256": "e9806accbbe7fee6ee0e74400bde0a177912d84a119d0aa5b2ab7cc6b8d76598"
+    },
+    "magento": {
+      "binding_sha256": "3796a86891553f2dae6092a9a8e548356467d6a312352a1768f5d7de9597b23a",
+      "control_entrypoint": "magento_catalog_factory.native_reference_qualification_v7",
+      "old_principal_epoch_qualification_credit": 0,
+      "principal_epoch": "v2",
+      "reference_binding_sha256": "de1169cd65013950f7d6b4d3cdd02c64e208288446f08c0378eeb72259f0966d",
+      "schema": "magento-native-five-slot-source-binding-v10",
+      "worker_entrypoint": "magento_catalog_factory.native_surface_workers_v10"
+    },
+    "odoo": {
+      "binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c"
+    },
+    "office": {
+      "schema": "office-current-rich-counterpart-registration-v5",
+      "source_files": 53
+    }
+  },
+  "date": "2026-10-02",
+  "desktop_native_commit_save_readback_qualification_passed": false,
+  "earlier_controller_conditional_skips": 64,
+  "earlier_controller_regression_tests": 3232,
+  "earlier_desktop_sdk_tests": 7,
+  "focused_refresh_tests": 54,
+  "full_empirical_study_complete": false,
+  "magento_fresh_train_trio_sql_scores": [
+    0,
+    1,
+    0
+  ],
+  "magento_queue_reset_cleanup_independently_audited": true,
+  "matched_full_study_outcomes": 0,
+  "merged_pr_url": "https://github.com/EnvLoop/cua-rsibench/pull/9",
+  "model_api_calls_by_build": 0,
+  "office_current_native_upload_lifecycle_passed": false,
+  "official_final_admissions": 0,
+  "pdf_and_source_text_cjk_matches": 0,
+  "pdf_pages_visually_checked": 3,
+  "pdf_sha256": "24c7337f612f2ddd11769ee6cfb1b8508b2b1bdf23d036cbad14b1091c279ff3",
+  "public_source_files_independently_reopened": 1638,
+  "public_source_pdf_all_assets_anonymous_download_verified": true,
+  "registry_anonymous_pull_verified": false,
+  "registry_image": "ghcr.io/envloop/cua-rsibench-runner:4b58b9474f42b507864c3383019895668c7d5091",
+  "registry_public_visibility_blocker": "Public choice disabled by organization administrators in actual package settings",
+  "registry_push_verified": true,
+  "release_url": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.3-non-training-runtime",
+  "schema": "envloop-non-tinker-build-publication-v2",
+  "scope": "source_controller_and_reference_controls_not_model_results",
+  "source_archive_sha256": "eea0345a8cb78506ae9887822f2aebb776ea0c25fb2d69c10d8909835cb9da43",
+  "source_commit": "4b58b9474f42b507864c3383019895668c7d5091",
+  "source_manifest_sha256": "5f6cb1a2009cd5963d29b00f5140d371809520ab9bd84e39e3f5b4aada5377b2",
+  "tinker_api_calls_by_build": 0,
+  "tinker_installed_in_controller": false
+}
