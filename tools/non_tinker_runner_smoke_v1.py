@@ -16,8 +16,8 @@ def current_source_bindings(root):
     probes={
         'gitlab':"from gitlab_world.v066_uniform_model_workers_v14 import public_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256']}",
         'odoo':"from enterprise_fallback.odoo18.native_surface_workers_v14 import public_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256']}",
-        'magento':"from magento_catalog_factory.native_surface_workers_v9 import public_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256']}",
-        'desktop':"from native_desktop_factory.native_window_current_runtime import source_manifest,public_binding; value=source_manifest(); result={'schema':value['schema'],'source_files':len(value['source_sha256s']),'source_manifest_sha256':public_binding()['source_manifest_sha256']}",
+        'magento':"from magento_catalog_factory.native_surface_workers_v10 import public_binding; from magento_catalog_factory.native_reference_qualification_v7 import reference_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256'],'schema':value['schema'],'principal_epoch':value['current_document_rendered_principal_epoch'],'reference_binding_sha256':reference_binding()['binding_sha256'],'worker_entrypoint':'magento_catalog_factory.native_surface_workers_v10','control_entrypoint':'magento_catalog_factory.native_reference_qualification_v7','old_principal_epoch_qualification_credit':value['old_principal_epoch_qualification_credit']}",
+        'desktop':"from native_desktop_factory.native_editor_runtime_v44 import source_manifest,public_binding; value=source_manifest(); result={'schema':value['schema'],'source_files':len(value['source_sha256s']),'source_manifest_sha256':public_binding()['source_manifest_sha256'],'native_qualification_passed':public_binding()['native_qualification_passed']}",
         'office':"from pathlib import Path; from tools.office_current_facade_v5 import current_sources,counterpart_registry; result={'source_files':len(current_sources(Path.cwd())),'schema':counterpart_registry(Path.cwd())['schema']}",
     }
     env={**os.environ,'PYTHONPATH':os.pathsep.join(str(p) for p in
@@ -30,7 +30,9 @@ def current_source_bindings(root):
         results[cell]=json.loads(completed.stdout)
     for entrypoint in ('tools.office_current_neutral_v5','tools.office_current_worker_cli_v5',
             'enterprise_fallback.odoo18.twenty_task_trial_controls_v2',
-            'native_desktop_factory.native_window_current_runtime'):
+            'magento_catalog_factory.native_surface_facade_v10',
+            'magento_catalog_factory.native_reference_qualification_v7',
+            'native_desktop_factory.native_editor_runtime_v44'):
         subprocess.run([sys.executable,'-m',entrypoint,'--help'],cwd=root,env=env,
             check=True,capture_output=True,timeout=60)
     return results

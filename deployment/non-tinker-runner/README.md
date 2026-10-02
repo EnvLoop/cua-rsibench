@@ -27,3 +27,5 @@ docker run --rm \
 ```
 
 The CI workflow builds an amd64 runner, verifies it without network access, uploads the source archive and smoke receipt, and pushes a commit-addressed GHCR image. It uses repository-scoped CI registry authorization. No external training-provider secret is needed. Native cell qualifications and the complete result paper remain separate gates.
+
+The first CI build and registry push passed on 2 October 2026. The organization currently disables the package's Public setting, so the GHCR image remains private and anonymous pull has not passed. The public [non-training release](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.2-non-training-build) provides the verified source archive, manifest, smoke receipt, English methods PDF and architecture diagram. Build from that archive without registry access. An organization administrator must enable public package visibility before the image can be advertised as anonymously pullable.

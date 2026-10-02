@@ -27,7 +27,9 @@ jobs:
       - name: Build runner
         run: docker build --progress=plain -f work/non-tinker-ci/context/deployment/non-tinker-runner/Dockerfile -t envloop/non-tinker-runner:ci work/non-tinker-ci/context
       - name: Verify actual container without network or provider keys
-        run: docker run --rm --network none envloop/non-tinker-runner:ci | tee work/non-tinker-ci/container-smoke.json
+        run: |
+          set -euo pipefail
+          docker run --rm --network none envloop/non-tinker-runner:ci | tee work/non-tinker-ci/container-smoke.json
       - name: Authenticate container registry
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
