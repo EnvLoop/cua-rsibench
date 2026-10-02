@@ -1,0 +1,29 @@
+{
+  "actual_cost_usd": null,
+  "authentic_provider_usage": {
+    "input_tokens": 256123,
+    "output_tokens": 3277,
+    "total_tokens": 259400
+  },
+  "difference_codes": [],
+  "episode_receipt_sha256": "7b318420586fd7278fb4c5424907adf2bcaa9a81c79b2534febf0c36eced5c1e",
+  "family": "sales",
+  "formal_large_study_credit": 0,
+  "independent_saved_score": 1.0,
+  "model_reported": "gpt-6-sol",
+  "model_requested": "gpt-6-sol",
+  "native_epoch": "v14",
+  "outstanding_callbacks": 0,
+  "positive_training_turns": 26,
+  "provider_reasoning_effort": "medium",
+  "provider_response_count": 26,
+  "real_provider_client_close": true,
+  "rejected_turns_excluded": 0,
+  "rendered_multimodal_sha256": "5c12b28df996d40c9df589fa33889644c7549c9ba2fe7227ca50b904e769eafe",
+  "reset_semantics_exact": true,
+  "schema": "envloop-odoo20-actual-public-train-teacher-result-v2",
+  "source_data_label": "Synthetic business fixture in real Odoo Community",
+  "student_inference_prompt_equality_checked": true,
+  "task_id": "ELSQ-TRN-0001",
+  "trial_plan_sha256": "0c8c292a9fadb9e4bb7e77658bc39938310b223d4f7ee36fa45457d24f398c0d"
+}

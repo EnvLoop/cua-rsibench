@@ -9,6 +9,10 @@ A real Kanboard application, public-source issue metadata, actual Tinker LoRA tr
 - [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories)
 - [Original-cohort audit](docs/site/factory-study.json) and [Sol 6 / Luna 6 audit](docs/site/model6-study.json)
 
+## Odoo20 pilot: current execution
+
+The [2 October execution record](docs/evidence/odoo20-pilot-progress-2026-10-02.json) covers the requested single-environment pilot. Sol 6 produced four independently verified GUI teacher workflows and 103 positive multimodal training turns. All 20 selection controls and 20 frozen final controls passed saved-state and source review. Three baseline selection cases completed; real Tinker training completed 19 of 192 optimizer steps before HTTP 402 blocked both jobs. No training checkpoint or final model outcome is available, and no training effect has been measured. Interrupted provider requests are retained as infrastructure failures, separately from model scores. The fixtures are synthetic business data inside real Odoo Community. The full six-environment study remains incomplete.
+
 ## v0.6 real-software qualification note
 
 The [English qualification PDF](docs/qualification-v06/EnvLoop-Computer-Use-Qualification-Report.pdf), [interactive six-application explorer](https://envloop.github.io/cua-rsibench/qualification-v06/), and [source-hashed evidence data](docs/evidence/v0.6-qualification-report-data.json) document the next benchmark's environment and verifier work. This is a **separate methods release**, not a new full-scale score: the planned Qwen3.8-27B study has zero completed researcher campaigns, zero official final task instances, and no application with 100 admitted tasks. Human GUI controls, one-task model pilots, published source inventories, and provisional splits are labeled separately. The v0.5 Qwen3.5-4B Kanboard results below remain unchanged.

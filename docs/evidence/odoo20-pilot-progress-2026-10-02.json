@@ -1,0 +1,57 @@
+{
+  "schema": "envloop-odoo20-pilot-progress-v1",
+  "as_of_date": "2026-10-02",
+  "scope": "single_environment_20_task_pilot",
+  "cell_id": "odoo-community",
+  "status": "interrupted_by_provider_billing_402",
+  "teacher_model": "gpt-6-sol",
+  "student_model": "Qwen/Qwen3.8-27B",
+  "source_data_label": "Synthetic business fixtures in real Odoo Community",
+  "train_teacher_workflows_verified": 4,
+  "train_teacher_positive_turns": 103,
+  "teacher_turn_origins": {
+    "native_v13": 77,
+    "native_v14": 26
+  },
+  "selection_environment_controls_verified": 20,
+  "frozen_final_environment_controls_verified": 20,
+  "baseline_selection_saved_outcomes": 3,
+  "baseline_selection_successes": 0,
+  "baseline_interrupted_case_completed_samples": 44,
+  "baseline_interrupted_case_uncertain_requests": 1,
+  "interrupted_case_is_model_score": false,
+  "training_optimizer_steps_completed": 19,
+  "training_optimizer_steps_planned": 192,
+  "training_checkpoint_saved": false,
+  "training_pending_forward_backward_outcome": "unknown",
+  "final_model_outcomes_completed": 0,
+  "final_model_outcomes_planned": 40,
+  "training_effect_measured": false,
+  "actual_cost_usd": null,
+  "billing_gate": {
+    "http_status": 402,
+    "single_request_readonly_check_verified": true,
+    "training_calls": 0,
+    "model_sampling_calls": 0,
+    "owned_close_returned": true
+  },
+  "original_evidence_preserved": true,
+  "automatic_replay_of_uncertain_requests_authorized": false,
+  "remaining": [
+    "Restore provider billing access",
+    "Continue baseline without repeating completed cases",
+    "Obtain a fully verified training checkpoint",
+    "Run matched checkpoint selection20 and freeze before final outcomes",
+    "Run matched baseline and checkpoint on final20",
+    "Render and visually inspect English report and publish verified pilot"
+  ],
+  "full_study_completed": false,
+  "full_study_admitted_final_tasks": 0,
+  "full_study_completed_researcher_campaigns": 0,
+  "full_study_final_outcomes": 0,
+  "retained_evidence_sha256": {
+    "training_terminal": "03ccbde772413890f2ab44938d4522655b29fdc7d1d1c6bbcd403b5840ca5579",
+    "baseline_terminal": "31f701bb5356a026a5772a011bdead8c32b679cdc1d3dab9ea4e6deff038eb10",
+    "billing_access_check": "08410c9c83fb0b508e69dbb9e2dddeeda80cb7cedb7d0a4f6c8a1c98ca9b1c2f"
+  }
+}
