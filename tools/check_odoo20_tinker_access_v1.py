@@ -37,7 +37,8 @@ def write_once(path, value):
 
 
 def result_receipt(*, terminal_ref, terminal, started_at, ended_at,
-                   capabilities, status_code, error_type, close_returned):
+                   capabilities, status_code, error_type, close_returned,
+                   raw_provider_evidence_ref=None):
     after = (type(terminal.get('ended_at')) in (int, float)
              and terminal['ended_at'] <= started_at
              and terminal.get('exit_code') == 1
@@ -49,12 +50,15 @@ def result_receipt(*, terminal_ref, terminal, started_at, ended_at,
     ready = (after and status_code == 200 and capabilities is not None
              and supported and close_returned is True and error_type is None)
     return {'schema': 'envloop-odoo20-tinker-access-restored-v1',
+            'checker_source_sha256': sha256(Path(__file__).read_bytes()).hexdigest(),
             'status': 'ready' if ready else 'not_ready', 'model': MODEL,
             'provider_http_status': status_code, 'error_type': error_type,
             'actual_provider_call': True, 'checked_after_prior_terminal': after,
             'prior_terminal_ref': terminal_ref, 'supported_model_verified': supported,
             'started_at': started_at, 'ended_at': ended_at,
+            'checked_at': ended_at, 'raw_provider_evidence_ref': raw_provider_evidence_ref,
             'owned_close_returned': close_returned,
+            'owned_close_awaited': close_returned,
             'training_calls': 0, 'model_sampling_calls': 0,
             'automatic_retries': 0, 'actual_cost_usd': None,
             'formal_large_study_credit': 0}
@@ -75,33 +79,35 @@ def run(*, terminal_path, terminal_sha, output_root):
     terminal_ref = {'path': str(Path(terminal_path).resolve()), 'sha256': terminal_sha}
     started = time.time()
     write_once(out/'access-intent.private.json', {'before_provider_call': True,
+        'checker_source_sha256': sha256(Path(__file__).read_bytes()).hexdigest(),
         'operation': 'get_server_capabilities', 'prior_terminal_ref': terminal_ref,
         'automatic_retries': 0, 'training_calls': 0, 'model_sampling_calls': 0})
     # Inspected, hash-pinned SDK facade disables holder retries as well as HTTP
     # retries. Capability reads create no sessionful training or sampling client.
     from enterprise_fallback.odoo18.twenty_task_trial_training_v1 import no_retry_service_class
     service = no_retry_service_class()(max_retries=0, timeout=30)
-    capabilities, code, error, closed = None, None, None, False
+    capabilities, code, error, closed, raw_ref = None, None, None, False, None
     try:
         response = service.get_server_capabilities()
         capabilities = response.model_dump(mode='json')
         code = 200
-        write_once(out/'capabilities-result.private.json', capabilities)
+        raw_ref = write_once(out/'capabilities-result.private.json', capabilities)
     except Exception as exc:
         code, error = getattr(exc, 'status_code', None), type(exc).__name__
         # Retain the raw message privately; console and public reports get only
         # typed status, never authenticated headers or credentials.
-        write_once(out/'capabilities-error.private.json', {
+        raw_ref = write_once(out/'capabilities-error.private.json', {
             'error_type': error, 'http_status': code, 'message': str(exc)[:8000]})
     finally:
         try:
-            service.close('success' if code == 200 else 'errored')
+            service.close('success' if code == 200 else 'errored').result(timeout=30)
             closed = True
         except Exception as exc:
             write_once(out/'close-error.private.json', {'error_type': type(exc).__name__})
     receipt = result_receipt(terminal_ref=terminal_ref, terminal=terminal,
         started_at=started, ended_at=time.time(), capabilities=capabilities,
-        status_code=code, error_type=error, close_returned=closed)
+        status_code=code, error_type=error, close_returned=closed,
+        raw_provider_evidence_ref=raw_ref)
     ref = write_once(out/'access-result.private.json', receipt)
     return receipt, ref
 
