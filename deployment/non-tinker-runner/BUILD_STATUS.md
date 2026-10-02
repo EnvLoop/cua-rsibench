@@ -12,7 +12,7 @@ The controller preserves the repository layout and hash-bound runtime dependenci
 | --- | --- | --- | --- |
 | Excel web | `tools.office_current_worker_cli_v5` | Original rich SEC graph and saved workbook checks | 140 original packages replayed offline; current native lifecycle pending |
 | PowerPoint web | `tools.office_current_worker_cli_v5` | Saved deck text, chart and collateral checks | 140 portable WDI packages built; current native lifecycle pending |
-| Native desktop | `native_desktop_factory.native_editor_runtime_v44` | Saved Calc, Impress and Writer artifacts | Native repairs tested and formula input applied; commit/save/readback qualification pending |
+| Native desktop | `native_desktop_factory.native_guarded_observation_runtime_v46` | Saved Calc, Impress and Writer artifacts | Five genuine actions applied; saved bytes remained the baseline, then window ownership failed; no positive/reset credit |
 | Odoo Community | `enterprise_fallback.odoo18.native_surface_workers_v14` | Trusted SQL state, exact reset and native receipt audit | Current 20 selection and 20 pilot-final control sets independently verified |
 | GitLab CE | `gitlab_world.v066_uniform_model_workers_v14` | Saved SQL plus Git trees, blobs and relationships | Two current saved control trios independently verified; retained source/sidebar pages reviewed; complete activity/link rendering not captured |
 | Magento | `magento_catalog_factory.native_surface_workers_v10` | Catalog SQL, search state, queue ownership, principal witness and exact reset | One fresh TRAIN trio verified: baseline 0, positive 1, wrong variant 0; pixel robustness unestablished; zero formal results |
@@ -20,6 +20,8 @@ The controller preserves the repository layout and hash-bound runtime dependenci
 Current source bindings and CLI help are checked in isolated processes inside the image. These checks construct no application worker, create no cloud guest, train no model and dispatch no inference. An application run requires its original private task allocation, owned execution resource and reviewed authority. The image alone is not a replacement application sandbox.
 
 Magento's fresh `native_reference_qualification_v7` controls passed saved SQL/search, queue, reset and cleanup audits. The repair accepts an owned rendered account header after scrolling; target and focus viewport checks remain strict. Its small raw-HTML source raster does not establish pixel robustness or model readability. Earlier controls receive zero new-epoch credit. Source and receipt hashes are in the [aggregate qualification note](../../docs/evidence/magento-rendered-principal-trio-2026-10-02.md).
+
+Desktop v46 uses one verified screenshot capture per observation for every role. Native state is checked before and after observation and predispatch screenshots. This explicitly replaces seven-capture readiness; ownership, target, read-only, nonce and budget checks remain unchanged. Its real control applied five actions, but saved readback failed and the next window check stopped. The active-window cause is unproved. Enter resampling and full qualification remain unchanged and unproved.
 
 ## Preserve the difficult data
 
@@ -51,7 +53,7 @@ See [README.md](README.md) for staging, build and network-isolated verification 
 
 ## Validation record
 
-Before the additive Magento v10 and Desktop v44 refresh, the controller regression profile passed 3,232 tests with 64 conditional skips. Seven Desktop SDK tests passed separately in a compatible E2B Desktop 2.2 / Pillow 11.3 interpreter. The refresh passed 54 focused bundle-boundary, Magento-principal and Desktop-capability tests. A network-blocked dispatch-gate suite passed 44 fake-provider tests without replacing its historical September receipt. The visible-toolbar reference regression rejects ambiguous visible controls and accepts the single visible original control while excluding its hidden sticky clone. These tests and source checks contribute no model outcome or native task admission.
+Before these additive repairs, the controller regression profile passed 3,232 tests with 64 conditional skips. Seven Desktop SDK tests passed separately in a compatible E2B Desktop 2.2 / Pillow 11.3 interpreter. The refresh passed 77 focused bundle-boundary, Magento-principal, Desktop-capability, current-path and observation/guard checks. A network-blocked dispatch-gate suite passed 44 fake-provider tests without replacing its historical receipt. Tests and source checks contribute no model outcome or native task admission.
 
 ## Closure checklist
 
