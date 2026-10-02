@@ -1,0 +1,15 @@
+{
+  "actual_cost_usd": null,
+  "candidate_receipt_sha256": "558cb2682ee4043ba912a9ebb0c33304571d44638a7cb292ce7bbea2af9ad3ba",
+  "first_case_replayed": false,
+  "formal_final_task_credit": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "new_paid_calls": 0,
+  "original_namespace_preserved": true,
+  "original_paid_calls": 90,
+  "schema": "envloop-odoo20-original-baseline-selection-case-recovered-v3",
+  "score": 0,
+  "source_actor_scorer_reset_unchanged": true,
+  "source_evidence_files_reverified": 2467,
+  "task_id": "ELPO-SEL-0001"
+}

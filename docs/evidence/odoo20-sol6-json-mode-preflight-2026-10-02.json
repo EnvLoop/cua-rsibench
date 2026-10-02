@@ -1,0 +1,14 @@
+{
+  "JSON_mode": "json_object",
+  "actual_cost_usd": null,
+  "benchmark_task_credit": 0,
+  "http_status": 200,
+  "provider_status": "completed",
+  "public_marker_only": true,
+  "reported_model": "gpt-6-sol",
+  "requested_model": "gpt-6-sol",
+  "response_sha256": "a26fcd76b91cfafcd2ae855c6ef279a8b991be227a1970cb80c29b2e5dbfe4a6",
+  "route": "AgentRouterHub Responses",
+  "schema": "envloop-sol6-json-mode-provider-preflight-v1",
+  "shared_action_validator_relaxed": false
+}
