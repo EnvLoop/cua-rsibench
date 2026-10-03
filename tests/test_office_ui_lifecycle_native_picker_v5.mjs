@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {createOfficeUiLifecycle,PARENT_SOURCE_SHA256,officeLifecycleV5SourceHashes} from '../tools/office_owned_folder_ui_lifecycle_v5.mjs';
+import {createOfficeNativeExtractor} from '../tools/office_owned_folder_native_extractor_v3.mjs';
 import {ooxmlFixture} from './office_ooxml_fixture_v4.mjs';
 const sha=raw=>createHash('sha256').update(raw).digest('hex');
 
@@ -15,26 +16,26 @@ async function fixture(t,{native=true,transport=native?'native_picker':undefined
  const baseline=path.join(root,'source.pptx');await fs.writeFile(baseline,ooxmlFixture('powerpoint-web'),{mode:0o600});
  const folder='https://onedrive.live.com/?id=fixture-child',parent='https://onedrive.live.com/?id=fixture-parent';
  const binding={tab_id:1,folder_url:folder,folder_url_sha256:sha(Buffer.from(folder)),account_principal_sha256:'a'.repeat(64),folder_scope_sha256:'b'.repeat(64),folder_clip:{x:0,y:126,width:1000,height:700}};
- const state={url:folder,rows:[],selected:false,editors:new Map(),nextTab:2,nextGuid:1,principal:binding.account_principal_sha256,callbackCalls:[],calls:[],beforeUpload:null,afterUpload:null,receiptChange:null,skipUpload:false,forcedGuid:null};
+ const state={url:folder,rows:[],selected:false,editors:new Map(),nextTab:2,nextGuid:1,principal:binding.account_principal_sha256,callbackCalls:[],calls:[],beforeUpload:null,afterUpload:null,receiptChange:null,skipUpload:false,forcedGuid:null,ready:new Set(),asyncMenu:false,waitError:null,deleteToast:false,deleteMessage:'Deleted 1 item',afterDelete:null,afterReload:null,staleDeleteRow:false};
  const install=file=>{
   const guid=state.forcedGuid??state.nextGuid++;const token=String(guid).padStart(12,'0');
   const edit='https://onedrive.live.com/personal/0000000000000001/_layouts/15/Doc.aspx?sourcedoc=%7B00000000-0000-0000-0000-'+token+'%7D&file='+encodeURIComponent(path.basename(file))+'&action=edit';
   state.rows=[{name:path.basename(file),href:edit}];state.selected=false;
  };
- const node=(name,scope='folder')=>({count:async()=>1,isVisible:async()=>true,isEnabled:async()=>true,waitFor:async()=>{},
-  evaluate:async()=>name==='badge'?{text:String(state.rows.length),tag:'SPAN',folderLabel:'Yellow folder'}:name==='card-name'?'Isolated fixture':name==='#SaveStatusButton'?'Saved to OneDrive':null,
+ const node=(name,scope='folder')=>({count:async()=>state.asyncMenu&&name==='Open in browser'&&!state.ready.has(name)?0:1,isVisible:async()=>true,isEnabled:async()=>true,waitFor:async options=>{state.calls.push('wait:'+name+':'+options.state);if(state.waitError&&name==='Open in browser')throw state.waitError;if(name==='Deleted 1 item'&&!state.deleteToast)throw new Error('fixture native delete success unavailable');state.ready.add(name);},
+  evaluate:async()=>name==='badge'?{text:String(state.rows.length),tag:'SPAN',folderLabel:'Yellow folder'}:name==='card-name'?'Isolated fixture':name==='#SaveStatusButton'?'Saved to OneDrive':name==='Deleted 1 item'?state.deleteMessage:null,
   evaluateAll:async()=>state.rows.map((row,row_index)=>({...row,row_index})),locator:selector=>node(selector,scope),nth:()=>node('row',scope),getByRole:(role,options)=>node(role==='checkbox'?'checkbox':options.name,scope),
   getAttribute:async attribute=>attribute==='aria-checked'?String(state.selected):null,
   click:async()=>{
    state.calls.push(scope+':'+name);
    if(name==='checkbox')state.selected=true;
-   if(name==='Delete')state.rows=[];
+   if(name==='Delete'){state.deleteToast=true;if(!state.staleDeleteRow)state.rows=[];if(state.afterDelete)await state.afterDelete();}
    if(name==='Open in browser'){
     const id=state.nextTab++,edit=state.rows[0].href;
     state.editors.set(id,{id,url:async()=>edit,close:async()=>state.editors.delete(id),playwright:{frameLocator:()=>({locator:selector=>node(selector,'editor'),getByRole:(role,options)=>node(options.name,'editor')}),locator:selector=>node(selector,'editor'),getByRole:(role,options)=>node(options.name,'editor')}});
    }
   }});
- const tab={id:1,url:async()=>state.url,goto:async url=>{state.url=url;state.calls.push('goto');},screenshot:async()=>Buffer.from('local fixture image'),playwright:{locator:selector=>node(selector),getByRole:(role,options)=>node(options.name),getByText:text=>node(text),domSnapshot:async()=>JSON.stringify({rows:state.rows}),
+ const tab={id:1,url:async()=>state.url,goto:async url=>{state.url=url;state.calls.push('goto');},reload:async()=>{state.calls.push('reload');state.rows=[];if(state.afterReload)await state.afterReload();},screenshot:async()=>Buffer.from('local fixture image'),playwright:{locator:selector=>node(selector),getByRole:(role,options)=>node(options.name),getByText:text=>node(text),domSnapshot:async()=>JSON.stringify({rows:state.rows}),
   waitForEvent:async event=>{
    state.calls.push('event:'+event);
    if(event==='filechooser')return {isMultiple:()=>false,setFiles:async file=>{state.calls.push('setFiles');install(file);}};
@@ -43,7 +44,7 @@ async function fixture(t,{native=true,transport=native?'native_picker':undefined
  const browser={tabs:{list:async()=>[{id:1,url:folder},...await Promise.all([...state.editors.values()].map(async tab=>({id:tab.id,url:await tab.url()})))],get:async id=>state.editors.get(id)}};
  const profile={schema:'office-owned-folder-native-ui-profile-v3',source_reviewed:true,upload_transport:transport,folder_heading:{role:'heading',name:'Isolated fixture'},item_rows_selector:'rows',name_cell_selector:'name',empty_state:{text:'This folder is empty'},
   folder_inventory_proof:{mode:'parent_card_count',parent_url:parent,parent_url_sha256:sha(Buffer.from(parent)),card_selector:'card',name_selector:'card-name',count_selector:'badge'},signed_in_principal:{folder:{},editor:{}},
-  upload_steps:[{role:'button',name:'Create or upload'},{role:'menuitem',name:'Files upload'}],open_steps:[{role:'menuitem',name:'Open'},{role:'menuitem',name:'Open in browser'}],editor_frame_selector:'iframe',editor_ready:{selector:'#ModeSwitcher'},saved_status:{selector:'#SaveStatusButton'},saved_status_expected:'Saved to OneDrive',download_surface:'folder_toolbar',download_steps:[{role:'menuitem',name:'Download'}],delete_steps:[{role:'button',name:'Delete'}]};
+  upload_steps:[{role:'button',name:'Create or upload'},{role:'menuitem',name:'Files upload'}],open_steps:[{role:'menuitem',name:'Open'},{role:'menuitem',name:'Open in browser'}],editor_frame_selector:'iframe',editor_ready:{selector:'#ModeSwitcher'},saved_status:{selector:'#SaveStatusButton'},saved_status_expected:'Saved to OneDrive',download_surface:'folder_toolbar',download_steps:[{role:'menuitem',name:'Download'}],delete_steps:[{role:'button',name:'Delete'}],delete_success:{text:'Deleted 1 item'}};
  const nativeBaselineUploader=async args=>{
   state.callbackCalls.push(args);state.calls.push('native-callback');
   assert.equal((await fs.stat(args.evidenceRoot)).mode&0o777,0o700);
@@ -148,4 +149,73 @@ test('source map binds exactly lifecycle and picker; original V4 bytes stay immu
  assert.deepEqual(Object.keys(values).sort(),['tools/office_native_picker_uploader_v1.mjs','tools/office_owned_folder_ui_lifecycle_v5.mjs']);
  for(const [name,digest] of Object.entries(values))assert.equal(sha(await fs.readFile(new URL('../'+name,import.meta.url))),digest);
  assert.equal(sha(await fs.readFile(new URL('../tools/office_owned_folder_ui_lifecycle_v4.mjs',import.meta.url))),PARENT_SOURCE_SHA256);
+});
+
+test('asynchronous native Open submenu is awaited before uniqueness and click',async t=>{
+ const f=await fixture(t);f.state.asyncMenu=true;
+ await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+ assert.ok(f.state.calls.indexOf('wait:Open in browser:visible')<f.state.calls.indexOf('folder:Open in browser'));
+ assert.equal(f.state.calls.filter(x=>x==='folder:Open in browser').length,1);
+});
+
+test('native readiness timeout propagates without clicking or retrying absent submenu',async t=>{
+ const f=await fixture(t);const error=new Error('fixture native submenu wait timeout');f.state.waitError=error;
+ await assert.rejects(f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'}),value=>value===error);
+ assert.equal(f.state.calls.filter(x=>x==='folder:Open in browser').length,0);
+ assert.equal(f.state.callbackCalls.length,1);
+});
+
+test('explicit successful deletion permits exactly one owned-folder reload before empty inventory proof',async t=>{
+ const f=await fixture(t);const created=await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+ await f.driver.closeDocument(f.binding,created.item);f.state.staleDeleteRow=true;
+ const result=await f.driver.removeOwnedItem(f.binding,created.item);
+ assert.equal(f.state.calls.filter(x=>x==='folder:Delete').length,1);assert.equal(f.state.calls.filter(x=>x==='reload').length,1);
+ assert.ok(f.state.calls.indexOf('folder:Delete')<f.state.calls.indexOf('wait:Deleted 1 item:visible'));
+ assert.ok(f.state.calls.indexOf('wait:Deleted 1 item:visible')<f.state.calls.indexOf('reload'));
+ assert.equal(result.explicit_delete_success_observed,true);assert.equal(result.owned_folder_reloaded_after_success,true);assert.equal(result.delete_retry_performed,false);
+ assert.deepEqual((await f.driver.folderInventory()).items,[]);
+});
+
+test('missing or wrong delete-success witness refuses without reload or duplicate delete',async t=>{
+ for(const kind of ['missing','wrong text'])await t.test(kind,async t=>{
+  const f=await fixture(t);const created=await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+  await f.driver.closeDocument(f.binding,created.item);
+  if(kind==='missing')f.state.afterDelete=async()=>{f.state.deleteToast=false;};else f.state.deleteMessage='Could not delete item';
+  await assert.rejects(f.driver.removeOwnedItem(f.binding,created.item));
+  assert.equal(f.state.calls.filter(x=>x==='folder:Delete').length,1);assert.equal(f.state.calls.filter(x=>x==='reload').length,0);
+ });
+});
+
+test('delete requires declared exact success profile and documented reload capability before input',async t=>{
+ for(const kind of ['profile','reload'])await t.test(kind,async t=>{
+  const f=await fixture(t);const created=await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+  await f.driver.closeDocument(f.binding,created.item);
+  if(kind==='profile')f.profile.delete_success={text:'Deleted items'};else delete f.tab.reload;
+  await assert.rejects(f.driver.removeOwnedItem(f.binding,created.item),/delete_success_and_reload_profile_required/);
+  assert.equal(f.state.calls.filter(x=>x==='folder:Delete').length,0);
+ });
+});
+
+test('foreign navigation before or after delete reload cannot complete owned cleanup',async t=>{
+ for(const when of ['before','after'])await t.test(when,async t=>{
+  const f=await fixture(t);const created=await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+  await f.driver.closeDocument(f.binding,created.item);
+  const change=async()=>{f.state.url='https://onedrive.live.com/?id=foreign';};
+  if(when==='before')f.state.afterDelete=change;else f.state.afterReload=change;
+  await assert.rejects(f.driver.removeOwnedItem(f.binding,created.item),/delete_folder_changed/);
+  assert.equal(f.state.calls.filter(x=>x==='folder:Delete').length,1);assert.equal(f.state.calls.filter(x=>x==='reload').length,when==='before'?0:1);
+ });
+});
+
+test('actual lifecycle receipt supplies unchanged Extractor3 membership identity in Host6 binding',async t=>{
+ const f=await fixture(t);const created=await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+ assert.equal(created.item_identity_sha256,created.item.item_identity_sha256);
+ const clip={x:0,y:126,width:1440,height:874};let geometryCalls=0;
+ const bound={...f.binding,...created.item,clip,window_sha256:'c'.repeat(64),signed_in_principal_profile:{open_steps:[]},owned_folder_item_ui_receipt:created,owned_folder_item_ui_receipt_sha256:sha(Buffer.from(JSON.stringify(created)))};
+ const tab={url:async()=>created.item.edit_url,playwright:{locator:()=>({evaluate:async()=>{geometryCalls++;return {document_ready:'complete',targets:[],viewport:[clip.width,clip.height],focus_path:'fixture',modal_path:'',modal_safe:true,editor_surface_observed:true,editing_mode_observed:true,private_chrome_observed:true,private_chrome_outside_crop:true};}})}};
+ const principalObserver=async()=>({nativeUiObserved:true,principalSha256:f.binding.account_principal_sha256});
+ const extract=createOfficeNativeExtractor({binding:bound,principalObserver});const metadata=await extract({tab,clip});
+ assert.equal(metadata.document_identity_sha256,created.item_identity_sha256);assert.equal(geometryCalls,1);
+ const foreign=createOfficeNativeExtractor({binding:{...bound,owned_folder_item_ui_receipt:{...created,item_identity_sha256:'0'.repeat(64)}},principalObserver});
+ await assert.rejects(foreign({tab,clip}),/observed_document_folder_binding_changed/);assert.equal(geometryCalls,1);
 });

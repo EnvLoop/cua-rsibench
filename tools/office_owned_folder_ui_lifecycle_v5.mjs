@@ -26,7 +26,7 @@ export async function createOfficeUiLifecycle({folderTab,browser=null,binding,pr
  let sequence=0;const owned=new Map(),documentTabs=new Map(),createdIdentities=new Set();
  const locator=(step,tab=folderTab)=>{const scope=tab!==folderTab&&profile.editor_frame_selector?tab.playwright.frameLocator(profile.editor_frame_selector):tab.playwright;return step.selector?scope.locator(step.selector):step.text?scope.getByText(step.text,{exact:true}):scope.getByRole(step.role,{name:step.name,exact:true});};
  async function write(name,raw){await fs.writeFile(path.join(root,name),raw,{flag:'wx',mode:0o600});return {path:name,sha256:sha(raw)};}
- async function visible(step,tab=folderTab){const node=locator(step,tab);check(await node.count()===1&&await node.isVisible()&&await node.isEnabled(),'native_visible_unique_control_required');return node;}
+ async function visible(step,tab=folderTab){const node=locator(step,tab);await node.waitFor({state:'visible',timeoutMs:10000});check(await node.count()===1&&await node.isVisible()&&await node.isEnabled(),'native_visible_unique_control_required');return node;}
  async function click(step,tab=folderTab){await (await visible(step,tab)).click({timeoutMs:10000});}
  async function snapshot(label){const refs=[];refs.push(await write(label+'.native.private.txt',Buffer.from(await folderTab.playwright.domSnapshot())));refs.push(await write(label+'.image',Buffer.from(await folderTab.screenshot({clip:binding.folder_clip}))));return refs;}
  async function begin(op,payload){const n=sequence++;const label='lifecycle-'+String(n).padStart(4,'0');await write(label+'.intent.private.json',bytes({schema:'office-owned-folder-ui-intent-v2',operation:op,payload,sequence:n,one_use:true}));return {label,refs:await snapshot(label+'-before')};}
@@ -134,7 +134,7 @@ export async function createOfficeUiLifecycle({folderTab,browser=null,binding,pr
    const cloudURL=new URL(editUrl),creationIdentity=sha(Buffer.from(cloudURL.origin+cloudURL.pathname.toLowerCase()+'|'+cloudURL.searchParams.get('sourcedoc').toLowerCase()));
    check(!createdIdentities.has(creationIdentity),'native_created_document_identity_reused');createdIdentities.add(creationIdentity);
    const item={account_principal_sha256:binding.account_principal_sha256,folder_scope_sha256:binding.folder_scope_sha256,item_identity_sha256:actual.documentSha256,document_owner_sha256:actual.documentOwnerSha256,edit_url:editUrl,file_name:file,cell_id:task.cell_id,purpose};owned.set(item.item_identity_sha256,item);if(opened)documentTabs.set(item.item_identity_sha256,opened);
-   return finish(state,'create_document',{item});
+   return finish(state,'create_document',{item,item_identity_sha256:actual.documentSha256});
   },
   async doubleDownload(_binding,item,{purpose}){
    check(profile.download_surface==='folder_toolbar','native_folder_toolbar_download_surface_required');
@@ -152,7 +152,12 @@ export async function createOfficeUiLifecycle({folderTab,browser=null,binding,pr
   },
   async closeDocument(_binding,item){checkItem(item);const state=await begin('close_document',{item_identity_sha256:item.item_identity_sha256});const tab=documentTabs.get(item.item_identity_sha256);if(tab){await tab.close();documentTabs.delete(item.item_identity_sha256);}await folder();return finish(state,'close_document',{item_identity_sha256:item.item_identity_sha256,owned_document_tab_closed:!!tab,owned_folder_scope_reopened:true});},
   async removeOwnedItem(_binding,item){await folder();checkItem(item);const rows=await inventoryRaw();check(rows.length===1&&rows[0].name===item.file_name,'native_delete_item_scope_changed');
-   const state=await begin('remove_document',{item_identity_sha256:item.item_identity_sha256});await selectOwnedRow(item);await menu(profile.delete_steps);await locator(profile.item_ready||{role:'gridcell',name:item.file_name}).waitFor({state:'hidden',timeoutMs:30000});check((await inventoryRaw()).length===0,'native_owned_item_delete_not_proved');owned.delete(item.item_identity_sha256);return finish(state,'remove_document',{item_identity_sha256:item.item_identity_sha256});
+   check(profile.delete_success?.text==='Deleted 1 item'&&Object.keys(profile.delete_success).length===1&&typeof folderTab.reload==='function','native_delete_success_and_reload_profile_required');
+   const state=await begin('remove_document',{item_identity_sha256:item.item_identity_sha256});await selectOwnedRow(item);await menu(profile.delete_steps);
+   const success=await visible(profile.delete_success);const message=await success.evaluate(e=>e.textContent.trim(),undefined,{timeoutMs:10000});check(message==='Deleted 1 item','native_explicit_delete_success_not_observed');
+   state.refs.push(await write(state.label+'-delete-success.private.json',bytes({schema:'office-owned-item-delete-success-v5',item_identity_sha256:item.item_identity_sha256,observed_message:message,native_ui_observed:true,recoverable_delete:true,delete_retry_performed:false})));
+   check(await folderTab.url()===pickerScope.folder_url,'native_delete_folder_changed_before_reload');await folderTab.reload();check(await folderTab.url()===pickerScope.folder_url,'native_delete_folder_changed_after_reload');await visible(profile.folder_heading);await principal(folderTab,'folder');
+   await locator(profile.item_ready||{role:'gridcell',name:item.file_name}).waitFor({state:'hidden',timeoutMs:30000});check((await inventoryRaw()).length===0,'native_owned_item_delete_not_proved');owned.delete(item.item_identity_sha256);return finish(state,'remove_document',{item_identity_sha256:item.item_identity_sha256,explicit_delete_success_observed:true,owned_folder_reloaded_after_success:true,delete_retry_performed:false});
   },
   async openOwnedDocument(item){return doc(item);},
  });
