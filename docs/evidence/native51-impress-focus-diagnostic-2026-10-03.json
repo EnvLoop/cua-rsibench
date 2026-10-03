@@ -1,0 +1,22 @@
+{
+  "actual_guarded_wait_steps": 1,
+  "actual_gui_inputs": 2,
+  "current_complete_desktop_qualification": false,
+  "date": "2026-10-03",
+  "earlier_controls_promoted": false,
+  "focused_zero_child_paragraph_and_same_document_ancestor_observed": true,
+  "full_tree_uniqueness_established": false,
+  "inventory_node_cap_reached": true,
+  "model_calls": 0,
+  "new_final_admissions": 0,
+  "owned_guest_terminated_and_account_active_zero": true,
+  "raw_focus_receipt_sha256": "bfb33606bd2c5501ab79f730439e0d964be8389390d1d1290d9f020f9f79289e",
+  "raw_native_focus_flags_preserved": true,
+  "runtime_source_manifest_sha256": "612b9b5e03139df83a2e9f892be5bc5c0b2223af5f80a44158a1f2bce5aa5ff2",
+  "saved_bytes_equal_baseline": true,
+  "schema": "envloop-native51-impress-navigation-focus-diagnostic-v1",
+  "selector_navigation_applied": true,
+  "terminal_sha256": "efe22d7d280796ab201ceaa6a08c088b1c2caa0bc30ec2e8b75dd50cd4188b42",
+  "tinker_calls": 0,
+  "typing_or_save_performed": false
+}
