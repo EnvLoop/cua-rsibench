@@ -1,0 +1,23 @@
+{
+  "actual_guarded_gui_inputs": 6,
+  "actual_guarded_wait_steps": 1,
+  "actual_terminal_sha256": "c77973ae338cf4c6dfcf694100811281be3dacb97239ba309ace0c2d084c7d11",
+  "both_owned_guests_terminated_account_active_zero": true,
+  "collateral_content_preserved": true,
+  "date": "2026-10-03",
+  "distinct_reset_original_bytes_exact": true,
+  "full_control_trio_claimed": false,
+  "full_native_cell_qualification_claimed": false,
+  "model_calls": 0,
+  "native_Save_label_geometry_and_owned_toolbar_proved": true,
+  "new_final_admissions": 0,
+  "original_guard_and_action_time_budgets_unchanged": true,
+  "original_saved_verifier_passed": true,
+  "prior_failures_and_diagnostic_control_not_promoted": true,
+  "raw_focus_flags_preserved_with_complete_visible_document_proof": true,
+  "root_terminal_saved_visual_reset_audit_sha256": "1b6509c64996f6c7f5329db94507c83942135357311e5ad124361c0528cae5c6",
+  "runtime_source_manifest_sha256": "260fb2f434dfce50c139386f16cd10d9b8603a6f6fdf270a5bd77c68dcc07d88",
+  "schema": "envloop-native52-Impress-positive-reset-public-v1",
+  "scope": "one original public TRAIN positive and distinct reset",
+  "tinker_calls": 0
+}
