@@ -1,0 +1,30 @@
+{
+  "actual_guarded_actions": 18,
+  "actual_guarded_screenshots": 36,
+  "actual_priority_autosave_waits": 1,
+  "actual_result_sha256": "362f08b92f4db2603c02f0dfb9fe26575cb4ce1c429188f46219b6108d19f56c",
+  "canonical_purchase_control_credit": 0,
+  "canonical_purchase_family_validator_unchanged": true,
+  "date": "2026-10-03",
+  "exact_reset": true,
+  "full100_control_credit": 0,
+  "independent_source_review_sha256": "30dfc28c4476886acd8f3d33b13d5e969178ed4f6eb1ff20cac5366b62d1c2b4",
+  "model_calls": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "official_final_admitted": 0,
+  "old_reference_credit": 0,
+  "original_guard_scorer_source_and_budgets_preserved": true,
+  "priority_wait_has_no_gui_input": true,
+  "qualified_source_proof_sha256": "6212667199d81248cff87e7cc2d62c29260b5e114c5210e15b81000e03287225",
+  "reference_binding_sha256": "f7b08878cb24b559a4200fed996f8363779e8367f5d77ef6e32167cdc1245647",
+  "schema": "envloop-reference8-qualification9-crm-calibration-public-v1",
+  "scope": "original public TRAIN CRM whole-case calibration; canonical purchase and original failed-case boundary remain separate",
+  "scores": [
+    0.0,
+    1.0,
+    0.0
+  ],
+  "services_restored": true,
+  "source_frame_visually_reviewed": true,
+  "tinker_calls": 0
+}

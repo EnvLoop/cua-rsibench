@@ -1,0 +1,48 @@
+{
+  "all_six_guest_handles_distinct_and_terminated": true,
+  "all_three_resets_byte_exact": true,
+  "cases": [
+    {
+      "actual_native_actions": 0,
+      "both_guests_terminated": true,
+      "control": "baseline",
+      "controller_sha256": "0afd4f0d1d99ecfd7476459c19d50cb8676e9e3cbc8a5dafc0866e238fc821b0",
+      "reset_byte_exact": true,
+      "reward": 0,
+      "saved_verifier_sha256": "27beaa006cbcad4309ae8a9385c138c6fc3c6e6c6764b65be97fe30c3a61cff6"
+    },
+    {
+      "actual_native_actions": 5,
+      "both_guests_terminated": true,
+      "control": "positive",
+      "controller_sha256": "409361db2311967250e3f08174518d85dd5799419e8b15bd1b6cdda955b81bfe",
+      "reset_byte_exact": true,
+      "reward": 1,
+      "saved_verifier_sha256": "51bd5825da45907a0defe7eea10781dcb0ecddbf83f7852d92b833206ef4ca7b"
+    },
+    {
+      "actual_native_actions": 5,
+      "both_guests_terminated": true,
+      "control": "near-miss",
+      "controller_sha256": "57f9c258c915dab210f04a4f262ecf327aaa05a377c1ea3d4e617228d7956cfe",
+      "reset_byte_exact": true,
+      "reward": 0,
+      "saved_verifier_sha256": "65c15b9699ce1510bf6e3747aade86042dfe8c399be0e684851b5075f0496b36"
+    }
+  ],
+  "date": "2026-10-03",
+  "full_desktop_qualification_claimed": false,
+  "impress_and_formal_current_cohort_pending": true,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "old_control_credit": 0,
+  "original_input_guard_and_budgets_unchanged": true,
+  "raw_focus_and_sensitive_preserved": true,
+  "root_independent_verifiers_exactly_rederived": true,
+  "runtime_binding_sha256": "964da51a08a7fd3a80aa0a8e7af511d34f33183440445af1f6ad98ff392ab395",
+  "schema": "envloop-native50-writer-trio-public-v1",
+  "scope": "current public TRAIN Writer native0/1/0 controls, independent saved scoring and distinct resets",
+  "source_files_frozen": 92,
+  "tinker_calls": 0,
+  "wrong_payload_changes_target_only": true
+}

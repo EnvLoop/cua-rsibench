@@ -1,0 +1,27 @@
+{
+  "activity_and_link_rendering_fully_verified": false,
+  "actual_final_native_frames_visually_reviewed": 3,
+  "actual_guarded_dispatch_receipts": 15,
+  "all_case_cold_resets_exact": true,
+  "all_cases_full_git_tree_verified": true,
+  "all_original_sql_git_and_owned_cleanup_proofs_replayed": true,
+  "asset_register_source_readability_qualified": false,
+  "date": "2026-10-03",
+  "full100_qualification_claimed": false,
+  "model_calls": 0,
+  "official_final_admitted": 0,
+  "old_control_credit": 0,
+  "raw_guarded_screenshots_reopened": 30,
+  "result_sha256": "b770a91675856134a2e3f1a29e436918eab629e4e1d66088776d30e459e23601",
+  "root_acceptance_sha256": "6dd68ec90249e084033851eb3665dd84a770e124c3c651087fb4163c0cd07660",
+  "runtime_binding_sha256": "07c1520799c160d4394f9f943601a83f18da825f0ce87b2faa776c66878608be",
+  "schema": "envloop-gitlab-v15-native-train-public-v1",
+  "scope": "current native GUI action/readback/reset prerequisite; complete source readability remains pending",
+  "scores": [
+    1.0,
+    0.0,
+    1.0
+  ],
+  "source_file_count": 146,
+  "tinker_calls": 0
+}
