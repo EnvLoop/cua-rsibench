@@ -2,6 +2,8 @@
 
 Updated: 3 October 2026. This build assumes Tinker is unavailable. It makes no model-performance claim and does not change the full study's 4-researcher by 6-cell design. The published 2 October PDF and container receipts retain their original, dated evidence.
 
+The [3 October readiness PDF](../../docs/non-tinker-build/EnvLoop-Non-Training-Readiness-2026-10-03.pdf) records the current application boundaries. The original Magento selection20 run is in progress: its first baseline and positive have independently checked saved state and reset. The first GitLab selection baseline stopped before business input at the exact project-URI check. The fresh Source52 Calc positive stopped before Save because the administrative lookup could not prove its target. Both failures are preserved; repairs require fresh evidence. No completed selection cohort or model result is inferred from these partial runs.
+
 ![Execution architecture](architecture.svg)
 
 ## Executable components
