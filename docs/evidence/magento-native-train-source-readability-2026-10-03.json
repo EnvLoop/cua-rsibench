@@ -1,0 +1,23 @@
+{
+  "actual_guarded_navigation_clicks": 4,
+  "actual_terminal_sha256": "3a985ad78b2d4bb751b753fc1e13f7f2601a5db051542a2c6c10047bc42d7ec3",
+  "all_referenced_original_evidence_reopened": true,
+  "business_source_edits_or_cms_save": 0,
+  "complete_cohort_pixel_robustness_claimed": false,
+  "date": "2026-10-03",
+  "distinct_fresh_reset_and_consumer_cleanup_exact": true,
+  "each_dispatch_accepted_and_applied": true,
+  "full_native_html_source_visually_readable": true,
+  "model_calls": 0,
+  "native10_source_guard_scorer_and_budgets_unchanged": true,
+  "native_binding_sha256": "3796a86891553f2dae6092a9a8e548356467d6a312352a1768f5d7de9597b23a",
+  "native_close_action_completed_without_save": true,
+  "new_final_admissions": 0,
+  "owned_containers_network_and_process_removed": true,
+  "prior_navigation_failures_preserved": true,
+  "quote_and_business_baseline_unchanged": true,
+  "root_source_visual_reset_audit_sha256": "4f6c8a83f1a271b98a7650b3042c677a7a0b5d9104e8422ea980c6cbe194c016",
+  "schema": "envloop-magento-native-train-source-readability-close-v1",
+  "scope": "original public TRAIN source-reading lifecycle, not complete cohort qualification",
+  "tinker_calls": 0
+}
