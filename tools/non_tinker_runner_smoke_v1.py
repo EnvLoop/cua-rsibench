@@ -15,6 +15,7 @@ def current_source_bindings(root):
     import os
     probes={
         'gitlab':"from gitlab_world.v066_uniform_model_workers_v15 import public_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256']}",
+        'gitlab_selection_reference_pending':"from gitlab_world.v066_selection_reference_controls_v2 import source_binding; value=source_binding(); result={'binding_sha256':value['binding_sha256'],'native_binding_sha256':value['native_binding_sha256'],'model_lane_authority':False,'native_qualification_passed':False}",
         'odoo':"from enterprise_fallback.odoo18.native_surface_workers_v14 import public_binding; from tools.odoo_v066_native_reference_qualification_v9 import reference_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256'],'reference_binding_sha256':reference_binding()['reference_binding_sha256'],'canonical_native14_train_family':'purchase','separate_crm_calibration_required':True}",
         'magento':"from magento_catalog_factory.native_surface_workers_v10 import public_binding; from magento_catalog_factory.native_reference_qualification_v7 import reference_binding; value=public_binding(); result={'binding_sha256':value['binding_sha256'],'schema':value['schema'],'principal_epoch':value['current_document_rendered_principal_epoch'],'reference_binding_sha256':reference_binding()['binding_sha256'],'worker_entrypoint':'magento_catalog_factory.native_surface_workers_v10','control_entrypoint':'magento_catalog_factory.native_reference_qualification_v7','old_principal_epoch_qualification_credit':value['old_principal_epoch_qualification_credit']}",
         'desktop':"from native_desktop_factory.native_editor_runtime_v50 import source_manifest,public_binding; value=source_manifest(); result={'schema':value['schema'],'source_files':len(value['source_sha256s']),'source_manifest_sha256':public_binding()['source_manifest_sha256'],'native_qualification_passed':public_binding()['native_qualification_passed'],'native_policy_sha256':public_binding()['native_policy_sha256']}",
@@ -32,6 +33,7 @@ def current_source_bindings(root):
     for entrypoint in ('tools.office_current_neutral_v6','tools.office_current_worker_cli_v6',
             'tools.office_current_neutral_v7','tools.office_current_worker_cli_v7',
             'gitlab_world.v066_selection_reference_controls_v1',
+            'gitlab_world.v066_selection_reference_controls_v2',
             'enterprise_fallback.odoo18.twenty_task_trial_controls_v2',
             'tools.odoo_v066_native_reference_qualification_v9',
             'magento_catalog_factory.native_surface_facade_v10',
