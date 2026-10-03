@@ -1,0 +1,27 @@
+{
+  "all_original_source_and_dispatch_refs_reopened": true,
+  "all_processes_absent_account_active_zero": true,
+  "all_three_resets_original_bytes_exact": true,
+  "collateral_content_preserved": true,
+  "current_complete_control_trio_passed": true,
+  "date": "2026-10-03",
+  "exact_current_native_frames_visually_reviewed": true,
+  "full_native_cell_or_cohort_qualification_claimed": false,
+  "model_calls": 0,
+  "new_final_admissions": 0,
+  "old_single_positive_or_diagnostic_records_reused": false,
+  "original_saved_verifier_rederived_all_three": true,
+  "producer_trio_audit_sha256": "961a7aecfece497a8b1c5f7d66b8a19a7212403d26972d0049146d0eb475b2ef",
+  "root_trio_saved_source_reset_audit_sha256": "33778257f6010beb9cd9b75224dc87a0016f8609ba0e8cdaa941e23e55f76684",
+  "schema": "envloop-native52-Impress-current-trio-public-v1",
+  "scope": "fresh original public TRAIN Impress baseline positive and authored wrong variant",
+  "scores": [
+    0,
+    1,
+    0
+  ],
+  "six_distinct_owned_guests_closed": true,
+  "source_manifest_sha256": "260fb2f434dfce50c139386f16cd10d9b8603a6f6fdf270a5bd77c68dcc07d88",
+  "tinker_calls": 0,
+  "wrong_variant_only_target_text_check_failed": true
+}
