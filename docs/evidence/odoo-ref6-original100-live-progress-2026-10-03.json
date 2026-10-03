@@ -1,0 +1,42 @@
+{
+  "actual_already_saved_no_input_proofs": 20,
+  "actual_cost_usd": null,
+  "all100_saved_complete": false,
+  "automatic_restarts": 0,
+  "checked_at_utc": "2026-10-03T01:21:47.555614+00:00",
+  "completed_case_saved_scores": [
+    0,
+    1,
+    0
+  ],
+  "completed_cases_by_family": {
+    "inventory": 4,
+    "purchase": 25
+  },
+  "completed_cases_exact_reset_and_service_restoration": true,
+  "completed_current_control_case_count": 29,
+  "completed_researcher_chains": 0,
+  "full_split_finalizer_performed": false,
+  "matched_model_outcomes": 0,
+  "model_calls": 0,
+  "native_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "official_final_admissions": 0,
+  "original_allocation_count": 100,
+  "original_family_allocation": {
+    "crm": 25,
+    "inventory": 25,
+    "purchase": 25,
+    "sales": 25
+  },
+  "original_tasks_and_checkpoints_unchanged": true,
+  "prior_source_case_promotion_performed": false,
+  "purchase_family_25_completed": true,
+  "reference_binding_sha256": "38344a953c496b0053106d3589fb85149a9e2c658df0eb2a643583a123bff09b",
+  "release_of_complete_benchmark_claimed": false,
+  "reviewed_source_commit": "8744185f344fb9f6f9c644fd47e7525950050f34",
+  "schema": "envloop-odoo-reference6-original100-live-progress-v1",
+  "source_qa_review_complete": false,
+  "status": "ongoing_original_allocation_controls_not_final_admissions",
+  "tinker_calls": 0,
+  "trial20_substitution_performed": false
+}

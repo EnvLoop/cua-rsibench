@@ -1,0 +1,57 @@
+{
+  "checked_at_utc": "2026-10-03T02:03:01.226283+00:00",
+  "completed_researcher_chains": 0,
+  "controller_tests": {
+    "errors": 0,
+    "failures": 0,
+    "run": 3362,
+    "skipped": 64
+  },
+  "current_node_tests_passed": 58,
+  "current_source_bindings": {
+    "desktop": {
+      "native_qualification_passed": false,
+      "observation_policy_sha256": "a7da63257bd8f1e8be34a16d032f992b4542d39ecff02499421bad9703b4cf21",
+      "schema": "cua-native-format-startup-runtime-source-v48",
+      "source_files": 84,
+      "source_manifest_sha256": "074e6feeeb393ad69f9df9bdb29c90403ffde702287a9aa125c5b940c6480a6d"
+    },
+    "gitlab": {
+      "binding_sha256": "e9806accbbe7fee6ee0e74400bde0a177912d84a119d0aa5b2ab7cc6b8d76598"
+    },
+    "magento": {
+      "binding_sha256": "3796a86891553f2dae6092a9a8e548356467d6a312352a1768f5d7de9597b23a",
+      "control_entrypoint": "magento_catalog_factory.native_reference_qualification_v7",
+      "old_principal_epoch_qualification_credit": 0,
+      "principal_epoch": "v2",
+      "reference_binding_sha256": "de1169cd65013950f7d6b4d3cdd02c64e208288446f08c0378eeb72259f0966d",
+      "schema": "magento-native-five-slot-source-binding-v10",
+      "worker_entrypoint": "magento_catalog_factory.native_surface_workers_v10"
+    },
+    "odoo": {
+      "binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+      "reference_binding_sha256": "38344a953c496b0053106d3589fb85149a9e2c658df0eb2a643583a123bff09b"
+    },
+    "office": {
+      "schema": "office-current-native-picker-counterpart-registration-v6",
+      "source_files": 59
+    }
+  },
+  "dependency_image": "envloop/non-tinker-runner:20261002-controller-final",
+  "desktop_sdk_tests_passed": 7,
+  "desktop_v48_target_tests_passed": 23,
+  "execution": "existing_verified_dependency_image_with_exact_new_source_readonly_mount",
+  "headless_browser_action_and_screenshot_verified": true,
+  "matched_model_outcomes": 0,
+  "model_calls": 0,
+  "network": "none",
+  "official_final_admissions": 0,
+  "provider_credentials_supplied": false,
+  "real_application_full_qualification_claimed": false,
+  "schema": "envloop-current-non-training-source-runtime-v1",
+  "source_archive_sha256": "277f8cd0b626f289e7e3bc18c0031f150dfad69eb80abd3a77291f961d0328a5",
+  "source_files_verified": 1672,
+  "tinker_calls": 0,
+  "tinker_installed": false,
+  "xlsx_pptx_docx_pdf_roundtrip_verified": true
+}

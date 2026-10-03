@@ -1,0 +1,11 @@
+# Native Desktop evidence, 3 October 2026
+
+**V48 completed one genuine Calc business control and a distinct fresh reset.** Five guarded GUI actions entered and committed the formula, then saved through the natively identified Save button. The original independent saved-artifact verifier passed with no errors and preserved all 63 non-target cells. A separate fresh guest restored the baseline byte for byte. Both owned guests acknowledged cleanup and reported not running; the worker ended and the frozen source remained unchanged.
+
+The runtime binding is `074e6feeeb393ad69f9df9bdb29c90403ffde702287a9aa125c5b940c6480a6d`. All seven actor roles and all three application constructors share the same source. Native ownership, leaf-hit, keyboard, read-only, nonce and lease checks remain unchanged, as do the paired observations and 90-action / 720-second / 1200-second limits.
+
+Two earlier failures remain separate evidence. A strict ten-second proof check rejected a freshly produced lifetime rounded above ten seconds; V47 conservatively rounds expiry downward while preserving the validator. V47 then reached the genuine Save button, but a **Confirm File Format** alert prevented persistence. Saved bytes remained at baseline, so that attempt receives no positive or reset credit.
+
+V48 applies only the declared `WarnAlienFormat=false` preference in the isolated guest before document open, uniformly for every role and reset. The installed schema and application build were checked, and full raw profiles were retained. The changed raw profile is recorded as a new epoch; all other profile settings match the parent reference. LibreOffice documents the preference in its [configuration schema](https://github.com/LibreOffice/core/blob/libreoffice-7.3.7.2/officecfg/registry/schema/org/openoffice/Office/Common.xcs), and its [GUI save implementation](https://github.com/LibreOffice/core/blob/libreoffice-7.3.7.2/sfx2/source/doc/guisaveas.cxx) uses it to govern the warning.
+
+Twenty-three offline tests passed. Full native qualification, the complete control trio, Writer/Impress business controls, and Enter coverage remain pending. Model outcomes and model/Tinker calls were zero. Actual cloud cost remains unknown.
