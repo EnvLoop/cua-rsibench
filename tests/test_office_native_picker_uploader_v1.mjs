@@ -55,3 +55,10 @@ test('two real Open controls refuse rather than selecting a convenient first mat
  const app={getAXState:async()=>states.shift(),pressKey:async()=>{},setValue:async()=>{},click:async()=>clicks++};
  await assert.rejects(selectApprovedBaseline({chromeApp:app,filePath:f.file,expectedSha256:f.sha,evidenceRoot:f.root}),/control_missing_or_ambiguous/);assert.equal(clicks,0);
 });
+
+test('a different selected filename with the approved URI prefix is refused',async t=>{
+ const f=await fixture(t);let clicks=0;
+ const states=['1 sheet ID: open-panel','2 sheet ID: GoToWindow\n 3 text field ID: PathTextField',`1 sheet ID: open-panel\n 4 text field (selected, settable) URL: ${pathToFileURL(f.file).href}.foreign.pptx\n 5 button Open, ID: OKButton`];
+ const app={getAXState:async()=>states.shift(),pressKey:async()=>{},setValue:async()=>{},click:async()=>clicks++};
+ await assert.rejects(selectApprovedBaseline({chromeApp:app,filePath:f.file,expectedSha256:f.sha,evidenceRoot:f.root}),/selected_file_not_exact/);assert.equal(clicks,0);
+});

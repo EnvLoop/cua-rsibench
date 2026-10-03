@@ -42,7 +42,11 @@ export async function selectApprovedBaseline({chromeApp,filePath,expectedSha256,
  let button;
  for(let sample=0;sample<3;sample++){
   check(/sheet.*ID: open-panel/.test(state),'native_picker_open_sheet_not_restored');
-  const selected=state.split('\n').filter(line=>/^\s*\d+\s/.test(line)&&/text field \(selected/.test(line)&&line.includes('URL: '+uri));
+  const selected=state.split('\n').filter(line=>{
+   if(!/^\s*\d+\s/.test(line)||!/text field \(selected/.test(line))return false;
+   const observed=line.match(/\bURL:\s*(file:\/\/[^\s,]+)/);
+   return observed?.[1]===uri;
+  });
   check(selected.length===1,'native_picker_selected_file_not_exact_baseline');
   const controls=state.split('\n').filter(line=>/^\s*\d+\s/.test(line)&&/button Open, ID: OKButton/.test(line));
   check(controls.length<=1,'native_picker_control_missing_or_ambiguous');

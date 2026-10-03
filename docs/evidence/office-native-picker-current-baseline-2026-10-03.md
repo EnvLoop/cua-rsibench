@@ -24,7 +24,12 @@ The reusable evaluator-only picker rejects changed hashes, symbolic links,
 foreign dialogs, wrong selected files, ambiguous controls and unavailable
 Open buttons. It uses full current native accessibility state and verifies
 the file again immediately before selection. Six targeted boundary tests
-passed. The same public module bytes executed against the real reset picker.
+passed for the execution snapshot. The same snapshot bytes executed against
+the real reset picker. Independent subsequent review found that its selected
+URI check allowed a filename-prefix collision; the actual uploaded file was
+correct and all retained download hashes still match. The successor compares
+the complete URI token for exact equality and passes seven boundary tests.
+That tighter successor has not yet received full bound-host qualification.
 The returned picker receipt deliberately does not claim server upload; that
 requires the subsequent native folder and downloaded-artifact evidence.
 
