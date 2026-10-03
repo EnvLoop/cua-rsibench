@@ -14,7 +14,7 @@ export async function waitOpenSheet(chromeApp,{retain,clock=Date.now,maximumMs=1
   if(clock()-began>=maximumMs)throw new Error('native_picker_open_readiness_deadline');
   const sheets=state.split('\n').filter(line=>/^\s*\d+\s+sheet\b/.test(line));
   if(sheets.length){
-   if(sheets.length!==1||!/\bID: open-panel\b/.test(sheets[0]))throw new Error('native_picker_foreign_or_ambiguous_sheet');
+   if(sheets.length!==1||sheets[0].match(/\bID:\s*([^\s,]+)/)?.[1]!=='open-panel')throw new Error('native_picker_foreign_or_ambiguous_sheet');
    return state;
   }
  }

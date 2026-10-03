@@ -13,7 +13,7 @@ test('delayed exact Open sheet is observed without input',async()=>{
  assert.match(state,/open-panel/);assert.equal(input,0);assert.equal(rows.length,3);
 });
 test('foreign or multiple sheets refuse without waiting for a convenient later sheet',async()=>{
- for(const state of ['1 sheet ID: unrelated','1 sheet ID: open-panel\n2 sheet ID: open-panel']){
+ for(const state of ['1 sheet ID: unrelated','1 sheet ID: open-panel-other','1 sheet ID: open-panel.other','1 sheet ID: open-panel\n2 sheet ID: open-panel']){
   let calls=0;await assert.rejects(waitOpenSheet({getAXState:async()=>{calls++;return state;}},{retain:async()=>{}}),/foreign_or_ambiguous/);assert.equal(calls,1);
  }
 });
