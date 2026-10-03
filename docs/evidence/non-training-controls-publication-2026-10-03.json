@@ -1,0 +1,23 @@
+{
+  "actual_ci_build_smoke_and_registry_push_passed": true,
+  "additional_selection20_asset_anonymous_byte_equal": true,
+  "additional_selection20_asset_sha256": "3134d3bdee45a8a76c4cd0ec619e605033d305ca1833d2b9d5dada67d3b53c2d",
+  "ci_run": "https://github.com/EnvLoop/cua-rsibench/actions/runs/37100689720",
+  "container_smoke_sha256": "d295b081d240942a9eea189e44ad9f98c717d729554d9d95ef36508f06e6d124",
+  "date": "2026-10-03",
+  "dated_methods_PDF_unchanged": true,
+  "existing_registry_visibility_policy_unchanged": true,
+  "full_study_results_claimed": false,
+  "initial_five_public_assets_anonymous_byte_equal": true,
+  "initial_public_asset_proof_sha256": "2f758a137d6df318f1c707670e8260de8a4697c366df59609f1971f0f6e77d7c",
+  "merged_pull_request": "https://github.com/EnvLoop/cua-rsibench/pull/13",
+  "model_and_tinker_calls": 0,
+  "registry_anonymous_pull_verified": false,
+  "release": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.6-non-training-controls",
+  "schema": "envloop-non-training-controls-publication-v1",
+  "source_archive_sha256": "413884466548284ebe854cd25ebb8f56f2fd6a3ebb903d2c4040e624d7b06b44",
+  "source_commit": "8b06b6cb748730fd2133f9efad8291bc8cf9092b",
+  "source_files_reopened": 1704,
+  "source_manifest_sha256": "01f16d89412c5e4024fa65e04970377250aba657005bcb8db029e476fdc08c62",
+  "tinker_installed_in_image": false
+}
