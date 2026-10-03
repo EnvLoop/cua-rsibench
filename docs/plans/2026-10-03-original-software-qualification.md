@@ -41,3 +41,29 @@ a fresh-document reset.
 
 No control, source package, partial run or controller build becomes a formal
 final identity or model result without all original admission gates.
+
+## Verified continuation
+
+The controller suite completed 3,362 tests with zero failures and errors;
+64 tests were conditionally skipped. The separate compatible Desktop SDK
+runtime completed seven tests. Provider credentials were removed from both
+test processes. These checks dispatched no model or training work.
+
+Desktop V47 corrected a proved floating-point expiry defect by rounding down
+the producer; the unchanged strict ten-second validator now accepts fresh
+proofs. Its genuine Save reached a native file-format confirmation dialog,
+which prevented saved-artifact credit. A uniform isolated-guest startup
+preference requires separate source review and fresh controls.
+
+Office Host6 binds the current native picker, account witness, dedicated
+folder, document identity and distinct-reset checks. The current picker was
+executed against the real macOS dialog. Its first bound neutral run stopped
+at a read-only inventory loading race, before document creation. The failed
+namespace is retained; actual parent count zero, empty child folder and zero
+document tabs were observed before its ended lease was archived. A bounded
+native readiness repair requires a fresh namespace.
+
+Odoo Reference6's original 100-case qualification is ongoing. Purchase's
+25 cases completed genuine 0/1/0 controls, exact reset and service audits;
+the remaining families continue. Existing failed references receive no
+new-epoch credit. This continuation has made no Tinker or model calls.

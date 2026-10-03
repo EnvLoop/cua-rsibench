@@ -1,6 +1,6 @@
 # Non-training build and verification
 
-Date: 2 October 2026. This build assumes Tinker is unavailable. It makes no model-performance claim and does not change the full study's 4-researcher by 6-cell design.
+Updated: 3 October 2026. This build assumes Tinker is unavailable. It makes no model-performance claim and does not change the full study's 4-researcher by 6-cell design. The published 2 October PDF and container receipts retain their original, dated evidence.
 
 ![Execution architecture](architecture.svg)
 
@@ -10,10 +10,10 @@ The controller preserves the repository layout and hash-bound runtime dependenci
 
 | Cell | Current entrypoint | Independent verification | Actual execution boundary |
 | --- | --- | --- | --- |
-| Excel web | `tools.office_current_worker_cli_v5` | Original rich SEC graph and saved workbook checks | 140 original packages replayed offline; current native lifecycle pending |
-| PowerPoint web | `tools.office_current_worker_cli_v5` | Saved deck text, chart and collateral checks | 140 portable WDI packages built; current native lifecycle pending |
-| Native desktop | `native_desktop_factory.native_guarded_observation_runtime_v46` | Saved Calc, Impress and Writer artifacts | Five genuine actions applied; saved bytes remained the baseline, then window ownership failed; no positive/reset credit |
-| Odoo Community | `enterprise_fallback.odoo18.native_surface_workers_v14` | Trusted SQL state, exact reset and native receipt audit | Current 20 selection and 20 pilot-final control sets independently verified |
+| Excel web | `tools.office_current_worker_cli_v6` | Original rich SEC graph and saved workbook checks | 140 original packages replayed offline; fresh bound native lifecycle pending |
+| PowerPoint web | `tools.office_current_worker_cli_v6` | Saved deck text, chart and collateral checks | Current TRAIN baseline uploaded to genuine PowerPoint; two equivalent downloads, distinct cloud reset and empty-folder cleanup verified; bound Host6 controls pending |
+| Native desktop | `native_desktop_factory.native_editor_runtime_v48` | Saved Calc, Impress and Writer artifacts | Genuine Calc saved positive and distinct byte-equivalent reset passed; 63 non-target cells preserved; complete multi-application qualification pending |
+| Odoo Community | `enterprise_fallback.odoo18.native_surface_workers_v14` with `native_reference_viewport_v6` | Trusted SQL state, exact reset and native receipt audit | 50 original purchase/inventory controls passed; first sales negative stopped before Save on a changing native saved indicator; complete 100-case qualification pending |
 | GitLab CE | `gitlab_world.v066_uniform_model_workers_v14` | Saved SQL plus Git trees, blobs and relationships | Two current saved control trios independently verified; retained source/sidebar pages reviewed; complete activity/link rendering not captured |
 | Magento | `magento_catalog_factory.native_surface_workers_v10` | Catalog SQL, search state, queue ownership, principal witness and exact reset | One fresh TRAIN trio verified: baseline 0, positive 1, wrong variant 0; pixel robustness unestablished; zero formal results |
 
@@ -21,7 +21,13 @@ Current source bindings and CLI help are checked in isolated processes inside th
 
 Magento's fresh `native_reference_qualification_v7` controls passed saved SQL/search, queue, reset and cleanup audits. The repair accepts an owned rendered account header after scrolling; target and focus viewport checks remain strict. Its small raw-HTML source raster does not establish pixel robustness or model readability. Earlier controls receive zero new-epoch credit. Source and receipt hashes are in the [aggregate qualification note](../../docs/evidence/magento-rendered-principal-trio-2026-10-02.md).
 
-Desktop v46 uses one verified screenshot capture per observation for every role. Native state is checked before and after observation and predispatch screenshots. This explicitly replaces seven-capture readiness; ownership, target, read-only, nonce and budget checks remain unchanged. Its real control applied five actions, but saved readback failed and the next window check stopped. The active-window cause is unproved. Enter resampling and full qualification remain unchanged and unproved.
+Desktop v47 retains v46's verified screenshot policy for every role. It rounds proof expiry down by one floating-point step; the original strict ten-second validator, native flags and actor budgets remain unchanged. The fresh control passed the previous typing refusal and reached the actual Save command. Native window facts identified the subsequent Confirm File Format dialog; saved bytes remained the baseline. Full qualification and Enter coverage remain pending. Historical failures receive no new-source credit.
+
+V48 declares a supported file-format preference in every fresh isolated guest before document open. It verifies the installed schema, absent profile, stopped application and original binary before writing the preference. The actual profile remains separately hashed; all other scoped profile properties must match the original baseline. Five genuine Calc actions then produced a saved positive, independently rederived by Root, with 63 non-target cells unchanged. A different guest restored the exact baseline and both guests were cleaned. This one positive/reset does not qualify the complete desktop cell.
+
+The Office native picker checks exact selected-file URI equality, baseline hashes, file ownership and private evidence. It uses the normal macOS dialog and changes no extension permissions. The actual current selector source was exercised in the disposable TRAIN folder. Host6 binds this one transport to all roles and fresh resets; the manual lifecycle diagnostic alone cannot qualify it. Its repaired full-inventory operation passed; native document creation subsequently stopped because macOS was locked. The pending dialog and lease are retained until explicit cleanup. See the [dated Office evidence](../../docs/evidence/office-native-picker-current-baseline-2026-10-03.md).
+
+Odoo Reference6 uses the original software's visible manual-save control. An already-saved form is accepted only through a positively observed stable native saved indicator, followed by the same reload and independent SQL readback. The original Native14 actor source is unchanged. The [ongoing original-allocation receipt](../../docs/evidence/odoo-ref6-original100-live-progress-2026-10-03.json) is a progress snapshot, not a 100-case completion or formal model result.
 
 ## Preserve the difficult data
 
