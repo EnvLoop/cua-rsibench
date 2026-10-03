@@ -16,15 +16,15 @@ async function fixture(t,{native=true,transport=native?'native_picker':undefined
  const baseline=path.join(root,'source.pptx');await fs.writeFile(baseline,ooxmlFixture('powerpoint-web'),{mode:0o600});
  const folder='https://onedrive.live.com/?id=fixture-child',parent='https://onedrive.live.com/?id=fixture-parent';
  const binding={tab_id:1,folder_url:folder,folder_url_sha256:sha(Buffer.from(folder)),account_principal_sha256:'a'.repeat(64),folder_scope_sha256:'b'.repeat(64),folder_clip:{x:0,y:126,width:1000,height:700}};
- const state={url:folder,rows:[],selected:false,editors:new Map(),nextTab:2,nextGuid:1,principal:binding.account_principal_sha256,callbackCalls:[],calls:[],beforeUpload:null,afterUpload:null,receiptChange:null,skipUpload:false,forcedGuid:null,ready:new Set(),asyncMenu:false,waitError:null,deleteToast:false,deleteMessage:'Deleted 1 item',afterDelete:null,afterReload:null,staleDeleteRow:false};
+ const state={url:folder,rows:[],selected:false,editors:new Map(),nextTab:2,nextGuid:1,principal:binding.account_principal_sha256,callbackCalls:[],calls:[],beforeUpload:null,afterUpload:null,receiptChange:null,skipUpload:false,forcedGuid:null,ready:new Set(),asyncMenu:false,waitError:null,deleteToast:false,deleteMessage:'Deleted 1 item',afterDelete:null,afterReload:null,staleDeleteRow:false,delayedInventory:false,childProjectionPending:false,badgeOverride:null,initialGridPending:false};
  const install=file=>{
   const guid=state.forcedGuid??state.nextGuid++;const token=String(guid).padStart(12,'0');
   const edit='https://onedrive.live.com/personal/0000000000000001/_layouts/15/Doc.aspx?sourcedoc=%7B00000000-0000-0000-0000-'+token+'%7D&file='+encodeURIComponent(path.basename(file))+'&action=edit';
   state.rows=[{name:path.basename(file),href:edit}];state.selected=false;
  };
- const node=(name,scope='folder')=>({count:async()=>state.asyncMenu&&name==='Open in browser'&&!state.ready.has(name)?0:1,isVisible:async()=>true,isEnabled:async()=>true,waitFor:async options=>{state.calls.push('wait:'+name+':'+options.state);if(state.waitError&&name==='Open in browser')throw state.waitError;if(name==='Deleted 1 item'&&!state.deleteToast)throw new Error('fixture native delete success unavailable');state.ready.add(name);},
-  evaluate:async()=>name==='badge'?{text:String(state.rows.length),tag:'SPAN',folderLabel:'Yellow folder'}:name==='card-name'?'Isolated fixture':name==='#SaveStatusButton'?'Saved to OneDrive':name==='Deleted 1 item'?state.deleteMessage:null,
-  evaluateAll:async()=>state.rows.map((row,row_index)=>({...row,row_index})),locator:selector=>node(selector,scope),nth:()=>node('row',scope),getByRole:(role,options)=>node(role==='checkbox'?'checkbox':options.name,scope),
+ const node=(name,scope='folder')=>({count:async()=>name==='rows'?(state.initialGridPending?0:state.rows.length):name==='This folder is empty'?(!state.initialGridPending&&state.rows.length===0?1:0):(state.asyncMenu&&name==='Open in browser'||state.delayedInventory&&['card','card-name','badge'].includes(name))&&!state.ready.has(name)?0:1,isVisible:async()=>true,isEnabled:async()=>true,waitFor:async options=>{state.calls.push('wait:'+name+':'+options.state);if(state.waitError&&name==='Open in browser')throw state.waitError;if(name==='Deleted 1 item'&&!state.deleteToast)throw new Error('fixture native delete success unavailable');if(name==='This folder is empty'||name==='source.pptx'||name==='[role="grid"]')state.childProjectionPending=false;state.ready.add(name);},
+  evaluate:async()=>name==='badge'?{text:String(state.badgeOverride??state.rows.length),tag:'SPAN',folderLabel:'Yellow folder'}:name==='card-name'?'Isolated fixture':name==='#SaveStatusButton'?'Saved to OneDrive':name==='Deleted 1 item'?state.deleteMessage:null,
+  evaluateAll:async()=>{state.calls.push('inventory-reread');const rows=state.childProjectionPending?(state.rows.length?[]:[{name:'stale fixture row',href:null}]):state.rows;return rows.map((row,row_index)=>({...row,row_index}));},locator:selector=>node(selector,scope),nth:()=>node('row',scope),getByRole:(role,options)=>node(role==='checkbox'?'checkbox':options.name,scope),
   getAttribute:async attribute=>attribute==='aria-checked'?String(state.selected):null,
   click:async()=>{
    state.calls.push(scope+':'+name);
@@ -35,7 +35,7 @@ async function fixture(t,{native=true,transport=native?'native_picker':undefined
     state.editors.set(id,{id,url:async()=>edit,close:async()=>state.editors.delete(id),playwright:{frameLocator:()=>({locator:selector=>node(selector,'editor'),getByRole:(role,options)=>node(options.name,'editor')}),locator:selector=>node(selector,'editor'),getByRole:(role,options)=>node(options.name,'editor')}});
    }
   }});
- const tab={id:1,url:async()=>state.url,goto:async url=>{state.url=url;state.calls.push('goto');},reload:async()=>{state.calls.push('reload');state.rows=[];if(state.afterReload)await state.afterReload();},screenshot:async()=>Buffer.from('local fixture image'),playwright:{locator:selector=>node(selector),getByRole:(role,options)=>node(options.name),getByText:text=>node(text),domSnapshot:async()=>JSON.stringify({rows:state.rows}),
+ const tab={id:1,url:async()=>state.url,goto:async url=>{if(state.delayedInventory&&state.url===parent&&url===folder)state.childProjectionPending=true;state.url=url;state.calls.push('goto');},reload:async()=>{state.calls.push('reload');state.rows=[];if(state.afterReload)await state.afterReload();},screenshot:async()=>Buffer.from('local fixture image'),playwright:{locator:selector=>node(selector),getByRole:(role,options)=>node(options.name),getByText:text=>node(text),domSnapshot:async()=>JSON.stringify({rows:state.rows}),
   waitForEvent:async event=>{
    state.calls.push('event:'+event);
    if(event==='filechooser')return {isMultiple:()=>false,setFiles:async file=>{state.calls.push('setFiles');install(file);}};
@@ -79,6 +79,16 @@ test('native route uploads once, preserves verified double download, cleans, and
 test('declared original filechooser route remains functional without a native callback',async t=>{
  const f=await fixture(t,{native:false});await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
  assert.equal(f.state.callbackCalls.length,0);assert.equal(f.state.calls.filter(x=>x==='event:filechooser').length,1);assert.ok(f.state.calls.includes('setFiles'));
+});
+
+test('current exact folder avoids a redundant reload and still checks full parent inventory',async t=>{
+ const f=await fixture(t);
+ assert.deepEqual((await f.driver.folderInventory()).items,[]);
+ assert.equal(f.state.calls.filter(x=>x==='goto').length,2);
+ assert.ok(f.state.calls.filter(x=>x==='principal').length>=3);
+ const foreign=await fixture(t);foreign.state.url='https://onedrive.live.com/?id=foreign';
+ assert.deepEqual((await foreign.driver.folderInventory()).items,[]);
+ assert.equal(foreign.state.calls.filter(x=>x==='goto').length,3);
 });
 
 test('wrong account, changed hash, public baseline, or nonempty folder refuse before upload',async t=>{
@@ -218,4 +228,38 @@ test('actual lifecycle receipt supplies unchanged Extractor3 membership identity
  assert.equal(metadata.document_identity_sha256,created.item_identity_sha256);assert.equal(geometryCalls,1);
  const foreign=createOfficeNativeExtractor({binding:{...bound,owned_folder_item_ui_receipt:{...created,item_identity_sha256:'0'.repeat(64)}},principalObserver});
  await assert.rejects(foreign({tab,clip}),/observed_document_folder_binding_changed/);assert.equal(geometryCalls,1);
+});
+
+test('delayed parent card/name/badge and child empty rendering are observed before exact inventory checks',async t=>{
+ const f=await fixture(t);f.state.delayedInventory=true;
+ const result=await f.driver.folderInventory();assert.deepEqual(result.items,[]);
+ for(const name of ['card','card-name','badge'])assert.ok(f.state.calls.includes('wait:'+name+':visible'));
+ const reads=f.state.calls.map((name,index)=>name==='inventory-reread'?index:-1).filter(index=>index>=0);
+ assert.equal(reads.length,2);assert.ok(f.state.calls.indexOf('wait:This folder is empty:visible')<reads[1]);
+ assert.equal(f.state.childProjectionPending,false);
+});
+
+test('proved single-item child readiness is awaited before inventory equality reread',async t=>{
+ const f=await fixture(t);await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+ f.state.delayedInventory=true;f.state.calls=[];
+ const result=await f.driver.folderInventory();assert.equal(result.items.length,1);
+ const reads=f.state.calls.map((name,index)=>name==='inventory-reread'?index:-1).filter(index=>index>=0);
+ assert.equal(reads.length,2);assert.ok(f.state.calls.indexOf('wait:source.pptx:visible')<reads[1]);
+});
+
+test('readiness waiting never accepts foreign parent count inconsistent with exact child rows',async t=>{
+ const f=await fixture(t);f.state.delayedInventory=true;f.state.badgeOverride=2;
+ await assert.rejects(f.driver.folderInventory(),/full_inventory_or_child_rows_changed/);
+ assert.equal(f.state.callbackCalls.length,0);assert.ok(!f.state.calls.includes('folder:Files upload'));
+});
+
+test('initial child data mount is ready before the first row projection even when heading/grid already exist',async t=>{
+ for(const occupied of [false,true])await t.test(occupied?'existing item':'positive empty',async t=>{
+  const f=await fixture(t);if(occupied)await f.driver.createFromBaseline(f.binding,f.task,f.baseline,{purpose:'actor'});
+  f.state.calls=[];f.state.initialGridPending=true;
+  const timer=setTimeout(()=>{f.state.initialGridPending=false;},5);t.after(()=>clearTimeout(timer));
+  const result=await f.driver.folderInventory();assert.equal(result.items.length,occupied?1:0);
+  const firstRead=f.state.calls.indexOf('inventory-reread');assert.ok(f.state.calls.indexOf('wait:[role="grid"]:visible')<firstRead);
+  assert.equal(f.state.initialGridPending,false);
+ });
 });

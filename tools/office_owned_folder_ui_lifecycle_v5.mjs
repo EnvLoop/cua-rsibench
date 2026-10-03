@@ -38,8 +38,19 @@ export async function createOfficeUiLifecycle({folderTab,browser=null,binding,pr
   await visible(profile.folder_heading);const observed=await principal(folderTab,'folder');
   state.refs.push(await write(state.label+'-native-picker-'+phase+'.private.json',bytes({schema:'office-native-picker-owned-context-v5',phase,tab_id:pickerScope.tab_id,account_principal_sha256:pickerScope.account_principal_sha256,folder_scope_sha256:pickerScope.folder_scope_sha256,folder_url_sha256:pickerScope.folder_url_sha256,native_signed_in_principal_observed:observed.nativeUiObserved===true,principal_witness_kind:observed.continuityFromInitialSignedInUiWitness?'initial_witness_continuity':'current_native_principal'})));
  }
- async function folder(){await folderTab.goto(binding.folder_url);check(await folderTab.url()===binding.folder_url,'native_folder_navigation_changed');await visible(profile.folder_heading);await principal(folderTab,'folder');}
+ async function folder(){if(await folderTab.url()!==binding.folder_url)await folderTab.goto(binding.folder_url);check(await folderTab.url()===binding.folder_url,'native_folder_navigation_changed');await visible(profile.folder_heading);await principal(folderTab,'folder');}
+ async function childInventoryReady(){
+  await visible({selector:'[role="grid"]'});const rows=folderTab.playwright.locator(profile.item_rows_selector),empty=locator(profile.empty_state),deadline=Date.now()+10000;
+  while(Date.now()<deadline){
+   const count=await rows.count();check(count===0||count===1,'native_child_row_count_unbounded');
+   if(count===1&&await rows.nth(0).isVisible())return;
+   if(count===0&&await empty.count()===1&&await empty.isVisible())return;
+   await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  throw new Error('native_child_grid_rows_or_empty_not_ready');
+ }
  async function inventoryRaw(state=null){
+  await childInventoryReady();
   const rows=await folderTab.playwright.locator(profile.item_rows_selector).evaluateAll((elements,arg)=>elements.map((e,index)=>({name:e.querySelector(arg.nameSelector)?.textContent?.trim(),href:e.querySelector('a[href]')?.href||null,row_index:index})),{nameSelector:profile.name_cell_selector},{timeoutMs:10000});
   check(rows.length<=1&&rows.every(r=>typeof r.name==='string'&&r.name.length>0),'native_folder_row_projection_unbounded_or_unnamed');
   const proof=profile.folder_inventory_proof;
@@ -48,14 +59,16 @@ export async function createOfficeUiLifecycle({folderTab,browser=null,binding,pr
   let observedCount;
   try{
    await folderTab.goto(proof.parent_url);check(await folderTab.url()===proof.parent_url,'native_parent_folder_navigation_changed');await principal(folderTab,'folder');
-   const card=folderTab.playwright.locator(proof.card_selector);check(await card.count()===1&&await card.isVisible(),'native_exact_parent_card_missing_or_ambiguous');
-   const name=card.locator(proof.name_selector);check(await name.count()===1&&await name.isVisible(),'native_parent_card_name_missing');
+   const card=folderTab.playwright.locator(proof.card_selector);await card.waitFor({state:'visible',timeoutMs:10000});check(await card.count()===1&&await card.isVisible(),'native_exact_parent_card_missing_or_ambiguous');
+   const name=card.locator(proof.name_selector);await name.waitFor({state:'visible',timeoutMs:10000});check(await name.count()===1&&await name.isVisible(),'native_parent_card_name_missing');
    check(await name.evaluate(e=>e.textContent.trim())===profile.folder_heading.name,'native_parent_card_child_name_changed');
-   const badge=card.locator(proof.count_selector);check(await badge.count()===1&&await badge.isVisible(),'native_parent_folder_badge_missing');
+   const badge=card.locator(proof.count_selector);await badge.waitFor({state:'visible',timeoutMs:10000});check(await badge.count()===1&&await badge.isVisible(),'native_parent_folder_badge_missing');
    const count=await badge.evaluate(e=>({text:e.textContent.trim(),tag:e.tagName,folderLabel:e.closest('[aria-label="Yellow folder"]')?.getAttribute('aria-label')}));
    check(count.tag==='SPAN'&&count.folderLabel==='Yellow folder'&&/^(0|[1-9][0-9]*)$/.test(count.text),'native_folder_card_count_not_observed');observedCount=Number(count.text);
    if(state)state.refs.push(...await snapshot(state.label+'-parent-count'));
   }finally{await folderTab.goto(binding.folder_url);check(await folderTab.url()===binding.folder_url,'native_child_return_navigation_changed');await visible(profile.folder_heading);await principal(folderTab,'folder');}
+  if(observedCount===0)await visible(profile.empty_state);
+  else if(observedCount===1&&rows.length===1)await visible(profile.item_ready||{role:'gridcell',name:rows[0].name});
   const reread=await folderTab.playwright.locator(profile.item_rows_selector).evaluateAll((elements,arg)=>elements.map((e,index)=>({name:e.querySelector(arg.nameSelector)?.textContent?.trim(),href:e.querySelector('a[href]')?.href||null,row_index:index})),{nameSelector:profile.name_cell_selector},{timeoutMs:10000});
   check(observedCount===rows.length&&bytes(reread).equals(bytes(rows)),'native_full_inventory_or_child_rows_changed');
   if(observedCount===0)await visible(profile.empty_state);
