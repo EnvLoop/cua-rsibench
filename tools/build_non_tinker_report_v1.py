@@ -5,6 +5,7 @@ Render the output and inspect every page before delivery.
 """
 from pathlib import Path
 import argparse,re
+from datetime import date,datetime
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.styles import ParagraphStyle
@@ -21,15 +22,22 @@ def inline(text):
     return escape(text).replace('`','')
 
 
-def build(output,diagram):
-    status=ROOT/'deployment/non-tinker-runner/BUILD_STATUS.md'
+def build(output,diagram,*,status=None,report_date=None):
+    status=Path(status) if status else ROOT/'deployment/non-tinker-runner/BUILD_STATUS.md'
     text=status.read_text()
     if re.search(r'[\u3400-\u9fff]',text):raise ValueError('English public report required')
+    updated=re.search(r'^Updated: (\d{1,2}) ([A-Za-z]+) (\d{4})\.',text,re.M)
+    if report_date is None:
+        if updated is None:raise ValueError('Explicit report date or dated status required')
+        report_date=datetime.strptime(' '.join(updated.groups()),'%d %B %Y').date()
+    else:
+        report_date=date.fromisoformat(report_date)
+    date_label=f'{report_date.day} {report_date.strftime("%B %Y")}'
     output=Path(output);output.parent.mkdir(parents=True,exist_ok=True)
     navy=colors.HexColor('#173448');teal=colors.HexColor('#287d87');muted=colors.HexColor('#496579')
     styles={
         'title':ParagraphStyle('Title',fontName='Helvetica-Bold',fontSize=23,leading=28,textColor=navy,spaceAfter=14),
-        'heading':ParagraphStyle('Heading',fontName='Helvetica-Bold',fontSize=13,leading=17,textColor=teal,spaceBefore=14,spaceAfter=8),
+        'heading':ParagraphStyle('Heading',fontName='Helvetica-Bold',fontSize=13,leading=17,textColor=teal,spaceBefore=14,spaceAfter=8,keepWithNext=True),
         'body':ParagraphStyle('Body',fontName='Helvetica',fontSize=9.5,leading=12.5,textColor=navy,spaceAfter=6),
         'cell':ParagraphStyle('Cell',fontName='Helvetica',fontSize=8,leading=11,textColor=navy),
         'header':ParagraphStyle('Header',fontName='Helvetica-Bold',fontSize=8,leading=11,textColor=colors.white),
@@ -37,12 +45,12 @@ def build(output,diagram):
     def footer(canvas,doc):
         canvas.saveState();canvas.setStrokeColor(colors.HexColor('#c3d3dc'));canvas.line(42,42,A4[0]-42,42)
         canvas.setFont('Helvetica',8);canvas.setFillColor(muted)
-        canvas.drawString(42,29,'ENVLOOP  |  Non-training build evidence  |  2 October 2026')
+        canvas.drawString(42,29,'ENVLOOP  |  Non-training build evidence  |  '+date_label)
         canvas.drawRightString(A4[0]-42,29,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(output),pagesize=A4,rightMargin=42,leftMargin=42,topMargin=40,bottomMargin=55,
         title='EnvLoop Computer Use Benchmark: Non-Training Build Report',author='EnvLoop')
     story=[Paragraph('Computer Use Benchmark<br/>Non-Training Build Report',styles['title']),
-        Paragraph('EnvLoop / 2 October 2026',styles['body']),
+        Paragraph('EnvLoop / '+date_label,styles['body']),
         Paragraph('Scope: executable infrastructure and independently checked controls. This report contains no full-study model result or measured training gain.',styles['body'])]
     if diagram:
         dimensions=ImageReader(str(diagram)).getSize();width=A4[0]-84
@@ -79,6 +87,7 @@ def build(output,diagram):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--out',required=True);p.add_argument('--diagram-png')
-    a=p.parse_args();print(str(build(a.out,a.diagram_png).resolve()))
+    p.add_argument('--status',type=Path);p.add_argument('--report-date',help='ISO date; defaults to the dated status document')
+    a=p.parse_args();print(str(build(a.out,a.diagram_png,status=a.status,report_date=a.report_date).resolve()))
 
 if __name__=='__main__':main()
