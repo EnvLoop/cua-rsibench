@@ -1,0 +1,26 @@
+{
+  "Office64_unqualified_locked_before_input": true,
+  "Tinker_installed": false,
+  "actual_build_network_none_smoke_and_registry_push_passed": true,
+  "all8_assets_anonymous_HTTP200_byte_equal": true,
+  "anonymous_publication_proof_sha256": "d65e4ed39aebe11f29c53c5904c21341e12cbfd2b6358ce69d97f3ef21740910",
+  "ci_run": "https://github.com/EnvLoop/cua-rsibench/actions/runs/37118914429",
+  "container_smoke_sha256": "7abcd21475b86b2211b4562fb95fe9d427da83551a4353bd3f4e14ef4cf14ca2",
+  "date": "2026-10-03",
+  "fresh_Impress_trio_scores": [
+    0,
+    1,
+    0
+  ],
+  "full_cohort_training_or_model_results_claimed": false,
+  "model_calls": 0,
+  "old_releases_and_dated_PDF_preserved": true,
+  "original_selection_entrypoints_build_only": true,
+  "release": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.8-non-training-readiness",
+  "schema": "envloop-non-training-readiness-publication-v1",
+  "source_archive_sha256": "05f52d43b1911766315cb0b8cc582dc887134b9fb4b8111593f62bb76b9c9a6d",
+  "source_commit": "5eeb4b411438aba5a6d92cc9427c4aef9bd7d9fc",
+  "source_files_reopened": 1720,
+  "source_manifest_sha256": "3679e628ec12475f35814c1925ee212fc969c84dfdc7c7d87c332dcc8a120547",
+  "tinker_calls": 0
+}
