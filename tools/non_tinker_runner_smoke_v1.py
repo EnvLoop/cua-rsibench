@@ -31,6 +31,7 @@ def current_source_bindings(root):
         results[cell]=json.loads(completed.stdout)
     for entrypoint in ('tools.office_current_neutral_v6','tools.office_current_worker_cli_v6',
             'tools.office_current_neutral_v7','tools.office_current_worker_cli_v7',
+            'gitlab_world.v066_selection_reference_controls_v1',
             'enterprise_fallback.odoo18.twenty_task_trial_controls_v2',
             'tools.odoo_v066_native_reference_qualification_v9',
             'magento_catalog_factory.native_surface_facade_v10',
