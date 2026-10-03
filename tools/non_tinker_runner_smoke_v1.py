@@ -39,6 +39,7 @@ def current_source_bindings(root):
             'magento_catalog_factory.native_surface_facade_v10',
             'magento_catalog_factory.native_reference_qualification_v7',
             'magento_catalog_factory.native_selection_reference_controls_v1',
+            'native_desktop_factory.native_selection_reference_preparation_v1',
             'native_desktop_factory.native_editor_runtime_v50'):
         subprocess.run([sys.executable,'-m',entrypoint,'--help'],cwd=root,env=env,
             check=True,capture_output=True,timeout=60)

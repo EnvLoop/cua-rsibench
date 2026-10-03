@@ -1,0 +1,23 @@
+{
+  "schema": "envloop-native52-original-public-calc-current-trio-evidence-v1",
+  "date": "2026-10-03",
+  "runtime_source_manifest_sha256": "260fb2f434dfce50c139386f16cd10d9b8603a6f6fdf270a5bd77c68dcc07d88",
+  "original_saved_scores": [0, 1, 0],
+  "terminal_sha256s": ["bb58deabbcc2cf5965ed57bf3495205789f51cfc8f6f6de883c3daf118de2c96", "f038479954b4bd03109b95d6cb82ff30137d497bf5fc5f44849c415649bec082", "873b018b32263ad0d22e09514013b8f32335582c18c05539adc4e657757b1aea"],
+  "guarded_business_action_counts": [0, 5, 5],
+  "non_target_cells_preserved_per_control": 63,
+  "original_saved_verifiers_independently_rederived": true,
+  "all_native_dispatch_and_paired_image_references_reopened": true,
+  "six_unique_owned_guests_closed": true,
+  "three_distinct_exact_resets_verified": true,
+  "source100_unchanged": true,
+  "final_native_frames_visually_reviewed": true,
+  "failed_first_positive_preserved_with_zero_credit": true,
+  "old_source48_source50_controls_promoted": false,
+  "original_reference_Save_point_current_native_identity_and_flags_proved": true,
+  "global_Save_uniqueness_claimed": false,
+  "native_full_qualification_claimed": false,
+  "complete_cohort_claimed": false,
+  "model_calls": 0,
+  "tinker_calls": 0
+}
