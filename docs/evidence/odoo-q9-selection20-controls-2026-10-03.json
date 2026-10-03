@@ -1,0 +1,35 @@
+{
+  "actual_guarded_actions": 529,
+  "actual_guarded_screenshots_reopened": 1058,
+  "all_case_resets_exact_and_services_restored": true,
+  "all_saved_audits_independently_rederived": true,
+  "all_twenty_native_sources_visually_reviewed_after_terminal_manifest": true,
+  "all_twenty_sources_match_original_packages": true,
+  "date": "2026-10-03",
+  "each_original_case_scores": [
+    0,
+    1,
+    0
+  ],
+  "family_counts": {
+    "crm": 5,
+    "inventory": 5,
+    "purchase": 5,
+    "sales": 5
+  },
+  "formal_final_admitted": 0,
+  "full_six_cell_study_complete": false,
+  "matched_model_outcomes": 0,
+  "model_calls": 0,
+  "native_worker_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "old_reference_credit": 0,
+  "qa_manifest_sha256": "0ac45ceac784d9ae797290ae1a6db3a634dce01e7c1cee7bcf7d69e95a37ff2e",
+  "qualified_control_cases": 20,
+  "qualified_receipt_sha256": "e690f5224f7d9bbbd081d629b5b0abc000faac9633d37d8e605ccb4099bad6e4",
+  "reference_binding_sha256": "f7b08878cb24b559a4200fed996f8363779e8367f5d77ef6e32167cdc1245647",
+  "researcher_training_chains_completed": 0,
+  "root_visual_review_sha256": "13a020eff961b78f457cd80c4902c2fe35d8edbc9e75f9fe6e6151b91b7797f3",
+  "schema": "envloop-current-odoo-selection20-controls-public-v1",
+  "scope": "original selection20 reference controls; no model benchmark result",
+  "tinker_calls": 0
+}
