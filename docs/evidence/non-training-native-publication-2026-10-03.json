@@ -1,0 +1,21 @@
+{
+  "Tinker_installed": false,
+  "actual_build_and_network_none_smoke_passed": true,
+  "all9_public_assets_anonymous_HTTP200_byte_equal": true,
+  "anonymous_publication_proof_sha256": "5e16243d0f7b25e3b93d9c8564c4884665a3ac8bfa4f8cbf52a80e8870809add",
+  "ci_run": "https://github.com/EnvLoop/cua-rsibench/actions/runs/37114526931",
+  "container_smoke_sha256": "7984749fd1f4d3b42c4f49181ae30ff8da0e3c21f55e96c55df763807f9284b1",
+  "date": "2026-10-03",
+  "full_study_results_claimed": false,
+  "model_calls": 0,
+  "old_release_and_dated_PDF_preserved": true,
+  "registry_anonymous_pull_verified": false,
+  "release": "https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.6.7-non-training-native",
+  "schema": "envloop-native-non-training-build-publication-v1",
+  "source_archive_sha256": "571fa2be722c2ec07dd30ec66c2429885af9a71192dd821f9cf8a2636cf129e7",
+  "source_commit": "a4d94ed42a52837c22f4dd33a725d807f8f44e2b",
+  "source_files_reopened": 1712,
+  "source_manifest_sha256": "48f67c94d5c411d0a89a00130156b9ebc23cae3607d5d04d9ccb224a7e9193f2",
+  "stable_default_desktop50_unchanged": true,
+  "tinker_calls": 0
+}
