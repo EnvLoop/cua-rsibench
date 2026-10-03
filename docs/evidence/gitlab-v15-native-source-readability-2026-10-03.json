@@ -1,0 +1,23 @@
+{
+  "actual_csv_asset_register_rendered_and_visually_reviewed": true,
+  "actual_linked_items_and_activity_content_rendered_and_visually_reviewed": true,
+  "actual_release_policy_rendered_and_visually_reviewed": true,
+  "actual_terminal_sha256": "a488c06890702b7ab81a1ce3ea81f1563bf867e88ecf3f561a6674a95a070404",
+  "both_owned_generations_and_parent_cleaned": true,
+  "browser_page_errors": 0,
+  "business_state_unchanged": true,
+  "date": "2026-10-03",
+  "failed_api_or_graphql_responses": 0,
+  "full100_source_qualification_claimed": false,
+  "model_calls": 0,
+  "new_final_admissions": 0,
+  "original_sql_and_all33_git_projects_restored": true,
+  "previous_pre_read_listener_failure_preserved": true,
+  "readiness_capture_gap_identified": "prior issue frame captured before asynchronous content finished rendering",
+  "root_visual_and_restoration_review_sha256": "b3d7c05187899d344e6955a4245fe5b7e6410963fe0ffba20dfe19ddc53e53a5",
+  "runtime_epoch": "uniform_v15",
+  "schema": "envloop-gitlab-current-native-source-reading-public-v1",
+  "scope": "read-only original public TRAIN source/UI diagnosis, not full task admission",
+  "source_files_unchanged": 146,
+  "tinker_calls": 0
+}
