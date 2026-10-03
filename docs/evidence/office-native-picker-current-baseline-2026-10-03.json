@@ -1,0 +1,46 @@
+{
+  "baseline_strict_scores": [
+    0.0,
+    0.0
+  ],
+  "current_package_sha256": "f40953c93cc6017e874387e08efa9627ce252f6556efb79c0ef44c8f6d31c0f7",
+  "date": "2026-10-03",
+  "distinct_cloud_reset_document": true,
+  "double_download_bytes_identical": true,
+  "double_download_equivalent": [
+    true,
+    true
+  ],
+  "evidence_hashes": {
+    "final-empty.private.png": "85253c51d56288b06808708010d9318b33672b14391405c35f14e3578dffd6ba",
+    "fresh-reset-readback.private.json": "3e63947d5e2af31f4d4c268fdaa8b1a11c790ee51c2b40293eacf6832e08aafa",
+    "neutral-readback.private.json": "6d60a30012b8052cce5ad9a70ed9dac28d193fa8d9189b25be3ff1afe93624fb",
+    "opened-powerpoint.private.png": "1e41713498d4b5fa2bc1c9f606792416c69216da3c51766c07a80e496426a78c",
+    "reset-opened.private.png": "e7ab995ca5d7c4f8a72110253bae1640332b6d9f99db72c00a8f9d23b7d1bd2b",
+    "upload-observed.private.png": "77ed2e63feb6366887bdcfe72f57e0913ecf7ff2bff1ed0e924adc18f0c3e2d7"
+  },
+  "extension_file_url_permission_changed": false,
+  "final_folder_empty_verified_after_reload": true,
+  "full_native_qualification_claimed": false,
+  "initial_delete_explicit_failed_retry_count": 1,
+  "initial_delete_lock_failure_preserved": true,
+  "model_calls": 0,
+  "native_saved_to_onedrive_observed": true,
+  "native_upload_verified": true,
+  "near_miss_edit_verified": false,
+  "official_final_admissions": 0,
+  "original_application": "Microsoft PowerPoint web and OneDrive",
+  "original_web_application_opened": true,
+  "owned_document_tabs_closed": true,
+  "picker_boundary_tests_passed": 6,
+  "positive_edit_verified": false,
+  "public_account_data_or_gold_included": false,
+  "reset_bytes_identical": true,
+  "reset_editor_switched_to_viewing_before_close": true,
+  "reset_source_equivalent": true,
+  "reusable_picker_source_sha256": "fd42c53a3afa45476ba756b1623035e9b99deed1fb45515bb38e76b139c5e05a",
+  "schema": "envloop-office-native-picker-current-train-baseline-v1",
+  "source_baseline_sha256": "7e47e52d015445806cc28071ab0ba1a4d59a8463bd453905679c469e7d64b8d2",
+  "source_bytes_changed": false,
+  "tinker_calls": 0
+}
