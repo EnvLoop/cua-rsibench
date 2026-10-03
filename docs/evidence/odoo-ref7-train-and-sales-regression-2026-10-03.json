@@ -1,0 +1,63 @@
+{
+  "actual_infrastructure_cost_usd": null,
+  "automatic_restarts": 0,
+  "focused_current_and_ancestor_tests_passed": 50,
+  "formal_admitted_final_identities": 0,
+  "formal_researcher_chains": 0,
+  "fresh_public_train": {
+    "already_saved_branch_exercised": false,
+    "exact_full_reset_verified": true,
+    "genuine_dirty_save_clicks": 2,
+    "independent_current_source_visual_review_verified": true,
+    "native_guard_actions": 22,
+    "original_services_restored": true,
+    "owned_processes_absent": true,
+    "pre_click_reclassification_branch_exercised": false,
+    "qualified_control_sha256": "13e0756e098dc79ab3950a930d84fe29e28564f647353da72d08adf4a56ccefb",
+    "raw_native_pngs_reopened": 44,
+    "reference7_provenance_sha256": "09da54297e0eb4bb852095c1045863bc3b0bcefc519997b479719a41c41744f6",
+    "whole_case_scores": [
+      0,
+      1,
+      0
+    ]
+  },
+  "full100_source7_cases_completed": 0,
+  "historical_reference4_5_6_control_promotion_performed": false,
+  "matched_model_outcomes": 0,
+  "model_calls": 0,
+  "native_actor_binding_sha256": "558f82222096b398898948a4de162c290e8af82b2d6c55fd8f6b5831a3c8390c",
+  "original_first_sales_regression": {
+    "boundary_result_sha256": "939fb53a9acf88b03d2a896021399a86da00c34ac06c9390e8e0eeba439b6e60",
+    "exact_full_reset_verified": true,
+    "full100_control_credit": 0,
+    "full100_intent_consumed": false,
+    "genuine_dirty_save_clicks": 7,
+    "gui_input_before_reclassification": 0,
+    "independent_current_source_visual_review_verified": true,
+    "native_guard_actions": 51,
+    "native_save_clicks_for_reclassified_operation": 1,
+    "original_services_restored": true,
+    "owned_processes_absent": true,
+    "pre_click_saved_to_positive_dirty_reclassifications": 1,
+    "raw_native_pngs_reopened": 102,
+    "same_current_document_verified": true,
+    "save_input_retry_performed": false,
+    "saved_audit_sha256": "2f3528f81113cbdac015e358b3536e6124acf9198f3e92a5c714de6432fc8d02",
+    "source_qa_manifest_sha256": "e7736cfe810811b1feeb3df2e28746b9c3ef5e69c22d8a125a7e084b9b1c57d6",
+    "whole_case_scores": [
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  "original_native_guard_sql_scorer_reset_and_90_action_720_second_actor_budget_unchanged": true,
+  "recorded_at_utc": "2026-10-03T02:41:25.797231+00:00",
+  "reference_binding_sha256": "e6c3105adfa17dc1eefedb56a759733167722f83506bd40730b6da8eccaab19c",
+  "schema": "envloop-odoo-reference7-qualified-train-and-sales-regression-public-v1",
+  "scope_limitation": "The fresh public TRAIN case exercises dirty saves. The separately reviewed original sales case exercises a pre-click Saved-to-Dirty transition. These source-epoch controls do not establish completion of the original 100-case reference qualification or any model campaign.",
+  "source_commit": "88589ec6eeb39548109c8c62b48f5b31b42e8968",
+  "source_manifest_sha256": "6869b8ec9154fa44ad6313dd532885e0b72789c74c2fa56adb81e41bbe15295f",
+  "status": "fresh_public_train_and_original_sales_regression_qualified_full100_not_executed",
+  "tinker_calls": 0
+}
