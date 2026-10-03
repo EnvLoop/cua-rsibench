@@ -1,0 +1,21 @@
+{
+  "schema": "envloop-native52-three-public-application-trios-evidence-v1",
+  "date": "2026-10-03",
+  "runtime_source_manifest_sha256": "260fb2f434dfce50c139386f16cd10d9b8603a6f6fdf270a5bd77c68dcc07d88",
+  "applications": ["calc", "impress", "writer"],
+  "original_scores_per_application": [0, 1, 0],
+  "current_public_train_trios_completed": 3,
+  "eighteen_unique_owned_guests_closed": true,
+  "nine_distinct_exact_resets_verified": true,
+  "original_saved_verifiers_and_collateral_independently_rederived": true,
+  "native_receipts_and_images_reopened": true,
+  "final_native_frames_visually_reviewed": true,
+  "failed_and_older_source_controls_receive_zero_credit": true,
+  "full_native_qualification_claimed": false,
+  "original_selection_control_trios_remaining": 20,
+  "original_final_candidate_control_trios_remaining": 100,
+  "public_sample_trios_subtracted_from_original_cohort": 0,
+  "all_seven_actor_paths_and_complete_cohort_source_review_pending": true,
+  "model_calls": 0,
+  "tinker_calls": 0
+}
