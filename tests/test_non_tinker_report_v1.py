@@ -27,7 +27,7 @@ class ReportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'dated status'):
             self.render('# Undated status\n')
         with self.assertRaisesRegex(ValueError,'English public report'):
-            self.render('# Status\nUpdated: 3 October 2026.\n测试\n')
+            self.render('# Status\nUpdated: 3 October 2026.\n\u6d4b\u8bd5\n')
 
 
 if __name__=='__main__':unittest.main()
