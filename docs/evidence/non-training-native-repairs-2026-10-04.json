@@ -1,0 +1,81 @@
+{
+  "as_of_utc": "2026-10-04T04:40:03.780110+00:00",
+  "completed_researcher_chains": 0,
+  "desktop": {
+    "completed_original_selection_trios": 2,
+    "distinct_owned_guests_closed": 3,
+    "evidence_sha256": "34df775ae317a081fca2bfeda8da3967510e29d0211c854d0fc1d9968c43831c",
+    "generic_model_readback_changed": false,
+    "latest_trio_scores": [
+      0,
+      1,
+      0
+    ],
+    "normal_guard_decisions_independently_rederived": 16,
+    "reference_only_save_readiness": true,
+    "saved_verifier_independently_replayed": true,
+    "selection_total": 20
+  },
+  "formal_final_identities_admitted": 0,
+  "full_benchmark_complete": false,
+  "gitlab": {
+    "completed_original_selection_trios": 2,
+    "diagnostic_qualification_credit": 0,
+    "latest_diagnostic_terminal": "required saved-state read missing at exit",
+    "original_state_restored": true,
+    "readonly_exact_six_line_source_proof": true,
+    "selection_total": 20,
+    "source146_changed": false
+  },
+  "magento": {
+    "automatic_restarts": 0,
+    "completed_native_modes": 60,
+    "completed_original_selection_trios": 20,
+    "evidence_sha256": "feeb17b23a9a3c856b41a453e5e8f9bd35c2e6abd612f02c4d8ac07c24f01d35",
+    "expected_trio_scores": [
+      0,
+      1,
+      0
+    ],
+    "fresh_whole_trios": 9,
+    "independently_reopened_actions": 840,
+    "independently_reopened_frames": 840,
+    "interrupted_partial_control_credit": 0,
+    "original_evidence_files_preserved": 20651,
+    "original_native10_changed": false,
+    "original_whole_trios_retained": 11,
+    "selection_total": 20,
+    "source_visual_readability_pending": true,
+    "worker_exit_code": 0,
+    "worker_launches": 1
+  },
+  "model_calls": 0,
+  "odoo": {
+    "SQL_filestore_protected_state_restored": true,
+    "completed_original_final_candidate_control_trios": 78,
+    "completed_original_selection_trios": 20,
+    "evidence_sha256": "4c017ce8d66b7e76702e8df9e1bcd1a8dea61604b67454d9ecddff397ea05314",
+    "final_candidate_total": 100,
+    "first_partial_selector_prefix_checks": 20,
+    "latest_actual_native_actions": 25,
+    "latest_diagnostic_pairs": 10,
+    "latest_trio_scores": [
+      0,
+      1,
+      0
+    ],
+    "old_failure_cause_established": false,
+    "reference_provenance": "77 unchanged original Reference8 controls plus one separately bound diagnostic reference control",
+    "source_visual_review_of_final_candidates_pending": true
+  },
+  "office": {
+    "current_original_host7_cloud_lifecycle_qualified": false,
+    "manual_host_unlock_pending": true,
+    "native_browser_upload_server_acknowledgement_missing": true
+  },
+  "reconciled_matched_model_outcomes": 0,
+  "schema": "non-training-native-repair-progress-v1",
+  "scope": "environment reference controls; no full-study model results",
+  "tinker_calls": 0,
+  "training_backend_assumed_unavailable": true
+}
