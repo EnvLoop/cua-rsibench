@@ -1,0 +1,83 @@
+{
+  "as_of_utc": "2026-10-04T05:30:46.793021+00:00",
+  "completed_researcher_chains": 0,
+  "credentials_accounts_private_bodies_and_hidden_allocations_included": false,
+  "desktop": {
+    "all_actor_interfaces_qualified": false,
+    "generic_model_readback_changed": false,
+    "latest_trio_scores": [
+      0,
+      1,
+      0
+    ],
+    "remaining_calc_trios_running": 7,
+    "root_ordinal04_audit_sha256": "320d6b9c1daf840b578873c7eb7390054d7a5d17204368df5a52c52a2bcdbe4a"
+  },
+  "formal_final_identities_admitted": 0,
+  "full_benchmark_complete": false,
+  "gitlab": {
+    "independent_whole_trio_audit_sha256": "092fadc252ce20c421b079f7261e0eab92689bb9800bcb9ab15187dea3760bd0",
+    "latest_distinct_clones": 6,
+    "latest_native_receipts": 17,
+    "latest_trio_scores": [
+      0,
+      1,
+      0
+    ],
+    "latest_worker_exit_code": 0,
+    "prior_failed_diagnostics_credit": 0
+  },
+  "magento": {
+    "actions_reopened": 840,
+    "completed_modes": 60,
+    "frames_reopened": 840,
+    "fresh_whole_trios": 9,
+    "original_preserved_evidence_files": 20651,
+    "partial_control_credit": 0,
+    "retained_whole_trios": 11,
+    "root_audit_sha256": "feeb17b23a9a3c856b41a453e5e8f9bd35c2e6abd612f02c4d8ac07c24f01d35",
+    "source_readability_review_pending": true,
+    "worker_exit_code": 0
+  },
+  "model_calls": 0,
+  "odoo_final_candidate_controls": {
+    "completed": 100,
+    "fresh22_actions_reopened": 564,
+    "fresh22_diagnostic_PNGs_reopened": 444,
+    "fresh22_guard_PNGs_reopened": 1128,
+    "fresh22_selector_prefix_checks": 444,
+    "independent_audit_sha256": "7af1e9419fc97a7f442097ed0c8aa92ee7b6089f4b14db1fc57559b64295dd42",
+    "provenance": {
+      "continuation12": 22,
+      "original_q9": 77,
+      "q11_original77": 1
+    },
+    "root_audit_sha256": "80c3da2eb0f5dffa89d7d699986f4f0df8e6986dc822778e811e5964aac9f0af",
+    "source_visual_review_pending": true,
+    "total": 100
+  },
+  "office": {
+    "current_host7_cloud_lifecycle_qualified": false,
+    "manual_host_unlock_pending": true,
+    "native_upload_acknowledgement_missing": true,
+    "second_account_required": false
+  },
+  "original_selection_trios": {
+    "Desktop": 3,
+    "Excel web": 0,
+    "GitLab CE": 3,
+    "Magento": 20,
+    "Odoo Community": 20,
+    "PowerPoint web": 0
+  },
+  "publication": {
+    "baseline_runtime_release": "v0.6.11-native-reference-validation",
+    "clean_checkout_reproduction_of_new_repairs_pending": true,
+    "new_private_diagnostic_adapters_in_public_runtime": false
+  },
+  "reconciled_matched_model_outcomes": 0,
+  "schema": "native-control-validation-snapshot-v2",
+  "scope": "reference controls and environment validation",
+  "selection_tasks_per_cell": 20,
+  "tinker_calls": 0
+}
