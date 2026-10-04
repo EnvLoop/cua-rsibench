@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="500" height="240" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 240" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="500" height="240"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-240)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="0" y="226" style="font-family: Helvetica-Bold; font-size: 12px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,452) scale(1,-1)">Original selection control trios</text>
+			<text x="0" y="209" style="font-family: Helvetica; font-size: 9px;fill: rgb(39%,45%,55%); stroke:none;" transform="translate(0,418) scale(1,-1)">Saved score and reset checks; 20 tasks per cell</text>
+			<text x="0" y="184" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,368) scale(1,-1)">Desktop</text>
+			<rect x="118" y="181" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<rect x="118" y="181" width="45.0" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(13%,32%,63%); fill-rule: evenodd;"/>
+			<text x="432" y="184" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,368) scale(1,-1)">3/20</text>
+			<text x="0" y="158" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,316) scale(1,-1)">Excel web</text>
+			<rect x="118" y="155" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<text x="432" y="158" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,316) scale(1,-1)">0/20</text>
+			<text x="0" y="132" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,264) scale(1,-1)">GitLab CE</text>
+			<rect x="118" y="129" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<rect x="118" y="129" width="45.0" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(13%,32%,63%); fill-rule: evenodd;"/>
+			<text x="432" y="132" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,264) scale(1,-1)">3/20</text>
+			<text x="0" y="106" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,212) scale(1,-1)">Magento</text>
+			<rect x="118" y="103" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<rect x="118" y="103" width="300.0" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(13%,32%,63%); fill-rule: evenodd;"/>
+			<text x="432" y="106" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,212) scale(1,-1)">20/20</text>
+			<text x="0" y="80" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,160) scale(1,-1)">Odoo Community</text>
+			<rect x="118" y="77" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<rect x="118" y="77" width="300.0" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(13%,32%,63%); fill-rule: evenodd;"/>
+			<text x="432" y="80" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,160) scale(1,-1)">20/20</text>
+			<text x="0" y="54" style="font-family: Helvetica; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,108) scale(1,-1)">PowerPoint web</text>
+			<rect x="118" y="51" width="300" height="14" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(90%,93%,97%); fill-rule: evenodd;"/>
+			<text x="432" y="54" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(9%,14%,23%); stroke:none;" transform="translate(0,108) scale(1,-1)">0/20</text>
+			<path d="M 0,29 L 488,29 Z" style="stroke: rgb(90%,93%,97%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="0" y="13" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(43%,33%,67%); stroke:none;" transform="translate(0,26) scale(1,-1)">Odoo final-candidate controls: 100/100</text>
+			<text x="270" y="13" style="font-family: Helvetica; font-size: 10px;fill: rgb(39%,45%,55%); stroke:none;" transform="translate(0,26) scale(1,-1)">Formal model outcomes: 0/3,000</text>
+		</g>
+	</g>
+</svg>
