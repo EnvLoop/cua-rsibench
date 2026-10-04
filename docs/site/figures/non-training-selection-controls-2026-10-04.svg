@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="650" height="330" preserveAspectRatio="xMinYMin meet" viewBox="0 0 650 330" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="650" height="330"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-330)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="0" width="650" height="330" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<text x="20" y="306" style="font-family: Helvetica-Bold; font-size: 18px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,612) scale(1,-1)">Original selection control trios</text>
+			<text x="20" y="284" style="font-family: Times-Roman; font-size: 10px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,568) scale(1,-1)">Environment and verifier checks; these are not model outcomes.</text>
+			<text x="20" y="245" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,490) scale(1,-1)">Excel web</text>
+			<rect x="170" y="242" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<text x="580" y="245" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,490) scale(1,-1)">0/20</text>
+			<text x="20" y="214" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,428) scale(1,-1)">PowerPoint web</text>
+			<rect x="170" y="211" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<text x="580" y="214" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,428) scale(1,-1)">0/20</text>
+			<text x="20" y="183" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,366) scale(1,-1)">Desktop</text>
+			<rect x="170" y="180" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<rect x="170" y="180" width="19.5" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,20%,28%); fill-rule: evenodd;"/>
+			<text x="580" y="183" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,366) scale(1,-1)">1/20</text>
+			<text x="20" y="152" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,304) scale(1,-1)">Odoo Community</text>
+			<rect x="170" y="149" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<rect x="170" y="149" width="390.0" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(15%,49%,52%); fill-rule: evenodd;"/>
+			<text x="580" y="152" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,304) scale(1,-1)">20/20</text>
+			<text x="20" y="121" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,242) scale(1,-1)">GitLab CE</text>
+			<rect x="170" y="118" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<rect x="170" y="118" width="19.5" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,20%,28%); fill-rule: evenodd;"/>
+			<text x="580" y="121" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,242) scale(1,-1)">1/20</text>
+			<text x="20" y="90" style="font-family: Times-Roman; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,180) scale(1,-1)">Magento</text>
+			<rect x="170" y="87" width="390" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(89%,92%,94%); fill-rule: evenodd;"/>
+			<rect x="170" y="87" width="234.0" height="15" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(9%,20%,28%); fill-rule: evenodd;"/>
+			<text x="580" y="90" style="font-family: Helvetica-Bold; font-size: 11px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,180) scale(1,-1)">12/20</text>
+			<path d="M 170,72 L 170,76 Z" style="stroke: rgb(28%,39%,47%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="167.0" y="59" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,118) scale(1,-1)">0</text>
+			<path d="M 267.5,72 L 267.5,76 Z" style="stroke: rgb(28%,39%,47%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="264.5" y="59" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,118) scale(1,-1)">5</text>
+			<path d="M 365,72 L 365,76 Z" style="stroke: rgb(28%,39%,47%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="362.0" y="59" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,118) scale(1,-1)">10</text>
+			<path d="M 462.5,72 L 462.5,76 Z" style="stroke: rgb(28%,39%,47%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="459.5" y="59" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,118) scale(1,-1)">15</text>
+			<path d="M 560,72 L 560,76 Z" style="stroke: rgb(28%,39%,47%); stroke-linecap: butt; stroke-width: 1;"/>
+			<text x="557.0" y="59" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,118) scale(1,-1)">20</text>
+			<text x="20" y="30" style="font-family: Times-Roman; font-size: 9px;fill: rgb(28%,39%,47%); stroke:none;" transform="translate(0,60) scale(1,-1)">Snapshot: 4 October 2026. Complete cohort/source review remains pending.</text>
+			<text x="20" y="12" style="font-family: Times-Roman; font-size: 9px;fill: rgb(9%,20%,28%); stroke:none;" transform="translate(0,24) scale(1,-1)">Official final admissions: 0/600   |   Researcher chains: 0/24   |   Model outcomes: 0/3,000</text>
+		</g>
+	</g>
+</svg>
