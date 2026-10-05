@@ -62,3 +62,64 @@ original hash-bound evaluator descriptor and rechecked during scoring.
 Ten standard-library tests passed, and an offline replay of the actual saved
 TRAIN files produced 0/1/0. Binding and native acceptance of that new adapter
 are still pending.
+
+## Automated retry findings
+
+The 5 October native retry confirmed that the desktop was unlocked. An initial
+folder inventory failed because the parent page had not rendered its heading
+within the browser's built-in selector wait. The additive parent readiness
+helper now polls the same heading and folder card within the original ten-second
+budget. Native inventory passed after that repair.
+
+A later fresh run completed upload, editor readiness, two actual untouched-file
+downloads, baseline binding, actor opening and two native surface captures. It
+then stopped before input because the lease adapter treated a validated
+`NativeLease` record as a dictionary. Reset creation separately exposed an
+exact-URL check that rejected removal of OneDrive's `CT` and `OR` tracking
+parameters. Read-only URL logging confirmed unchanged origin, document path,
+document identity and every other query parameter.
+
+The next repair must accept only those observed tracking-parameter transitions
+and validate the actual structured lease against its current account lease
+file. Existing document identity, principal, action guard, scoring and time
+budgets remain required. Earlier failed runs are retained, and their owned
+files were recycled before another attempt. No model or training calls were
+made, and a complete automated lifecycle remains unqualified.
+
+The next native attempt verified two distinct cloud creates and one stable
+download pair. The navigation-hint repair worked during fresh reset creation.
+The attempt also exposed a missing clocked-actor base class in the typed lease
+adapter and another built-in selector timeout on returning to the task folder.
+The runtime closed and recycled both owned documents, confirmed a final empty
+inventory, and released its account lease. The successor must preserve the
+original clocked actor and use bounded visibility checks consistently.
+
+The full PowerPoint editor and its cropped view were visually inspected before
+actor opening in that attempt. The title, flagged summary and instructions were
+readable. Actual actor observations still require a separate visual check; an
+earlier attempt returned mostly blank captures.
+
+The clock-preserving successor completed native observation, pre-dispatch
+verification, an accepted guarded neutral finish, two saved-state downloads and
+an independent score of zero. The document was closed and recycled, and the
+folder inventory returned empty. Fresh reset upload then stopped before native
+menu input because macOS had locked. The retained lease was recovered only after
+worker termination, an empty native-picker evidence directory and a new empty
+folder observation were verified. A complete reset is still pending.
+
+Actual actor captures remained mostly blank through the browser's clip API,
+while a full screenshot of the same current editor was readable. Another clip
+capture immediately after that full capture was also blank. The next capture
+adapter must take one actual full screenshot, retain its original encoded bytes
+privately, and derive the unchanged viewport crop from its decoded pixels.
+Independent validation must verify the rectangle and every output pixel. The
+model receives only the cropped view; the private header remains excluded.
+
+The single-full-capture adapter is now implemented. A joined evaluator artifact
+worker crops the one native screenshot while the existing operation request
+waits; it never operates the UI. Concurrent request completion, tampering,
+timeout and worker shutdown tests passed. The actual saved full screenshot was
+JPEG. Its derived PNG was independently checked against manual decoded-pixel
+row slices and visually inspected: the slide is readable and the account header
+is excluded. A fresh native replay of this adapter still requires desktop
+unlock, and the three-attempt acceptance gate remains pending.

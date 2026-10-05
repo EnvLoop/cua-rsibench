@@ -1,0 +1,36 @@
+name: Office native repair components
+
+on:
+  pull_request:
+    paths:
+      - 'tools/office_*'
+      - 'tests/test_office_*'
+      - '.github/workflows/office-native-repair-components.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/office_*'
+      - 'tests/test_office_*'
+      - '.github/workflows/office-native-repair-components.yml'
+
+jobs:
+  focused-components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install pillow==11.3.0
+      - name: Artifact crop, typed lease and current actor clock
+        env:
+          PYTHONPATH: '.:src'
+        run: python -m unittest tests.test_office_capture_crop_v17 tests.test_office_clocked_spool_v16 tests.test_office_typed_lease_v15 -v
+      - name: Exact URL and bounded control readiness
+        run: |
+          node tests/test_office_loading_url_v15.mjs
+          node tests/test_office_control_readiness_v16.mjs
+          node tests/test_office_parent_navigation_readiness_public_v14.mjs
