@@ -15,6 +15,8 @@ from ppt_wdi_factory import verify as ppt
 from ppt_wdi_factory import office_revision_verifier_v2 as revision
 
 ORIGINAL_RUNTIME_SHA = '0a7a628610d729ba99480c6ba9488c7d14f13e40f221fcc955bbb90c8fa3bd47'
+CONTEXT_FILES = ('source-snapshot.private.json', 'source-provenance.private.json',
+                 'source-country.private.zip')
 
 
 class Package(PreviousPackage):
@@ -36,12 +38,27 @@ class Package(PreviousPackage):
                          'Owned evaluator before-actor download receipt required')
         original.require(self.neutral(baseline)['equivalent'] is True,
                          'Untouched Office baseline differs from original task source')
+        # Reserve-task validation addresses these evaluator-only dependencies
+        # relative to the source artifact. Copy only the original descriptor's
+        # explicit, hash-bound context before freezing the native artifact.
+        context = {}
+        for name in CONTEXT_FILES:
+            if name not in self.paths:
+                continue
+            raw_context = original.private(self.paths[name])
+            expected = self.value['refs'][name]['sha256']
+            original.require(original.sha(raw_context) == expected,
+                             'Original evaluator source context changed')
+            destination = baseline.parent / name
+            original.write_new(destination, raw_context)
+            context[name] = {'path': destination, 'sha256': expected}
         oracle = ppt.freeze(baseline, self.task, office_web_normalized=True)
         self.office_baseline = baseline
         self.office_baseline_sha256 = original.sha(raw)
         self.office_oracle = oracle
         self.office_baseline_receipt = receipt
         self.office_baseline_receipt_sha256 = original.sha(original.private(receipt))
+        self.office_context = context
 
     def strict_score(self, candidate):
         if self.actor.cell_id != 'powerpoint-web':
@@ -56,6 +73,9 @@ class Package(PreviousPackage):
                          original.sha(original.private(self.office_baseline_receipt)) ==
                          self.office_baseline_receipt_sha256,
                          'Frozen Office baseline or native receipt changed')
+        for reference in self.office_context.values():
+            original.require(original.sha(original.private(reference['path'])) == reference['sha256'],
+                             'Frozen evaluator source context changed')
         result = revision.verify(self.office_baseline, Path(candidate), self.office_oracle)
         return {'score': result.get('score'), 'raw_strict': result,
                 'native_metadata_normalization_applied': True,

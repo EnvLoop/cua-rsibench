@@ -57,6 +57,8 @@ The additive `tools.office_web_normalized_runtime_v8` adapter now copies the
 verified native before-actor download to evaluator-owned storage and freezes
 its oracle before calling `host.actor_open`. It rejects baseline reuse,
 changed baseline or receipt bytes, and candidate scoring before the freeze.
-Nine standard-library tests passed, and an offline replay of the actual saved
+Its reserve-task snapshot, provenance and source ZIP are copied only from the
+original hash-bound evaluator descriptor and rechecked during scoring.
+Ten standard-library tests passed, and an offline replay of the actual saved
 TRAIN files produced 0/1/0. Binding and native acceptance of that new adapter
 are still pending.
