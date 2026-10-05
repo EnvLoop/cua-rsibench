@@ -1,0 +1,37 @@
+name: Public Odoo reference package
+on:
+  pull_request:
+    paths: ['packages/odoo-reference/**', '.github/workflows/public-odoo-reference.yml']
+  push:
+    branches: [main]
+    paths: ['packages/odoo-reference/**', '.github/workflows/public-odoo-reference.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install only the public package
+        run: python -m pip install ./packages/odoo-reference
+      - name: Constructor-free source and provenance tests
+        run: PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s packages/odoo-reference/tests -v
+      - name: Verify the exact reproduced wheel
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          root = Path('packages/odoo-reference')
+          receipt = json.loads((root / 'validation/native-train-v5.json').read_text())
+          wheel = root / 'dist/odoo_reference_controls-0.4.0-py3-none-any.whl'
+          assert hashlib.sha256(wheel.read_bytes()).hexdigest() == receipt['tested_wheel_sha256']
+          assert receipt['reference_score_trio'] == [0, 1, 0]
+          assert receipt['model_calls'] == receipt['official_model_admissions'] == 0
+          PY
+      - name: Build source distribution wheel
+        run: python -m pip wheel --no-deps ./packages/odoo-reference -w build/public-odoo-wheel
