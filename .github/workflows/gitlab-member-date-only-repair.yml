@@ -1,0 +1,26 @@
+name: GitLab member date-only repair
+on:
+  pull_request:
+    paths:
+      - 'tools/build_gitlab_member_date_only_image.py'
+      - 'gitlab_world/member_date_application_epoch.py'
+      - 'tests/test_gitlab_member_date_only_repair_public.py'
+      - 'docs/gitlab-member-date-only-repair.md'
+      - 'docs/evidence/gitlab-member-date-only-repair.json'
+      - '.github/workflows/gitlab-member-date-only-repair.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m unittest tests.test_gitlab_member_date_only_repair_public -v
