@@ -1,0 +1,25 @@
+name: Atomic readonly editor matching
+on:
+  pull_request:
+    paths:
+      - 'src/cursibench/atomic_editor_matching.py'
+      - 'tests/test_atomic_editor_matching.py'
+      - 'docs/plans/2026-10-05-atomic-editor-matching.md'
+      - 'docs/evidence/gitlab-atomic-editor-control-trio-2026-10-05.json'
+      - '.github/workflows/atomic-editor-matching.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  readonly-fact-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: PYTHONPATH=src python -m unittest tests.test_atomic_editor_matching -v

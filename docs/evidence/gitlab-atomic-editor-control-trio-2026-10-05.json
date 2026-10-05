@@ -1,0 +1,22 @@
+{
+  "schema": "gitlab-atomic-readonly-editor-control-trio-public-scalar-v1",
+  "scope": "one fresh original reference control trio in the repaired application epoch",
+  "actual_saved_scores": [0, 1, 0],
+  "native_dispatch_receipts_independently_replayed": 17,
+  "distinct_owned_cold_clones_closed": 6,
+  "original_git_state_refs_rehashed": 594,
+  "actual_atomic_readonly_matching_observations": 39,
+  "full_excluded_match_evidence_retained": true,
+  "original_identity_business_state_seed_and_protected_sources_restored": true,
+  "original_native_guard_sources_unchanged": true,
+  "original_actor_and_lifecycle_budgets_unchanged": true,
+  "durable_worker_exit_code": 0,
+  "automatic_retries": 0,
+  "model_calls": 0,
+  "tinker_calls": 0,
+  "formal_admissions": 0,
+  "full_twenty_task_successor_run": "pending",
+  "prior_partial_failures_reclassified": false,
+  "private_task_account_gold_or_raw_state_included": false,
+  "artifact_role": "scalar evidence only; does not authorize native qualification"
+}
