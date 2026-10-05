@@ -51,6 +51,8 @@ class NormalizedBaselineTests(unittest.TestCase):
             package.actor = SimpleNamespace(cell_id='powerpoint-web', task_id='fixture')
             package.binding_sha256 = 'a'*64
             package.task = {'fixture': True}
+            package.paths = {}
+            package.value = {'refs': {}}
             package.revalidate = lambda: None
             package.neutral = lambda _: {'equivalent': True}
             with patch.object(adapter.ppt, 'freeze', return_value={'fixture': 'oracle'}) as freeze:
@@ -58,6 +60,38 @@ class NormalizedBaselineTests(unittest.TestCase):
                 self.assertEqual(freeze.call_count, 1)
                 with self.assertRaises(ValueError): package.bind_native_baseline(baseline, receipt)
             baseline.write_bytes(b'tampered source')
+            with self.assertRaises(ValueError): package.strict_score(baseline)
+
+    def test_hash_bound_reserve_context_copied_before_freeze(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); root.chmod(0o700)
+            source, attempt = root/'source', root/'attempt'
+            source.mkdir(mode=0o700); attempt.mkdir(mode=0o700)
+            baseline, receipt = attempt/'baseline.pptx', attempt/'native-before.private.json'
+            fixture.put(baseline, b'neutral source')
+            fixture.put(receipt, fixture.rt.canonical({
+                'task_id': 'fixture', 'package_sha256': 'a'*64,
+                'native_before_sha256': fixture.rt.sha(b'neutral source'),
+                'item_identity_sha256': 'b'*64}))
+            package = object.__new__(adapter.Package)
+            package.actor = SimpleNamespace(cell_id='powerpoint-web', task_id='fixture')
+            package.binding_sha256 = 'a'*64
+            package.task = {'source_scope': 'private_wdi_country_csv_reserve_v1'}
+            package.paths = {}
+            package.value = {'refs': {}}
+            for name in adapter.CONTEXT_FILES:
+                path = source/name; raw = ('fixture context ' + name).encode()
+                fixture.put(path, raw); package.paths[name] = path
+                package.value['refs'][name] = {'sha256': fixture.rt.sha(raw)}
+            package.revalidate = lambda: None
+            package.neutral = lambda _: {'equivalent': True}
+            def freeze(path, task, **kwargs):
+                for name in adapter.CONTEXT_FILES:
+                    self.assertEqual((path.parent/name).read_bytes(), package.paths[name].read_bytes())
+                return {'fixture': 'oracle'}
+            with patch.object(adapter.ppt, 'freeze', side_effect=freeze):
+                package.bind_native_baseline(baseline, receipt)
+            (attempt/adapter.CONTEXT_FILES[0]).write_bytes(b'tampered context')
             with self.assertRaises(ValueError): package.strict_score(baseline)
 
     def test_scoring_before_baseline_freeze_rejects_candidate(self):
