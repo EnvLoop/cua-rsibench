@@ -1,0 +1,37 @@
+name: Office verifier regression
+on:
+  pull_request:
+    paths:
+      - 'ppt_wdi_factory/office_revision_verifier_v2.py'
+      - 'tools/office_web_normalized_runtime_v8.py'
+      - 'tests/test_office_revision_verifier_v2.py'
+      - 'tests/test_office_normalized_runtime_v8.py'
+      - '.github/workflows/office-verifier-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ppt_wdi_factory/office_revision_verifier_v2.py'
+      - 'tools/office_web_normalized_runtime_v8.py'
+      - 'tests/test_office_revision_verifier_v2.py'
+      - 'tests/test_office_normalized_runtime_v8.py'
+      - '.github/workflows/office-verifier-regression.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify scoring, baseline ordering, and unchanged lifecycle
+        env:
+          PYTHONPATH: .:src
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: >-
+          python -S -m unittest
+          tests.test_office_revision_verifier_v2
+          tests.test_office_normalized_runtime_v8
+          tests.test_office_owned_folder_runtime_v2 -v
