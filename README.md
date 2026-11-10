@@ -4,6 +4,7 @@
 
 A real Kanboard application, public-source issue metadata, actual Tinker LoRA training, an E2B sampling proxy, Harbor task execution, and an independent saved-state verifier. Inspired by [RSIBench-Data](https://github.com/evolvent-ai/RSIBench-Data).
 
+- [Paper page on envloop.ai](https://envloop.ai/research/cua-rsibench)
 - [English technical report](docs/site/CUA-RSIBench-Technical-Report.pdf)
 - [Interactive evidence explorer](https://envloop.github.io/cua-rsibench/site/)
 - [Report, figures and offline bundle](https://github.com/EnvLoop/cua-rsibench/releases/tag/v0.5.0-executable-factories)
